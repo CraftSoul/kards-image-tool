@@ -30,10 +30,10 @@
 
         /* 主卡片 */
         .card-panel {
-            max-width: 750px;
+            max-width: 850px;
             width: 100%;
-            background: rgba(30, 28, 20, 0.75);
-            backdrop-filter: blur(2px);
+            background: rgba(30, 28, 20, 0.78);
+            backdrop-filter: blur(3px);
             border-radius: 2rem;
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 200, 0.1);
             border: 1px solid rgba(150, 130, 70, 0.6);
@@ -41,7 +41,6 @@
             transition: all 0.2s;
         }
 
-        /* 标题区 */
         .title-section {
             text-align: center;
             margin-bottom: 1.8rem;
@@ -68,7 +67,7 @@
 
         /* 表单区 */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.3rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -97,7 +96,7 @@
         }
         input {
             flex: 2;
-            min-width: 180px;
+            min-width: 200px;
             background: #252219;
         }
         input:focus, select:focus {
@@ -105,31 +104,144 @@
             box-shadow: 0 0 6px rgba(228, 179, 99, 0.6);
             background: #2f2a1e;
         }
-        /* 老兵复选框自定义 */
-        .vet-check {
+        .vet-toggle {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            background: rgba(0,0,0,0.45);
-            padding: 0.4rem 1rem;
-            border-radius: 40px;
+            gap: 12px;
+            background: rgba(0,0,0,0.55);
+            padding: 0.3rem 1rem 0.3rem 1.2rem;
+            border-radius: 60px;
             backdrop-filter: blur(2px);
+            border: 1px solid #ab8e4e;
         }
-        .vet-check label {
-            color: #ffe3a3;
+        .vet-toggle span {
+            color: #ffeaae;
             font-weight: 600;
-            cursor: pointer;
+            font-size: 0.9rem;
         }
-        input[type="checkbox"] {
-            width: 0.4rem;
-            height: 1.2rem;
-            accent-color: #b68b40;
-            margin: 0;
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 26px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3a3222;
+            transition: 0.2s;
+            border-radius: 34px;
+            border: 1px solid #b19458;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 2px;
+            background-color: #e9cf95;
+            transition: 0.2s;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px black;
+        }
+        input:checked + .slider {
+            background-color: #7a6233;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            background-color: #fef0b6;
+        }
+        .lang-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+        }
+        .lang-box label {
+            color: #ffe6aa;
+            font-weight: 500;
         }
         select {
-            cursor: pointer;
             background: #2c281e;
+            cursor: pointer;
+            width: auto;
+        }
+        /* 同名卡列表区域 */
+        .variants-panel {
+            margin: 0.5rem 0 0.8rem;
+            background: #262216b3;
+            border-radius: 32px;
+            padding: 0.5rem 0.8rem;
+            backdrop-filter: blur(1px);
+            border: 1px solid #7d6a42;
+            transition: all 0.2s;
+        }
+        .variants-header {
+            font-size: 0.75rem;
+            color: #dcc98a;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.5rem;
+            padding-left: 0.3rem;
             font-weight: bold;
+        }
+        .variants-badge {
+            background: #5b4b2b;
+            border-radius: 30px;
+            padding: 0.15rem 0.6rem;
+            font-size: 0.7rem;
+            color: #ffefbf;
+        }
+        .variant-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .variant-chip {
+            background: #312b1c;
+            border: 1px solid #ad924d;
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fddf9e;
+            cursor: pointer;
+            transition: 0.1s linear;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .variant-chip:hover {
+            background: #7e643a;
+            color: white;
+            transform: scale(0.96);
+            border-color: #ebc27a;
+        }
+        .variant-chip.active {
+            background: #c7a252;
+            color: #1f1c0f;
+            border-color: #fbdd8b;
+            box-shadow: 0 0 5px #f3bc5c;
+        }
+        .no-variant-msg {
+            font-size: 0.75rem;
+            color: #c9b16e;
+            padding: 0.2rem 0.4rem;
         }
         button {
             background: #6b5a39;
@@ -150,12 +262,10 @@
         button:active {
             transform: scale(0.96);
         }
-
-        /* 图片展示区 */
         .image-showcase {
             background: #19170fcc;
             border-radius: 28px;
-            margin: 1.5rem 0 1rem;
+            margin: 1.2rem 0 1rem;
             padding: 1rem;
             text-align: center;
             border: 1px solid #ad9a68;
@@ -190,7 +300,7 @@
         .save-area {
             display: flex;
             justify-content: center;
-            margin: 1rem 0 0.5rem;
+            margin: 0.8rem 0 0.5rem;
         }
         #saveBtn {
             background: #3e6b3e;
@@ -202,15 +312,8 @@
             transform: translateY(1px);
             box-shadow: 0 1px 0 #1e3a1e;
         }
-        #saveBtn.disabled-btn {
-            opacity: 0.6;
-            pointer-events: none;
-            filter: grayscale(0.2);
-        }
-
-        /* 页脚 – 战地通联 */
         .footer-simple {
-            margin-top: 2rem;
+            margin-top: 1.8rem;
             padding-top: 1rem;
             border-top: 1px solid #928451;
             display: flex;
@@ -243,25 +346,6 @@
             filter: invert(0.95);
             transition: filter 0.2s;
         }
-        .footer-simple a:hover img {
-            filter: invert(0.2);
-        }
-        /* 响应式 */
-        @media (max-width: 550px) {
-            .card-panel {
-                padding: 1.2rem;
-            }
-            .form-group {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .vet-check {
-                justify-content: center;
-            }
-            button {
-                width: 100%;
-            }
-        }
         .loader {
             display: inline-block;
             width: 28px;
@@ -274,13 +358,20 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         .hide { display: none; }
+        @media (max-width: 550px) {
+            .card-panel { padding: 1rem; }
+            .form-group { flex-direction: column; align-items: stretch; }
+            .vet-toggle { justify-content: space-between; }
+            .variant-list { justify-content: center; }
+            button { width: 100%; }
+        }
     </style>
 </head>
 <body>
 <div class="card-panel">
     <div class="title-section">
         <h1>KARDS 军械库</h1>
-        <p>使用Weserv从官网获取卡图</p>
+        <p>使用Wersev从官网获取卡图</p>
     </div>
 
     <div class="form-group">
@@ -288,49 +379,60 @@
         <input type="text" id="cardNameInput" placeholder="例: SINCERELY YOURS" value="SINCERELY YOURS">
     </div>
 
-    <div class="form-group" style="justify-content: space-between;">
-        <div class="vet-check">
-            <input type="checkbox" id="veteranCheckbox">
-            <label for="veteranCheckbox">老兵</label>
+    <div class="form-group" style="justify-content: space-between; flex-wrap: wrap;">
+        <div class="vet-toggle">
+            <span>⚔️ 老兵</span>
+            <label class="switch">
+                <input type="checkbox" id="veteranSwitch">
+                <span class="slider"></span>
+            </label>
         </div>
-        <div style="display: flex; gap: 0.8rem; align-items: center;">
-            <span class="label-icon" style="background: none; padding-left:0;">语系</span>
+        <div class="lang-box">
+            <label>🌐 语系</label>
             <select id="langSelect">
-                <option value="zh-Hans">简体中文 (zh-Hans)</option>
-                <option value="zh-Hant">繁體中文 (zh-Hant)</option>
+                <option value="zh-Hans">简体中文</option>
+                <option value="zh-Hant">繁體中文</option>
             </select>
         </div>
     </div>
 
-    <div style="display: flex; justify-content: center; margin: 0.5rem 0 0.2rem;">
+    <!-- 同名卡牌变体列表区 (动态) -->
+    <div id="variantsContainer" class="variants-panel" style="display: none;">
+        <div class="variants-header">
+            <span>📜 同名卡牌变体</span>
+            <span class="variants-badge" id="variantCountBadge">0</span>
+            <span style="font-size:0.7rem;">点击切换</span>
+        </div>
+        <div id="variantList" class="variant-list"></div>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin: 0.3rem 0 0.2rem;">
         <button id="fetchBtn">获取卡图</button>
     </div>
 
-    <!-- 图片显示区域 -->
     <div class="image-showcase">
         <div class="img-wrapper">
-            <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待指令 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览" style="max-width:100%;">
+            <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待指令 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
         </div>
-        <div id="imageStatus" class="status-msg">等待输入卡名，点击「获取卡图」</div>
+        <div id="imageStatus" class="status-msg">输入卡名，点击获取</div>
     </div>
 
     <div class="save-area">
-        <button id="saveBtn">保存图像</button>
+        <button id="saveBtn">保存图像(PNG)</button>
     </div>
 
-    <!-- 页脚组件 -->
     <div class="footer-simple">
         <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="gayhub" style="filter: invert(0);"> GitHub
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub
         </a>
         <a href="https://space.bilibili.com/3546775476505152" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="ilidilid" style="filter: invert(0);"> BiliBili
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili
         </a>
         <a href="https://www.douyin.com/user/MS4wLjABAAAAERwZXqP_VI8qTqzyV-A6aJircP4R6tiOBRCY5QCFQrAd_gZ8z-LsyNvUHuDipQ7S" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="西大快乐音" style="filter: invert(0);"> 抖音
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="抖音"> 抖音
         </a>
         <a href="https://www.zhihu.com/people/7-97-53-5-79" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="不知" style="filter: invert(0);"> 知乎
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="知乎"> 知乎
         </a>
     </div>
 </div>
@@ -338,198 +440,328 @@
 <script>
     // DOM 元素
     const cardNameInput = document.getElementById('cardNameInput');
-    const veteranCheck = document.getElementById('veteranCheckbox');
+    const veteranSwitch = document.getElementById('veteranSwitch');
     const langSelect = document.getElementById('langSelect');
     const fetchBtn = document.getElementById('fetchBtn');
     const cardImage = document.getElementById('cardImage');
     const imageStatus = document.getElementById('imageStatus');
     const saveBtn = document.getElementById('saveBtn');
+    const variantsContainer = document.getElementById('variantsContainer');
+    const variantListDiv = document.getElementById('variantList');
+    const variantCountBadge = document.getElementById('variantCountBadge');
 
-    // 格式化卡名
-    function formatCardName(rawName, isVeteran) {
-        if (!rawName || rawName.trim() === "") {
-            return "";
-        }
-        // 1. 转小写
+    // 存储当前发现的变体列表 (非老兵模式)
+    let currentVariants = [];          // 存放对象 { suffix: '', fullFormatted: '' }
+    let activeVariantSuffix = null;    // 当前选中的后缀 (如 '_b', '_c' 或空串 '' )
+    let currentRawCardName = '';
+    let lastSearchNonVet = false;
+    
+    // 格式化基础名 (不含vet后缀, 清理连字符与空格)
+    function formatBaseName(rawName) {
+        if (!rawName || rawName.trim() === "") return "";
         let processed = rawName.trim().toLowerCase();
-        // 2. 删除所有连字符 '-'
         processed = processed.replace(/-/g, '');
-        // 3. 将空格替换为单个下划线
         processed = processed.replace(/\s+/g, '_');
-        // 4. 老兵后缀
-        if (isVeteran) {
-            processed = processed + '_vet';
-        }
         return processed;
     }
-
-    // 构建 Weserv 图片URL
+    
+    // 最终格式化：若老兵模式直接添加 _vet ; 否则返回基础名（无后缀或附加变体后缀）
+    function formatFinalCardName(baseFormatted, isVeteran, variantSuffix = '') {
+        if (isVeteran) {
+            // 老兵模式忽略变体后缀，直接统一带_vet (KARDS 老兵卡命名规范)
+            return baseFormatted + '_vet';
+        } else {
+            // 非老兵：如果有选中的变体后缀(如 '_b') 则追加，否则无后缀
+            return baseFormatted + (variantSuffix || '');
+        }
+    }
+    
+    // 构建 weserv URL
     function buildImageUrl(formattedName, lang) {
         const basePath = `ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif`;
-        const weservUrl = `https://images.weserv.nl/?url=${basePath}`;
-        return weservUrl;
+        return `https://images.weserv.nl/?url=${basePath}`;
     }
-
-    // 显示加载状态
+    
+    async function discoverVariants(baseCleanName, lang) {
+        let possibleSuffixes = [''];
+        const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
+        for (let letter of suffixLetters) {
+            possibleSuffixes.push('_' + letter);
+        }
+        const found = [];
+        // 并行探测轻量级promise (仅测试图片是否存在)
+        const testPromises = possibleSuffixes.map(async (suffix) => {
+            const testName = baseCleanName + suffix;
+            const url = buildImageUrl(testName, lang);
+            const exists = await testImageExists(url);
+            if (exists) {
+                return { suffix: suffix, fullFormatted: testName };
+            }
+            return null;
+        });
+        const results = await Promise.all(testPromises);
+        for (let res of results) {
+            if (res) found.push(res);
+        }
+        found.sort((a,b) => {
+            if (a.suffix === '') return -1;
+            if (b.suffix === '') return 1;
+            return a.suffix.localeCompare(b.suffix);
+        });
+        return found;
+    }
+    
+    // 测试图片是否存在 (通过Image 对象，超时3秒)
+    function testImageExists(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            let timeout = setTimeout(() => {
+                img.src = '';
+                resolve(false);
+            }, 2800);
+            img.onload = () => {
+                clearTimeout(timeout);
+                resolve(true);
+            };
+            img.onerror = () => {
+                clearTimeout(timeout);
+                resolve(false);
+            };
+            img.src = url;
+        });
+    }
+    
+    // 渲染变体列表UI
+    function renderVariants(variants, activeSuffix) {
+        if (!variants || variants.length <= 1) {
+            variantsContainer.style.display = 'none';
+            return;
+        }
+        variantsContainer.style.display = 'block';
+        variantCountBadge.innerText = variants.length;
+        variantListDiv.innerHTML = '';
+        variants.forEach(v => {
+            const chip = document.createElement('div');
+            chip.className = 'variant-chip';
+            if ((v.suffix === '' && activeSuffix === '') || (v.suffix !== '' && activeSuffix === v.suffix)) {
+                chip.classList.add('active');
+            }
+            let displayName = v.suffix === '' ? '本体 (无后缀)' : `后缀 ${v.suffix.toUpperCase()}`;
+            if (v.suffix === '') displayName = '📄 原版';
+            else displayName = `🃏 ${v.suffix.substring(1).toUpperCase()}版`;
+            chip.innerHTML = displayName;
+            chip.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // 更新选中后缀并重新加载当前图片
+                if (veteranSwitch.checked) {
+                    imageStatus.innerHTML = "⚠️ 老兵模式下无法切换变体卡片，请关闭老兵开关。";
+                    imageStatus.style.color = "#f0bc70";
+                    return;
+                }
+                activeVariantSuffix = v.suffix;
+                // 重新加载当前所选卡牌
+                loadSpecificCard(currentRawCardName, false, activeVariantSuffix, langSelect.value);
+                renderVariants(currentVariants, activeVariantSuffix);
+            });
+            variantListDiv.appendChild(chip);
+        });
+    }
+    
+    // 核心加载卡片图片
+    async function loadSpecificCard(rawName, isVeteran, variantSuffix, lang) {
+        if (!rawName || rawName.trim() === "") {
+            showError("请输入英文卡名");
+            return false;
+        }
+        const baseClean = formatBaseName(rawName);
+        if (baseClean === "") {
+            showError("无效卡名");
+            return false;
+        }
+        // 构造最终的格式化名称
+        let finalFormatted = '';
+        if (isVeteran) {
+            finalFormatted = baseClean + '_vet';
+        } else {
+            finalFormatted = baseClean + (variantSuffix || '');
+        }
+        const imageUrl = buildImageUrl(finalFormatted, lang);
+        setLoadingState(true);
+        imageStatus.innerHTML = `🔍 请求: ${finalFormatted}.avif (${lang === 'zh-Hans' ? '简中' : '繁中'})`;
+        
+        const tester = new Image();
+        let timeout = setTimeout(() => {
+            tester.src = '';
+            setLoadingState(false);
+            showError(`超时/404 · 未找到 ${finalFormatted}.avif`);
+            cardImage.setAttribute('data-valid', 'false');
+            cardImage.setAttribute('data-current-name', finalFormatted);
+        }, 12000);
+        
+        return new Promise((resolve) => {
+            tester.onload = () => {
+                clearTimeout(timeout);
+                cardImage.src = imageUrl;
+                setLoadingState(false);
+                const statusMsg = `✅ 加载成功 | ${finalFormatted}.avif (${lang === 'zh-Hans' ? '简体' : '繁体'})`;
+                imageStatus.innerHTML = statusMsg;
+                imageStatus.style.color = "#f4e2aa";
+                cardImage.setAttribute('data-valid', 'true');
+                cardImage.setAttribute('data-current-name', finalFormatted);
+                cardImage.setAttribute('data-lang', lang);
+                cardImage.style.opacity = '1';
+                resolve(true);
+            };
+            tester.onerror = () => {
+                clearTimeout(timeout);
+                setLoadingState(false);
+                showError(`❌ 无法找到: ${finalFormatted}.avif (卡名或后缀不存在)`);
+                cardImage.setAttribute('data-valid', 'false');
+                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 无此卡 💀%3C/text%3E%3C/svg%3E";
+                resolve(false);
+            };
+            tester.src = imageUrl;
+        });
+    }
+    
+    // 主入口
+    async function enhancedFetchWithDiscovery() {
+        let rawName = cardNameInput.value.trim();
+        if (!rawName) {
+            showError("请输入卡牌英文名 (如 SINCERELY YOURS)");
+            return;
+        }
+        const isVeteran = veteranSwitch.checked;
+        const lang = langSelect.value;
+        currentRawCardName = rawName;
+        const baseClean = formatBaseName(rawName);
+        if (!baseClean) {
+            showError("卡名格式化失败");
+            return;
+        }
+        
+        if (isVeteran) {
+            // 隐藏变体面板，禁止变体切换
+            variantsContainer.style.display = 'none';
+            activeVariantSuffix = null;
+            currentVariants = [];
+            await loadSpecificCard(rawName, true, '', lang);
+            return;
+        }
+        
+        // 非老兵模式: 先探测同名变体列表
+        setLoadingState(true);
+        imageStatus.innerHTML = `🔎 检索同名卡: ${baseClean} ...`;
+        const discovered = await discoverVariants(baseClean, lang);
+        setLoadingState(false);
+        
+        if (!discovered.length) {
+            // 一个都没发现
+            showError(`未找到"${rawName}"，请检查名称。`);
+            variantsContainer.style.display = 'none';
+            currentVariants = [];
+            cardImage.setAttribute('data-valid', 'false');
+            cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 未检索到任何版本%3C/text%3E%3C/svg%3E";
+            return;
+        }
+        
+        // 储存变体
+        currentVariants = discovered;
+        // 默认激活第一个 (通常本体)
+        const defaultVariant = discovered[0];
+        activeVariantSuffix = defaultVariant.suffix;
+        renderVariants(currentVariants, activeVariantSuffix);
+        // 加载默认图片 (非老兵，默认后缀)
+        await loadSpecificCard(rawName, false, activeVariantSuffix, lang);
+    }
+    
+    // 保存功能 (支持png导出)
+    async function saveCardImage() {
+        const currentSrc = cardImage.src;
+        if (!currentSrc || currentSrc.includes("data:image/svg+xml") && (currentSrc.includes("等待指令") || currentSrc.includes("遗失") || currentSrc.includes("无此卡") || currentSrc.includes("未检索"))) {
+            imageStatus.innerHTML = "⚠️ 无有效卡图可保存";
+            imageStatus.style.color = "#ffaa66";
+            return;
+        }
+        if (!cardImage.complete || cardImage.naturalWidth === 0) {
+            imageStatus.innerHTML = "⛔ 图片加载不完整，稍后重试";
+            return;
+        }
+        saveBtn.disabled = true;
+        const originalText = saveBtn.innerText;
+        saveBtn.innerText = "💾 导出中...";
+        try {
+            const response = await fetch(cardImage.src);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const blob = await response.blob();
+            const bitmap = await createImageBitmap(blob);
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0);
+            const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+            let baseFileName = cardImage.getAttribute('data-current-name') || 'kards_card';
+            const currentLang = cardImage.getAttribute('data-lang') || langSelect.value;
+            const langLabel = (currentLang === 'zh-Hans') ? 'SC' : 'TC';
+            const fileName = `${baseFileName}_${langLabel}.png`;
+            const url = URL.createObjectURL(pngBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            imageStatus.innerHTML = `📥 已保存: ${fileName}`;
+            setTimeout(() => {
+                if (imageStatus.innerHTML.includes('已保存')) imageStatus.style.color = "#e7dfb0";
+            }, 500);
+        } catch (err) {
+            imageStatus.innerHTML = `保存失败: ${err.message || "跨域限制"}`;
+            imageStatus.style.color = "#ffb570";
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerText = originalText;
+        }
+    }
+    
     function setLoadingState(isLoading) {
         if (isLoading) {
-            imageStatus.innerHTML = '<div class="loader"></div><span style="margin-left: 8px;"> 正在渗透...</span>';
+            imageStatus.innerHTML = '<div class="loader"></div><span> 解析战场...</span>';
             cardImage.style.opacity = '0.6';
         } else {
             cardImage.style.opacity = '1';
         }
     }
-
-    // 显示错误信息
+    
     function showError(msg) {
         imageStatus.innerHTML = `⚠️ ${msg}`;
         imageStatus.style.color = "#ffbc6e";
-        cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E❌ 图像遗失 ❌%3C/text%3E%3C/svg%3E";
         cardImage.style.opacity = '1';
-    }
-
-    // 重置状态成功
-    function setSuccessStatus(msg) {
-        imageStatus.innerHTML = `✓ ${msg}`;
-        imageStatus.style.color = "#e7dfb0";
-    }
-
-    // 获取卡图
-    async function enhancedFetch() {
-        let rawName = cardNameInput.value;
-        if (!rawName || rawName.trim() === "") {
-            showError("请输入卡牌英文名 (例: SINCERELY YOURS)");
-            return;
-        }
-        const isVeteran = veteranCheck.checked;
-        const lang = langSelect.value;
-        let formatted = formatCardName(rawName, isVeteran);
-        if (formatted === "") {
-            showError("卡名格式化失败，请检查输入");
-            return;
-        }
-
-        setLoadingState(true);
-        const imageUrl = buildImageUrl(formatted, lang);
-        imageStatus.innerHTML = `⚙️ 构建指令: ${formatted} | ${lang === 'zh-Hans' ? '简体' : '繁体'} 请求中...`;
-
-        const tester = new Image();
-        let timeout = setTimeout(() => {
-            tester.src = '';
-            setLoadingState(false);
-            showError(`加载超时，请核实「${rawName}」图像资源是否存在`);
-            cardImage.setAttribute('data-valid', 'false');
-        }, 14000);
-
-        tester.onload = () => {
-            clearTimeout(timeout);
-            cardImage.src = imageUrl;
-            cardImage.onerror = null;
-            setLoadingState(false);
-            setSuccessStatus(`卡图就绪 | ${formatted}.avif (${lang === 'zh-Hans' ? '简体' : '繁体'})`);
-            // 存储元数据以供保存
-            cardImage.setAttribute('data-valid', 'true');
-            cardImage.setAttribute('data-original-name', formatted);
-            cardImage.setAttribute('data-lang', lang);
-            cardImage.style.opacity = '1';
-        };
-        tester.onerror = () => {
-            clearTimeout(timeout);
-            setLoadingState(false);
-            showError(`未找到: ${formatted}.avif\n检查卡名/老兵选项或版本(v48)`);
-            cardImage.setAttribute('data-valid', 'false');
-            cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 未找到 💀%3C/text%3E%3C/svg%3E";
-        };
-        tester.src = imageUrl;
-    }
-
-    // 保存图片功能
-    async function saveCardImage() {
-        const currentSrc = cardImage.src;
-        if (!currentSrc || currentSrc.includes("data:image/svg+xml") && (currentSrc.includes("等待指令") || currentSrc.includes("图像遗失") || currentSrc.includes("未找到"))) {
-            imageStatus.innerHTML = "⚠️ 无有效卡图";
-            imageStatus.style.color = "#ffaa66";
-            return;
-        }
-        
-        if (!cardImage.complete || cardImage.naturalWidth === 0 || cardImage.naturalHeight === 0) {
-            imageStatus.innerHTML = "⛔ 图片未正确加载";
-            imageStatus.style.color = "#ffae70";
-            return;
-        }
-        
-        const imgUrl = cardImage.src;
-        if (!imgUrl || imgUrl === "") {
-            imageStatus.innerHTML = "❌ 无可保存的图片资源";
-            return;
-        }
-        
-        const originalBtnText = saveBtn.innerText;
-        saveBtn.innerText = "⏳ 保存中...";
-        saveBtn.disabled = true;
-        
-        try {
-            const response = await fetch(imgUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            const blob = await response.blob();
-            // 强制转换为 PNG 格式
-            const imgBitmap = await createImageBitmap(blob);
-            const canvas = document.createElement('canvas');
-            canvas.width = imgBitmap.width;
-            canvas.height = imgBitmap.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(imgBitmap, 0, 0);
-            const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-            const finalBlob = pngBlob;
-            const ext = 'png';
-            
-            let baseFileName = 'kards_card';
-            let customName = cardImage.getAttribute('data-original-name');
-            const curLang = cardImage.getAttribute('data-lang') || langSelect.value;
-            if (customName && customName !== 'null') {
-                baseFileName = customName;
-            } else {
-                const rawInput = cardNameInput.value;
-                const isVet = veteranCheck.checked;
-                const fmt = formatCardName(rawInput, isVet);
-                baseFileName = fmt ? fmt : 'kards_img';
-            }
-            const langLabel = (curLang === 'zh-Hans') ? 'SC' : 'TC';
-            // 强制使用png
-            const fileName = `${baseFileName}_${langLabel}.png`;
-            
-            const downloadUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(downloadUrl);
-            
-            imageStatus.innerHTML = `📦 已保存: ${fileName}`;
-            imageStatus.style.color = "#e2e0a9";
-            setTimeout(() => {
-                if (imageStatus.innerHTML.includes('已保存')) {
-                    // 保持状态，不做额外操作
-                }
-            }, 2000);
-        } catch (err) {
-            console.error(err);
-            imageStatus.innerHTML = `🚫 关键防御: ${err.message || '网络错误或图片跨域限制'}`;
-            imageStatus.style.color = "#ffaa77";
-        } finally {
-            saveBtn.innerText = originalBtnText;
-            saveBtn.disabled = false;
-        }
+        cardImage.setAttribute('data-valid', 'false');
     }
     
-    // 绑定事件
+    // 绑定事件 + 老兵切换时重置变体面板 & 刷新
+    veteranSwitch.addEventListener('change', () => {
+        // 切换老兵模式后，清空变体记录，重新获取当前卡牌
+        if (currentRawCardName) {
+            enhancedFetchWithDiscovery();
+        } else {
+            variantsContainer.style.display = 'none';
+            if (cardNameInput.value.trim()) enhancedFetchWithDiscovery();
+        }
+    });
+    
+    langSelect.addEventListener('change', () => {
+        if (currentRawCardName) {
+            enhancedFetchWithDiscovery();
+        }
+    });
+    
     fetchBtn.onclick = (e) => {
         e.preventDefault();
-        enhancedFetch();
+        enhancedFetchWithDiscovery();
     };
     
     saveBtn.onclick = (e) => {
@@ -540,13 +772,13 @@
     cardNameInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            enhancedFetch();
+            enhancedFetchWithDiscovery();
         }
     });
     
     setTimeout(() => {
         if (cardNameInput.value.trim() === "SINCERELY YOURS") {
-            enhancedFetch();
+            enhancedFetchWithDiscovery();
         }
     }, 200);
 </script>
