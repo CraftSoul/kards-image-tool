@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>KARDS军械库 | 智能卡牌检索</title>
+    <title>KARDS军械库</title>
     <style>
         * {
             margin: 0;
@@ -394,8 +394,8 @@
     function formatBaseName(rawName) {
         if (!rawName || rawName.trim() === "") return "";
         let processed = rawName.trim().toLowerCase();
-        processed = processed.replace(/[-&]/g, '');
-        processed = processed.replace(/\s+/g, '_');
+        processed = processed.replace(/[&!\/\\\'"(),-]/g, '');
+        processed = processed.replace(/[\.\s]+/g, '_');
         return processed;
     }
     
@@ -582,7 +582,7 @@
         
         currentRawCardName = rawName;
         setLoadingState(true);
-        imageStatus.innerHTML = `🔎 正在现在敌人: ${baseClean} ...`;
+        imageStatus.innerHTML = `🔎 正在寻找敌人: ${baseClean} ...`;
         
         const discoverResult = await unifiedDiscover(baseClean, lang);
         setLoadingState(false);
