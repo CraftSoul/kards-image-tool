@@ -332,10 +332,10 @@
         </div>
     </div>
 
-    <!-- 同名卡牌变体列表区 (动态) -->
+    <!-- 同名卡牌变体列表区 (包含老兵和变体后缀) -->
     <div id="variantsContainer" class="variants-panel" style="display: none;">
         <div class="variants-header">
-            <span>📜 同名变体</span>
+            <span>📜 同名卡牌</span>
             <span class="variants-badge" id="variantCountBadge">0</span>
             <span style="font-size:0.7rem;">点击切换</span>
         </div>
@@ -350,11 +350,11 @@
         <div class="img-wrapper">
             <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
         </div>
-        <div id="imageStatus" class="status-msg">输入卡名，自动识别老兵/变体</div>
+        <div id="imageStatus" class="status-msg">输入卡名，自动识别老兵与变体版本</div>
     </div>
 
     <div class="save-area">
-        <button id="saveBtn">保存图像 (PNG)</button>
+        <button id="saveBtn">保存图像(PNG)</button>
     </div>
 
     <div class="footer-simple">
@@ -385,16 +385,16 @@
     const variantListDiv = document.getElementById('variantList');
     const variantCountBadge = document.getElementById('variantCountBadge');
 
-    // 存储当前发现的变体列表 (仅非老兵模式且为同名卡)
-    let currentVariants = [];          // { suffix: '', fullFormatted: '' }
-    let activeVariantSuffix = null;    
+    // 存储候选列表
+    let currentVariants = [];          // 元素: { suffixKey, displayName, formattedName, isVeteran }
+    let activeVariantId = null;        // 当前选中项的 suffixKey (例如 '' , '_b', '_vet')
     let currentRawCardName = '';
-    let isCurrentVeteranCard = false;   // 当前展示的是否为老兵版本
     
+    // 辅助: 格式化基础名
     function formatBaseName(rawName) {
         if (!rawName || rawName.trim() === "") return "";
         let processed = rawName.trim().toLowerCase();
-        processed = processed.replace(/-/g, '');
+        processed = processed.replace(/[-&]/g, '');
         processed = processed.replace(/\s+/g, '_');
         return processed;
     }
@@ -405,7 +405,7 @@
         return `https://images.weserv.nl/?url=${basePath}`;
     }
     
-    function testImageExists(url, timeoutMs = 2500) {
+    function testImageExists(url, timeoutMs = 2400) {
         return new Promise((resolve) => {
             const img = new Image();
             let timeout = setTimeout(() => {
@@ -424,54 +424,85 @@
         });
     }
     
-    async function smartDiscover(baseClean, lang) {
-        const vetName = baseClean + '_vet';
-        const vetUrl = buildImageUrl(vetName, lang);
-        const hasVeteran = await testImageExists(vetUrl);
-        if (hasVeteran) {
-            return { type: 'veteran', formattedName: vetName, suffix: null };
-        }
+    async function unifiedDiscover(baseClean, lang) {
+        const suffixCandidates = [
+            { suffix: '', type: 'normal', displayPostfix: '原版' },
+            { suffix: '_b', type: 'variant', displayPostfix: '变体 B' },
+            { suffix: '_c', type: 'variant', displayPostfix: '变体 C' },
+            { suffix: '_d', type: 'variant', displayPostfix: '变体 D' },
+            { suffix: '_e', type: 'variant', displayPostfix: '变体 E' },
+            { suffix: '_f', type: 'variant', displayPostfix: '变体 F' },
+            { suffix: '_g', type: 'variant', displayPostfix: '变体 G' },
+            { suffix: '_h', type: 'variant', displayPostfix: '变体 H' },
+            { suffix: '_i', type: 'variant', displayPostfix: '变体 I' },
+            { suffix: '_j', type: 'variant', displayPostfix: '变体 J' },
+            { suffix: '_k', type: 'variant', displayPostfix: '变体 K' },
+            { suffix: '_l', type: 'variant', displayPostfix: '变体 L' }
+        ];
         
-        const suffixesToCheck = ['', '_b', '_c', '_d', '_e', '_f', '_g', '_h', '_i', '_j', '_k', '_l'];
-        const foundVariants = [];
-        const checkPromises = suffixesToCheck.map(async (suffix) => {
-            const testName = baseClean + suffix;
+        const vetSuffix = '_vet';
+        const vetFullName = baseClean + vetSuffix;
+        const vetUrl = buildImageUrl(vetFullName, lang);
+        const hasVeteran = await testImageExists(vetUrl);
+        
+        // 并发探测所有普通后缀
+        const probeTasks = suffixCandidates.map(async (candidate) => {
+            const testName = baseClean + candidate.suffix;
             const url = buildImageUrl(testName, lang);
             const exists = await testImageExists(url, 2000);
             if (exists) {
-                return { suffix: suffix, fullFormatted: testName };
+                return {
+                    suffixKey: candidate.suffix,
+                    displayName: candidate.displayPostfix,
+                    formattedName: testName,
+                    isVeteran: false,
+                    orderPri: candidate.suffix === '' ? 0 : (candidate.suffix.charCodeAt(1) || 99)
+                };
             }
             return null;
         });
-        const results = await Promise.all(checkPromises);
-        for (let res of results) {
-            if (res) foundVariants.push(res);
-        }
-        if (foundVariants.length > 0) {
-            // 排序：空后缀优先，然后按字母顺序
-            foundVariants.sort((a,b) => {
-                if (a.suffix === '') return -1;
-                if (b.suffix === '') return 1;
-                return a.suffix.localeCompare(b.suffix);
+        
+        let results = await Promise.all(probeTasks);
+        let variantItems = results.filter(r => r !== null);
+        
+        if (hasVeteran) {
+            variantItems.push({
+                suffixKey: '_vet',
+                displayName: '⭐ 老兵',
+                formattedName: vetFullName,
+                isVeteran: true,
+                orderPri: 100
             });
-            return { type: 'variant', variantsList: foundVariants, defaultSuffix: foundVariants[0].suffix };
         }
         
-        // 3. 完全未找到
-        return { type: 'none' };
+        variantItems.sort((a, b) => {
+            if (a.suffixKey === '' && b.suffixKey !== '') return -1;
+            if (a.suffixKey !== '' && b.suffixKey === '') return 1;
+            if (a.isVeteran && !b.isVeteran) return 1;
+            if (!a.isVeteran && b.isVeteran) return -1;
+            if (a.suffixKey < b.suffixKey) return -1;
+            return 1;
+        });
+        
+        if (variantItems.length === 0) {
+            return { type: 'none', variants: [] };
+        }
+        return { type: 'multi', variants: variantItems };
     }
     
-    async function loadCardByFormattedName(formattedName, lang, displayMeta = {}) {
-        if (!formattedName) return false;
+    // 加载指定卡片
+    async function loadCardByVariantItem(item, lang) {
+        if (!item || !item.formattedName) return false;
+        const formattedName = item.formattedName;
         const imageUrl = buildImageUrl(formattedName, lang);
         setLoadingState(true);
-        imageStatus.innerHTML = `🔍 加载: ${formattedName}.avif (${lang === 'zh-Hans' ? '简中' : '繁中'})`;
+        imageStatus.innerHTML = `🔍 请求: ${formattedName}.avif (${lang === 'zh-Hans' ? '简中' : '繁中'})`;
         
         const tester = new Image();
         let timeout = setTimeout(() => {
             tester.src = '';
             setLoadingState(false);
-            showError(`超时 · 未响应 ${formattedName}.avif`);
+            showError(`超时 · ${formattedName}.avif`);
             cardImage.setAttribute('data-valid', 'false');
             cardImage.setAttribute('data-current-name', formattedName);
         }, 10000);
@@ -481,10 +512,10 @@
                 clearTimeout(timeout);
                 cardImage.src = imageUrl;
                 setLoadingState(false);
-                let extra = '';
-                if (displayMeta.isVeteran) extra = ' ⭐ 老兵单位';
-                if (displayMeta.variantSuffix && displayMeta.variantSuffix !== '') extra = ` 🔹 变体${displayMeta.variantSuffix.toUpperCase()}`;
-                imageStatus.innerHTML = `✅ 就绪 | ${formattedName}.avif${extra} (${lang === 'zh-Hans' ? '简体' : '繁体'})`;
+                let extraFlag = '';
+                if (item.isVeteran) extraFlag = ' ⭐ 老兵单位';
+                else if (item.suffixKey !== '' && item.suffixKey !== '_vet') extraFlag = ` 🔹 ${item.displayName}`;
+                imageStatus.innerHTML = `✅ ${formattedName}.avif${extraFlag} (${lang === 'zh-Hans' ? '简体' : '繁体'})`;
                 imageStatus.style.color = "#f4e2aa";
                 cardImage.setAttribute('data-valid', 'true');
                 cardImage.setAttribute('data-current-name', formattedName);
@@ -504,8 +535,13 @@
         });
     }
     
-    function renderVariantsUI(variants, activeSuffix, onSelectCallback) {
-        if (!variants || variants.length <= 1) {
+    // 渲染变体列表
+    function renderUnifiedVariants(variants, activeItemKey, onSelect) {
+        if (!variants || variants.length === 0) {
+            variantsContainer.style.display = 'none';
+            return;
+        }
+        if (variants.length === 1 && !variants[0].isVeteran && variants[0].suffixKey === '') {
             variantsContainer.style.display = 'none';
             return;
         }
@@ -515,19 +551,22 @@
         variants.forEach(v => {
             const chip = document.createElement('div');
             chip.className = 'variant-chip';
-            if ((v.suffix === '' && activeSuffix === '') || (v.suffix !== '' && activeSuffix === v.suffix)) {
-                chip.classList.add('active');
-            }
-            let displayName = v.suffix === '' ? '📄 原版' : `🃏 后缀 ${v.suffix.substring(1).toUpperCase()}`;
-            chip.innerHTML = displayName;
+            const isActive = (v.suffixKey === activeItemKey);
+            if (isActive) chip.classList.add('active');
+            let label = '';
+            if (v.isVeteran) label = '🎖️ 老兵';
+            else if (v.suffixKey === '') label = '📄 原版';
+            else label = `🃏 ${v.displayName}`;
+            chip.innerHTML = label;
             chip.addEventListener('click', (e) => {
                 e.stopPropagation();
-                onSelectCallback(v.suffix);
+                onSelect(v);
             });
             variantListDiv.appendChild(chip);
         });
     }
     
+    // 主要检索入口
     async function advancedRetrieve() {
         let rawName = cardNameInput.value.trim();
         if (!rawName) {
@@ -537,19 +576,19 @@
         const lang = langSelect.value;
         const baseClean = formatBaseName(rawName);
         if (!baseClean) {
-            showError("卡名格式化失败，请使用英文字符");
+            showError("卡名格式化失败，使用英文字符");
             return;
         }
         
         currentRawCardName = rawName;
         setLoadingState(true);
-        imageStatus.innerHTML = `正在寻找敌人: ${baseClean} ...`;
+        imageStatus.innerHTML = `🔎 正在现在敌人: ${baseClean} ...`;
         
-        const discoverResult = await smartDiscover(baseClean, lang);
+        const discoverResult = await unifiedDiscover(baseClean, lang);
         setLoadingState(false);
         
-        if (discoverResult.type === 'none') {
-            showError(`未找到:"${rawName}"`);
+        if (discoverResult.type === 'none' || discoverResult.variants.length === 0) {
+            showError(`未找到: "${rawName}"`);
             variantsContainer.style.display = 'none';
             currentVariants = [];
             cardImage.setAttribute('data-valid', 'false');
@@ -557,64 +596,40 @@
             return;
         }
         
-        if (discoverResult.type === 'veteran') {
-            isCurrentVeteranCard = true;
-            currentVariants = [];
-            variantsContainer.style.display = 'none';
-            activeVariantSuffix = null;
-            await loadCardByFormattedName(discoverResult.formattedName, lang, { isVeteran: true });
-            return;
-        }
-        
-        if (discoverResult.type === 'variant') {
-            isCurrentVeteranCard = false;
-            const variantsList = discoverResult.variantsList;
-            currentVariants = variantsList;
-            const defaultSuffix = discoverResult.defaultSuffix;
-            activeVariantSuffix = defaultSuffix;
-            // 获取默认的格式化名
-            const defaultItem = variantsList.find(v => v.suffix === defaultSuffix);
-            if (defaultItem) {
-                await loadCardByFormattedName(defaultItem.fullFormatted, lang, { variantSuffix: defaultSuffix });
-            } else {
-                // fallback
-                await loadCardByFormattedName(variantsList[0].fullFormatted, lang, { variantSuffix: variantsList[0].suffix });
-                activeVariantSuffix = variantsList[0].suffix;
-            }
-            // 渲染变体UI (点击切换)
-            renderVariantsUI(currentVariants, activeVariantSuffix, async (newSuffix) => {
-                if (isCurrentVeteranCard) {
-                    imageStatus.innerHTML = "⚠️ 老兵卡无双生变体";
-                    return;
-                }
-                const targetVariant = currentVariants.find(v => v.suffix === newSuffix);
-                if (targetVariant) {
-                    activeVariantSuffix = newSuffix;
-                    await loadCardByFormattedName(targetVariant.fullFormatted, lang, { variantSuffix: newSuffix });
-                    renderVariantsUI(currentVariants, activeVariantSuffix, arguments.callee);
-                }
-            });
-            return;
-        }
-        showError("未知错误，请重试");
+        // 获得完整列表
+        const variantsList = discoverResult.variants;
+        currentVariants = variantsList;
+        const defaultItem = variantsList[0];
+        if (!defaultItem) return;
+        activeVariantId = defaultItem.suffixKey;
+        // 加载图片
+        await loadCardByVariantItem(defaultItem, lang);
+        // 渲染切换组件
+        renderUnifiedVariants(currentVariants, activeVariantId, async (selectedItem) => {
+            if (selectedItem.suffixKey === activeVariantId) return;
+            activeVariantId = selectedItem.suffixKey;
+            await loadCardByVariantItem(selectedItem, lang);
+            // 重新渲染高亮
+            renderUnifiedVariants(currentVariants, activeVariantId, arguments.callee);
+        });
     }
     
-    // 保存图片
+    // 保存图片 (PNG)
     async function saveCardImage() {
         const currentSrc = cardImage.src;
         if (!currentSrc || currentSrc.includes("data:image/svg+xml") && 
-            (currentSrc.includes("等待指令") || currentSrc.includes("遗失") || currentSrc.includes("无此卡") || currentSrc.includes("不存在"))) {
-            imageStatus.innerHTML = "⚠️ 无有效卡图";
+            (currentSrc.includes("等待检索") || currentSrc.includes("遗失") || currentSrc.includes("无此卡") || currentSrc.includes("不存在"))) {
+            imageStatus.innerHTML = "⚠️ 无有效卡图可保存";
             imageStatus.style.color = "#ffaa66";
             return;
         }
         if (!cardImage.complete || cardImage.naturalWidth === 0) {
-            imageStatus.innerHTML = "⛔ 图片未加载完毕";
+            imageStatus.innerHTML = "⛔ 图片未完全加载，稍后重试";
             return;
         }
         saveBtn.disabled = true;
         const originalText = saveBtn.innerText;
-        saveBtn.innerText = "💾 保存中...";
+        saveBtn.innerText = "💾 导出中...";
         try {
             const response = await fetch(cardImage.src);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -653,7 +668,7 @@
     
     function setLoadingState(isLoading) {
         if (isLoading) {
-            imageStatus.innerHTML = '<div class="loader"></div><span> 战术检索中...</span>';
+            imageStatus.innerHTML = '<div class="loader"></div><span> 联络军械库...</span>';
             cardImage.style.opacity = '0.6';
         } else {
             cardImage.style.opacity = '1';
