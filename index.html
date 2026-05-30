@@ -85,7 +85,7 @@
             background: #2e2b22;
             border: 1px solid #8f7a52;
             padding: 0.7rem 1rem;
-            border-radius: 40px;
+            border-radius: 0px;
             font-size: 1rem;
             color: #faf2da;
             outline: none;
@@ -96,6 +96,7 @@
             flex: 2;
             min-width: 200px;
             background: #252219;
+            border-radius: 0px;
         }
         input:focus, select:focus {
             border-color: #e4b363;
@@ -108,7 +109,7 @@
             gap: 0.5rem;
             background: rgba(0,0,0,0.4);
             padding: 0.2rem 0.8rem;
-            border-radius: 40px;
+            border-radius: 0px;
             flex-wrap: wrap;
         }
         .lang-box label {
@@ -120,11 +121,12 @@
             cursor: pointer;
             width: auto;
             min-width: 150px;
+            border-radius: 0px;
         }
         .variants-panel {
             margin: 0.5rem 0 0.8rem;
             background: #262216b3;
-            border-radius: 32px;
+            border-radius: 0px;
             padding: 0.5rem 0.8rem;
             backdrop-filter: blur(1px);
             border: 1px solid #7d6a42;
@@ -157,7 +159,7 @@
         .variant-chip {
             background: #312b1c;
             border: 1px solid #ad924d;
-            border-radius: 40px;
+            border-radius: 0px;
             padding: 0.3rem 1rem;
             font-size: 0.8rem;
             font-weight: 600;
@@ -189,6 +191,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.4);
             transition: 0.1s linear;
             letter-spacing: 1px;
+            border-radius: 0px;
         }
         button:hover {
             background: #8f774b;
@@ -244,6 +247,7 @@
             padding: 0.6rem 2rem;
             font-size: 1rem;
             box-shadow: 0 3px 0 #1e3a1e;
+            border-radius: 0px;
         }
         #saveBtn:active {
             transform: translateY(1px);
@@ -349,7 +353,7 @@
         </div>
     </div>
 
-    <!-- 同名卡牌变体列表区 (包含老兵和变体后缀) -->
+    <!-- 同名卡牌变体列表区 -->
     <div id="variantsContainer" class="variants-panel" style="display: none;">
         <div class="variants-header">
             <span>📜 同名卡牌</span>
@@ -402,10 +406,11 @@
     const variantListDiv = document.getElementById('variantList');
     const variantCountBadge = document.getElementById('variantCountBadge');
 
-    // 存储候选列表
+    // 存储候选列表 & 当前激活的同名选项（原版/变体/老兵）
     let currentVariants = [];          // 元素: { suffixKey, displayName, formattedName, isVeteran, orderPri }
     let activeVariantId = null;        // 当前选中项的 suffixKey (例如 '' , '_b', '_vet')
     let currentRawCardName = '';
+    let currentBaseClean = '';          // 上次检索的基础格式名 (用于语言切换重建)
     let currentLang = 'zh-Hans';       // 当前语言缓存
     
     function formatBaseName(rawName) {
@@ -458,17 +463,18 @@
             { suffix: '_i', type: 'variant', displayPostfix: '变体 I' },
             { suffix: '_j', type: 'variant', displayPostfix: '变体 J' },
             { suffix: '_k', type: 'variant', displayPostfix: '变体 K' },
-            { suffix: '_l', type: 'variant', displayPostfix: '变体 L' },
-            { suffix: '_m', type: 'variant', displayPostfix: '变体 M' },
-            { suffix: '_n', type: 'variant', displayPostfix: '变体 N' }
+            { suffix: '_l', type: 'variant', displayPostfix: '变体 L' }
         ];
         
-        const vetSuffix = '_vet';
-        const vetFullName = baseClean + vetSuffix;
-        const vetUrl = buildImageUrl(vetFullName, lang);
-        const hasVeteran = await testImageExists(vetUrl, 2400);
+        const originalName = baseClean + '';
+        const originalUrl = buildImageUrl(originalName, lang);
+        const originalExists = await testImageExists(originalUrl, 2800);
         
-        const probeTasks = suffixCandidates.map(async (candidate) => {
+        const vetFullName = baseClean + '_vet';
+        const vetUrl = buildImageUrl(vetFullName, lang);
+        const hasVeteranPromise = testImageExists(vetUrl, 2400);
+        
+        const variantProbes = suffixCandidates.filter(c => c.suffix !== '').map(async (candidate) => {
             const testName = baseClean + candidate.suffix;
             const url = buildImageUrl(testName, lang);
             const exists = await testImageExists(url, 2000);
@@ -478,15 +484,16 @@
                     displayName: candidate.displayPostfix,
                     formattedName: testName,
                     isVeteran: false,
-                    orderPri: candidate.suffix === '' ? 0 : (candidate.suffix.charCodeAt(1) || 99)
+                    orderPri: candidate.suffix.charCodeAt(1) || 99
                 };
             }
             return null;
         });
         
-        let results = await Promise.all(probeTasks);
-        let variantItems = results.filter(r => r !== null);
+        let variantResults = await Promise.all(variantProbes);
+        let variantItems = variantResults.filter(r => r !== null);
         
+        const hasVeteran = await hasVeteranPromise;
         if (hasVeteran) {
             variantItems.push({
                 suffixKey: '_vet',
@@ -497,19 +504,33 @@
             });
         }
         
-        variantItems.sort((a, b) => {
-            if (a.suffixKey === '' && b.suffixKey !== '') return -1;
-            if (a.suffixKey !== '' && b.suffixKey === '') return 1;
+        // 构建最终列表: 如果原版存在，插入原版置于最前 (保证原版优先)
+        let finalItems = [];
+        if (originalExists) {
+            finalItems.push({
+                suffixKey: '',
+                displayName: '原版',
+                formattedName: originalName,
+                isVeteran: false,
+                orderPri: -1
+            });
+        }
+        // 添加其他变体
+        finalItems.push(...variantItems);
+        
+        finalItems.sort((a, b) => {
+            if (a.orderPri === -1) return -1;
+            if (b.orderPri === -1) return 1;
             if (a.isVeteran && !b.isVeteran) return 1;
             if (!a.isVeteran && b.isVeteran) return -1;
             if (a.suffixKey < b.suffixKey) return -1;
             return 1;
         });
         
-        if (variantItems.length === 0) {
+        if (finalItems.length === 0) {
             return { type: 'none', variants: [] };
         }
-        return { type: 'multi', variants: variantItems };
+        return { type: 'multi', variants: finalItems };
     }
     
     async function loadCardByVariantItem(item, lang) {
@@ -558,20 +579,20 @@
     
     function getLangDisplayName(langCode) {
         const map = {
-            'zh-Hans': '简体中文', 'zh-Hant': '繁體中文', 'en': 'English',
-            'fr': 'Français', 'de': 'Deutsch', 'pl': 'Polski', 'pt': 'Português',
-            'ru': 'Pусский', 'it': 'Italiano', 'es': 'Español', 'ko': '한국어', 'ja': '日本語'
+            'zh-Hans': '简体中文', 'zh-Hant': '繁體中文', 'en-EN': 'English',
+            'fr-FR': 'Français', 'de-DE': 'Deutsch', 'pl-PL': 'Polski', 'pt-BT': 'Português',
+            'ru-RU': 'Pусский', 'it-IT': 'Italiano', 'es-ES': 'Español', 'ko-KR': '한국어', 'ja-JP': '日本語'
         };
         return map[langCode] || langCode;
     }
     
-    // 渲染变体切换列表
+    // 渲染变体切换列表 (同名栏)
     function renderUnifiedVariants(variants, activeItemKey, onSelectCallback) {
         if (!variants || variants.length === 0) {
             variantsContainer.style.display = 'none';
             return;
         }
-        // 只有一个原版且无变体时隐藏面板
+        // 隐藏规则: 只有一个原版且无任何变体/老兵时隐藏同名栏
         if (variants.length === 1 && !variants[0].isVeteran && variants[0].suffixKey === '') {
             variantsContainer.style.display = 'none';
             return;
@@ -597,8 +618,8 @@
         });
     }
     
-    // 主检索函数
-    async function advancedRetrieve() {
+    // 核心检索逻辑：先发现变体列表，等待原版必然返回，然后渲染同名栏，加载默认项（原版或者第一项）
+    async function advancedRetrieve(keepVariantSelection = false, targetVariantSuffix = null) {
         let rawName = cardNameInput.value.trim();
         if (!rawName) {
             showError("请输入卡牌英文名 (例如: SINCERELY YOURS, B-17, 1st Polish)");
@@ -613,8 +634,9 @@
         }
         
         currentRawCardName = rawName;
+        currentBaseClean = baseClean;
         setLoadingState(true);
-        imageStatus.innerHTML = `🔎 正在寻找敌人: ${baseClean} (${getLangDisplayName(lang)}) ...`;
+        imageStatus.innerHTML = `🔎 正在寻找: ${baseClean} (${getLangDisplayName(lang)}) ...`;
         
         const discoverResult = await unifiedDiscover(baseClean, lang);
         setLoadingState(false);
@@ -630,25 +652,34 @@
         
         const variantsList = discoverResult.variants;
         currentVariants = variantsList;
-        const defaultItem = variantsList[0];
-        if (!defaultItem) return;
-        activeVariantId = defaultItem.suffixKey;
+        
+        // 处理保留同名选项逻辑：如果keepVariantSelection为true并且targetVariantSuffix在当前变体列表中，则沿用；否则取第一项（原版优先）
+        let targetItem = null;
+        if (keepVariantSelection && targetVariantSuffix !== null) {
+            targetItem = currentVariants.find(v => v.suffixKey === targetVariantSuffix);
+        }
+        if (!targetItem) {
+            targetItem = currentVariants[0];
+        }
+        if (!targetItem) return;
+        
+        activeVariantId = targetItem.suffixKey;
         
         // 加载图片
-        await loadCardByVariantItem(defaultItem, lang);
+        await loadCardByVariantItem(targetItem, lang);
         
-        // 渲染切换组件，并绑定选中回调
+        // 渲染同名切换栏，绑定回调
         const boundSelect = async (selectedItem) => {
             if (selectedItem.suffixKey === activeVariantId) return;
             activeVariantId = selectedItem.suffixKey;
             await loadCardByVariantItem(selectedItem, lang);
-            // 刷新高亮
+            // 刷新高亮，不丢失当前选择上下文
             renderUnifiedVariants(currentVariants, activeVariantId, boundSelect);
         };
         renderUnifiedVariants(currentVariants, activeVariantId, boundSelect);
     }
     
-    // 保存图像为PNG (跨域使用Weserv已支持)
+    // 保存图像为PNG (跨域使用Weserv支持)
     async function saveCardImage() {
         const currentSrc = cardImage.src;
         if (!currentSrc || (currentSrc.includes("data:image/svg+xml") && 
@@ -665,7 +696,6 @@
         const originalText = saveBtn.innerText;
         saveBtn.innerText = "💾 导出中...";
         try {
-            // 由于weserv代理支持跨域，fetch即可
             const response = await fetch(cardImage.src);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const blob = await response.blob();
@@ -679,7 +709,7 @@
             let baseFileName = cardImage.getAttribute('data-current-name') || 'kards_card';
             const currentLangAttr = cardImage.getAttribute('data-lang') || langSelect.value;
             let langLabel = currentLangAttr.replace('-', '_');
-            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en-EN':'EN', 'fr-FR':'FR', 'de-DE':'DE', 'pl-PL':'PL', 'pt-BT':'BT', 'ru-RU':'RU', 'it-IT':'IT', 'es-ES':'ES', 'ko-KR':'KR', 'ja-JP':'JP' };
+            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en_EN':'EN', 'fr_FR':'FR', 'de_DE':'DE', 'pl_PL':'PL', 'pt_BT':'BT', 'ru_RU':'RU', 'it_IT':'IT', 'es_ES':'ES', 'ko_KR':'KR', 'ja_JP':'JP' };
             let short = langMapShort[langLabel] || langLabel.toUpperCase();
             const fileName = `${baseFileName}_${short}.png`;
             const url = URL.createObjectURL(pngBlob);
@@ -722,28 +752,36 @@
     // ----- 事件绑定 -----
     fetchBtn.onclick = (e) => {
         e.preventDefault();
-        advancedRetrieve();
+        advancedRetrieve(false, null);
     };
+    
     saveBtn.onclick = (e) => {
         e.preventDefault();
         saveCardImage();
     };
+    
     cardNameInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            advancedRetrieve();
+            advancedRetrieve(false, null);
         }
     });
+    
+    // 仅切换语言，保留当前同名卡牌选项
     langSelect.addEventListener('change', () => {
-        if (currentRawCardName) {
-            advancedRetrieve();
+        if (currentBaseClean && currentRawCardName) {
+            // 保留当前同名选项的suffixKey
+            const currentSuffix = activeVariantId;
+            advancedRetrieve(true, currentSuffix);
+        } else if (cardNameInput.value.trim()) {
+            advancedRetrieve(false, null);
         }
     });
     
     // 初始加载示例
     setTimeout(() => {
         if (cardNameInput.value.trim() === "SINCERELY YOURS") {
-            advancedRetrieve();
+            advancedRetrieve(false, null);
         }
     }, 180);
 </script>
