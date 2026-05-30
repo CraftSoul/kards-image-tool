@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>KARDS军械库 | 全语言卡牌图鉴</title>
+    <title>KARDS军械库 | 全语言卡牌图片下载</title>
     <style>
         * {
             margin: 0;
@@ -331,7 +331,7 @@
 
     <div class="form-group" style="justify-content: flex-end;">
         <div class="lang-box">
-            <label>🌍 语言</label>
+            <label>语言</label>
             <select id="langSelect">
                 <option value="zh-Hans">🇨🇳 简体中文 (zh-Hans)</option>
                 <option value="zh-Hant">🇨🇳 繁體中文 (zh-Hant)</option>
@@ -339,12 +339,12 @@
                 <option value="fr-FR">🇫🇷 Français (fr-FR)</option>
                 <option value="de-DE">🇩🇪 Deutsch (de-DE)</option>
                 <option value="pl-PL">🇵🇱 Polski (pl-PL)</option>
-                <option value="pt-PT">🇵🇹 Português (pt-PT)</option>
+                <option value="pt-BT">🇵🇹 Português (pt-BT)</option>
                 <option value="ru-RU">🇷🇺 Pусский (ru-RU)</option>
                 <option value="it-IT">🇮🇹 Italiano (it-IT)</option>
                 <option value="es-ES">🇪🇸 Español (es-ES)</option>
-                <option value="ko-KO">🇰🇷 한국어 (ko-KO)</option>
-                <option value="ja-JP">🇯🇵 日本語 (ja-JA)</option>
+                <option value="ko-KR">🇰🇷 한국어 (ko-KR)</option>
+                <option value="ja-JP">🇯🇵 日本語 (ja-JP)</option>
             </select>
         </div>
     </div>
@@ -679,7 +679,7 @@
             let baseFileName = cardImage.getAttribute('data-current-name') || 'kards_card';
             const currentLangAttr = cardImage.getAttribute('data-lang') || langSelect.value;
             let langLabel = currentLangAttr.replace('-', '_');
-            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en-EN':'EN', 'fr-FR':'FR', 'de-DE':'DE', 'pl-PL':'PL', 'pt-PT':'PT', 'ru-RU':'RU', 'it-IT':'IT', 'es-ES':'ES', 'ko-KR':'KR', 'ja-JP':'JP' };
+            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en-EN':'EN', 'fr-FR':'FR', 'de-DE':'DE', 'pl-PL':'PL', 'pt-BT':'BT', 'ru-RU':'RU', 'it-IT':'IT', 'es-ES':'ES', 'ko-KR':'KR', 'ja-JP':'JP' };
             let short = langMapShort[langLabel] || langLabel.toUpperCase();
             const fileName = `${baseFileName}_${short}.png`;
             const url = URL.createObjectURL(pngBlob);
