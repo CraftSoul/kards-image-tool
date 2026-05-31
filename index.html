@@ -123,44 +123,62 @@
             min-width: 100px;
             border-radius: 0px;
         }
-    .toggle-switch {
-            display: flex;
+        .toggle-switch {
+            display: inline-flex;
             align-items: center;
-            gap: 0.6rem;
-            background: rgba(0,0,0,0.4);
-            padding: 0.2rem 1rem;
-            border-radius: 40px;
-            margin-left: auto;
-    }
-
-    .toggle-checkbox {
-            width: 44px;
-            height: 24px;
-            appearance: none;
-            background: #3a3426;
-            border-radius: 24px;
+            gap: 12px;
+            background: rgba(0,0,0,0.55);
+            padding: 0.3rem 1rem 0.3rem 1.2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+            border: 1px solid #ab8e4e;
+        }
+        .toggle-switch span {
+            color: #ffeaae;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .switch {
             position: relative;
-            cursor: pointer;
-            border: 1px solid #8f7a52;
-            transition: 0.2s;
-    }
-
-    .toggle-checkbox::before {
-            content: '';
-            width: 18px;
-            height: 18px;
-            background: #faf2da;
-            border-radius: 50%;
+            display: inline-block;
+            width: 52px;
+            height: 26px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
             position: absolute;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.2s;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3a3222;
+            transition: 0.2s;
+            border-radius: 34px;
+            border: 1px solid #b19458;
         }
-        .toggle-checkbox:checked::before {
-          transform: translateX(19px);
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 2px;
+            background-color: #e9cf95;
+            transition: 0.2s;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px black;
         }
-        .toggle-checkbox:checked {
-            background: #c7a252;
+        input:checked + .slider {
+            background-color: #7a6233;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            background-color: #fef0b6;
         }
         .variants-panel {
             margin: 0.5rem 0 0.8rem;
@@ -344,20 +362,7 @@
             .variant-list { justify-content: center; }
             button { width: 100%; }
             .lang-box select { width: 100%; }
-            .toggle-switch { margin-left: 0; justify-content: flex-start; }
-        }
-        .veteran-badge {
-            background: #9b7b42;
-            border-radius: 20px;
-            padding: 0.2rem 0.7rem;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-left: 8px;
-            color: #fceabb;
-        }
-        .lang-flag {
-            font-size: 1.1rem;
-            margin-right: 4px;
+            .toggle-switch { justify-content: space-between; }
         }
     </style>
 </head>
@@ -392,8 +397,11 @@
             </select>
         </div>
         <div class="toggle-switch">
-            <label for="variantToggle">♠️ 变体检索</label>
-            <input type="checkbox" id="variantToggle" class="toggle-checkbox" checked>
+            <span>♠️ 变体检索</span>
+            <label class="switch">
+                <input type="checkbox" id="variantToggle" checked>
+                <span class="slider"></span>
+            </label>
         </div>
     </div>
 
@@ -415,7 +423,7 @@
         <div class="img-wrapper">
             <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
         </div>
-        <div id="imageStatus" class="status-msg">输入英文卡名，自动识别老兵与变体（可关闭变体检索）</div>
+        <div id="imageStatus" class="status-msg">Waiting for orders.</div>
     </div>
 
     <div class="save-area">
@@ -458,7 +466,6 @@
     let currentBaseClean = '';
     let currentLang = 'zh-Hans';
     let isDiscovering = false;
-    let abortController = null; // 用于取消进行中的探测
 
     function formatBaseName(rawName) {
         if (!rawName || rawName.trim() === "") return "";
@@ -493,11 +500,13 @@
         });
     }
     
+    // 核心探测：根据开关决定是否扫描变体。每个请求都等待明确响应(不存在/存在)
     async function progressiveDiscover(baseClean, lang, includeVariants) {
         const originalFormatted = baseClean;
         const originalUrl = buildImageUrl(originalFormatted, lang);
         
-        const originalExists = await testImageExists(originalUrl, 6000);
+        // 等待原版响应
+        const originalExists = await testImageExists(originalUrl, 7000);
         let variantsList = [];
         
         if (originalExists) {
@@ -518,6 +527,7 @@
         const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
         const variantCandidates = suffixLetters.map(letter => ({ suffix: `_${letter}`, display: `变体 ${letter.toUpperCase()}` }));
         
+        // 并发检测变体（每个独立超时不影响整体）
         const variantCheckPromises = variantCandidates.map(async (cand) => {
             const testName = baseClean + cand.suffix;
             const url = buildImageUrl(testName, lang);
@@ -536,7 +546,7 @@
         // 老兵检测
         const vetName = baseClean + '_vet';
         const vetUrl = buildImageUrl(vetName, lang);
-        const vetPromise = testImageExists(vetUrl, 2500);
+        const vetPromise = testImageExists(vetUrl, 2600);
         
         const variantResults = await Promise.all(variantCheckPromises);
         const foundVariants = variantResults.filter(v => v !== null);
@@ -619,6 +629,7 @@
             variantsContainer.style.display = 'none';
             return;
         }
+        // 只有单一原版且无其他变体时隐藏面板
         if (variants.length === 1 && variants[0].suffixKey === '' && !variants[0].isVeteran) {
             variantsContainer.style.display = 'none';
             return;
@@ -643,11 +654,12 @@
         });
     }
     
+    // 主检索：根据变体开关决定扫描范围，等待每个响应结果，动态添加变体
     async function advancedRetrieve(keepSelection = false, targetSuffix = null) {
         if (isDiscovering) return;
         const rawName = cardNameInput.value.trim();
         if (!rawName) {
-            showError("请输入卡牌英文名 (例如: SINCERELY YOURS)");
+            showError("请输入卡牌英文名 (例: SINCERELY YOURS)");
             return;
         }
         const lang = langSelect.value;
@@ -666,7 +678,6 @@
         const includeVariants = variantToggle.checked;
         imageStatus.innerHTML = `🔎 检索: ${baseClean} (${getLangDisplayName(lang)}) ${includeVariants ? '含变体' : '仅原版'}...`;
         
-        // 执行探测
         const discoverResult = await progressiveDiscover(baseClean, lang, includeVariants);
         isDiscovering = false;
         
@@ -695,10 +706,10 @@
         
         activeVariantId = targetItem.suffixKey;
         
-        // 加载图片
+        // 加载目标图片
         await loadCardByVariantItem(targetItem, lang);
         
-        // 渲染同名栏
+        // 渲染同名栏（动态绑定切换）
         const onSelectVariant = async (selectedItem) => {
             if (selectedItem.suffixKey === activeVariantId) return;
             activeVariantId = selectedItem.suffixKey;
@@ -793,7 +804,7 @@
             advancedRetrieve(false, null);
         }
     });
-    // 变体开关切换时，若已有卡名则重新检索
+    // 变体开关切换时重新检索（保留原版选项）
     variantToggle.addEventListener('change', () => {
         if (currentBaseClean && currentRawCardName) {
             advancedRetrieve(false, null);
