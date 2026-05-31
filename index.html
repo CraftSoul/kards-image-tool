@@ -425,7 +425,7 @@
     
     function buildImageUrl(formattedName, lang) {
         const basePath = `ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif`;
-        return `https://images.weserv.nl/?url=${basePath}&il&af`;
+        return `https://images.weserv.nl/?url=${basePath}`;
     }
     
     function testImageExists(url, timeoutMs = 9178) {
