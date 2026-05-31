@@ -343,7 +343,7 @@
                 <option value="fr-FR">🇫🇷Français(fr-FR)</option>
                 <option value="de-DE">🇩🇪Deutsch(de-DE)</option>
                 <option value="pl-PL">🇵🇱Polski(pl-PL)</option>
-                <option value="pt-BT">🇵🇹Português(pt-BT)</option>
+                <option value="pt-BR">🇵🇹Português(pt-BR)</option>
                 <option value="ru-RU">🇷🇺Pусский(ru-RU)</option>
                 <option value="it-IT">🇮🇹Italiano(it-IT)</option>
                 <option value="es-ES">🇪🇸Español(es-ES)</option>
@@ -562,7 +562,7 @@
     function getLangDisplayName(langCode) {
         const map = {
             'zh-Hans': '简体中文', 'zh-Hant': '繁體中文', 'en-EN': 'English',
-            'fr-FR': 'Français', 'de-DE': 'Deutsch', 'pl-PL': 'Polski', 'pt-BT': 'Português',
+            'fr-FR': 'Français', 'de-DE': 'Deutsch', 'pl-PL': 'Polski', 'pt-BR': 'Português',
             'ru-RU': 'Pусский', 'it-IT': 'Italiano', 'es-ES': 'Español', 'ko-KR': '한국어', 'ja-JP': '日本語'
         };
         return map[langCode] || langCode;
@@ -693,7 +693,7 @@
             let baseFileName = cardImage.getAttribute('data-current-name') || 'kards_card';
             const currentLangAttr = cardImage.getAttribute('data-lang') || langSelect.value;
             let langLabel = currentLangAttr.replace('-', '_');
-            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en_EN':'EN', 'fr_FR':'FR', 'de_DE':'DE', 'pl_PL':'PL', 'pt_BT':'BT', 'ru_RU':'RU', 'it_IT':'IT', 'es_ES':'ES', 'ko_KR':'KR', 'ja_JP':'JP' };
+            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en_EN':'EN', 'fr_FR':'FR', 'de_DE':'DE', 'pl_PL':'PL', 'pt_BR':'BR', 'ru_RU':'RU', 'it_IT':'IT', 'es_ES':'ES', 'ko_KR':'KR', 'ja_JP':'JP' };
             let short = langMapShort[langLabel] || langLabel.toUpperCase();
             const fileName = `${baseFileName}_${short}.png`;
             const url = URL.createObjectURL(pngBlob);
