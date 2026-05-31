@@ -123,6 +123,49 @@
             min-width: 100px;
             border-radius: 0px;
         }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(0,0,0,0.4);
+            padding: 0.2rem 1rem;
+            border-radius: 0px;
+            margin-left: auto;
+        }
+        .toggle-switch label {
+            color: #ffe6aa;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .toggle-checkbox {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #3a3426;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid #8f7a52;
+            transition: 0.2s;
+        }
+        .toggle-checkbox:checked {
+            background: #c7a252;
+        }
+        .toggle-checkbox::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: #faf2da;
+            border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+        .toggle-checkbox:checked::before {
+            transform: translateX(19px);
+        }
         .variants-panel {
             margin: 0.5rem 0 0.8rem;
             background: #262216b3;
@@ -305,6 +348,7 @@
             .variant-list { justify-content: center; }
             button { width: 100%; }
             .lang-box select { width: 100%; }
+            .toggle-switch { margin-left: 0; justify-content: flex-start; }
         }
         .veteran-badge {
             background: #9b7b42;
@@ -333,7 +377,7 @@
         <input type="text" id="cardNameInput" placeholder="例:SINCERELY YOURS" value="SINCERELY YOURS">
     </div>
 
-    <div class="form-group" style="justify-content: flex-end;">
+    <div class="form-group" style="justify-content: space-between; flex-wrap: wrap;">
         <div class="lang-box">
             <label>语言</label>
             <select id="langSelect">
@@ -350,6 +394,10 @@
                 <option value="ko-KR">🇰🇷한국어(ko-KR)</option>
                 <option value="ja-JP">🇯🇵日本語(ja-JP)</option>
             </select>
+        </div>
+        <div class="toggle-switch">
+            <label for="variantToggle">♠️ 变体检索</label>
+            <input type="checkbox" id="variantToggle" class="toggle-checkbox" checked>
         </div>
     </div>
 
@@ -371,7 +419,7 @@
         <div class="img-wrapper">
             <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
         </div>
-        <div id="imageStatus" class="status-msg">输入英文卡名，自动识别老兵与变体</div>
+        <div id="imageStatus" class="status-msg">输入英文卡名，自动识别老兵与变体（可关闭变体检索）</div>
     </div>
 
     <div class="save-area">
@@ -405,14 +453,16 @@
     const variantsContainer = document.getElementById('variantsContainer');
     const variantListDiv = document.getElementById('variantList');
     const variantCountBadge = document.getElementById('variantCountBadge');
+    const variantToggle = document.getElementById('variantToggle');
 
     // 全局状态
-    let currentVariants = [];           // { suffixKey, displayName, formattedName, isVeteran }
-    let activeVariantId = null;         // 当前选中的suffixKey
+    let currentVariants = [];
+    let activeVariantId = null;
     let currentRawCardName = '';
     let currentBaseClean = '';
     let currentLang = 'zh-Hans';
-    let isDiscovering = false;           // 防止并发
+    let isDiscovering = false;
+    let abortController = null; // 用于取消进行中的探测
 
     function formatBaseName(rawName) {
         if (!rawName || rawName.trim() === "") return "";
@@ -447,14 +497,13 @@
         });
     }
     
-    // 动态渐进探测变体: 先等待原版响应, 然后动态扫描最多11个变体后缀(_b 至 _n) + 老兵(_vet)
-    // 保证不会因为加载顺序遗漏，且减少总耗时（原版优先）
-    async function progressiveDiscover(baseClean, lang) {
+    async function progressiveDiscover(baseClean, lang, includeVariants) {
         const originalFormatted = baseClean;
         const originalUrl = buildImageUrl(originalFormatted, lang);
-        const originalExists = await testImageExists(originalUrl, 9178);
         
+        const originalExists = await testImageExists(originalUrl, 6000);
         let variantsList = [];
+        
         if (originalExists) {
             variantsList.push({
                 suffixKey: '',
@@ -466,16 +515,17 @@
             return { variants: [] };
         }
         
+        if (!includeVariants) {
+            return { variants: variantsList };
+        }
+        
         const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
         const variantCandidates = suffixLetters.map(letter => ({ suffix: `_${letter}`, display: `变体 ${letter.toUpperCase()}` }));
         
-        // 限制最多探测前11个明确变体，保证不超量
-        const limitedVariants = variantCandidates.slice(0, 11);
-        
-        const variantCheckPromises = limitedVariants.map(async (cand) => {
+        const variantCheckPromises = variantCandidates.map(async (cand) => {
             const testName = baseClean + cand.suffix;
             const url = buildImageUrl(testName, lang);
-            const exists = await testImageExists(url, 1800);
+            const exists = await testImageExists(url, 9178);
             if (exists) {
                 return {
                     suffixKey: cand.suffix,
@@ -487,13 +537,13 @@
             return null;
         });
         
+        // 老兵检测
         const vetName = baseClean + '_vet';
         const vetUrl = buildImageUrl(vetName, lang);
-        const vetPromise = testImageExists(vetUrl, 2000);
+        const vetPromise = testImageExists(vetUrl, 2500);
         
         const variantResults = await Promise.all(variantCheckPromises);
         const foundVariants = variantResults.filter(v => v !== null);
-        
         const hasVeteran = await vetPromise;
         if (hasVeteran) {
             foundVariants.push({
@@ -526,9 +576,9 @@
         
         let timeout = setTimeout(() => {
             setLoadingState(false);
-            showError(`超时 · ${item.formattedName}.avif`);
+            showError(`⏱️ 超时 · ${item.formattedName}.avif，请检查输入或网络`);
             cardImage.setAttribute('data-valid', 'false');
-        }, 9000);
+        }, 10000);
         
         return new Promise((resolve) => {
             const tester = new Image();
@@ -550,7 +600,7 @@
             tester.onerror = () => {
                 clearTimeout(timeout);
                 setLoadingState(false);
-                showError(`❌ 缺失: ${item.formattedName}.avif`);
+                showError(`❌ 缺失: ${item.formattedName}.avif，卡图不存在`);
                 cardImage.setAttribute('data-valid', 'false');
                 cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 无此卡图 💀%3C/text%3E%3C/svg%3E";
                 resolve(false);
@@ -573,7 +623,6 @@
             variantsContainer.style.display = 'none';
             return;
         }
-        // 只有单一原版且没有其他变体/老兵时隐藏面板
         if (variants.length === 1 && variants[0].suffixKey === '' && !variants[0].isVeteran) {
             variantsContainer.style.display = 'none';
             return;
@@ -598,7 +647,6 @@
         });
     }
     
-    // 先等待原版响应，动态探测变体并逐步渲染同名栏
     async function advancedRetrieve(keepSelection = false, targetSuffix = null) {
         if (isDiscovering) return;
         const rawName = cardNameInput.value.trim();
@@ -619,15 +667,16 @@
         isDiscovering = true;
         
         setLoadingState(true);
-        imageStatus.innerHTML = `🔎 正在寻找敌人: ${baseClean} (${getLangDisplayName(lang)}) ...`;
+        const includeVariants = variantToggle.checked;
+        imageStatus.innerHTML = `🔎 检索: ${baseClean} (${getLangDisplayName(lang)}) ${includeVariants ? '含变体' : '仅原版'}...`;
         
-        // 执行渐进探测（内部优先等待原版）
-        const discoverResult = await progressiveDiscover(baseClean, lang);
+        // 执行探测
+        const discoverResult = await progressiveDiscover(baseClean, lang, includeVariants);
         isDiscovering = false;
         
         if (!discoverResult.variants.length) {
             setLoadingState(false);
-            showError(`未找到: "${rawName}" 在 ${getLangDisplayName(lang)} 语系中`);
+            showError(`未找到: "${rawName}"`);
             variantsContainer.style.display = 'none';
             currentVariants = [];
             cardImage.setAttribute('data-valid', 'false');
@@ -638,7 +687,7 @@
         const variantsList = discoverResult.variants;
         currentVariants = variantsList;
         
-        // 确定目标项：若保留选择且targetSuffix在当前列表中存在则沿用，否则默认选中原版（第一个）
+        // 确定目标项：保留选择或默认原版
         let targetItem = null;
         if (keepSelection && targetSuffix !== null) {
             targetItem = variantsList.find(v => v.suffixKey === targetSuffix);
@@ -650,10 +699,10 @@
         
         activeVariantId = targetItem.suffixKey;
         
-        // 加载目标图片
+        // 加载图片
         await loadCardByVariantItem(targetItem, lang);
         
-        // 渲染同名切换栏 (动态绑定切换回调)
+        // 渲染同名栏
         const onSelectVariant = async (selectedItem) => {
             if (selectedItem.suffixKey === activeVariantId) return;
             activeVariantId = selectedItem.suffixKey;
@@ -667,7 +716,7 @@
     async function saveCardImage() {
         const currentSrc = cardImage.src;
         if (!currentSrc || (currentSrc.includes("data:image/svg+xml") && 
-            (currentSrc.includes("等待检索") || currentSrc.includes("遗失") || currentSrc.includes("无此卡") || currentSrc.includes("不存在") || currentSrc.includes("⚙️")))) {
+            (currentSrc.includes("等待检索") || currentSrc.includes("遗失") || currentSrc.includes("无此卡") || currentSrc.includes("不存在") || currentSrc.includes("⚙️") || currentSrc.includes("💀")))) {
             imageStatus.innerHTML = "⚠️ 无有效卡图可保存";
             imageStatus.style.color = "#ffaa66";
             return;
@@ -748,7 +797,15 @@
             advancedRetrieve(false, null);
         }
     });
-    // 语言切换时保留同名选项
+    // 变体开关切换时，若已有卡名则重新检索
+    variantToggle.addEventListener('change', () => {
+        if (currentBaseClean && currentRawCardName) {
+            advancedRetrieve(false, null);
+        } else if (cardNameInput.value.trim()) {
+            advancedRetrieve(false, null);
+        }
+    });
+    // 语言切换保留同名选项
     langSelect.addEventListener('change', () => {
         if (currentBaseClean && currentRawCardName) {
             advancedRetrieve(true, activeVariantId);
