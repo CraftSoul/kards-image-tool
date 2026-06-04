@@ -481,32 +481,28 @@
         return `https://images.weserv.nl/?url=${basePath}`;
     }
     
-    function testImageExists(url, timeoutMs = 9178) {
+    // 移除超时限制，持续等待直到图片自然加载完成或彻底失败 (保持无限等待)
+    function testImageExistsInfinite(url) {
         return new Promise((resolve) => {
             const img = new Image();
-            const timeout = setTimeout(() => {
-                img.src = '';
-                resolve(false);
-            }, timeoutMs);
+            // 不设置任何超时，持续等待网络响应，直至完成
             img.onload = () => {
-                clearTimeout(timeout);
                 resolve(true);
             };
             img.onerror = () => {
-                clearTimeout(timeout);
                 resolve(false);
             };
             img.src = url;
         });
     }
     
-    // 核心探测：根据开关决定是否扫描变体。每个请求都等待明确响应(不存在/存在)
+    // 核心探测：根据开关决定是否扫描变体。每个请求都无限等待响应直到资源确认为止，确保加载全部结果。
     async function progressiveDiscover(baseClean, lang, includeVariants) {
         const originalFormatted = baseClean;
         const originalUrl = buildImageUrl(originalFormatted, lang);
         
-        // 等待原版响应
-        const originalExists = await testImageExists(originalUrl, 7000);
+        // 无限等待原版响应（持续等待直到结果自然返回）
+        const originalExists = await testImageExistsInfinite(originalUrl);
         let variantsList = [];
         
         if (originalExists) {
@@ -517,6 +513,7 @@
                 isVeteran: false
             });
         } else {
+            // 原版不存在，则没有资源
             return { variants: [] };
         }
         
@@ -527,11 +524,11 @@
         const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
         const variantCandidates = suffixLetters.map(letter => ({ suffix: `_${letter}`, display: `变体 ${letter.toUpperCase()}` }));
         
-        // 并发检测变体（每个独立超时不影响整体）
+        // 并发检测变体（每个独立无超时，确保全部检查完毕）
         const variantCheckPromises = variantCandidates.map(async (cand) => {
             const testName = baseClean + cand.suffix;
             const url = buildImageUrl(testName, lang);
-            const exists = await testImageExists(url, 9178);
+            const exists = await testImageExistsInfinite(url);
             if (exists) {
                 return {
                     suffixKey: cand.suffix,
@@ -546,8 +543,9 @@
         // 老兵检测
         const vetName = baseClean + '_vet';
         const vetUrl = buildImageUrl(vetName, lang);
-        const vetPromise = testImageExists(vetUrl, 2600);
+        const vetPromise = testImageExistsInfinite(vetUrl);
         
+        // 等待所有变体检测结束 (不再使用任何timeout，确保所有候选都完成)
         const variantResults = await Promise.all(variantCheckPromises);
         const foundVariants = variantResults.filter(v => v !== null);
         const hasVeteran = await vetPromise;
@@ -580,16 +578,10 @@
         const langDisplay = getLangDisplayName(lang);
         imageStatus.innerHTML = `🔍 加载: ${item.formattedName}.avif (${langDisplay})`;
         
-        let timeout = setTimeout(() => {
-            setLoadingState(false);
-            showError(`⏱️ 超时 · ${item.formattedName}.avif，请检查输入或网络`);
-            cardImage.setAttribute('data-valid', 'false');
-        }, 10000);
-        
+        // 无超时：持续等待图片最终响应
         return new Promise((resolve) => {
             const tester = new Image();
             tester.onload = () => {
-                clearTimeout(timeout);
                 cardImage.src = imageUrl;
                 setLoadingState(false);
                 let extraFlag = '';
@@ -604,7 +596,6 @@
                 resolve(true);
             };
             tester.onerror = () => {
-                clearTimeout(timeout);
                 setLoadingState(false);
                 showError(`❌ 缺失: ${item.formattedName}.avif，卡图不存在`);
                 cardImage.setAttribute('data-valid', 'false');
@@ -654,7 +645,7 @@
         });
     }
     
-    // 主检索：根据变体开关决定扫描范围，等待每个响应结果，动态添加变体
+    // 主检索：无限等待所有变体探测完成，确保加载全部结果后才展示UI
     async function advancedRetrieve(keepSelection = false, targetSuffix = null) {
         if (isDiscovering) return;
         const rawName = cardNameInput.value.trim();
@@ -676,8 +667,9 @@
         
         setLoadingState(true);
         const includeVariants = variantToggle.checked;
-        imageStatus.innerHTML = `🔎 检索: ${baseClean} (${getLangDisplayName(lang)}) ${includeVariants ? '含变体' : '仅原版'}...`;
+        imageStatus.innerHTML = `🔎 检索: ${baseClean} (${getLangDisplayName(lang)}) ${includeVariants ? '含变体' : '仅原版'}... 持续探测中`;
         
+        // 无限等待全部探测完成 (无任何超时，保证所有潜在资源被发现)
         const discoverResult = await progressiveDiscover(baseClean, lang, includeVariants);
         isDiscovering = false;
         
