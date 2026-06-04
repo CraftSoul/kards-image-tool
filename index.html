@@ -36,32 +36,40 @@
             border-radius: 2rem;
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 200, 0.1);
             border: 1px solid rgba(150, 130, 70, 0.6);
-            padding: 1.8rem 2rem 1.5rem;
+            padding: 0 0 1.5rem 0;
             transition: all 0.2s;
+            overflow: hidden;
         }
 
-        .title-section {
+        /* 顶部横幅样式 */
+        .hero-banner {
+            background: linear-gradient(135deg, #1f1c12 0%, #2c281c 100%);
+            border-bottom: 3px solid #e6bc7e;
+            padding: 1.2rem 1.8rem;
             text-align: center;
-            margin-bottom: 1.8rem;
-            border-bottom: 2px solid #b8a87c;
-            display: inline-block;
-            width: 100%;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .title-section h1 {
+        .hero-banner h1 {
             font-size: 2rem;
             letter-spacing: 3px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f3e7c0, #c7b27b);
+            font-weight: 800;
+            background: linear-gradient(135deg, #f9efcf, #e2bf7a);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            margin-bottom: 0.3rem;
         }
-        .title-section p {
+        .hero-banner p {
             color: #e6ddb3;
             font-size: 0.85rem;
-            margin-top: 8px;
             opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        .content-padding {
+            padding: 0 2rem;
         }
 
         .form-group {
@@ -319,6 +327,7 @@
             justify-content: center;
             gap: 1.2rem 2rem;
             font-size: 0.85rem;
+            margin-bottom: 0.2rem;
         }
         .footer-simple a {
             display: inline-flex;
@@ -357,7 +366,8 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .hide { display: none; }
         @media (max-width: 650px) {
-            .card-panel { padding: 1rem; }
+            .content-padding { padding: 0 1rem; }
+            .card-panel { padding: 0 0 1rem 0; }
             .form-group { flex-direction: column; align-items: stretch; }
             .variant-list { justify-content: center; }
             button { width: 100%; }
@@ -368,81 +378,84 @@
 </head>
 <body>
 <div class="card-panel">
-    <div class="title-section">
+    <!-- 顶部横幅区域，标题移至此处 -->
+    <div class="hero-banner">
         <h1>KARDS 军械库</h1>
         <p>全语系卡图检索</p>
     </div>
 
-    <div class="form-group">
-        <span class="label-icon">卡牌英名</span>
-        <input type="text" id="cardNameInput" placeholder="例:SINCERELY YOURS" value="SINCERELY YOURS">
-    </div>
-
-    <div class="form-group" style="justify-content: space-between; flex-wrap: wrap;">
-        <div class="lang-box">
-            <label>语言</label>
-            <select id="langSelect">
-                <option value="zh-Hans">🇨🇳简体中文(zh-Hans)</option>
-                <option value="zh-Hant">🇨🇳繁體中文(zh-Hant)</option>
-                <option value="en-EN">🇬🇧English(en-En)</option>
-                <option value="fr-FR">🇫🇷Français(fr-FR)</option>
-                <option value="de-DE">🇩🇪Deutsch(de-DE)</option>
-                <option value="pl-PL">🇵🇱Polski(pl-PL)</option>
-                <option value="pt-BR">🇵🇹Português(pt-BR)</option>
-                <option value="ru-RU">🇷🇺Pусский(ru-RU)</option>
-                <option value="it-IT">🇮🇹Italiano(it-IT)</option>
-                <option value="es-ES">🇪🇸Español(es-ES)</option>
-                <option value="ko-KR">🇰🇷한국어(ko-KR)</option>
-                <option value="ja-JP">🇯🇵日本語(ja-JP)</option>
-            </select>
+    <div class="content-padding">
+        <div class="form-group">
+            <span class="label-icon">卡牌英名</span>
+            <input type="text" id="cardNameInput" placeholder="例:SINCERELY YOURS" value="SINCERELY YOURS">
         </div>
-        <div class="toggle-switch">
-            <span>♠️ 变体检索</span>
-            <label class="switch">
-                <input type="checkbox" id="variantToggle" checked>
-                <span class="slider"></span>
-            </label>
+
+        <div class="form-group" style="justify-content: space-between; flex-wrap: wrap;">
+            <div class="lang-box">
+                <label>语言</label>
+                <select id="langSelect">
+                    <option value="zh-Hans">🇨🇳简体中文(zh-Hans)</option>
+                    <option value="zh-Hant">🇨🇳繁體中文(zh-Hant)</option>
+                    <option value="en-EN">🇬🇧English(en-En)</option>
+                    <option value="fr-FR">🇫🇷Français(fr-FR)</option>
+                    <option value="de-DE">🇩🇪Deutsch(de-DE)</option>
+                    <option value="pl-PL">🇵🇱Polski(pl-PL)</option>
+                    <option value="pt-BR">🇵🇹Português(pt-BR)</option>
+                    <option value="ru-RU">🇷🇺Pусский(ru-RU)</option>
+                    <option value="it-IT">🇮🇹Italiano(it-IT)</option>
+                    <option value="es-ES">🇪🇸Español(es-ES)</option>
+                    <option value="ko-KR">🇰🇷한국어(ko-KR)</option>
+                    <option value="ja-JP">🇯🇵日本語(ja-JP)</option>
+                </select>
+            </div>
+            <div class="toggle-switch">
+                <span>♠️ 变体检索</span>
+                <label class="switch">
+                    <input type="checkbox" id="variantToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
-    </div>
 
-    <!-- 同名卡牌变体列表区 -->
-    <div id="variantsContainer" class="variants-panel" style="display: none;">
-        <div class="variants-header">
-            <span>📜 同名卡牌</span>
-            <span class="variants-badge" id="variantCountBadge">0</span>
-            <span style="font-size:0.7rem;">点击切换版本</span>
+        <!-- 同名卡牌变体列表区 -->
+        <div id="variantsContainer" class="variants-panel" style="display: none;">
+            <div class="variants-header">
+                <span>📜 同名卡牌</span>
+                <span class="variants-badge" id="variantCountBadge">0</span>
+                <span style="font-size:0.7rem;">点击切换版本</span>
+            </div>
+            <div id="variantList" class="variant-list"></div>
         </div>
-        <div id="variantList" class="variant-list"></div>
-    </div>
 
-    <div style="display: flex; justify-content: center; margin: 0.3rem 0 0.2rem;">
-        <button id="fetchBtn">🔍 检索卡图</button>
-    </div>
-
-    <div class="image-showcase">
-        <div class="img-wrapper">
-            <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
+        <div style="display: flex; justify-content: center; margin: 0.3rem 0 0.2rem;">
+            <button id="fetchBtn">🔍 检索卡图</button>
         </div>
-        <div id="imageStatus" class="status-msg">Waiting for orders.</div>
-    </div>
 
-    <div class="save-area">
-        <button id="saveBtn">💾 保存图像(PNG)</button>
-    </div>
+        <div class="image-showcase">
+            <div class="img-wrapper">
+                <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
+            </div>
+            <div id="imageStatus" class="status-msg">Waiting for orders.</div>
+        </div>
 
-    <div class="footer-simple">
-        <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub
-        </a>
-        <a href="https://space.bilibili.com/3546775476505152" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili
-        </a>
-        <a href="https://www.douyin.com/user/MS4wLjABAAAAERwZXqP_VI8qTqzyV-A6aJircP4R6tiOBRCY5QCFQrAd_gZ8z-LsyNvUHuDipQ7S" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="抖音"> 抖音
-        </a>
-        <a href="https://www.zhihu.com/people/7-97-53-5-79" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="知乎"> 知乎
-        </a>
+        <div class="save-area">
+            <button id="saveBtn">💾 保存图像(PNG)</button>
+        </div>
+
+        <div class="footer-simple">
+            <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub
+            </a>
+            <a href="https://space.bilibili.com/3546775476505152" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili
+            </a>
+            <a href="https://www.douyin.com/user/MS4wLjABAAAAERwZXqP_VI8qTqzyV-A6aJircP4R6tiOBRCY5QCFQrAd_gZ8z-LsyNvUHuDipQ7S" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="抖音"> 抖音
+            </a>
+            <a href="https://www.zhihu.com/people/7-97-53-5-79" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="知乎"> 知乎
+            </a>
+        </div>
     </div>
 </div>
 
@@ -476,9 +489,10 @@
         return processed;
     }
     
+    // 直接使用官方源，不经过第三方代理，不使用w3.org图片服务
     function buildImageUrl(formattedName, lang) {
-        const basePath = `ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif`;
-        return `https://images.weserv.nl/?url=${basePath}`;
+        // 直接拼接KARDS官方CDN地址
+        return `https://www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=100`;
     }
     
     // 移除超时限制，持续等待直到图片自然加载完成或彻底失败 (保持无限等待)
