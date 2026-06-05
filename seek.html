@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>KARDS军械库 | 英文直检</title>
     <style>
         * {
@@ -22,7 +22,7 @@
                 repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
             background-blend-mode: overlay, normal;
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            padding-top: 80px;
+            padding-top: 70px;
         }
 
         .top-nav-bar {
@@ -35,85 +35,75 @@
             backdrop-filter: blur(16px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             border-bottom: 1px solid #aa8e4e;
-        }
-
-        .nav-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0.7rem 1rem;
-            gap: 0.8rem;
-            border-bottom: 1px solid rgba(170, 142, 78, 0.3);
-        }
-
-        .nav-brand {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-shrink: 0;
-        }
-
-        .nav-scroll-wrapper {
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
             overflow-x: auto;
             overflow-y: hidden;
             white-space: nowrap;
             scrollbar-width: thin;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
-            padding: 0.4rem 0 0.5rem 0;
-            border-top: 1px solid rgba(120, 100, 55, 0.4);
         }
 
-        .nav-scroll-wrapper::-webkit-scrollbar {
+        .top-nav-bar::-webkit-scrollbar {
             height: 3px;
         }
-        .nav-scroll-wrapper::-webkit-scrollbar-track {
+        .top-nav-bar::-webkit-scrollbar-track {
             background: #2d2a1c;
         }
-        .nav-scroll-wrapper::-webkit-scrollbar-thumb {
+        .top-nav-bar::-webkit-scrollbar-thumb {
             background: #b6964b;
             border-radius: 20px;
         }
 
+        .nav-brand {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+            margin-right: 0.25rem;
+            white-space: nowrap;
+        }
+
         .nav-links {
-            display: inline-flex;
-            gap: 0.25rem;
-            padding: 0 1rem;
+            display: flex;
+            flex-direction: row;
+            gap: 0.3rem;
+            flex-shrink: 0;
+            align-items: center;
         }
 
         .nav-link {
-            display: inline-block;
+            display: inline-flex;
             text-decoration: none;
             font-weight: 600;
             font-size: 0.85rem;
-            padding: 0.5rem 1.2rem;
+            padding: 0.45rem 1.2rem;
             border-radius: 40px;
             background: rgba(210, 210, 225, 0.12);
             color: #eef0ff;
             transition: all 0.2s ease;
             letter-spacing: 0.5px;
             backdrop-filter: blur(2px);
-            margin: 0 2px;
             white-space: nowrap;
+            align-items: center;
+            justify-content: center;
         }
+
         .nav-link:hover {
             background: rgba(235, 235, 245, 0.25);
             color: #ffffff;
             transform: translateY(-1px);
         }
+
         .nav-link.active {
             background: #c9a53b;
             color: #1e1c10;
@@ -121,6 +111,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
+        /* 卡片主体容器 */
         .card-panel {
             max-width: 950px;
             width: 100%;
@@ -434,14 +425,22 @@
         @media (max-width: 650px) {
             .content-padding { padding: 0 1rem; }
             .card-panel { padding: 0 0 1rem 0; }
-            body { padding-top: 110px; }
+            body { padding-top: 70px; }  /* 移动端适配标题高度 */
             .form-group { flex-direction: column; align-items: stretch; }
             .variant-list { justify-content: center; }
             button { width: 100%; }
             .lang-box select { width: 100%; }
             .toggle-switch { justify-content: space-between; }
             .nav-brand {
-                font-size: 1.2rem;
+                font-size: 1.15rem;
+            }
+            .nav-link {
+                padding: 0.4rem 1rem;
+                font-size: 0.8rem;
+            }
+            .top-nav-bar {
+                padding: 0.45rem 0.8rem;
+                gap: 0.4rem;
             }
         }
         @media (min-width: 1400px) {
@@ -449,20 +448,30 @@
                 max-width: 1100px;
             }
         }
+
+        /* 确保在极端窄屏下，滚动条依然可用但视觉干净 */
+        @media (max-width: 480px) {
+            .nav-brand {
+                font-size: 1rem;
+                letter-spacing: 1px;
+            }
+            .nav-link {
+                padding: 0.35rem 0.9rem;
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="card-panel">
-    <!-- 顶部导航栏 -->
+    <!-- 导航栏 -->
     <div class="top-nav-bar">
         <div class="nav-brand">KARDS 军械库</div>
-        <div class="nav-scroll-wrapper">
-            <div class="nav-links">
-                <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌总览</a>
-                <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
-                <a class="nav-link active" href="#" target="_blank" data-target="seek">英文直检</a>
-                <a class="nav-link" href="#" data-target="about">关于军械库</a>
-            </div>
+        <div class="nav-links">
+            <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌总览</a>
+            <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
+            <a class="nav-link active" href="#" data-target="seek">英文直检</a>
+            <a class="nav-link" href="#" data-target="about">关于军械库</a>
         </div>
     </div>
 
