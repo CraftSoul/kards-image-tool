@@ -22,7 +22,7 @@
                 repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
             background-blend-mode: overlay, normal;
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            padding-top: 70px;
+            padding-top: 72px;
         }
 
         .top-nav-bar {
@@ -35,75 +35,88 @@
             backdrop-filter: blur(16px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             border-bottom: 1px solid #aa8e4e;
+        }
+
+        .nav-main-row {
             display: flex;
             align-items: center;
-            flex-wrap: nowrap;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
+            justify-content: space-between;
+            padding: 0.7rem 1rem;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(170, 142, 78, 0.3);
+            min-width: 0;
+        }
+
+        .nav-brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-right: 0.5rem;
+        }
+
+        .nav-actions-placeholder {
+            flex-shrink: 0;
+            width: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nav-scroll-wrapper {
             overflow-x: auto;
             overflow-y: hidden;
             white-space: nowrap;
             scrollbar-width: thin;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
+            padding: 0.5rem 0 0.6rem 0;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(120, 100, 55, 0.5);
         }
 
-        .top-nav-bar::-webkit-scrollbar {
+        .nav-scroll-wrapper::-webkit-scrollbar {
             height: 3px;
         }
-        .top-nav-bar::-webkit-scrollbar-track {
+        .nav-scroll-wrapper::-webkit-scrollbar-track {
             background: #2d2a1c;
         }
-        .top-nav-bar::-webkit-scrollbar-thumb {
+        .nav-scroll-wrapper::-webkit-scrollbar-thumb {
             background: #b6964b;
             border-radius: 20px;
         }
 
-        .nav-brand {
-            font-size: 1.3rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-            flex-shrink: 0;
-            margin-right: 0.25rem;
-            white-space: nowrap;
-        }
-
         .nav-links {
-            display: flex;
-            flex-direction: row;
-            gap: 0.3rem;
-            flex-shrink: 0;
-            align-items: center;
+            display: inline-flex;
+            gap: 0.25rem;
+            padding: 0 1rem;
         }
 
         .nav-link {
-            display: inline-flex;
+            display: inline-block;
             text-decoration: none;
             font-weight: 600;
             font-size: 0.85rem;
-            padding: 0.45rem 1.2rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 40px;
             background: rgba(210, 210, 225, 0.12);
             color: #eef0ff;
             transition: all 0.2s ease;
             letter-spacing: 0.5px;
             backdrop-filter: blur(2px);
+            margin: 0 2px;
             white-space: nowrap;
-            align-items: center;
-            justify-content: center;
         }
-
         .nav-link:hover {
             background: rgba(235, 235, 245, 0.25);
             color: #ffffff;
             transform: translateY(-1px);
         }
-
         .nav-link.active {
             background: #c9a53b;
             color: #1e1c10;
@@ -111,7 +124,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* 卡片主体容器 */
         .card-panel {
             max-width: 950px;
             width: 100%;
@@ -423,24 +435,40 @@
         .hide { display: none; }
         
         @media (max-width: 650px) {
-            .content-padding { padding: 0 1rem; }
-            .card-panel { padding: 0 0 1rem 0; }
-            body { padding-top: 70px; }  /* 移动端适配标题高度 */
-            .form-group { flex-direction: column; align-items: stretch; }
-            .variant-list { justify-content: center; }
-            button { width: 100%; }
-            .lang-box select { width: 100%; }
-            .toggle-switch { justify-content: space-between; }
+            body {
+                padding-top: 68px;
+            }
+            .content-padding { 
+                padding: 0 1rem; 
+            }
+            .card-panel { 
+                padding: 0 0 1rem 0; 
+            }
+            .form-group { 
+                flex-direction: column; 
+                align-items: stretch; 
+            }
+            .variant-list { 
+                justify-content: center; 
+            }
+            button { 
+                width: 100%; 
+            }
+            .lang-box select { 
+                width: 100%; 
+            }
+            .toggle-switch { 
+                justify-content: space-between; 
+            }
             .nav-brand {
-                font-size: 1.15rem;
+                font-size: 1.2rem;
+            }
+            .nav-main-row {
+                padding: 0.6rem 1rem;
             }
             .nav-link {
-                padding: 0.4rem 1rem;
+                padding: 0.45rem 1rem;
                 font-size: 0.8rem;
-            }
-            .top-nav-bar {
-                padding: 0.45rem 0.8rem;
-                gap: 0.4rem;
             }
         }
         @media (min-width: 1400px) {
@@ -448,30 +476,25 @@
                 max-width: 1100px;
             }
         }
-
-        /* 确保在极端窄屏下，滚动条依然可用但视觉干净 */
-        @media (max-width: 480px) {
-            .nav-brand {
-                font-size: 1rem;
-                letter-spacing: 1px;
-            }
-            .nav-link {
-                padding: 0.35rem 0.9rem;
-                font-size: 0.75rem;
-            }
+        .nav-scroll-wrapper {
+            width: 100%;
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
 <div class="card-panel">
-    <!-- 导航栏 -->
     <div class="top-nav-bar">
-        <div class="nav-brand">KARDS 军械库</div>
-        <div class="nav-links">
-            <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌总览</a>
-            <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
-            <a class="nav-link active" href="#" data-target="seek">英文直检</a>
-            <a class="nav-link" href="#" data-target="about">关于军械库</a>
+        <div style="display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 1rem 0.4rem 1rem; border-bottom: 1px solid rgba(170, 142, 78, 0.2);">
+            <div class="nav-brand">KARDS 军械库</div>
+            <div class="nav-scroll-wrapper" style="flex: 1; overflow-x: auto; white-space: nowrap; padding: 0; margin: 0; background: transparent; border-top: none; scrollbar-width: thin;">
+                <div class="nav-links" style="display: inline-flex; gap: 0.25rem; padding: 0 0.2rem;">
+                    <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌总览</a>
+                    <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
+                    <a class="nav-link active" href="#" data-target="seek">英文直检</a>
+                    <a class="nav-link" href="#" data-target="about">关于军械库</a>
+                </div>
+            </div>
         </div>
     </div>
 
