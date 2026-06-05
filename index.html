@@ -31,17 +31,17 @@
             left: 0;
             width: 100%;
             z-index: 1000;
-            background: rgba(28, 28, 28, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(210, 210, 210, 0.6);
-            padding: 0.8rem 2rem;
+            background: rgba(20, 20, 15, 0.92);
+            backdrop-filter: blur(14px);
+            border-bottom: none;
+            padding: 0.6rem 2rem;
             display: flex;
             flex-wrap: wrap;
-            align-items: baseline;
+            align-items: center;
             justify-content: space-between;
             gap: 1rem;
             transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         .nav-brand {
             font-size: 1.5rem;
@@ -56,36 +56,39 @@
         .nav-links {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.25rem;
             align-items: center;
         }
         .nav-link {
             text-decoration: none;
             font-weight: 600;
             font-size: 0.9rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            background: rgba(220, 220, 235, 0.15);
-            color: #f0f2ff;
-            transition: all 0.25s ease;
-            border: 1px solid rgba(210, 210, 230, 0.4);
+            padding: 0.6rem 1.4rem;
+            border-radius: 0px;
+            background: rgba(210, 210, 225, 0.12);
+            color: #eef0ff;
+            transition: all 0.2s ease;
             letter-spacing: 0.5px;
-            backdrop-filter: blur(3px);
+            border: none;
+            backdrop-filter: blur(2px);
+            margin: 0;
         }
         .nav-link:hover {
-            background: rgba(235, 235, 255, 0.35);
-            color: white;
-            border-color: #e0e0f0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            background: rgba(235, 235, 245, 0.25);
+            color: #ffffff;
+            transform: translateY(-1px);
         }
         .nav-link.active {
-            background: #c7c7dd3c;
-            border-color: #e2e2f0;
-            color: #fff9e8;
-            box-shadow: 0 0 8px rgba(200,200,240,0.6);
+            background: #c9a53b;
+            color: #1e1c10;
             font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+        .nav-link.active:hover {
+            background: #dcb753;
+            color: #1f1c0c;
+        }
+
         .card-panel {
             max-width: 950px;
             width: 100%;
@@ -395,6 +398,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         .hide { display: none; }
+        
         @media (max-width: 650px) {
             .content-padding { padding: 0 1rem; }
             .card-panel { padding: 0 0 1rem 0; }
@@ -404,13 +408,34 @@
             button { width: 100%; }
             .lang-box select { width: 100%; }
             .toggle-switch { justify-content: space-between; }
-            .top-nav-bar { flex-direction: column; align-items: center; padding: 0.8rem 1rem; }
-            .nav-links { justify-content: center; width: 100%; }
+            .top-nav-bar { 
+                flex-direction: column; 
+                align-items: center; 
+                padding: 0.6rem 1rem; 
+                gap: 0.6rem;
+            }
+            .nav-links { 
+                justify-content: center; 
+                width: 100%; 
+                gap: 0.2rem;
+                flex-wrap: wrap;
+            }
+            .nav-link {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+                flex: 0 0 auto;
+            }
+        }
+        @media (min-width: 1400px) {
+            .card-panel {
+                max-width: 1100px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="card-panel">
+    <!-- 顶部导航栏 -->
     <div class="top-nav-bar">
         <div class="nav-brand">KARDS 军械库</div>
         <div class="nav-links">
@@ -635,7 +660,7 @@
                 setLoadingState(false);
                 showError(`⚠️ 加载失败: ${item.formattedName}.avif`);
                 cardImage.setAttribute('data-valid', 'false');
-                cardImage.src = "%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 高清图不可用 💀%3C/text%3E";
+                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 高清图不可用 💀%3C/text%3E%3C/svg%3E";
                 resolve(false);
             };
             imgLoader.src = highResUrl;
@@ -783,7 +808,6 @@
             ctx.quadraticCurveTo(0, 0, radius, 0);
             ctx.closePath();
             ctx.clip();
-            // 绘制原始图像
             ctx.drawImage(imgBitmap, 0, 0, w, h);
             ctx.restore();
             
@@ -802,7 +826,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            imageStatus.innerHTML = `📦 已保存: ${fileName} (圆角12px,透明底)`;
+            imageStatus.innerHTML = `📦 已保存: ${fileName}`;
             setTimeout(() => {
                 if (imageStatus.innerHTML.includes('已保存')) imageStatus.style.color = "#e7dfb0";
             }, 1500);
