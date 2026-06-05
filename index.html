@@ -22,30 +22,18 @@
                 repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
             background-blend-mode: overlay, normal;
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1rem;
+            padding-top: 80px;
         }
 
-        .card-panel {
-            max-width: 950px;
-            width: 100%;
-            background: rgba(30, 28, 20, 0.78);
-            backdrop-filter: blur(3px);
-            border-radius: 2rem;
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 200, 0.1);
-            border: 1px solid rgba(150, 130, 70, 0.6);
-            padding: 0 0 1.5rem 0;
-            transition: all 0.2s;
-            overflow: hidden;
-        }
-
-        /* 银白色顶部导航栏 */
         .top-nav-bar {
-            background: rgba(28, 28, 28, 0.85);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(210, 210, 210, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(28, 28, 28, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(210, 210, 210, 0.6);
             padding: 0.8rem 2rem;
             display: flex;
             flex-wrap: wrap;
@@ -53,7 +41,7 @@
             justify-content: space-between;
             gap: 1rem;
             transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .nav-brand {
             font-size: 1.5rem;
@@ -75,26 +63,39 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 0.9rem;
-            padding: 0.4rem 0.9rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 40px;
-            background: rgba(220, 220, 235, 0.12);
-            color: #eef2ff;
-            transition: all 0.2s ease;
-            border: 1px solid rgba(210, 210, 230, 0.3);
+            background: rgba(220, 220, 235, 0.15);
+            color: #f0f2ff;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(210, 210, 230, 0.4);
             letter-spacing: 0.5px;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(3px);
         }
         .nav-link:hover {
-            background: rgba(235, 235, 255, 0.3);
+            background: rgba(235, 235, 255, 0.35);
             color: white;
-            border-color: #c0c0d0;
-            transform: translateY(-1px);
+            border-color: #e0e0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .nav-link.active {
-            background: #c7c7dd2e;
+            background: #c7c7dd3c;
             border-color: #e2e2f0;
             color: #fff9e8;
-            box-shadow: 0 0 6px rgba(200,200,230,0.5);
+            box-shadow: 0 0 8px rgba(200,200,240,0.6);
+            font-weight: 700;
+        }
+        .card-panel {
+            max-width: 950px;
+            width: 100%;
+            margin: 0 auto;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            padding: 0 0 1.5rem 0;
+            overflow: visible;
         }
 
         .content-padding {
@@ -297,28 +298,28 @@
             transform: scale(0.96);
         }
         .image-showcase {
-            background: #19170fcc;
-            border-radius: 28px;
             margin: 1.2rem 0 1rem;
-            padding: 1rem;
+            padding: 0.8rem;
             text-align: center;
-            border: 1px solid #ad9a68;
-            box-shadow: inset 0 0 12px rgba(0,0,0,0.5), 0 6px 12px rgba(0,0,0,0.3);
+            background: transparent;
+            border: none;
+            box-shadow: none;
         }
         .img-wrapper {
-            background: #18150e;
+            background: rgba(0,0,0,0.35);
             border-radius: 20px;
             min-height: 240px;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 1rem;
+            border: 1px dashed rgba(180, 150, 80, 0.6);
         }
         #cardImage {
             max-width: 100%;
             max-height: 380px;
-            border-radius: 16px;
-            box-shadow: 0 8px 18px black;
+            border-radius: 12px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.6);
             transition: 0.2s;
             background: #2b281f;
         }
@@ -397,6 +398,7 @@
         @media (max-width: 650px) {
             .content-padding { padding: 0 1rem; }
             .card-panel { padding: 0 0 1rem 0; }
+            body { padding-top: 110px; }
             .form-group { flex-direction: column; align-items: stretch; }
             .variant-list { justify-content: center; }
             button { width: 100%; }
@@ -409,7 +411,6 @@
 </head>
 <body>
 <div class="card-panel">
-    <!-- 顶部导航栏 -->
     <div class="top-nav-bar">
         <div class="nav-brand">KARDS 军械库</div>
         <div class="nav-links">
@@ -524,17 +525,15 @@
         return processed;
     }
     
-    // 构建高清展示图片URL (quality=100, 不进行额外缩放)
+    // 构建高清展示图片URL
     function buildHighResImageUrl(formattedName, lang) {
         return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=100`;
     }
     
-    // 构建用于检测的轻量URL (q=1,w=1,h=1极小检测，精准判断存在性)
     function buildDetectionUrl(formattedName, lang) {
         return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=1&w=1&h=1`;
     }
     
-    // 使用轻量检测（单像素）快速判断卡图是否存在（节省流量且极速）
     function testImageExistsViaDetection(formattedName, lang) {
         return new Promise((resolve) => {
             const detectionUrl = buildDetectionUrl(formattedName, lang);
@@ -545,7 +544,6 @@
         });
     }
     
-    // 渐进发现变体: 使用轻量检测先判定存在性，再返回变体列表，保持展示时加载高清图。
     async function progressiveDiscover(baseClean, lang, includeVariants) {
         const originalFormatted = baseClean;
         const originalExists = await testImageExistsViaDetection(originalFormatted, lang);
@@ -569,7 +567,6 @@
         const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
         const variantCandidates = suffixLetters.map(letter => ({ suffix: `_${letter}`, display: `变体 ${letter.toUpperCase()}` }));
         
-        // 并行检测所有变体 + 老兵
         const variantPromises = variantCandidates.map(async (cand) => {
             const testName = baseClean + cand.suffix;
             const exists = await testImageExistsViaDetection(testName, lang);
@@ -612,7 +609,6 @@
         return { variants: variantsList };
     }
     
-    // 加载高清卡图（基于已确认存在的item, 使用高清url）
     async function loadCardByVariantItem(item, lang) {
         if (!item || !item.formattedName) return false;
         const highResUrl = buildHighResImageUrl(item.formattedName, lang);
@@ -637,10 +633,9 @@
             };
             imgLoader.onerror = () => {
                 setLoadingState(false);
-                // 降级防御: 理论上检测通过后极少出错，但若失败则展示错误
-                showError(`⚠️ 高清图加载失败: ${item.formattedName}.avif`);
+                showError(`⚠️ 加载失败: ${item.formattedName}.avif`);
                 cardImage.setAttribute('data-valid', 'false');
-                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 高清图不可用 💀%3C/text%3E%3C/svg%3E";
+                cardImage.src = "%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 高清图不可用 💀%3C/text%3E";
                 resolve(false);
             };
             imgLoader.src = highResUrl;
@@ -661,7 +656,6 @@
             variantsContainer.style.display = 'none';
             return;
         }
-        // 只有单一原版且无其他变体时隐藏面板
         if (variants.length === 1 && variants[0].suffixKey === '' && !variants[0].isVeteran) {
             variantsContainer.style.display = 'none';
             return;
@@ -747,7 +741,6 @@
         renderVariantPanel(currentVariants, activeVariantId, onSelectVariant);
     }
     
-    // 保存图像 (与高清源一致)
     async function saveCardImage() {
         const currentSrc = cardImage.src;
         if (!currentSrc || (currentSrc.includes("data:image/svg+xml") && 
@@ -767,19 +760,40 @@
             const response = await fetch(cardImage.src);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const blob = await response.blob();
-            const bitmap = await createImageBitmap(blob);
+            const imgBitmap = await createImageBitmap(blob);
+            const w = imgBitmap.width;
+            const h = imgBitmap.height;
             const canvas = document.createElement('canvas');
-            canvas.width = bitmap.width;
-            canvas.height = bitmap.height;
+            canvas.width = w;
+            canvas.height = h;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(bitmap, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+            
+            const radius = 12;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(w - radius, 0);
+            ctx.quadraticCurveTo(w, 0, w, radius);
+            ctx.lineTo(w, h - radius);
+            ctx.quadraticCurveTo(w, h, w - radius, h);
+            ctx.lineTo(radius, h);
+            ctx.quadraticCurveTo(0, h, 0, h - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.clip();
+            // 绘制原始图像
+            ctx.drawImage(imgBitmap, 0, 0, w, h);
+            ctx.restore();
+            
             const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
             let baseFileName = cardImage.getAttribute('data-current-name') || 'kards_card';
             const currentLangAttr = cardImage.getAttribute('data-lang') || langSelect.value;
             let langLabel = currentLangAttr.replace('-', '_');
             const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en_EN':'EN', 'fr_FR':'FR', 'de_DE':'DE', 'pl_PL':'PL', 'pt_BR':'BR', 'ru_RU':'RU', 'it_IT':'IT', 'es_ES':'ES', 'ko_KR':'KR', 'ja_JP':'JP' };
             let short = langMapShort[langLabel] || langLabel.toUpperCase();
-            const fileName = `${baseFileName}_${short}.png`;
+            const fileName = `${baseFileName}_${short}_rounded.png`;
             const url = URL.createObjectURL(pngBlob);
             const a = document.createElement('a');
             a.href = url;
@@ -788,7 +802,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            imageStatus.innerHTML = `📦 已保存: ${fileName}`;
+            imageStatus.innerHTML = `📦 已保存: ${fileName} (圆角12px,透明底)`;
             setTimeout(() => {
                 if (imageStatus.innerHTML.includes('已保存')) imageStatus.style.color = "#e7dfb0";
             }, 1500);
@@ -817,7 +831,6 @@
         cardImage.setAttribute('data-valid', 'false');
     }
     
-    // 事件绑定
     fetchBtn.onclick = (e) => {
         e.preventDefault();
         advancedRetrieve(false, null);
