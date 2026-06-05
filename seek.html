@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>KARDS军械库 | 英文直检</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #2b2b1f;
+            background-image: 
+                radial-gradient(circle at 20% 40%, rgba(80, 70, 40, 0.4) 2%, transparent 2.5%),
+                radial-gradient(circle at 70% 85%, rgba(60, 50, 30, 0.5) 1.8%, transparent 2.2%),
+                radial-gradient(circle at 45% 20%, rgba(110, 90, 50, 0.3) 3%, transparent 3.5%),
+                repeating-linear-gradient(45deg, #5e5536 0px, #5e5536 2px, #7e6e48 2px, #7e6e48 8px),
+                repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
+            background-blend-mode: overlay, normal;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding-top: 80px;
+        }
+
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(20, 20, 15, 0.92);
+            backdrop-filter: blur(14px);
+            border-bottom: none;
+            padding: 0.6rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #f9f9fc, #d8d8e6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        .nav-link {
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.4rem;
+            border-radius: 0px;
+            background: rgba(210, 210, 225, 0.12);
+            color: #eef0ff;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+            border: none;
+            backdrop-filter: blur(2px);
+            margin: 0;
+        }
+        .nav-link:hover {
+            background: rgba(235, 235, 245, 0.25);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        .nav-link.active {
+            background: #c9a53b;
+            color: #1e1c10;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .nav-link.active:hover {
+            background: #dcb753;
+            color: #1f1c0c;
+        }
+
+        .card-panel {
+            max-width: 950px;
+            width: 100%;
+            margin: 0 auto;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            padding: 0 0 1.5rem 0;
+            overflow: visible;
+        }
+
+        .content-padding {
+            padding: 0 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.3rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem 1.2rem;
+        }
+        .label-icon {
+            color: #fff0c0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.5);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border-left: 3px solid #dbb45c;
+        }
+        input, select, button {
+            background: #2e2b22;
+            border: 1px solid #8f7a52;
+            padding: 0.7rem 1rem;
+            border-radius: 0px;
+            font-size: 1rem;
+            color: #faf2da;
+            outline: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        input {
+            flex: 2;
+            min-width: 200px;
+            background: #252219;
+            border-radius: 0px;
+        }
+        input:focus, select:focus {
+            border-color: #e4b363;
+            box-shadow: 0 0 6px rgba(228, 179, 99, 0.6);
+            background: #2f2a1e;
+        }
+        .lang-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 0px;
+            flex-wrap: wrap;
+        }
+        .lang-box label {
+            color: #ffe6aa;
+            font-weight: 500;
+        }
+        select {
+            background: #2c281e;
+            cursor: pointer;
+            width: auto;
+            min-width: 100px;
+            border-radius: 0px;
+        }
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,0,0,0.55);
+            padding: 0.3rem 1rem 0.3rem 1.2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+            border: 1px solid #ab8e4e;
+        }
+        .toggle-switch span {
+            color: #ffeaae;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 26px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3a3222;
+            transition: 0.2s;
+            border-radius: 34px;
+            border: 1px solid #b19458;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 2px;
+            background-color: #e9cf95;
+            transition: 0.2s;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px black;
+        }
+        input:checked + .slider {
+            background-color: #7a6233;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            background-color: #fef0b6;
+        }
+        .variants-panel {
+            margin: 0.5rem 0 0.8rem;
+            background: #262216b3;
+            border-radius: 0px;
+            padding: 0.5rem 0.8rem;
+            backdrop-filter: blur(1px);
+            border: 1px solid #7d6a42;
+            transition: all 0.2s;
+        }
+        .variants-header {
+            font-size: 0.75rem;
+            color: #dcc98a;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.5rem;
+            padding-left: 0.3rem;
+            font-weight: bold;
+        }
+        .variants-badge {
+            background: #5b4b2b;
+            border-radius: 30px;
+            padding: 0.15rem 0.6rem;
+            font-size: 0.7rem;
+            color: #ffefbf;
+        }
+        .variant-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .variant-chip {
+            background: #312b1c;
+            border: 1px solid #ad924d;
+            border-radius: 0px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fddf9e;
+            cursor: pointer;
+            transition: 0.1s linear;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .variant-chip:hover {
+            background: #7e643a;
+            color: white;
+            transform: scale(0.96);
+            border-color: #ebc27a;
+        }
+        .variant-chip.active {
+            background: #c7a252;
+            color: #1f1c0f;
+            border-color: #fbdd8b;
+            box-shadow: 0 0 5px #f3bc5c;
+        }
+        button {
+            background: #6b5a39;
+            border: none;
+            font-weight: bold;
+            padding: 0.7rem 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            transition: 0.1s linear;
+            letter-spacing: 1px;
+            border-radius: 0px;
+        }
+        button:hover {
+            background: #8f774b;
+            transform: scale(0.97);
+            box-shadow: 0 1px 3px black;
+            color: white;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .image-showcase {
+            margin: 1.2rem 0 1rem;
+            padding: 0.8rem;
+            text-align: center;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .img-wrapper {
+            background: rgba(0,0,0,0.35);
+            border-radius: 20px;
+            min-height: 240px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            border: 1px dashed rgba(180, 150, 80, 0.6);
+        }
+        #cardImage {
+            max-width: 100%;
+            max-height: 380px;
+            border-radius: 12px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+            transition: 0.2s;
+            background: #2b281f;
+        }
+        .status-msg {
+            color: #f3d48f;
+            background: #2a2419b3;
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+        .save-area {
+            display: flex;
+            justify-content: center;
+            margin: 0.8rem 0 0.5rem;
+        }
+        #saveBtn {
+            background: #3e6b3e;
+            padding: 0.6rem 2rem;
+            font-size: 1rem;
+            box-shadow: 0 3px 0 #1e3a1e;
+            border-radius: 0px;
+        }
+        #saveBtn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 #1e3a1e;
+        }
+        .footer-simple {
+            margin-top: 1.8rem;
+            padding-top: 1rem;
+            border-top: 1px solid #928451;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.2rem 2rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+        .footer-simple a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            color: #f8efcf;
+            background: rgba(0.5,0.5,0.5,0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: all 0.2s;
+            font-weight: 500;
+            backdrop-filter: blur(2px);
+        }
+        .footer-simple a:hover {
+            background: #b48b3f;
+            color: #181d0e;
+            transform: translateY(-2px);
+        }
+        .footer-simple img {
+            width: 18px;
+            height: 18px;
+            filter: invert(0.95);
+            transition: filter 0.2s;
+        }
+        .loader {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #c0a56b;
+            border-radius: 50%;
+            border-top-color: #fae468;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hide { display: none; }
+        
+        @media (max-width: 650px) {
+            .content-padding { padding: 0 1rem; }
+            .card-panel { padding: 0 0 1rem 0; }
+            body { padding-top: 110px; }
+            .form-group { flex-direction: column; align-items: stretch; }
+            .variant-list { justify-content: center; }
+            button { width: 100%; }
+            .lang-box select { width: 100%; }
+            .toggle-switch { justify-content: space-between; }
+            .top-nav-bar { 
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0.6rem 1rem;
+                gap: 0.6rem;
+            }
+            .nav-links { 
+                flex-direction: column;
+                width: 100%;
+                gap: 0.2rem;
+            }
+            .nav-link {
+                display: block;
+                text-align: center;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                width: 100%;
+            }
+        }
+        @media (min-width: 1400px) {
+            .card-panel {
+                max-width: 1100px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card-panel">
+    <!-- 顶部导航栏 -->
+    <div class="top-nav-bar">
+        <div class="nav-brand">KARDS 军械库</div>
+        <div class="nav-links">
+            <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool" target="_blank">卡牌总览</a>
+            <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank">卡组构筑</a>
+            <a class="nav-link active" href="#" target="_blank">英文直检</a>
+        </div>
+    </div>
+
+    <div class="content-padding">
+        <div class="form-group">
+            <span class="label-icon">卡牌英名</span>
+            <input type="text" id="cardNameInput" placeholder="例:RESISTANCE" value="RESISTANCE">
+        </div>
+
+        <div class="form-group" style="justify-content: space-between; flex-wrap: wrap;">
+            <div class="lang-box">
+                <label>语言</label>
+                <select id="langSelect">
+                    <option value="zh-Hans">🇨🇳简体中文(zh-Hans)</option>
+                    <option value="zh-Hant">🇨🇳繁體中文(zh-Hant)</option>
+                    <option value="en-EN">🇬🇧English(en-En)</option>
+                    <option value="fr-FR">🇫🇷Français(fr-FR)</option>
+                    <option value="de-DE">🇩🇪Deutsch(de-DE)</option>
+                    <option value="pl-PL">🇵🇱Polski(pl-PL)</option>
+                    <option value="pt-BR">🇵🇹Português(pt-BR)</option>
+                    <option value="ru-RU">🇷🇺Pусский(ru-RU)</option>
+                    <option value="it-IT">🇮🇹Italiano(it-IT)</option>
+                    <option value="es-ES">🇪🇸Español(es-ES)</option>
+                    <option value="ko-KR">🇰🇷한국어(ko-KR)</option>
+                    <option value="ja-JP">🇯🇵日本語(ja-JP)</option>
+                </select>
+            </div>
+            <div class="toggle-switch">
+                <span>♠️ 变体检索</span>
+                <label class="switch">
+                    <input type="checkbox" id="variantToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 同名卡牌变体列表区 -->
+        <div id="variantsContainer" class="variants-panel" style="display: none;">
+            <div class="variants-header">
+                <span>📜 同名卡牌</span>
+                <span class="variants-badge" id="variantCountBadge">0</span>
+                <span style="font-size:0.7rem;">点击切换版本</span>
+            </div>
+            <div id="variantList" class="variant-list"></div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin: 0.3rem 0 0.2rem;">
+            <button id="fetchBtn">🔍 检索卡图</button>
+        </div>
+
+        <div class="image-showcase">
+            <div class="img-wrapper">
+                <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
+            </div>
+            <div id="imageStatus" class="status-msg">Waiting for orders.</div>
+        </div>
+
+        <div class="save-area">
+            <button id="saveBtn">💾 保存图像(PNG)</button>
+        </div>
+
+        <div class="footer-simple">
+            <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub
+            </a>
+            <a href="https://space.bilibili.com/3546775476505152" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili
+            </a>
+            <a href="https://www.douyin.com/user/MS4wLjABAAAAERwZXqP_VI8qTqzyV-A6aJircP4R6tiOBRCY5QCFQrAd_gZ8z-LsyNvUHuDipQ7S" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="抖音"> 抖音
+            </a>
+            <a href="https://www.zhihu.com/people/7-97-53-5-79" target="_blank">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="知乎"> 知乎
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DOM 元素
+    const cardNameInput = document.getElementById('cardNameInput');
+    const langSelect = document.getElementById('langSelect');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const cardImage = document.getElementById('cardImage');
+    const imageStatus = document.getElementById('imageStatus');
+    const saveBtn = document.getElementById('saveBtn');
+    const variantsContainer = document.getElementById('variantsContainer');
+    const variantListDiv = document.getElementById('variantList');
+    const variantCountBadge = document.getElementById('variantCountBadge');
+    const variantToggle = document.getElementById('variantToggle');
+
+    // 全局状态
+    let currentVariants = [];
+    let activeVariantId = null;
+    let currentRawCardName = '';
+    let currentBaseClean = '';
+    let currentLang = 'zh-Hans';
+    let isDiscovering = false;
+
+    function formatBaseName(rawName) {
+        if (!rawName || rawName.trim() === "") return "";
+        let processed = rawName.trim().toLowerCase();
+        processed = processed.replace(/[&!\/\\\'"(),-]/g, '');
+        processed = processed.replace(/[\.\s]+/g, '_');
+        processed = processed.replace(/^_+|_+$/g, '');
+        return processed;
+    }
+    
+    // 构建高清展示图片URL
+    function buildHighResImageUrl(formattedName, lang) {
+        return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=100`;
+    }
+    
+    function buildDetectionUrl(formattedName, lang) {
+        return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=1&w=1&h=1`;
+    }
+    
+    function testImageExistsViaDetection(formattedName, lang) {
+        return new Promise((resolve) => {
+            const detectionUrl = buildDetectionUrl(formattedName, lang);
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = detectionUrl;
+        });
+    }
+    
+    async function progressiveDiscover(baseClean, lang, includeVariants) {
+        const originalFormatted = baseClean;
+        const originalExists = await testImageExistsViaDetection(originalFormatted, lang);
+        let variantsList = [];
+        
+        if (originalExists) {
+            variantsList.push({
+                suffixKey: '',
+                displayName: '原版',
+                formattedName: originalFormatted,
+                isVeteran: false
+            });
+        } else {
+            return { variants: [] };
+        }
+        
+        if (!includeVariants) {
+            return { variants: variantsList };
+        }
+        
+        const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
+        const variantCandidates = suffixLetters.map(letter => ({ suffix: `_${letter}`, display: `变体 ${letter.toUpperCase()}` }));
+        
+        const variantPromises = variantCandidates.map(async (cand) => {
+            const testName = baseClean + cand.suffix;
+            const exists = await testImageExistsViaDetection(testName, lang);
+            if (exists) {
+                return {
+                    suffixKey: cand.suffix,
+                    displayName: cand.display,
+                    formattedName: testName,
+                    isVeteran: false
+                };
+            }
+            return null;
+        });
+        
+        const vetName = baseClean + '_vet';
+        const vetPromise = testImageExistsViaDetection(vetName, lang);
+        
+        const variantResults = await Promise.all(variantPromises);
+        const foundVariants = variantResults.filter(v => v !== null);
+        const hasVeteran = await vetPromise;
+        if (hasVeteran) {
+            foundVariants.push({
+                suffixKey: '_vet',
+                displayName: '⭐ 老兵',
+                formattedName: vetName,
+                isVeteran: true
+            });
+        }
+        
+        variantsList.push(...foundVariants);
+        variantsList.sort((a, b) => {
+            if (a.suffixKey === '') return -1;
+            if (b.suffixKey === '') return 1;
+            if (a.isVeteran && !b.isVeteran) return 1;
+            if (!a.isVeteran && b.isVeteran) return -1;
+            if (a.suffixKey < b.suffixKey) return -1;
+            return 1;
+        });
+        
+        return { variants: variantsList };
+    }
+    
+    async function loadCardByVariantItem(item, lang) {
+        if (!item || !item.formattedName) return false;
+        const highResUrl = buildHighResImageUrl(item.formattedName, lang);
+        setLoadingState(true);
+        const langDisplay = getLangDisplayName(lang);
+        imageStatus.innerHTML = `🔍 加载高清: ${item.formattedName}.avif (${langDisplay})`;
+        return new Promise((resolve) => {
+            const imgLoader = new Image();
+            imgLoader.onload = () => {
+                cardImage.src = highResUrl;
+                setLoadingState(false);
+                let extraFlag = '';
+                if (item.isVeteran) extraFlag = ' ⭐ 老兵单位';
+                else if (item.suffixKey !== '' && item.suffixKey !== '_vet') extraFlag = ` 🔹 ${item.displayName}`;
+                imageStatus.innerHTML = `✅ 高清 ${item.formattedName}.avif${extraFlag} (${langDisplay})`;
+                imageStatus.style.color = "#f4e2aa";
+                cardImage.setAttribute('data-valid', 'true');
+                cardImage.setAttribute('data-current-name', item.formattedName);
+                cardImage.setAttribute('data-lang', lang);
+                cardImage.style.opacity = '1';
+                resolve(true);
+            };
+            imgLoader.onerror = () => {
+                setLoadingState(false);
+                showError(`⚠️ 加载失败: ${item.formattedName}.avif`);
+                cardImage.setAttribute('data-valid', 'false');
+                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 高清图不可用 💀%3C/text%3E%3C/svg%3E";
+                resolve(false);
+            };
+            imgLoader.src = highResUrl;
+        });
+    }
+    
+    function getLangDisplayName(langCode) {
+        const map = {
+            'zh-Hans': '简体中文', 'zh-Hant': '繁體中文', 'en-EN': 'English',
+            'fr-FR': 'Français', 'de-DE': 'Deutsch', 'pl-PL': 'Polski', 'pt-BR': 'Português',
+            'ru-RU': 'Pусский', 'it-IT': 'Italiano', 'es-ES': 'Español', 'ko-KR': '한국어', 'ja-JP': '日本語'
+        };
+        return map[langCode] || langCode;
+    }
+    
+    function renderVariantPanel(variants, activeKey, onSelect) {
+        if (!variants || variants.length === 0) {
+            variantsContainer.style.display = 'none';
+            return;
+        }
+        if (variants.length === 1 && variants[0].suffixKey === '' && !variants[0].isVeteran) {
+            variantsContainer.style.display = 'none';
+            return;
+        }
+        variantsContainer.style.display = 'block';
+        variantCountBadge.innerText = variants.length;
+        variantListDiv.innerHTML = '';
+        variants.forEach(v => {
+            const chip = document.createElement('div');
+            chip.className = 'variant-chip';
+            if (v.suffixKey === activeKey) chip.classList.add('active');
+            let label = '';
+            if (v.isVeteran) label = '🎖️ 老兵';
+            else if (v.suffixKey === '') label = '📄 原版';
+            else label = `🃏 ${v.displayName}`;
+            chip.innerHTML = label;
+            chip.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (onSelect) onSelect(v);
+            });
+            variantListDiv.appendChild(chip);
+        });
+    }
+    
+    async function advancedRetrieve(keepSelection = false, targetSuffix = null) {
+        if (isDiscovering) return;
+        const rawName = cardNameInput.value.trim();
+        if (!rawName) {
+            showError("请输入卡牌英文名 (例: RESISTANCE)");
+            return;
+        }
+        const lang = langSelect.value;
+        const baseClean = formatBaseName(rawName);
+        if (!baseClean) {
+            showError("卡名格式化失败");
+            return;
+        }
+        
+        currentRawCardName = rawName;
+        currentBaseClean = baseClean;
+        currentLang = lang;
+        isDiscovering = true;
+        
+        setLoadingState(true);
+        const includeVariants = variantToggle.checked;
+        imageStatus.innerHTML = `🔎 轻量检测: ${baseClean} (${getLangDisplayName(lang)}) ${includeVariants ? '含变体' : '仅原版'}...`;
+        
+        const discoverResult = await progressiveDiscover(baseClean, lang, includeVariants);
+        isDiscovering = false;
+        
+        if (!discoverResult.variants.length) {
+            setLoadingState(false);
+            showError(`未找到: "${rawName}" (该语言无此卡图)`);
+            variantsContainer.style.display = 'none';
+            currentVariants = [];
+            cardImage.setAttribute('data-valid', 'false');
+            cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 / 语言无资源 %3C/text%3E%3C/svg%3E";
+            return;
+        }
+        
+        const variantsList = discoverResult.variants;
+        currentVariants = variantsList;
+        
+        let targetItem = null;
+        if (keepSelection && targetSuffix !== null) {
+            targetItem = variantsList.find(v => v.suffixKey === targetSuffix);
+        }
+        if (!targetItem) {
+            targetItem = variantsList.find(v => v.suffixKey === '') || variantsList[0];
+        }
+        if (!targetItem) return;
+        
+        activeVariantId = targetItem.suffixKey;
+        
+        await loadCardByVariantItem(targetItem, lang);
+        
+        const onSelectVariant = async (selectedItem) => {
+            if (selectedItem.suffixKey === activeVariantId) return;
+            activeVariantId = selectedItem.suffixKey;
+            await loadCardByVariantItem(selectedItem, lang);
+            renderVariantPanel(currentVariants, activeVariantId, onSelectVariant);
+        };
+        renderVariantPanel(currentVariants, activeVariantId, onSelectVariant);
+    }
+    
+    async function saveCardImage() {
+        const currentSrc = cardImage.src;
+        if (!currentSrc || (currentSrc.includes("data:image/svg+xml") && 
+            (currentSrc.includes("等待检索") || currentSrc.includes("遗失") || currentSrc.includes("无此卡") || currentSrc.includes("不存在") || currentSrc.includes("⚙️") || currentSrc.includes("💀")))) {
+            imageStatus.innerHTML = "⚠️ 无有效卡图可保存";
+            imageStatus.style.color = "#ffaa66";
+            return;
+        }
+        if (!cardImage.complete || cardImage.naturalWidth === 0) {
+            imageStatus.innerHTML = "⛔ 图片未完全加载，稍后重试";
+            return;
+        }
+        saveBtn.disabled = true;
+        const originalText = saveBtn.innerText;
+        saveBtn.innerText = "💾 导出中...";
+        try {
+            const response = await fetch(cardImage.src);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const blob = await response.blob();
+            const imgBitmap = await createImageBitmap(blob);
+            const w = imgBitmap.width;
+            const h = imgBitmap.height;
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, w, h);
+            
+            const radius = 12;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(w - radius, 0);
+            ctx.quadraticCurveTo(w, 0, w, radius);
+            ctx.lineTo(w, h - radius);
+            ctx.quadraticCurveTo(w, h, w - radius, h);
+            ctx.lineTo(radius, h);
+            ctx.quadraticCurveTo(0, h, 0, h - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(imgBitmap, 0, 0, w, h);
+            ctx.restore();
+            
+            const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+            let baseFileName = cardImage.getAttribute('data-current-name') || 'kards_card';
+            const currentLangAttr = cardImage.getAttribute('data-lang') || langSelect.value;
+            let langLabel = currentLangAttr.replace('-', '_');
+            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en_EN':'EN', 'fr_FR':'FR', 'de_DE':'DE', 'pl_PL':'PL', 'pt_BR':'BR', 'ru_RU':'RU', 'it_IT':'IT', 'es_ES':'ES', 'ko_KR':'KR', 'ja_JP':'JP' };
+            let short = langMapShort[langLabel] || langLabel.toUpperCase();
+            const fileName = `${baseFileName}_${short}_rounded.png`;
+            const url = URL.createObjectURL(pngBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            imageStatus.innerHTML = `📦 已保存: ${fileName}`;
+            setTimeout(() => {
+                if (imageStatus.innerHTML.includes('已保存')) imageStatus.style.color = "#e7dfb0";
+            }, 1500);
+        } catch (err) {
+            imageStatus.innerHTML = `保存失败: ${err.message || "关键防御"}`;
+            imageStatus.style.color = "#ffb570";
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerText = originalText;
+        }
+    }
+    
+    function setLoadingState(isLoading) {
+        if (isLoading) {
+            imageStatus.innerHTML = '<div class="loader"></div><span> 解析卡图...</span>';
+            cardImage.style.opacity = '0.6';
+        } else {
+            cardImage.style.opacity = '1';
+        }
+    }
+    
+    function showError(msg) {
+        imageStatus.innerHTML = `⚠️ ${msg}`;
+        imageStatus.style.color = "#ffbc6e";
+        cardImage.style.opacity = '1';
+        cardImage.setAttribute('data-valid', 'false');
+    }
+    
+    fetchBtn.onclick = (e) => {
+        e.preventDefault();
+        advancedRetrieve(false, null);
+    };
+    saveBtn.onclick = (e) => {
+        e.preventDefault();
+        saveCardImage();
+    };
+    cardNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            advancedRetrieve(false, null);
+        }
+    });
+    variantToggle.addEventListener('change', () => {
+        if (currentBaseClean && currentRawCardName) {
+            advancedRetrieve(false, null);
+        } else if (cardNameInput.value.trim()) {
+            advancedRetrieve(false, null);
+        }
+    });
+    langSelect.addEventListener('change', () => {
+        if (currentBaseClean && currentRawCardName) {
+            advancedRetrieve(true, activeVariantId);
+        } else if (cardNameInput.value.trim()) {
+            advancedRetrieve(false, null);
+        }
+    });
+    
+    setTimeout(() => {
+        if (cardNameInput.value.trim() === "RESISTANCE") {
+            advancedRetrieve(false, null);
+        }
+    }, 150);
+</script>
+</body>
+</html>
