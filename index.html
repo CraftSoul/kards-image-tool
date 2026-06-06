@@ -743,12 +743,12 @@
     
     function closeModal() { document.getElementById('cardModal').style.display = 'none'; }
 
-    window.addEventListener('load', async() => {
+    window.addEventListener('load', () => {
         loadData();
         document.querySelector('.modal-close').addEventListener('click', closeModal);
         document.getElementById('cardModal').addEventListener('click', (e) => { if(e.target === document.getElementById('cardModal')) closeModal(); });
         document.getElementById('saveImgBtn').onclick = () => { let a = document.createElement('a'); a.href = document.getElementById('modalImg').src; a.download = 'kards_card.png'; a.click(); };
-        document.getElementById('copyLinkBtn').onclick = () => { 
+        document.getElementById('copyLinkBtn').onclick = async() => { 
             try {
                 await navigator.clipboard.writeText(document.getElementById('modalImg').src);
                 alert('已复制');
