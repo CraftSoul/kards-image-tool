@@ -505,8 +505,9 @@
             <div id="modalCostDefense" class="badge-stat"></div>
             <div class="detail-line"><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line; font-size:0.85rem;"></span></div>
             <div class="detail-line"><strong>✨ 词条</strong> <span id="modalAttributes"></span></div>
-            <div class="detail-line"><strong>📚 扩展包</strong> <span id="modalSet"></span></div>
-            <div class="detail-line"><strong>🌍 英文名</strong> <span id="modalEnName"></span></div>
+            <div class="detail-line"><strong>📦 扩展包</strong> <span id="modalSet"></span></div>
+            <div class="detail-line"><strong>🌐 英文名</strong> <span id="modalEnName"></span></div>
+            <div class="detail-line"><strong>🔧 导入代码</strong> <span id="modalImportId"></span></div>
         </div>
     </div>
 </div>
@@ -581,7 +582,8 @@
                     titleEn: card.json?.title?.["en-EN"] || "",
                     image: card.json?.image || card.image,
                     reserved: !!card.reserved,
-                    isSpawn: card.json?.set === "OnlySpawnable"
+                    isSpawn: card.json?.set === "OnlySpawnable",
+                    importId: card.importId
                 };
             });
             initFilters();
@@ -720,6 +722,7 @@
         document.getElementById('modalAttributes').innerHTML = translateAttributes(c.attributes);
         document.getElementById('modalSet').innerHTML = c.setName;
         document.getElementById('modalEnName').innerHTML = c.titleEn || '---';
+        document.getElementById('modalImportId').innerHTML = c.importId || '---';
     }
     
     function updateModalImage() {
