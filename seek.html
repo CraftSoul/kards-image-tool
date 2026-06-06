@@ -22,32 +22,35 @@
                 repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
             background-blend-mode: overlay, normal;
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            padding-top: 80px;
         }
 
-        .top-nav-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 20px 32px;
+        }
+
+        .nav-bar {
             background: rgba(20, 20, 15, 0.96);
             backdrop-filter: blur(16px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border-bottom: 1px solid #aa8e4e;
+            border: 1px solid #aa8e4e;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
         }
 
-        .nav-header {
+        .nav-header-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.7rem 1rem;
-            gap: 0.8rem;
+            padding: 12px 18px;
+            background: rgba(0,0,0,0.2);
             border-bottom: 1px solid rgba(170, 142, 78, 0.3);
         }
 
         .nav-brand {
-            font-size: 1.4rem;
+            font-size: 1.45rem;
             font-weight: 800;
             letter-spacing: 2px;
             background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
@@ -56,85 +59,79 @@
             color: transparent;
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
             white-space: nowrap;
-            flex-shrink: 0;
         }
 
-        .nav-actions {
+        .menu-btn {
+            background: rgba(210, 210, 225, 0.12);
+            border: 1px solid #aa8e4e;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 0.6rem;
-            flex-shrink: 0;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .menu-btn span {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background-color: #f2e2b0;
+            border-radius: 2px;
+        }
+        .menu-btn:active {
+            transform: scale(0.96);
         }
 
-        .nav-scroll-wrapper {
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            scrollbar-width: thin;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-            padding: 0.4rem 0 0.5rem 0;
-            border-top: 1px solid rgba(120, 100, 55, 0.4);
+        .nav-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out;
+            background: rgba(10, 10, 8, 0.98);
+            backdrop-filter: blur(12px);
         }
-
-        .nav-scroll-wrapper::-webkit-scrollbar {
-            height: 3px;
+        .nav-menu.open {
+            max-height: 320px;
+            transition: max-height 0.4s ease-in;
         }
-        .nav-scroll-wrapper::-webkit-scrollbar-track {
-            background: #2d2a1c;
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px 20px 20px;
         }
-        .nav-scroll-wrapper::-webkit-scrollbar-thumb {
-            background: #b6964b;
-            border-radius: 20px;
-        }
-
-        .nav-links {
-            display: inline-flex;
-            gap: 0.25rem;
-            padding: 0 1rem;
-        }
-
-        .nav-link {
-            display: inline-block;
+        .menu-link {
+            display: block;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            background: rgba(210, 210, 225, 0.12);
+            font-size: 1rem;
+            padding: 12px 20px;
+            border-radius: 60px;
+            background: rgba(210, 210, 225, 0.08);
             color: #eef0ff;
-            transition: all 0.2s ease;
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(2px);
-            margin: 0 2px;
-            white-space: nowrap;
+            text-align: center;
+            transition: 0.2s;
+            border: 1px solid transparent;
         }
-        .nav-link:hover {
-            background: rgba(235, 235, 245, 0.25);
-            color: #ffffff;
-            transform: translateY(-1px);
+        .menu-link:hover {
+            background: rgba(235, 235, 245, 0.2);
+            transform: translateX(5px);
+            border-color: #c9a53b;
         }
-        .nav-link.active {
+        .menu-link.active {
             background: #c9a53b;
             color: #1e1c10;
             font-weight: 700;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
+        /* 卡片主体区域 */
         .card-panel {
-            max-width: 950px;
-            width: 100%;
-            margin: 0 auto;
             background: transparent;
             border: none;
-            box-shadow: none;
-            backdrop-filter: none;
-            padding: 0 0 1.5rem 0;
-            overflow: visible;
-        }
-
-        .content-padding {
-            padding: 0 2rem;
         }
 
         .form-group {
@@ -169,7 +166,6 @@
             flex: 2;
             min-width: 200px;
             background: #252219;
-            border-radius: 0px;
         }
         input:focus, select:focus {
             border-color: #e4b363;
@@ -182,7 +178,6 @@
             gap: 0.5rem;
             background: rgba(0,0,0,0.4);
             padding: 0.2rem 0.8rem;
-            border-radius: 0px;
             flex-wrap: wrap;
         }
         .lang-box label {
@@ -194,7 +189,6 @@
             cursor: pointer;
             width: auto;
             min-width: 100px;
-            border-radius: 0px;
         }
         .toggle-switch {
             display: inline-flex;
@@ -256,21 +250,17 @@
         .variants-panel {
             margin: 0.5rem 0 0.8rem;
             background: #262216b3;
-            border-radius: 0px;
             padding: 0.5rem 0.8rem;
             backdrop-filter: blur(1px);
             border: 1px solid #7d6a42;
-            transition: all 0.2s;
         }
         .variants-header {
             font-size: 0.75rem;
             color: #dcc98a;
-            letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 0.5rem;
-            padding-left: 0.3rem;
             font-weight: bold;
         }
         .variants-badge {
@@ -289,7 +279,6 @@
         .variant-chip {
             background: #312b1c;
             border: 1px solid #ad924d;
-            border-radius: 0px;
             padding: 0.3rem 1rem;
             font-size: 0.8rem;
             font-weight: 600;
@@ -304,13 +293,11 @@
             background: #7e643a;
             color: white;
             transform: scale(0.96);
-            border-color: #ebc27a;
         }
         .variant-chip.active {
             background: #c7a252;
             color: #1f1c0f;
             border-color: #fbdd8b;
-            box-shadow: 0 0 5px #f3bc5c;
         }
         button {
             background: #6b5a39;
@@ -321,12 +308,10 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.4);
             transition: 0.1s linear;
             letter-spacing: 1px;
-            border-radius: 0px;
         }
         button:hover {
             background: #8f774b;
             transform: scale(0.97);
-            box-shadow: 0 1px 3px black;
             color: white;
         }
         button:active {
@@ -336,9 +321,6 @@
             margin: 1.2rem 0 1rem;
             padding: 0.8rem;
             text-align: center;
-            background: transparent;
-            border: none;
-            box-shadow: none;
         }
         .img-wrapper {
             background: rgba(0,0,0,0.35);
@@ -355,7 +337,6 @@
             max-height: 380px;
             border-radius: 12px;
             box-shadow: 0 8px 18px rgba(0,0,0,0.6);
-            transition: 0.2s;
             background: #2b281f;
         }
         .status-msg {
@@ -377,14 +358,13 @@
             padding: 0.6rem 2rem;
             font-size: 1rem;
             box-shadow: 0 3px 0 #1e3a1e;
-            border-radius: 0px;
         }
         #saveBtn:active {
             transform: translateY(1px);
             box-shadow: 0 1px 0 #1e3a1e;
         }
         .footer-simple {
-            margin-top: 1.8rem;
+            margin-top: 2rem;
             padding-top: 1rem;
             border-top: 1px solid #928451;
             display: flex;
@@ -392,7 +372,6 @@
             justify-content: center;
             gap: 1.2rem 2rem;
             font-size: 0.85rem;
-            margin-bottom: 0.2rem;
         }
         .footer-simple a {
             display: inline-flex;
@@ -400,23 +379,19 @@
             gap: 0.4rem;
             text-decoration: none;
             color: #f8efcf;
-            background: rgba(0.5,0.5,0.5,0.4);
+            background: rgba(0,0,0,0.4);
             padding: 0.4rem 1rem;
             border-radius: 40px;
-            transition: all 0.2s;
-            font-weight: 500;
-            backdrop-filter: blur(2px);
+            transition: 0.2s;
         }
         .footer-simple a:hover {
             background: #b48b3f;
             color: #181d0e;
-            transform: translateY(-2px);
         }
         .footer-simple img {
             width: 18px;
             height: 18px;
             filter: invert(0.95);
-            transition: filter 0.2s;
         }
         .loader {
             display: inline-block;
@@ -429,67 +404,77 @@
             margin: 0 auto;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .hide { display: none; }
-        
+
         @media (max-width: 650px) {
-            body {
-                padding-top: 108px;
-            }
-            .content-padding { 
-                padding: 0 1rem; 
-            }
-            .card-panel { 
-                padding: 0 0 1rem 0; 
-            }
-            .form-group { 
-                flex-direction: column; 
-                align-items: stretch; 
-            }
-            .variant-list { 
-                justify-content: center; 
-            }
-            button { 
-                width: 100%; 
-            }
-            .lang-box select { 
-                width: 100%; 
-            }
-            .toggle-switch { 
-                justify-content: space-between; 
+            .app-container {
+                padding: 12px 16px 24px;
             }
             .nav-brand {
                 font-size: 1.2rem;
             }
-            .nav-link {
-                padding: 0.45rem 1rem;
-                font-size: 0.8rem;
+            .menu-btn {
+                width: 40px;
+                height: 40px;
+            }
+            .menu-btn span {
+                width: 20px;
+                height: 2px;
+            }
+            .menu-link {
+                font-size: 0.9rem;
+                padding: 10px 16px;
+            }
+            .form-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .variant-list {
+                justify-content: center;
+            }
+            button {
+                width: 100%;
+            }
+            .lang-box select {
+                width: 100%;
+            }
+            .toggle-switch {
+                justify-content: space-between;
             }
         }
-        @media (min-width: 1400px) {
-            .card-panel {
-                max-width: 1100px;
+        @media (max-width: 480px) {
+            .nav-brand {
+                font-size: 1rem;
+            }
+            .menu-btn {
+                width: 36px;
+                height: 36px;
             }
         }
     </style>
 </head>
 <body>
-<div class="card-panel">
-    <div class="top-nav-bar">
-        <div class="nav-header">
-            <div class="nav-brand">KARDS 军械库</div>
-            <div class="nav-actions"></div>
+<div class="app-container">
+    <div class="nav-bar">
+        <div class="nav-header-row">
+            <div class="nav-brand">⚔️ KARDS 军械库</div>
+            <div class="menu-btn" id="menuToggleBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-        <div class="nav-scroll-wrapper">
-            <div class="nav-links">
-                <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌总览</a>
-                <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
-                <a class="nav-link active" href="#" data-target="seek">英文直检</a>
-                <a class="nav-link" href="#" data-target="about">关于军械库</a>
+        <div class="nav-menu" id="navMenu">
+            <div class="menu-links">
+                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">📋 卡牌总览</a>
+                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">🛠️ 卡组构筑</a>
+                <a class="menu-link active" href="#" data-target="seek">🔍 英文直检</a>
+                <a class="menu-link" href="#" data-target="about">📖 关于军械库</a>
             </div>
         </div>
     </div>
 
-    <div class="content-padding">
+    <!-- 主功能卡片 -->
+    <div class="card-panel">
         <div class="form-group">
             <span class="label-icon">卡牌英名</span>
             <input type="text" id="cardNameInput" placeholder="例:RESISTANCE" value="RESISTANCE">
@@ -575,6 +560,44 @@
     const variantCountBadge = document.getElementById('variantCountBadge');
     const variantToggle = document.getElementById('variantToggle');
 
+    // 菜单交互
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const navMenu = document.getElementById('navMenu');
+    function toggleMenu() {
+        navMenu.classList.toggle('open');
+    }
+    function closeMenu() {
+        navMenu.classList.remove('open');
+    }
+    if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+    }
+    document.addEventListener('click', function(event) {
+        const isClickInside = menuToggleBtn?.contains(event.target) || navMenu?.contains(event.target);
+        if (!isClickInside && navMenu?.classList.contains('open')) {
+            closeMenu();
+        }
+    });
+    document.querySelectorAll('.menu-link').forEach(link => {
+        link.addEventListener('click', () => {
+            closeMenu();
+        });
+    });
+    // 高亮当前菜单
+    function setActiveMenu() {
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-target') === 'seek') {
+                link.classList.add('active');
+            }
+        });
+    }
+    setActiveMenu();
+
+    // 卡牌检索核心逻辑（完全保留原有功能）
     let currentVariants = [];
     let activeVariantId = null;
     let currentRawCardName = '';
