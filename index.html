@@ -24,7 +24,7 @@
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
         }
 
-        /* 阵营主题色变量 */
+        /* 阵营主题色变量 (统一小写匹配) */
         :root {
             --germany: #5A5F55;
             --britain: #857A60;
@@ -128,7 +128,7 @@
             font-weight: 700;
         }
 
-        /* 筛选面板 — 下拉式，无卡片样式 */
+        /* 筛选面板 — 下拉式 */
         .filter-panel {
             background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(8px);
@@ -170,13 +170,8 @@
             background-repeat: no-repeat;
             background-position: right 1rem center;
         }
-        .search-input {
-            background-image: none;
-        }
-        select optgroup, select option {
-            background: #1e1c16;
-            color: #f0e2c5;
-        }
+        .search-input { background-image: none; }
+        select optgroup, select option { background: #1e1c16; color: #f0e2c5; }
         .range-group {
             display: flex;
             gap: 8px;
@@ -203,23 +198,20 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        .stats-item {
-            flex: 1;
-            min-width: 130px;
-        }
+        .stats-item { flex: 1; min-width: 130px; }
         .stats-note { font-size: 0.7rem; color: #c9b06b; margin-top: 6px; }
 
-        /* 卡片网格: 移动端每行5张 */
+        /* 卡片网格: PC端自适应，移动端每行4张 */
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
             gap: 1rem;
             margin-top: 1.5rem;
         }
         @media (max-width: 680px) {
-            .card-grid { gap: 0.7rem; }
+            .card-grid { grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
         }
-        @media (max-width: 560px) {
+        @media (max-width: 480px) {
             .card-grid { gap: 0.6rem; }
             .card-name { font-size: 0.65rem; }
         }
@@ -229,7 +221,7 @@
             overflow: hidden;
             transition: transform 0.15s, box-shadow 0.2s;
             cursor: pointer;
-            border: 1.5px solid; /* 阵营主题色动态 */
+            border: 1.5px solid; /* 动态设置主题色 */
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .card-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
@@ -275,7 +267,7 @@
             display: inline-block;
         }
 
-        /* 模态框 纵向 白色文字 */
+        /* 模态框 - 移动端顶部留空、左右留白，纵向滚动，无切换按钮 */
         .modal {
             display: none;
             position: fixed;
@@ -284,21 +276,22 @@
             background: rgba(0,0,0,0.94);
             backdrop-filter: blur(12px);
             z-index: 1000;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             overflow-y: auto;
+            padding: 20px 16px;
         }
         .modal-content {
             background: #121a14;
-            max-width: 520px;
-            width: 92%;
+            max-width: 500px;
+            width: 100%;
             border-radius: 28px;
             display: flex;
             flex-direction: column;
             position: relative;
-            border: 1px solid;
+            border: 2px solid; /* 主题色动态 */
             box-shadow: 0 20px 40px black;
-            margin: 1.5rem auto;
+            margin: 8px auto;
         }
         .modal-close {
             position: absolute;
@@ -308,13 +301,14 @@
             cursor: pointer;
             z-index: 25;
             color: #f0e6cc;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             width: 36px;
             height: 36px;
             border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(4px);
         }
         .modal-left {
             background: #0e120f;
@@ -322,14 +316,18 @@
             flex-direction: column;
             align-items: center;
             padding: 24px 20px 16px;
+            border-top-left-radius: 26px;
+            border-top-right-radius: 26px;
         }
         .modal-right {
-            padding: 20px 22px 26px;
+            padding: 20px 22px 28px;
             background: #101813;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
             color: #fef6e6;
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
         }
         .modal-img {
             width: 100%;
@@ -347,7 +345,7 @@
         .action-btn {
             background: #2a2a1c;
             border: none;
-            padding: 5px 16px;
+            padding: 6px 18px;
             border-radius: 32px;
             cursor: pointer;
             font-size: 0.8rem;
@@ -358,7 +356,7 @@
         .nav-btn {
             position: absolute;
             top: 45%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             border: none;
             font-size: 1.8rem;
             cursor: pointer;
@@ -367,33 +365,47 @@
             border-radius: 40px;
             z-index: 20;
         }
-        .nav-left { left: 4px; }
-        .nav-right { right: 4px; }
+        .nav-left { left: -8px; }
+        .nav-right { right: -8px; }
+        @media (max-width: 560px) {
+            .nav-left { left: 0px; }
+            .nav-right { right: 0px; }
+        }
         .faction-icon-lg {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             vertical-align: middle;
-            margin-right: 8px;
+            margin-right: 10px;
+            filter: drop-shadow(0 1px 2px black);
         }
         .reserve-badge {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             background: url('reserve.png') no-repeat center;
             background-size: contain;
             display: inline-block;
-            margin-left: 6px;
+            margin-left: 8px;
             vertical-align: middle;
         }
         .badge-stat {
             background: #1e2a1f;
             border-radius: 32px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
+            padding: 6px 14px;
+            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             border-left: 3px solid;
         }
+        .detail-line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .detail-line strong { min-width: 70px; color: #e6d5a8; }
         .pagination {
             display: flex;
             justify-content: center;
@@ -415,6 +427,8 @@
         @media (max-width: 560px) {
             .filter-grid { flex-direction: column; gap: 0.7rem; }
             .filter-item { min-width: 100%; }
+            .modal-content { margin: 0 auto; }
+            .nav-left, .nav-right { top: 40%; }
         }
     </style>
 </head>
@@ -435,7 +449,7 @@
         </div>
     </div>
 
-    <!-- 筛选面板：下拉式 + 数字输入 -->
+    <!-- 筛选面板：下拉式 -->
     <div class="filter-panel">
         <div class="filter-grid">
             <div class="filter-item">
@@ -463,7 +477,7 @@
                 <select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select>
             </div>
         </div>
-        <!-- 身材筛选区域 (仅当筛选类型为单位时显示) -->
+        <!-- 身材筛选区域 -->
         <div id="statsArea" style="display: none;">
             <div class="stats-group">
                 <div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><div class="range-group"><input type="number" id="attackMin" value="0" min="0" max="12"><span>-</span><input type="number" id="attackMax" value="12" min="0" max="12"></div></div>
@@ -478,7 +492,7 @@
     <div class="pagination" id="pagination"></div>
 </div>
 
-<!-- 模态框 纵向 -->
+<!-- 模态框 -->
 <div id="cardModal" class="modal">
     <div class="modal-content" id="modalContent">
         <span class="modal-close">&times;</span>
@@ -492,13 +506,16 @@
             </div>
         </div>
         <div class="modal-right">
-            <h2 id="modalName" style="font-size:1.3rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap;"></h2>
-            <div><span id="modalFactionIcon"></span><span id="modalFaction"></span> &nbsp;| <span id="modalType"></span> &nbsp;| <span id="modalRarity"></span></div>
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span id="modalFactionIcon"></span>
+                <h2 id="modalName" style="font-size:1.3rem; margin:0; display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap;"></h2>
+            </div>
+            <div class="detail-line"><span id="modalFaction"></span> &nbsp;| <span id="modalType"></span> &nbsp;| <span id="modalRarity"></span></div>
             <div id="modalCostDefense" class="badge-stat"></div>
-            <div><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line; font-size:0.85rem;"></span></div>
-            <div><strong>✨ 词条</strong> <span id="modalAttributes"></span></div>
-            <div><strong>📚 扩展包</strong> <span id="modalSet"></span> &nbsp;| <strong>状态</strong> <span id="modalStatus"></span></div>
-            <div><strong>🌍 英文名</strong> <span id="modalEnName"></span></div>
+            <div class="detail-line"><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line; font-size:0.85rem; margin-top:4px; display:inline-block;"></span></div>
+            <div class="detail-line"><strong>✨ 词条</strong> <span id="modalAttributes"></span></div>
+            <div class="detail-line"><strong>📚 扩展包</strong> <span id="modalSet"></span></div>
+            <div class="detail-line"><strong>🌍 英文名</strong> <span id="modalEnName"></span></div>
         </div>
     </div>
 </div>
@@ -508,9 +525,14 @@
     let currentPage = 1, PAGE_SIZE = 20;
     let currentModalIndex = -1, currentModalCard = null;
 
+    // 阵营配置 (小写key)
     const factionList = ["soviet","usa","poland","neutral","japan","italy","france","britain","finland","germany"];
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
-    const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
+    const factionColor = { 
+        "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32",
+        "japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633",
+        "finland":"#C9C8BC","neutral":"#6b6e5c"
+    };
     const typeMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
 
@@ -524,23 +546,26 @@
             const res = await fetch('data.json');
             if(!res.ok) throw new Error("data.json failed");
             const data = await res.json();
-            allCards = (data.cards || []).map(card => ({
-                ...card,
-                type: card.json?.type || card.type,
-                faction: card.json?.faction || card.faction,
-                setName: card.json?.set || card.set || "基础",
-                attack: card.json?.attack ?? card.attack,
-                defense: card.json?.defense ?? card.defense,
-                operationCost: card.json?.operationCost ?? card.operationCost,
-                cost: card.json?.kredits ?? (card.json?.cost ?? card.cost ?? 0),
-                attributes: card.json?.attributes || [],
-                text: card.json?.text?.["zh-Hans"] || "无描述",
-                titleZh: card.json?.title?.["zh-Hans"] || card.title?.["zh-Hans"] || "无名",
-                titleEn: card.json?.title?.["en-EN"] || "",
-                image: card.json?.image || card.image,
-                reserved: !!card.reserved,
-                isSpawn: card.json?.set === "OnlySpawnable"
-            }));
+            allCards = (data.cards || []).map(card => {
+                let rawFaction = (card.json?.faction || card.faction || "").toLowerCase();
+                return {
+                    ...card,
+                    type: card.json?.type || card.type,
+                    faction: rawFaction,
+                    setName: card.json?.set || card.set || "基础",
+                    attack: card.json?.attack ?? card.attack,
+                    defense: card.json?.defense ?? card.defense,
+                    operationCost: card.json?.operationCost ?? card.operationCost,
+                    cost: card.json?.kredits ?? (card.json?.cost ?? card.cost ?? 0),
+                    attributes: card.json?.attributes || [],
+                    text: card.json?.text?.["zh-Hans"] || "无描述",
+                    titleZh: card.json?.title?.["zh-Hans"] || card.title?.["zh-Hans"] || "无名",
+                    titleEn: card.json?.title?.["en-EN"] || "",
+                    image: card.json?.image || card.image,
+                    reserved: !!card.reserved,
+                    isSpawn: card.json?.set === "OnlySpawnable"
+                };
+            });
             initFilters();
             applyFilters();
         } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div class="loading-placeholder">❌ 数据加载失败</div>'; }
@@ -567,10 +592,6 @@
         applyFilters();
     }
 
-    function getSelectedType() {
-        let t = document.getElementById('typeSelect').value;
-        return t === 'all' ? [] : [t];
-    }
     function filterCardsLogic() {
         let result = [...allCards];
         const search = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -587,7 +608,7 @@
         if(status === 'active') result = result.filter(c => !c.reserved && !c.isSpawn);
         else if(status === 'reserve') result = result.filter(c => c.reserved);
         else if(status === 'spawn') result = result.filter(c => c.isSpawn);
-        // 身材筛选可见性
+
         const selectedTypes = typeVal !== 'all' ? [typeVal] : [...new Set(allCards.map(c=>c.type))];
         const onlyUnits = selectedTypes.length > 0 && selectedTypes.every(t => unitTypes.includes(t));
         const statsArea = document.getElementById('statsArea');
@@ -660,15 +681,15 @@
         const themeColor = factionColor[fKey] || '#6b6e5c';
         const modalContent = document.getElementById('modalContent');
         modalContent.style.borderColor = themeColor;
-        const iconHtml = `<img class="faction-icon-lg" src="${fKey}.svg" onerror="this.style.display='none'">`;
+        // 阵营图标: 小写.svg
+        const iconHtml = `<img class="faction-icon-lg" src="${fKey}.svg" onerror="this.style.display='none'" alt="faction icon">`;
         document.getElementById('modalFactionIcon').innerHTML = iconHtml;
-        document.getElementById('modalFaction').innerText = factionNames[fKey] || c.faction;
-        document.getElementById('modalType').innerText = typeMap[c.type] || c.type;
-        document.getElementById('modalRarity').innerText = c.json?.rarity || c.rarity || '';
-        let statusLabel = c.reserved ? '预备' : (c.isSpawn ? '衍生' : '活跃');
+        document.getElementById('modalFaction').innerHTML = factionNames[fKey] || c.faction;
+        document.getElementById('modalType').innerHTML = typeMap[c.type] || c.type;
+        document.getElementById('modalRarity').innerHTML = c.json?.rarity || c.rarity || '';
         const reserveIconSpan = c.reserved ? '<span class="reserve-badge"></span>' : '';
-        document.getElementById('modalName').innerHTML = `${c.titleZh} ${reserveIconSpan} <span style="font-size:0.7rem; background:#2e2a1c; padding:0.2rem 0.6rem; border-radius:30px;">${statusLabel}</span>`;
-        document.getElementById('modalText').innerText = c.text;
+        document.getElementById('modalName').innerHTML = `${c.titleZh} ${reserveIconSpan}`;
+        document.getElementById('modalText').innerHTML = c.text;
         let statLine = `💎 花费: ${c.cost}`;
         if(c.attack !== undefined && c.defense !== undefined) statLine += ` &nbsp; ⚔️ ${c.attack} / 🛡️ ${c.defense}`;
         if(c.operationCost !== undefined) statLine += ` &nbsp; ⚙️ 行动: ${c.operationCost}`;
@@ -676,9 +697,8 @@
         badgeDiv.innerHTML = statLine;
         badgeDiv.style.borderLeftColor = themeColor;
         document.getElementById('modalAttributes').innerHTML = (c.attributes?.length ? c.attributes.join(', ') : '无');
-        document.getElementById('modalSet').innerText = c.setName;
-        document.getElementById('modalStatus').innerHTML = statusLabel;
-        document.getElementById('modalEnName').innerText = c.titleEn || '---';
+        document.getElementById('modalSet').innerHTML = c.setName;
+        document.getElementById('modalEnName').innerHTML = c.titleEn || '---';
         document.getElementById('modalImg').src = getCardImageUrl(c.image, 100);
         document.getElementById('cardModal').style.display = 'flex';
     }
