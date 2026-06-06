@@ -321,6 +321,7 @@
             max-width: 280px;
             border-radius: 12px;
             box-shadow: 0 8px 18px black;
+            display: block;
         }
         .modal-actions {
             display: flex;
@@ -494,7 +495,7 @@
             <img id="modalImg" class="modal-img" alt="card art">
             <div class="lang-switch" id="modalLangSwitch"></div>
             <div class="modal-actions">
-                <button class="action-btn" id="saveImgBtn">💾 保存图片</button>
+                <button class="action-btn" id="saveImgBtn">💾 保存图片 (圆角透明底)</button>
                 <button class="action-btn" id="copyLinkBtn">🔗 复制链接</button>
             </div>
         </div>
@@ -519,7 +520,6 @@
         "intel1": "情报1", "intel2": "情报2", "intel3": "情报3"
     };
     
-    // 翻译词条，合并 BecomesVeteran 和 OnlySpawnable 为"晋升老兵"
     function translateAttributes(attrs) {
         if (!attrs || !attrs.length) return "无";
         let hasVeteranUpgrade = false;
@@ -548,7 +548,7 @@
     let currentModalLang = "zh-Hans";
 
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
-    const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
+    const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
     const typeMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
 
@@ -741,13 +741,68 @@
         });
     }
     
+    async function saveCardAsRoundedPng() {
+        const imgElement = document.getElementById('modalImg');
+        if (!imgElement || !imgElement.complete || imgElement.naturalWidth === 0) {
+            alert("图片尚未加载完成，请稍后再试");
+            return;
+        }
+        const imageUrl = imgElement.src;
+        try {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = imageUrl;
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+            });
+            const w = img.width;
+            const h = img.height;
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, w, h);
+            const radius = 12;
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(w - radius, 0);
+            ctx.quadraticCurveTo(w, 0, w, radius);
+            ctx.lineTo(w, h - radius);
+            ctx.quadraticCurveTo(w, h, w - radius, h);
+            ctx.lineTo(radius, h);
+            ctx.quadraticCurveTo(0, h, 0, h - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(img, 0, 0, w, h);
+            const pngDataUrl = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = pngDataUrl;
+            a.download = `kards_${currentModalCard?.titleZh || 'card'}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (err) {
+            console.error(err);
+            alert("导出失败");
+        }
+    }
+
     function closeModal() { document.getElementById('cardModal').style.display = 'none'; }
 
     window.addEventListener('load', () => {
         loadData();
         document.querySelector('.modal-close').addEventListener('click', closeModal);
         document.getElementById('cardModal').addEventListener('click', (e) => { if(e.target === document.getElementById('cardModal')) closeModal(); });
-        document.getElementById('saveImgBtn').onclick = () => { let a = document.createElement('a'); a.href = document.getElementById('modalImg').src; a.download = 'kards_card.png'; a.click(); };
+        const saveBtn = document.getElementById('saveImgBtn');
+        if (saveBtn) {
+            saveBtn.onclick = (e) => {
+                e.preventDefault();
+                saveCardAsRoundedPng();
+            };
+        }
         document.getElementById('copyLinkBtn').onclick = async() => { 
             try {
                 await navigator.clipboard.writeText(document.getElementById('modalImg').src);
