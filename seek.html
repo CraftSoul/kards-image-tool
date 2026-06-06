@@ -22,13 +22,14 @@
                 repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
             background-blend-mode: overlay, normal;
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            padding-top: 72px;
+            padding-top: 60px;
         }
 
         .top-nav-bar {
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
             width: 100%;
             z-index: 1000;
             background: rgba(20, 20, 15, 0.96);
@@ -41,15 +42,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.6rem 1rem;
-            gap: 1rem;
-            min-width: 0;
+            padding: 10px 16px;
+            min-height: 52px;
+            width: 100%;
         }
 
         .nav-brand {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
             background-clip: text;
             -webkit-background-clip: text;
@@ -57,14 +58,15 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
             white-space: nowrap;
             flex-shrink: 0;
+            line-height: 1.2;
         }
 
         .menu-btn {
-            background: rgba(210, 210, 225, 0.15);
+            background: rgba(210, 210, 225, 0.12);
             border: 1px solid #aa8e4e;
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -78,15 +80,14 @@
         }
         .menu-btn:hover {
             background: rgba(235, 235, 245, 0.25);
-            transform: scale(0.96);
         }
         .menu-btn:active {
-            transform: scale(0.94);
+            transform: scale(0.96);
         }
         .menu-btn span {
             display: block;
             width: 22px;
-            height: 2px;
+            height: 2.5px;
             background-color: #f2e2b0;
             border-radius: 2px;
             transition: 0.2s;
@@ -95,22 +96,21 @@
         .nav-menu-dropdown {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.35s ease-out, border-color 0.2s;
-            background: rgba(15, 15, 10, 0.98);
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(10, 10, 8, 0.98);
             backdrop-filter: blur(12px);
             border-top: 0px solid rgba(170, 142, 78, 0.3);
         }
         .nav-menu-dropdown.open {
             max-height: 320px;
             border-top-width: 1px;
-            transition: max-height 0.4s ease-in;
         }
 
         .menu-links {
             display: flex;
             flex-direction: column;
-            padding: 0.8rem 1rem 1rem 1rem;
-            gap: 0.5rem;
+            padding: 12px 16px 18px 16px;
+            gap: 8px;
         }
 
         .menu-link {
@@ -118,47 +118,64 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 1rem;
-            padding: 0.7rem 1.2rem;
+            padding: 12px 20px;
             border-radius: 40px;
-            background: rgba(210, 210, 225, 0.1);
+            background: rgba(210, 210, 225, 0.08);
             color: #eef0ff;
             transition: all 0.2s ease;
-            letter-spacing: 0.5px;
             text-align: center;
             border: 1px solid transparent;
+            letter-spacing: 0.5px;
         }
         .menu-link:hover {
             background: rgba(235, 235, 245, 0.2);
             color: #ffffff;
-            transform: translateX(4px);
+            transform: translateX(5px);
             border-color: #c9a53b;
         }
         .menu-link.active {
             background: #c9a53b;
             color: #1e1c10;
             font-weight: 700;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             border-color: #e6c77a;
         }
 
         @media (max-width: 650px) {
             body {
-                padding-top: 65px;
+                padding-top: 56px;
             }
             .nav-brand {
                 font-size: 1.2rem;
             }
             .menu-btn {
-                width: 38px;
-                height: 38px;
+                width: 40px;
+                height: 40px;
             }
             .menu-btn span {
                 width: 20px;
                 height: 2px;
             }
             .menu-link {
-                font-size: 0.9rem;
-                padding: 0.6rem 1rem;
+                font-size: 0.95rem;
+                padding: 10px 16px;
+            }
+            .nav-header-row {
+                padding: 8px 14px;
+                min-height: 48px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .nav-brand {
+                font-size: 1.05rem;
+            }
+            .menu-btn {
+                width: 36px;
+                height: 36px;
+            }
+            .menu-links {
+                padding: 10px 12px 14px 12px;
             }
         }
 
@@ -507,7 +524,7 @@
 <div class="card-panel">
     <div class="top-nav-bar">
         <div class="nav-header-row">
-            <div class="nav-brand">KARDS 军械库</div>
+            <div class="nav-brand">⚔️ KARDS 军械库</div>
             <div class="menu-btn" id="menuToggleBtn">
                 <span></span>
                 <span></span>
@@ -647,22 +664,17 @@
     
     function setActiveMenuItem() {
         const currentPath = window.location.pathname;
-        const currentPage = currentPath.split('/').pop() || 'seek.html';
         menuLinks.forEach(link => {
             link.classList.remove('active');
             const href = link.getAttribute('href');
-            if (href === '#' && link.getAttribute('data-target') === 'seek') {
+            const target = link.getAttribute('data-target');
+            if (target === 'seek' || (href && href.includes('seek'))) {
                 link.classList.add('active');
-            } else if (href && href.includes('builder') && currentPage.includes('builder')) {
-                link.classList.add('active');
-            } else if (href && href.includes('kards-image-tool') && !href.includes('builder') && currentPage === '' || currentPage === 'index.html' || currentPage === 'seek.html') {
-                if (link.getAttribute('data-target') === 'index') link.classList.add('active');
             }
         });
     }
     setActiveMenuItem();
 
-    // 全局状态
     let currentVariants = [];
     let activeVariantId = null;
     let currentRawCardName = '';
@@ -767,16 +779,16 @@
         const highResUrl = buildHighResImageUrl(item.formattedName, lang);
         setLoadingState(true);
         const langDisplay = getLangDisplayName(lang);
-        imageStatus.innerHTML = `🔍 加载高清: ${item.formattedName}.avif (${langDisplay})`;
+        imageStatus.innerHTML = `🔍 加载: ${item.formattedName}.avif (${langDisplay})`;
         return new Promise((resolve) => {
             const imgLoader = new Image();
             imgLoader.onload = () => {
                 cardImage.src = highResUrl;
                 setLoadingState(false);
                 let extraFlag = '';
-                if (item.isVeteran) extraFlag = ' ⭐ 老兵单位';
+                if (item.isVeteran) extraFlag = ' ⭐ 老兵';
                 else if (item.suffixKey !== '' && item.suffixKey !== '_vet') extraFlag = ` 🔹 ${item.displayName}`;
-                imageStatus.innerHTML = `✅ 高清 ${item.formattedName}.avif${extraFlag} (${langDisplay})`;
+                imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extraFlag} (${langDisplay})`;
                 imageStatus.style.color = "#f4e2aa";
                 cardImage.setAttribute('data-valid', 'true');
                 cardImage.setAttribute('data-current-name', item.formattedName);
@@ -786,9 +798,9 @@
             };
             imgLoader.onerror = () => {
                 setLoadingState(false);
-                showError(`⚠️ 加载失败: ${item.formattedName}.avif`);
+                showError(`加载失败: ${item.formattedName}.avif`);
                 cardImage.setAttribute('data-valid', 'false');
-                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 高清图不可用 💀%3C/text%3E%3C/svg%3E";
+                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 不可用 💀%3C/text%3E%3C/svg%3E";
                 resolve(false);
             };
             imgLoader.src = highResUrl;
@@ -837,7 +849,7 @@
         if (isDiscovering) return;
         const rawName = cardNameInput.value.trim();
         if (!rawName) {
-            showError("请输入卡牌英文名 (例: RESISTANCE)");
+            showError("请输入卡牌英文名");
             return;
         }
         const lang = langSelect.value;
@@ -854,18 +866,18 @@
         
         setLoadingState(true);
         const includeVariants = variantToggle.checked;
-        imageStatus.innerHTML = `🔎 轻量检测: ${baseClean} (${getLangDisplayName(lang)}) ${includeVariants ? '含变体' : '仅原版'}...`;
+        imageStatus.innerHTML = `🔎 检测: ${baseClean} (${getLangDisplayName(lang)})`;
         
         const discoverResult = await progressiveDiscover(baseClean, lang, includeVariants);
         isDiscovering = false;
         
         if (!discoverResult.variants.length) {
             setLoadingState(false);
-            showError(`未找到: "${rawName}" (该语言无此卡图)`);
+            showError(`未找到: "${rawName}"`);
             variantsContainer.style.display = 'none';
             currentVariants = [];
             cardImage.setAttribute('data-valid', 'false');
-            cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 / 语言无资源 %3C/text%3E%3C/svg%3E";
+            cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 %3C/text%3E%3C/svg%3E";
             return;
         }
         
@@ -897,13 +909,12 @@
     async function saveCardImage() {
         const currentSrc = cardImage.src;
         if (!currentSrc || (currentSrc.includes("data:image/svg+xml") && 
-            (currentSrc.includes("等待检索") || currentSrc.includes("遗失") || currentSrc.includes("无此卡") || currentSrc.includes("不存在") || currentSrc.includes("⚙️") || currentSrc.includes("💀")))) {
-            imageStatus.innerHTML = "⚠️ 无有效卡图可保存";
-            imageStatus.style.color = "#ffaa66";
+            (currentSrc.includes("等待") || currentSrc.includes("不可用") || currentSrc.includes("不存在") || currentSrc.includes("⚙️") || currentSrc.includes("💀")))) {
+            imageStatus.innerHTML = "⚠️ 无有效卡图";
             return;
         }
         if (!cardImage.complete || cardImage.naturalWidth === 0) {
-            imageStatus.innerHTML = "⛔ 图片未完全加载，稍后重试";
+            imageStatus.innerHTML = "⛔ 图片未完全加载";
             return;
         }
         saveBtn.disabled = true;
@@ -955,12 +966,8 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             imageStatus.innerHTML = `📦 已保存: ${fileName}`;
-            setTimeout(() => {
-                if (imageStatus.innerHTML.includes('已保存')) imageStatus.style.color = "#e7dfb0";
-            }, 1500);
         } catch (err) {
-            imageStatus.innerHTML = `保存失败: ${err.message || "关键防御"}`;
-            imageStatus.style.color = "#ffb570";
+            imageStatus.innerHTML = `保存失败: ${err.message}`;
         } finally {
             saveBtn.disabled = false;
             saveBtn.innerText = originalText;
@@ -969,7 +976,7 @@
     
     function setLoadingState(isLoading) {
         if (isLoading) {
-            imageStatus.innerHTML = '<div class="loader"></div><span> 解析卡图...</span>';
+            imageStatus.innerHTML = '<div class="loader"></div><span> 解析中...</span>';
             cardImage.style.opacity = '0.6';
         } else {
             cardImage.style.opacity = '1';
