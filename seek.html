@@ -348,20 +348,28 @@
             font-size: 0.85rem;
             margin-top: 12px;
         }
-        .save-area {
+        .action-bar {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 2rem;
             margin: 0.8rem 0 0.5rem;
         }
-        #saveBtn {
+        .btn-save {
             background: #3e6b3e;
-            padding: 0.6rem 2rem;
-            font-size: 1rem;
             box-shadow: 0 3px 0 #1e3a1e;
         }
-        #saveBtn:active {
+        .btn-save:active {
             transform: translateY(1px);
             box-shadow: 0 1px 0 #1e3a1e;
+        }
+        .btn-copy {
+            background: #5c5a3c;
+            box-shadow: 0 3px 0 #3b3922;
+        }
+        .btn-copy:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 #3b3922;
         }
         .footer-simple {
             margin-top: 2rem;
@@ -440,6 +448,10 @@
             .toggle-switch {
                 justify-content: space-between;
             }
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
         @media (max-width: 480px) {
             .nav-brand {
@@ -456,7 +468,7 @@
 <div class="app-container">
     <div class="nav-bar">
         <div class="nav-header-row">
-            <div class="nav-brand">⚔️ KARDS 军械库</div>
+            <div class="nav-brand">KARDS 军械库</div>
             <div class="menu-btn" id="menuToggleBtn">
                 <span></span>
                 <span></span>
@@ -465,10 +477,10 @@
         </div>
         <div class="nav-menu" id="navMenu">
             <div class="menu-links">
-                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">📋 卡牌总览</a>
-                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">🛠️ 卡组构筑</a>
-                <a class="menu-link active" href="#" data-target="seek">🔍 英文直检</a>
-                <a class="menu-link" href="#" data-target="about">📖 关于军械库</a>
+                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌收藏</a>
+                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
+                <a class="menu-link active" href="#" data-target="seek">英文直检</a>
+                <a class="menu-link" href="#" data-target="about">关于军械库</a>
             </div>
         </div>
     </div>
@@ -527,8 +539,9 @@
             <div id="imageStatus" class="status-msg">Waiting for orders.</div>
         </div>
 
-        <div class="save-area">
-            <button id="saveBtn">💾 保存图像(PNG)</button>
+        <div class="action-bar">
+            <button id="saveBtn" class="btn-save">💾 保存图像(PNG)</button>
+            <button id="copyUrlBtn" class="btn-copy">🔗 复制图片链接</button>
         </div>
 
         <div class="footer-simple">
@@ -555,6 +568,7 @@
     const cardImage = document.getElementById('cardImage');
     const imageStatus = document.getElementById('imageStatus');
     const saveBtn = document.getElementById('saveBtn');
+    const copyUrlBtn = document.getElementById('copyUrlBtn');
     const variantsContainer = document.getElementById('variantsContainer');
     const variantListDiv = document.getElementById('variantList');
     const variantCountBadge = document.getElementById('variantCountBadge');
@@ -586,7 +600,6 @@
             closeMenu();
         });
     });
-    // 高亮当前菜单
     function setActiveMenu() {
         document.querySelectorAll('.menu-link').forEach(link => {
             link.classList.remove('active');
@@ -597,13 +610,13 @@
     }
     setActiveMenu();
 
-    // 卡牌检索核心逻辑（完全保留原有功能）
     let currentVariants = [];
     let activeVariantId = null;
     let currentRawCardName = '';
     let currentBaseClean = '';
     let currentLang = 'zh-Hans';
     let isDiscovering = false;
+    let currentHighResImageUrl = '';
 
     function formatBaseName(rawName) {
         if (!rawName || rawName.trim() === "") return "";
@@ -700,6 +713,7 @@
     async function loadCardByVariantItem(item, lang) {
         if (!item || !item.formattedName) return false;
         const highResUrl = buildHighResImageUrl(item.formattedName, lang);
+        currentHighResImageUrl = highResUrl;
         setLoadingState(true);
         const langDisplay = getLangDisplayName(lang);
         imageStatus.innerHTML = `🔍 加载: ${item.formattedName}.avif (${langDisplay})`;
@@ -724,6 +738,7 @@
                 showError(`加载失败: ${item.formattedName}.avif`);
                 cardImage.setAttribute('data-valid', 'false');
                 cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 不可用 💀%3C/text%3E%3C/svg%3E";
+                currentHighResImageUrl = ''; // 清空无效url
                 resolve(false);
             };
             imgLoader.src = highResUrl;
@@ -801,6 +816,7 @@
             currentVariants = [];
             cardImage.setAttribute('data-valid', 'false');
             cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 %3C/text%3E%3C/svg%3E";
+            currentHighResImageUrl = '';
             return;
         }
         
@@ -897,6 +913,24 @@
         }
     }
     
+    async function copyImageUrl() {
+        if (!currentHighResImageUrl) {
+            imageStatus.innerHTML = "⚠️ 没有可用的图片链接，请先检索有效卡牌";
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(currentHighResImageUrl);
+            imageStatus.innerHTML = `🔗 链接已复制: ${currentHighResImageUrl.substring(0, 70)}...`;
+            setTimeout(() => {
+                if (imageStatus.innerHTML.includes("链接已复制")) {
+                    imageStatus.innerHTML = `✅ 已就绪，可继续检索`;
+                }
+            }, 2000);
+        } catch (err) {
+            imageStatus.innerHTML = `❌ 复制失败: ${err.message}`;
+        }
+    }
+    
     function setLoadingState(isLoading) {
         if (isLoading) {
             imageStatus.innerHTML = '<div class="loader"></div><span> 解析中...</span>';
@@ -911,6 +945,7 @@
         imageStatus.style.color = "#ffbc6e";
         cardImage.style.opacity = '1';
         cardImage.setAttribute('data-valid', 'false');
+        currentHighResImageUrl = '';
     }
     
     fetchBtn.onclick = (e) => {
@@ -920,6 +955,10 @@
     saveBtn.onclick = (e) => {
         e.preventDefault();
         saveCardImage();
+    };
+    copyUrlBtn.onclick = (e) => {
+        e.preventDefault();
+        copyImageUrl();
     };
     cardNameInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
