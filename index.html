@@ -24,6 +24,7 @@
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
         }
 
+        /* 阵营主题色变量 */
         :root {
             --germany: #5A5F55;
             --britain: #857A60;
@@ -43,6 +44,7 @@
             padding: 16px 16px 32px;
         }
 
+        /* 导航栏 */
         .nav-bar {
             background: rgba(20, 20, 15, 0.96);
             backdrop-filter: blur(16px);
@@ -126,6 +128,7 @@
             font-weight: 700;
         }
 
+        /* 筛选面板 — 下拉式 */
         .filter-panel {
             background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(8px);
@@ -168,23 +171,6 @@
             background-position: right 1rem center;
         }
         .search-input { background-image: none; }
-        .range-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 0.3rem 0.8rem;
-        }
-        .range-group input {
-            width: 70px;
-            background: transparent;
-            border: none;
-            color: #f5efdb;
-            text-align: center;
-            font-size: 0.85rem;
-        }
         .stats-group {
             margin-top: 0.8rem;
             padding-top: 0.5rem;
@@ -193,8 +179,19 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
+        .stats-item { flex: 1; min-width: 120px; }
+        .exact-input {
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.4rem 0.8rem;
+            width: 100%;
+            color: #f5efdb;
+            text-align: center;
+        }
         .stats-note { font-size: 0.7rem; color: #c9b06b; margin-top: 6px; }
 
+        /* 卡片网格: 移动端每行4张 */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -206,7 +203,6 @@
         }
         @media (max-width: 480px) {
             .card-grid { gap: 0.6rem; }
-            .card-name { font-size: 0.65rem; }
         }
         .card-item {
             background: #111812;
@@ -222,6 +218,9 @@
             width: 100%;
             aspect-ratio: 500 / 702;
             background: #0a0f0c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
         .card-img img {
@@ -229,6 +228,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            border-radius: 0;
         }
         .card-info {
             padding: 0.5rem 0.6rem 0.7rem;
@@ -243,6 +243,11 @@
             gap: 4px;
             color: #faf0cf;
         }
+        .card-name span:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         .reserve-icon-sm {
             width: 14px;
             height: 14px;
@@ -255,6 +260,7 @@
             .card-info { padding: 0.4rem 0.5rem 0.6rem; }
         }
 
+        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -270,7 +276,7 @@
         }
         .modal-content {
             background: #121a14;
-            max-width: 550px;
+            max-width: 500px;
             width: 100%;
             border-radius: 28px;
             display: flex;
@@ -310,7 +316,7 @@
             background: #101813;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
             color: #fef6e6;
             border-bottom-left-radius: 26px;
             border-bottom-right-radius: 26px;
@@ -321,7 +327,25 @@
             border-radius: 12px;
             box-shadow: 0 8px 18px black;
         }
-        .lang-switch-modal {
+        .modal-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            background: #2a2a1c;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 32px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #f5efdb;
+            transition: 0.1s;
+        }
+        .action-btn:hover { background: #c9a63b; color: #1e1c0b; }
+        .lang-switch {
             margin-top: 12px;
             display: flex;
             gap: 8px;
@@ -338,28 +362,12 @@
             cursor: pointer;
         }
         .lang-btn.active { background: #c9a63b; color: #161a0c; }
-        .modal-actions {
-            display: flex;
-            gap: 16px;
-            margin-top: 14px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .action-btn {
-            background: #2a2a1c;
-            border: none;
-            padding: 6px 18px;
-            border-radius: 32px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #f5efdb;
-        }
-        .action-btn:hover { background: #c9a63b; color: #1e1c0b; }
         .faction-icon-lg {
             width: 30px;
             height: 30px;
             vertical-align: middle;
             margin-right: 10px;
+            filter: drop-shadow(0 1px 2px black);
         }
         .reserve-badge {
             width: 22px;
@@ -406,6 +414,7 @@
             font-size: 0.8rem;
         }
         .page-btn.active-page { background: #dbaa3a; color: #171e0c; }
+        .page-btn:disabled { opacity: 0.4; }
         .footer-simple {
             margin-top: 2rem;
             padding-top: 1rem;
@@ -432,7 +441,7 @@
         @media (max-width: 560px) {
             .filter-grid { flex-direction: column; gap: 0.7rem; }
             .filter-item { min-width: 100%; }
-            .footer-simple { gap: 0.8rem; }
+            .modal-content { margin: 0 auto; }
         }
     </style>
 </head>
@@ -465,11 +474,11 @@
         </div>
         <div id="statsArea" style="display: none;">
             <div class="stats-group">
-                <div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><div class="range-group"><input type="number" id="attackMin" value="0" min="0" max="12"><span>-</span><input type="number" id="attackMax" value="12" min="0" max="12"></div></div>
-                <div class="stats-item"><div class="filter-label">🛡️ 防御力</div><div class="range-group"><input type="number" id="defenseMin" value="0" min="0" max="12"><span>-</span><input type="number" id="defenseMax" value="12" min="0" max="12"></div></div>
-                <div class="stats-item"><div class="filter-label">⚙️ 行动花费</div><div class="range-group"><input type="number" id="opMin" value="0" min="0" max="6"><span>-</span><input type="number" id="opMax" value="6" min="0" max="6"></div></div>
+                <div class="stats-item"><div class="filter-label">⚔️ 攻击力 (精确值，-1表示不限)</div><input type="number" id="attackExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div>
+                <div class="stats-item"><div class="filter-label">🛡️ 防御力 (精确值，-1表示不限)</div><input type="number" id="defenseExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div>
+                <div class="stats-item"><div class="filter-label">⚙️ 行动花费 (精确值，-1表示不限)</div><input type="number" id="opExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="6"></div>
             </div>
-            <div class="stats-note">※ 仅当筛选类型为纯战斗单位时生效</div>
+            <div class="stats-note">※ 仅当筛选类型为纯战斗单位时生效，-1 = 不筛选</div>
         </div>
     </div>
 
@@ -488,17 +497,14 @@
         <span class="modal-close">&times;</span>
         <div class="modal-left">
             <img id="modalImg" class="modal-img" alt="card art">
-            <div class="lang-switch-modal" id="modalLangSwitch"></div>
+            <div class="lang-switch" id="modalLangSwitch"></div>
             <div class="modal-actions">
                 <button class="action-btn" id="saveImgBtn">💾 保存图片</button>
                 <button class="action-btn" id="copyLinkBtn">🔗 复制链接</button>
             </div>
         </div>
         <div class="modal-right">
-            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-                <span id="modalFactionIcon"></span>
-                <h2 id="modalName" style="font-size:1.3rem; margin:0; display:inline-flex; align-items:center; gap:6px;"></h2>
-            </div>
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;"><span id="modalFactionIcon"></span><h2 id="modalName" style="font-size:1.3rem; margin:0; display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap;"></h2></div>
             <div class="detail-line"><span id="modalFaction"></span> &nbsp;| <span id="modalType"></span> &nbsp;| <span id="modalRarity"></span></div>
             <div id="modalCostDefense" class="badge-stat"></div>
             <div class="detail-line"><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line; font-size:0.85rem;"></span></div>
@@ -510,38 +516,38 @@
 </div>
 
 <script>
+    // 词条翻译映射
+    const attrTranslation = {
+        "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴",
+        "guard": "守护", "heavyarmor1": "重甲1", "heavyarmor2": "重甲2", "heavyarmor3": "重甲3",
+        "alpine": "山地", "mobilize": "动员", "covert": "隐蔽", "shock": "冲击", "bond": "协力", "ambush": "伏击",
+        "intel1": "情报1", "intel2": "情报2", "intel3": "情报3"
+    };
+    function translateAttributes(attrs) {
+        if (!attrs || !attrs.length) return "无";
+        return attrs.map(a => {
+            if (a.startsWith("VeteranOf:") || a.startsWith("becomesVeteran:") || a === "OnlySpawnable") return "老兵";
+            return attrTranslation[a] || a;
+        }).join(", ");
+    }
+    // 稀有度翻译
+    const rarityNames = { "Standard":"普通", "Limited":"限定", "Special":"特殊", "Elite":"精英" };
+
     let allCards = [], filteredCards = [];
     let currentPage = 1, PAGE_SIZE = 20;
     let currentModalCard = null;
-    
+    let currentModalLang = "zh-Hans";
+
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
     const typeMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
-    const rarityOrder = { "Standard":1, "Limited":2, "Special":3, "Elite":4 };
-    
-    // 词条翻译映射
-    const keywordMap = {
-        "blitz":"闪击","furry":"奋战","smokescreen":"烟幕","pincer":"钳击","salvage":"收缴",
-        "shock":"冲击","bond":"协力","ambush":"伏击","guard":"守护","alpine":"山地","mobilize":"动员","covert":"隐蔽",
-        "VeteranOf":"老兵","becomesVeteran":"晋升老兵","OnlySpawnable":"仅衍生"
-    };
-    for(let i=1;i<=3;i++) { keywordMap[`intel${i}`]=`情报${i}`; keywordMap[`heavyarmor${i}`]=`重甲${i}`; }
-    
-    function translateKeyword(key) {
-        if(!key) return key;
-        const lower = key.toLowerCase();
-        if(keywordMap[lower]) return keywordMap[lower];
-        if(lower.startsWith('veteranof')) return '老兵';
-        if(lower.startsWith('becomesveteran')) return '晋升老兵';
-        return key;
-    }
-    
-    function getCardImageUrl(imgName, lang='zh-Hans', quality=100) {
+
+    function getCardImageUrl(imgName, lang = "zh-Hans", quality = 20) {
         if(!imgName) return "";
         return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${imgName}&q=${quality}`;
     }
-    
+
     async function loadData() {
         try {
             const res = await fetch('data.json');
@@ -549,33 +555,32 @@
             const data = await res.json();
             allCards = (data.cards || []).map(card => {
                 let rawFaction = (card.json?.faction || card.faction || "").toLowerCase();
-                let attrs = card.json?.attributes || [];
-                let translatedAttrs = attrs.map(a => translateKeyword(a));
+                let rawRarity = card.json?.rarity || card.rarity || "Standard";
                 return {
                     ...card,
                     type: card.json?.type || card.type,
                     faction: rawFaction,
+                    rarity: rawRarity,
                     setName: card.json?.set || card.set || "基础",
                     attack: card.json?.attack ?? card.attack,
                     defense: card.json?.defense ?? card.defense,
                     operationCost: card.json?.operationCost ?? card.operationCost,
                     cost: card.json?.kredits ?? (card.json?.cost ?? card.cost ?? 0),
-                    attributes: attrs,
-                    attributesZh: translatedAttrs,
-                    text: card.json?.text?.["zh-Hans"] || "无描述",
+                    attributes: card.json?.attributes || [],
+                    text_zh: card.json?.text?.["zh-Hans"] || "无描述",
+                    text_en: card.json?.text?.["en-EN"] || "",
                     titleZh: card.json?.title?.["zh-Hans"] || card.title?.["zh-Hans"] || "无名",
                     titleEn: card.json?.title?.["en-EN"] || "",
                     image: card.json?.image || card.image,
-                    rarity: card.json?.rarity || card.rarity || "Standard",
                     reserved: !!card.reserved,
                     isSpawn: card.json?.set === "OnlySpawnable"
                 };
             });
             initFilters();
             applyFilters();
-        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div class="loading-placeholder">❌ 数据加载失败</div>'; }
+        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div>❌ 数据加载失败</div>'; }
     }
-    
+
     function initFilters() {
         const factions = [...new Set(allCards.map(c=>c.faction))];
         const typeOpts = [...new Set(allCards.map(c=>c.type))];
@@ -587,19 +592,20 @@
             document.getElementById(id).addEventListener('change', () => applyFilters());
         });
         document.getElementById('searchInput').addEventListener('input', () => applyFilters());
-        ['attackMin','attackMax','defenseMin','defenseMax','opMin','opMax'].forEach(id => {
+        ['attackExact','defenseExact','opExact'].forEach(id => {
             document.getElementById(id).addEventListener('input', () => applyFilters());
         });
-        applyFilters();
     }
-    
+
+    function searchableText(card) {
+        let attrsTrans = card.attributes.map(a => attrTranslation[a] || a).join(" ");
+        return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase();
+    }
+
     function filterCardsLogic() {
         let result = [...allCards];
         const search = document.getElementById('searchInput').value.trim().toLowerCase();
-        if(search) {
-            result = result.filter(c => c.titleZh.toLowerCase().includes(search) || c.text.toLowerCase().includes(search) || 
-                (c.attributesZh && c.attributesZh.some(a=>a.toLowerCase().includes(search))));
-        }
+        if(search) result = result.filter(c => searchableText(c).includes(search));
         const faction = document.getElementById('factionSelect').value;
         if(faction !== 'all') result = result.filter(c => c.faction === faction);
         const typeVal = document.getElementById('typeSelect').value;
@@ -614,26 +620,24 @@
         if(status === 'active') result = result.filter(c => !c.reserved && !c.isSpawn);
         else if(status === 'reserve') result = result.filter(c => c.reserved);
         else if(status === 'spawn') result = result.filter(c => c.isSpawn);
-        
+
         const selectedTypes = typeVal !== 'all' ? [typeVal] : [...new Set(allCards.map(c=>c.type))];
         const onlyUnits = selectedTypes.length > 0 && selectedTypes.every(t => unitTypes.includes(t));
         const statsArea = document.getElementById('statsArea');
         if(onlyUnits && typeVal !== 'all') statsArea.style.display = 'block';
         else statsArea.style.display = 'none';
         if(onlyUnits && typeVal !== 'all') {
-            let attMin = parseInt(document.getElementById('attackMin').value) || 0;
-            let attMax = parseInt(document.getElementById('attackMax').value) || 12;
-            let defMin = parseInt(document.getElementById('defenseMin').value) || 0;
-            let defMax = parseInt(document.getElementById('defenseMax').value) || 12;
-            let opMin = parseInt(document.getElementById('opMin').value) || 0;
-            let opMax = parseInt(document.getElementById('opMax').value) || 6;
+            let attExact = parseInt(document.getElementById('attackExact').value);
+            let defExact = parseInt(document.getElementById('defenseExact').value);
+            let opExact = parseInt(document.getElementById('opExact').value);
             result = result.filter(c => {
                 if(!unitTypes.includes(c.type)) return false;
-                let att = c.attack ?? -1, def = c.defense ?? -1, op = c.operationCost ?? 0;
-                return (att >= attMin && att <= attMax) && (def >= defMin && def <= defMax) && (op >= opMin && op <= opMax);
+                if(attExact !== -1 && (c.attack ?? -2) !== attExact) return false;
+                if(defExact !== -1 && (c.defense ?? -2) !== defExact) return false;
+                if(opExact !== -1 && (c.operationCost ?? -2) !== opExact) return false;
+                return true;
             });
         }
-        result.sort((a,b) => (rarityOrder[a.rarity]||99) - (rarityOrder[b.rarity]||99));
         return result;
     }
     function applyFilters() { filteredCards = filterCardsLogic(); currentPage = 1; renderCards(); renderPagination(); }
@@ -644,15 +648,19 @@
         if(!pageCards.length) { container.innerHTML = '<div class="loading-placeholder">⚔️ 暂无卡牌</div>'; return; }
         container.innerHTML = pageCards.map((card, idx) => {
             const globalIdx = filteredCards.indexOf(card);
-            const imgUrl = getCardImageUrl(card.image, 'zh-Hans', 20);
-            const color = factionColor[card.faction] || '#6b6e5c';
+            const imgUrl = getCardImageUrl(card.image, "zh-Hans", 20);
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
-            return `<div class="card-item" data-index="${globalIdx}" style="border-color: ${color};"><div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div><div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div></div>`;
+            return `<div class="card-item" data-index="${globalIdx}" style="border-color: ${factionColor[card.faction] || '#6b6e5c'};">
+                        <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div>
+                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
+                    </div>`;
         }).join('');
-        document.querySelectorAll('.card-item').forEach(el => { el.addEventListener('click', () => { let idx = parseInt(el.dataset.index); if(!isNaN(idx)) openModal(idx); }); });
+        document.querySelectorAll('.card-item').forEach(el => {
+            el.addEventListener('click', () => { let idx = parseInt(el.dataset.index); if(!isNaN(idx)) openModal(idx); });
+        });
     }
     function renderPagination() {
-        const pages = Math.ceil(filteredCards.length/PAGE_SIZE);
+        const total = filteredCards.length, pages = Math.ceil(total/PAGE_SIZE);
         const pagDiv = document.getElementById('pagination');
         if(pages<=1) { pagDiv.innerHTML = ''; return; }
         let btns = `<button class="page-btn" data-page="prev" ${currentPage===1?'disabled':''}>◀</button>`;
@@ -669,76 +677,54 @@
             });
         });
     }
-    
-    let currentModalLang = 'zh-Hans';
+
     function openModal(index) {
         const card = filteredCards[index];
         if(!card) return;
         currentModalCard = card;
-        const themeColor = factionColor[card.faction] || '#6b6e5c';
+        currentModalLang = "zh-Hans";
+        updateModalContent();
+        document.getElementById('cardModal').style.display = 'flex';
+        buildLangSwitch();
+    }
+    function updateModalContent() {
+        const c = currentModalCard;
+        const themeColor = factionColor[c.faction] || '#6b6e5c';
         document.getElementById('modalContent').style.borderColor = themeColor;
-        document.getElementById('modalFactionIcon').innerHTML = `<img class="faction-icon-lg" src="${card.faction}.svg" onerror="this.style.display='none'">`;
-        document.getElementById('modalFaction').innerHTML = factionNames[card.faction] || card.faction;
-        document.getElementById('modalType').innerHTML = typeMap[card.type] || card.type;
-        document.getElementById('modalRarity').innerHTML = card.rarity;
-        const reserveSpan = card.reserved ? '<span class="reserve-badge"></span>' : '';
-        document.getElementById('modalName').innerHTML = `${card.titleZh} ${reserveSpan}`;
-        let statLine = `💎 花费: ${card.cost}`;
-        if(card.attack !== undefined && card.defense !== undefined) statLine += ` &nbsp; ⚔️ ${card.attack} / 🛡️ ${card.defense}`;
-        if(card.operationCost !== undefined) statLine += ` &nbsp; ⚙️ 行动: ${card.operationCost}`;
-        const badge = document.getElementById('modalCostDefense');
-        badge.innerHTML = statLine;
-        badge.style.borderLeftColor = themeColor;
-        document.getElementById('modalAttributes').innerHTML = (card.attributesZh?.length ? card.attributesZh.join(', ') : '无');
-        document.getElementById('modalSet').innerHTML = card.setName;
-        document.getElementById('modalEnName').innerHTML = card.titleEn;
-        document.getElementById('modalText').innerHTML = card.text;
-        
-        // 语言切换UI
-        const langContainer = document.getElementById('modalLangSwitch');
-        const languages = ['zh-Hans','zh-Hant','en-EN','fr-FR','de-DE','pl-PL','pt-BR','ru-RU','it-IT','es-ES','ko-KR','ja-JP'];
-        const langNames = { 'zh-Hans':'简中','zh-Hant':'繁中','en-EN':'ENG','fr-FR':'FR','de-DE':'DE','pl-PL':'PL','pt-BR':'BR','ru-RU':'RU','it-IT':'IT','es-ES':'ES','ko-KR':'KR','ja-JP':'JP' };
-        langContainer.innerHTML = languages.map(l => `<button class="lang-btn ${currentModalLang===l?'active':''}" data-lang="${l}">${langNames[l]}</button>`).join('');
-        langContainer.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const newLang = btn.dataset.lang;
-                currentModalLang = newLang;
-                langContainer.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                await updateModalLanguage(card, newLang);
+        document.getElementById('modalFactionIcon').innerHTML = `<img class="faction-icon-lg" src="${c.faction}.svg" onerror="this.style.display='none'">`;
+        document.getElementById('modalFaction').innerHTML = factionNames[c.faction] || c.faction;
+        document.getElementById('modalType').innerHTML = typeMap[c.type] || c.type;
+        document.getElementById('modalRarity').innerHTML = rarityNames[c.rarity] || c.rarity;
+        const reserveSpan = c.reserved ? '<span class="reserve-badge"></span>' : '';
+        document.getElementById('modalName').innerHTML = `${currentModalLang === "zh-Hans" ? c.titleZh : c.titleEn} ${reserveSpan}`;
+        const textContent = currentModalLang === "zh-Hans" ? c.text_zh : (c.text_en || c.text_zh);
+        document.getElementById('modalText').innerHTML = textContent;
+        let statLine = `💎 花费: ${c.cost}`;
+        if(c.attack !== undefined && c.defense !== undefined) statLine += ` &nbsp; ⚔️ ${c.attack} / 🛡️ ${c.defense}`;
+        if(c.operationCost !== undefined) statLine += ` &nbsp; ⚙️ 行动: ${c.operationCost}`;
+        const badgeDiv = document.getElementById('modalCostDefense');
+        badgeDiv.innerHTML = statLine;
+        badgeDiv.style.borderLeftColor = themeColor;
+        document.getElementById('modalAttributes').innerHTML = translateAttributes(c.attributes);
+        document.getElementById('modalSet').innerHTML = c.setName;
+        document.getElementById('modalEnName').innerHTML = c.titleEn || '---';
+        document.getElementById('modalImg').src = getCardImageUrl(c.image, currentModalLang, 100);
+    }
+    function buildLangSwitch() {
+        const container = document.getElementById('modalLangSwitch');
+        const languages = ["zh-Hans", "zh-Hant", "en-EN", "fr-FR", "de-DE", "pl-PL", "pt-BR", "ru-RU", "it-IT", "es-ES", "ko-KR", "ja-JP"];
+        const langNames = { "zh-Hans":"简中","zh-Hant":"繁中","en-EN":"EN","fr-FR":"FR","de-DE":"DE","pl-PL":"PL","pt-BR":"PT","ru-RU":"RU","it-IT":"IT","es-ES":"ES","ko-KR":"KR","ja-JP":"JP" };
+        container.innerHTML = languages.map(l => `<button class="lang-btn ${currentModalLang === l ? 'active' : ''}" data-lang="${l}">${langNames[l]}</button>`).join('');
+        container.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentModalLang = btn.dataset.lang;
+                updateModalContent();
+                buildLangSwitch();
             });
         });
-        updateModalLanguage(card, currentModalLang);
-        document.getElementById('cardModal').style.display = 'flex';
     }
-    
-    async function updateModalLanguage(card, lang) {
-        const imgUrl = getCardImageUrl(card.image, lang, 100);
-        document.getElementById('modalImg').src = imgUrl;
-        if(lang === 'zh-Hans') {
-            document.getElementById('modalText').innerHTML = card.text;
-            document.getElementById('modalName').innerHTML = `${card.titleZh} ${card.reserved ? '<span class="reserve-badge"></span>' : ''}`;
-        } else {
-            try {
-                const res = await fetch(`https://images.weserv.nl/?url=ssl:www.kards.com/json/card/${card.image.replace('.avif','.json')}&q=1`);
-                if(res.ok) {
-                    const jsonData = await res.json();
-                    const title = jsonData.title?.[lang] || card.titleEn;
-                    const text = jsonData.text?.[lang] || card.text;
-                    document.getElementById('modalName').innerHTML = `${title} ${card.reserved ? '<span class="reserve-badge"></span>' : ''}`;
-                    document.getElementById('modalText').innerHTML = text;
-                } else {
-                    document.getElementById('modalName').innerHTML = `${card.titleEn} ${card.reserved ? '<span class="reserve-badge"></span>' : ''}`;
-                    document.getElementById('modalText').innerHTML = card.text;
-                }
-            } catch(e) {
-                document.getElementById('modalName').innerHTML = `${card.titleEn} ${card.reserved ? '<span class="reserve-badge"></span>' : ''}`;
-                document.getElementById('modalText').innerHTML = card.text;
-            }
-        }
-    }
-    
-    function closeModal() { document.getElementById('cardModal').style.display = 'none'; currentModalLang = 'zh-Hans'; }
+    function closeModal() { document.getElementById('cardModal').style.display = 'none'; }
+
     window.addEventListener('load', () => {
         loadData();
         document.querySelector('.modal-close').addEventListener('click', closeModal);
