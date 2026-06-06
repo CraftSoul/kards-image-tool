@@ -495,7 +495,7 @@
             <img id="modalImg" class="modal-img" alt="card art">
             <div class="lang-switch" id="modalLangSwitch"></div>
             <div class="modal-actions">
-                <button class="action-btn" id="saveImgBtn">💾 保存图片 (圆角透明底)</button>
+                <button class="action-btn" id="saveImgBtn">💾 保存图片</button>
                 <button class="action-btn" id="copyLinkBtn">🔗 复制链接</button>
             </div>
         </div>
@@ -780,7 +780,7 @@
             const pngDataUrl = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = pngDataUrl;
-            a.download = `kards_${currentModalCard?.titleZh || 'card'}.png`;
+            a.download = `${currentModalCard?.titleZh || 'card'}_{currentModalLang}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
