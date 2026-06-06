@@ -24,7 +24,7 @@
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
         }
 
-        /* 阵营主题色 (用于卡片边框、选中项) */
+        /* 阵营主题色变量 */
         :root {
             --germany: #5A5F55;
             --britain: #857A60;
@@ -39,7 +39,7 @@
         }
 
         .app-container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 16px 16px 32px;
         }
@@ -54,6 +54,7 @@
             overflow: hidden;
             box-shadow: 0 6px 14px rgba(0,0,0,0.3);
         }
+
         .nav-header-row {
             display: flex;
             align-items: center;
@@ -62,6 +63,7 @@
             background: rgba(0,0,0,0.2);
             border-bottom: 1px solid rgba(170, 142, 78, 0.3);
         }
+
         .nav-brand {
             font-size: 1.45rem;
             font-weight: 800;
@@ -70,7 +72,9 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
+            white-space: nowrap;
         }
+
         .menu-btn {
             background: rgba(210, 210, 225, 0.12);
             border: 1px solid #aa8e4e;
@@ -114,160 +118,125 @@
             background: rgba(210, 210, 225, 0.08);
             color: #eef0ff;
             text-align: center;
+            transition: 0.2s;
+            border: 1px solid transparent;
         }
+        .menu-link:hover { background: rgba(235, 235, 245, 0.2); border-color: #c9a53b; }
         .menu-link.active {
             background: #c9a53b;
             color: #1e1c10;
+            font-weight: 700;
         }
 
-        /* 筛选面板 —— 无卡片样式，简洁换行 */
+        /* 筛选面板 — 下拉式，无卡片样式 */
         .filter-panel {
-            background: rgba(12, 12, 8, 0.85);
-            backdrop-filter: blur(6px);
-            border: 1px solid #aa8e4e;
-            border-radius: 28px;
-            padding: 1rem 1.2rem;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 1.2rem 1.2rem;
             margin-bottom: 2rem;
+            border: 1px solid rgba(170, 142, 78, 0.5);
         }
-        .filter-row {
+        .filter-grid {
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
-            gap: 0.8rem 1.2rem;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            align-items: flex-end;
         }
-        .filter-group {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.6rem;
-            background: rgba(0,0,0,0.3);
-            padding: 0.3rem 0.8rem;
-            border-radius: 48px;
+        .filter-item {
+            flex: 1;
+            min-width: 140px;
         }
         .filter-label {
             font-size: 0.7rem;
-            font-weight: bold;
-            color: #e9dbbd;
-            letter-spacing: 1px;
             text-transform: uppercase;
-            background: none;
-            padding: 0;
+            letter-spacing: 1px;
+            color: #e9dbbd;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
         }
-        .filter-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        /* 阵营选项：图标+文字，主题色背景仅在激活时 */
-        .filter-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #2c281c;
-            padding: 0.25rem 0.8rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            color: #f0e2c5;
-            border: 1px solid #8f7a52;
-            transition: 0.1s;
-            white-space: nowrap;
-        }
-        .filter-chip img.faction-icon-small {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
-        }
-        .filter-chip.active {
-            background: #c9a63b;
-            color: #111;
-            border-color: #fde096;
-        }
-        /* 阵营激活专属色 */
-        .filter-chip[data-faction="germany"].active { background: var(--germany); color: white; }
-        .filter-chip[data-faction="britain"].active { background: var(--britain); color: white; }
-        .filter-chip[data-faction="soviet"].active { background: var(--soviet); color: white; }
-        .filter-chip[data-faction="usa"].active { background: var(--usa); color: white; }
-        .filter-chip[data-faction="japan"].active { background: var(--japan); color: white; }
-        .filter-chip[data-faction="france"].active { background: var(--france); color: white; }
-        .filter-chip[data-faction="italy"].active { background: var(--italy); color: white; }
-        .filter-chip[data-faction="poland"].active { background: var(--poland); color: white; }
-        .filter-chip[data-faction="finland"].active { background: var(--finland); color: #1e2a1a; }
-
-        .range-input {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .range-input input[type="number"] {
-            width: 60px;
-            background: #252219;
-            border: 1px solid #aa8e4e;
-            color: #faf2da;
-            border-radius: 30px;
-            padding: 0.25rem 0.4rem;
-            text-align: center;
-            font-size: 0.75rem;
-        }
-        .search-box {
-            flex: 2;
-            min-width: 160px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 48px;
-            padding: 0.2rem 0.8rem;
-            display: flex;
-            align-items: center;
-        }
-        .search-box input {
+        select, .search-input {
             width: 100%;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.55rem 1rem;
+            color: #f5efdb;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23dbb45c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        .search-input {
+            background-image: none;
+        }
+        select optgroup, select option {
+            background: #1e1c16;
+            color: #f0e2c5;
+        }
+        .range-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.3rem 0.8rem;
+        }
+        .range-group input {
+            width: 70px;
             background: transparent;
             border: none;
-            color: white;
-            padding: 0.5rem 0.2rem;
+            color: #f5efdb;
+            text-align: center;
             font-size: 0.85rem;
-            outline: none;
         }
-        .stats-note {
-            font-size: 0.7rem;
-            color: #c9b06b;
-            margin-top: 6px;
-            padding-left: 0.5rem;
+        .range-group span { color: #dbb45c; }
+        .stats-group {
+            margin-top: 0.8rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed rgba(170, 142, 78, 0.4);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
+        .stats-item {
+            flex: 1;
+            min-width: 130px;
+        }
+        .stats-note { font-size: 0.7rem; color: #c9b06b; margin-top: 6px; }
 
         /* 卡片网格: 移动端每行5张 */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 0.9rem;
-            margin-top: 1rem;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
-        @media (max-width: 640px) {
+        @media (max-width: 680px) {
+            .card-grid { gap: 0.7rem; }
+        }
+        @media (max-width: 560px) {
             .card-grid { gap: 0.6rem; }
-        }
-        @media (max-width: 550px) {
-            .card-grid { gap: 0.5rem; }
             .card-name { font-size: 0.65rem; }
         }
         .card-item {
-            background: #131a16;
-            border-radius: 16px;
+            background: #111812;
+            border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.1s, box-shadow 0.2s;
+            transition: transform 0.15s, box-shadow 0.2s;
             cursor: pointer;
-            border-width: 2px;
-            border-style: solid;
-            border-color: #6b5a3e;
+            border: 1.5px solid; /* 阵营主题色动态 */
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
-        /* 卡片边框采用阵营主题色 (动态) */
-        .card-item:hover { transform: translateY(-3px); filter: brightness(1.02); }
+        .card-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .card-img {
             width: 100%;
-            aspect-ratio: 300 / 420;
-            background: #0e1310;
+            aspect-ratio: 500 / 702;
+            background: #0a0f0c;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -281,8 +250,8 @@
             border-radius: 12px;
         }
         .card-info {
-            padding: 0.4rem 0.5rem 0.6rem;
-            background: rgba(0,0,0,0.7);
+            padding: 0.5rem 0.6rem 0.7rem;
+            background: rgba(0,0,0,0.75);
         }
         .card-name {
             font-weight: 700;
@@ -293,15 +262,20 @@
             gap: 4px;
             color: #faf0cf;
         }
-        .reserve-icon-small {
-            width: 16px;
-            height: 16px;
+        .card-name span:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .reserve-icon-sm {
+            width: 14px;
+            height: 14px;
             background: url('reserve.png') no-repeat center;
             background-size: contain;
             display: inline-block;
         }
 
-        /* 模态框 白色文字 预备图标 */
+        /* 模态框 纵向 白色文字 */
         .modal {
             display: none;
             position: fixed;
@@ -315,17 +289,16 @@
             overflow-y: auto;
         }
         .modal-content {
-            background: #181e1a;
-            max-width: 500px;
+            background: #121a14;
+            max-width: 520px;
             width: 92%;
-            border-radius: 32px;
+            border-radius: 28px;
             display: flex;
             flex-direction: column;
             position: relative;
-            border: 1px solid #dbb45c;
-            box-shadow: 0 28px 44px black;
+            border: 1px solid;
+            box-shadow: 0 20px 40px black;
             margin: 1.5rem auto;
-            color: #f5f0e0;
         }
         .modal-close {
             position: absolute;
@@ -334,8 +307,8 @@
             font-size: 28px;
             cursor: pointer;
             z-index: 25;
-            color: #ddd2b0;
-            background: #2d281c;
+            color: #f0e6cc;
+            background: rgba(0,0,0,0.5);
             width: 36px;
             height: 36px;
             border-radius: 40px;
@@ -352,10 +325,11 @@
         }
         .modal-right {
             padding: 20px 22px 26px;
-            background: #111812;
+            background: #101813;
             display: flex;
             flex-direction: column;
             gap: 12px;
+            color: #fef6e6;
         }
         .modal-img {
             width: 100%;
@@ -363,37 +337,22 @@
             border-radius: 12px;
             box-shadow: 0 8px 18px black;
         }
-        .img-quality-switch {
-            margin-top: 14px;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .qual-btn {
-            background: #2e2a1c;
-            border: 1px solid #b69654;
-            padding: 4px 16px;
-            border-radius: 40px;
-            color: #f7ebc6;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        .qual-btn.active { background: #c9a63b; color: #161a0c; }
         .modal-actions {
             display: flex;
             gap: 16px;
-            margin-top: 12px;
+            margin-top: 14px;
             justify-content: center;
             flex-wrap: wrap;
         }
         .action-btn {
-            background: #322d1e;
+            background: #2a2a1c;
             border: none;
-            padding: 5px 14px;
+            padding: 5px 16px;
             border-radius: 32px;
             cursor: pointer;
             font-size: 0.8rem;
             color: #f5efdb;
+            transition: 0.1s;
         }
         .action-btn:hover { background: #c9a63b; color: #1e1c0b; }
         .nav-btn {
@@ -410,29 +369,30 @@
         }
         .nav-left { left: 4px; }
         .nav-right { right: 4px; }
-        .faction-icon {
-            width: 26px;
-            height: 26px;
+        .faction-icon-lg {
+            width: 28px;
+            height: 28px;
             vertical-align: middle;
-            margin-right: 6px;
+            margin-right: 8px;
         }
-        .badge {
-            background: #20281e;
+        .reserve-badge {
+            width: 20px;
+            height: 20px;
+            background: url('reserve.png') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .badge-stat {
+            background: #1e2a1f;
             border-radius: 32px;
             padding: 4px 12px;
             font-size: 0.75rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-        }
-        .reserve-badge-modal {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #4a3a28;
-            padding: 2px 8px;
-            border-radius: 40px;
-            font-size: 0.7rem;
+            border-left: 3px solid;
         }
         .pagination {
             display: flex;
@@ -451,12 +411,10 @@
             font-size: 0.8rem;
         }
         .page-btn.active-page { background: #dbaa3a; color: #171e0c; }
+        .page-btn:disabled { opacity: 0.4; }
         @media (max-width: 560px) {
-            .filter-row { flex-direction: column; align-items: stretch; }
-            .filter-group { justify-content: space-between; overflow-x: auto; flex-wrap: nowrap; }
-            .filter-options { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
-            .filter-chip { white-space: nowrap; flex-shrink: 0; }
-            .search-box { width: 100%; }
+            .filter-grid { flex-direction: column; gap: 0.7rem; }
+            .filter-item { min-width: 100%; }
         }
     </style>
 </head>
@@ -477,43 +435,42 @@
         </div>
     </div>
 
-    <!-- 筛选面板 无卡片样式，紧凑换行 -->
+    <!-- 筛选面板：下拉式 + 数字输入 -->
     <div class="filter-panel">
-        <div class="filter-row">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 搜索卡名 / 文本 / 词条">
+        <div class="filter-grid">
+            <div class="filter-item">
+                <div class="filter-label">🔍 搜索</div>
+                <input type="text" id="searchInput" class="search-input" placeholder="卡名 / 文本 / 词条">
             </div>
-            <div class="filter-group">
-                <span class="filter-label">🏷️ 阵营</span>
-                <div class="filter-options" id="factionFilter"></div>
+            <div class="filter-item">
+                <div class="filter-label">🏷️ 阵营</div>
+                <select id="factionSelect"><option value="all">全部阵营</option></select>
             </div>
-            <div class="filter-group">
-                <span class="filter-label">📦 类型</span>
-                <div class="filter-options" id="typeFilter"></div>
+            <div class="filter-item">
+                <div class="filter-label">📦 类型</div>
+                <select id="typeSelect"><option value="all">全部类型</option></select>
+            </div>
+            <div class="filter-item">
+                <div class="filter-label">💰 花费</div>
+                <select id="costSelect"><option value="all">全部费用</option><option value="0-3">0~3费</option><option value="4-6">4~6费</option><option value="7-12">7+费</option></select>
+            </div>
+            <div class="filter-item">
+                <div class="filter-label">💠 扩展包</div>
+                <select id="setSelect"><option value="all">全部扩展</option></select>
+            </div>
+            <div class="filter-item">
+                <div class="filter-label">🗃️ 卡池</div>
+                <select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select>
             </div>
         </div>
-        <div class="filter-row">
-            <div class="filter-group">
-                <span class="filter-label">💰 花费</span>
-                <div class="filter-options" id="costFilterGroup"></div>
+        <!-- 身材筛选区域 (仅当筛选类型为单位时显示) -->
+        <div id="statsArea" style="display: none;">
+            <div class="stats-group">
+                <div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><div class="range-group"><input type="number" id="attackMin" value="0" min="0" max="12"><span>-</span><input type="number" id="attackMax" value="12" min="0" max="12"></div></div>
+                <div class="stats-item"><div class="filter-label">🛡️ 防御力</div><div class="range-group"><input type="number" id="defenseMin" value="0" min="0" max="12"><span>-</span><input type="number" id="defenseMax" value="12" min="0" max="12"></div></div>
+                <div class="stats-item"><div class="filter-label">⚙️ 行动花费</div><div class="range-group"><input type="number" id="opMin" value="0" min="0" max="6"><span>-</span><input type="number" id="opMax" value="6" min="0" max="6"></div></div>
             </div>
-            <div class="filter-group">
-                <span class="filter-label">💠 扩展包</span>
-                <div class="filter-options" id="setFilter"></div>
-            </div>
-            <div class="filter-group">
-                <span class="filter-label">🗃️ 卡池</span>
-                <div class="filter-options" id="statusFilter"></div>
-            </div>
-        </div>
-        <!-- 身材筛选 (纯数字输入) -->
-        <div id="statsFilterGroup" style="display: none;">
-            <div class="filter-row">
-                <div class="filter-group"><span class="filter-label">⚔️ 攻击</span><div class="range-input"><input type="number" id="attackMinNum" min="0" max="12" value="0" placeholder="0"><span>-</span><input type="number" id="attackMaxNum" min="0" max="12" value="12" placeholder="12"></div></div>
-                <div class="filter-group"><span class="filter-label">🛡️ 防御</span><div class="range-input"><input type="number" id="defenseMinNum" min="0" max="12" value="0"><span>-</span><input type="number" id="defenseMaxNum" min="0" max="12" value="12"></div></div>
-                <div class="filter-group"><span class="filter-label">⚙️ 行动</span><div class="range-input"><input type="number" id="opMinNum" min="0" max="6" value="0"><span>-</span><input type="number" id="opMaxNum" min="0" max="6" value="6"></div></div>
-            </div>
-            <div class="stats-note">※ 仅当筛选类型全为战斗单位时生效</div>
+            <div class="stats-note">※ 仅当筛选类型为纯战斗单位时生效</div>
         </div>
     </div>
 
@@ -521,27 +478,23 @@
     <div class="pagination" id="pagination"></div>
 </div>
 
-<!-- 模态框 -->
+<!-- 模态框 纵向 -->
 <div id="cardModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" id="modalContent">
         <span class="modal-close">&times;</span>
         <button class="nav-btn nav-left" id="prevCardBtn">◀</button>
         <button class="nav-btn nav-right" id="nextCardBtn">▶</button>
         <div class="modal-left">
             <img id="modalImg" class="modal-img" alt="card art">
-            <div class="img-quality-switch">
-                <button class="qual-btn" data-quality="20">预览画质</button>
-                <button class="qual-btn active" data-quality="100">高清画质</button>
-            </div>
             <div class="modal-actions">
                 <button class="action-btn" id="saveImgBtn">💾 保存图片</button>
                 <button class="action-btn" id="copyLinkBtn">🔗 复制链接</button>
             </div>
         </div>
         <div class="modal-right">
-            <h2 id="modalName" style="font-size:1.2rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap;"></h2>
+            <h2 id="modalName" style="font-size:1.3rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap;"></h2>
             <div><span id="modalFactionIcon"></span><span id="modalFaction"></span> &nbsp;| <span id="modalType"></span> &nbsp;| <span id="modalRarity"></span></div>
-            <div id="modalCostDefense" class="badge"></div>
+            <div id="modalCostDefense" class="badge-stat"></div>
             <div><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line; font-size:0.85rem;"></span></div>
             <div><strong>✨ 词条</strong> <span id="modalAttributes"></span></div>
             <div><strong>📚 扩展包</strong> <span id="modalSet"></span> &nbsp;| <strong>状态</strong> <span id="modalStatus"></span></div>
@@ -552,15 +505,14 @@
 
 <script>
     let allCards = [], filteredCards = [];
-    let currentPage = 1;
-    const PAGE_SIZE = 20;
-    let currentModalIndex = -1, currentQuality = 100, currentModalCard = null;
+    let currentPage = 1, PAGE_SIZE = 20;
+    let currentModalIndex = -1, currentModalCard = null;
 
-    const factionsList = ["soviet","usa","poland","neutral","japan","italy","france","britain","finland","germany"];
+    const factionList = ["soviet","usa","poland","neutral","japan","italy","france","britain","finland","germany"];
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
+    const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
     const typeMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
-    const costRanges = [{label:"0~3费", min:0,max:3},{label:"4~6费", min:4,max:6},{label:"7+费", min:7,max:12}];
 
     function getCardImageUrl(imgName, quality=20) {
         if(!imgName) return "";
@@ -570,7 +522,7 @@
     async function loadData() {
         try {
             const res = await fetch('data.json');
-            if(!res.ok) throw new Error("data.json加载失败");
+            if(!res.ok) throw new Error("data.json failed");
             const data = await res.json();
             allCards = (data.cards || []).map(card => ({
                 ...card,
@@ -589,99 +541,65 @@
                 reserved: !!card.reserved,
                 isSpawn: card.json?.set === "OnlySpawnable"
             }));
-            initFiltersAndRender();
-        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem;">❌ data.json 加载失败</div>'; }
+            initFilters();
+            applyFilters();
+        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div class="loading-placeholder">❌ 数据加载失败</div>'; }
     }
 
-    function renderFactionChips(containerId, values) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = values.map(f => {
-            const iconPath = `${f}.svg`;
-            return `<div class="filter-chip" data-faction="${f}"><img class="faction-icon-small" src="${iconPath}" onerror="this.style.display='none'"> ${factionNames[f]}</div>`;
-        }).join('');
-        container.querySelectorAll('[data-faction]').forEach(el => {
-            el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('active'); applyFiltersAndRender(); });
+    function initFilters() {
+        const factions = [...new Set(allCards.map(c=>c.faction))];
+        const typeOpts = [...new Set(allCards.map(c=>c.type))];
+        const sets = [...new Set(allCards.map(c=>c.setName).filter(Boolean))];
+        const factionSelect = document.getElementById('factionSelect');
+        factionSelect.innerHTML = '<option value="all">全部阵营</option>' + factions.map(f => `<option value="${f}">${factionNames[f] || f}</option>`).join('');
+        const typeSelect = document.getElementById('typeSelect');
+        typeSelect.innerHTML = '<option value="all">全部类型</option>' + typeOpts.map(t => `<option value="${t}">${typeMap[t] || t}</option>`).join('');
+        const setSelect = document.getElementById('setSelect');
+        setSelect.innerHTML = '<option value="all">全部扩展</option>' + sets.map(s => `<option value="${s}">${s}</option>`).join('');
+
+        ['factionSelect','typeSelect','costSelect','setSelect','statusSelect','searchInput'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => applyFilters());
         });
-    }
-
-    function renderChipGroup(containerId, values, key, nameMap) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = values.map(val => `<div class="filter-chip" data-${key}="${val}">${nameMap?.[val] || val}</div>`).join('');
-        container.querySelectorAll(`[data-${key}]`).forEach(el => {
-            el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('active'); applyFiltersAndRender(); });
+        document.getElementById('searchInput').addEventListener('input', () => applyFilters());
+        ['attackMin','attackMax','defenseMin','defenseMax','opMin','opMax'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => applyFilters());
         });
+        applyFilters();
     }
 
-    function getSelectedMulti(key) {
-        const chips = document.querySelectorAll(`.filter-chip[data-${key}]`);
-        let selected = [];
-        chips.forEach(chip => { if(chip.classList.contains('active')) selected.push(chip.getAttribute(`data-${key}`)); });
-        return selected;
+    function getSelectedType() {
+        let t = document.getElementById('typeSelect').value;
+        return t === 'all' ? [] : [t];
     }
-
-    function getSelectedCostRanges() {
-        const chips = document.querySelectorAll('[data-cost-range]');
-        let ranges = [];
-        chips.forEach(chip => { if(chip.classList.contains('active')) { let [min,max] = chip.getAttribute('data-cost-range').split('-').map(Number); ranges.push({min,max}); } });
-        return ranges;
-    }
-
-    function getSelectedStatus() {
-        const active = document.querySelector('.filter-chip[data-status].active');
-        return active ? active.getAttribute('data-status') : null;
-    }
-
-    function initFiltersAndRender() {
-        const factionSet = [...new Set(allCards.map(c=>c.faction))];
-        const typeSet = [...new Set(allCards.map(c=>c.type))];
-        const setSet = [...new Set(allCards.map(c=>c.setName).filter(Boolean))];
-        renderFactionChips('factionFilter', factionSet);
-        renderChipGroup('typeFilter', typeSet, 'type', typeMap);
-        renderChipGroup('setFilter', setSet, 'set', null);
-        const costDiv = document.getElementById('costFilterGroup');
-        costDiv.innerHTML = costRanges.map(r => `<div class="filter-chip" data-cost-range="${r.min}-${r.max}">${r.label}</div>`).join('');
-        costDiv.querySelectorAll('[data-cost-range]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('active'); applyFiltersAndRender(); }));
-        const statusDiv = document.getElementById('statusFilter');
-        statusDiv.innerHTML = `<div class="filter-chip" data-status="active">活跃</div><div class="filter-chip" data-status="reserve">预备</div><div class="filter-chip" data-status="spawn">衍生</div>`;
-        statusDiv.querySelectorAll('[data-status]').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); statusDiv.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); applyFiltersAndRender(); }); });
-        document.getElementById('searchInput').addEventListener('input', () => applyFiltersAndRender());
-        ['attackMinNum','attackMaxNum','defenseMinNum','defenseMaxNum','opMinNum','opMaxNum'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.addEventListener('input', () => applyFiltersAndRender());
-        });
-        applyFiltersAndRender();
-    }
-
-    function filterCards() {
+    function filterCardsLogic() {
         let result = [...allCards];
         const search = document.getElementById('searchInput').value.trim().toLowerCase();
         if(search) result = result.filter(c => c.titleZh.toLowerCase().includes(search) || c.text.toLowerCase().includes(search) || (c.attributes && c.attributes.some(a=>a.toLowerCase().includes(search))));
-        let factionsSel = getSelectedMulti('faction');
-        if(factionsSel.length) result = result.filter(c => factionsSel.includes(c.faction));
-        let typesSel = getSelectedMulti('type');
-        if(typesSel.length) result = result.filter(c => typesSel.includes(c.type));
-        let setsSel = getSelectedMulti('set');
-        if(setsSel.length) result = result.filter(c => setsSel.includes(c.setName));
-        let costRangesSel = getSelectedCostRanges();
-        if(costRangesSel.length) result = result.filter(c => costRangesSel.some(r => c.cost >= r.min && c.cost <= r.max));
-        let statusSel = getSelectedStatus();
-        if(statusSel) {
-            if(statusSel === 'active') result = result.filter(c => !c.reserved && !c.isSpawn);
-            else if(statusSel === 'reserve') result = result.filter(c => c.reserved);
-            else if(statusSel === 'spawn') result = result.filter(c => c.isSpawn);
-        }
-        let selectedTypesNow = typesSel.length ? typesSel : [...new Set(allCards.map(c=>c.type))];
-        let onlyUnits = selectedTypesNow.length > 0 && selectedTypesNow.every(t => unitTypes.includes(t));
-        const statsGroup = document.getElementById('statsFilterGroup');
-        if(onlyUnits && selectedTypesNow.length>0) statsGroup.style.display = 'block';
-        else statsGroup.style.display = 'none';
-        if(onlyUnits && statsGroup.style.display === 'block') {
-            let attMin = parseInt(document.getElementById('attackMinNum').value) || 0;
-            let attMax = parseInt(document.getElementById('attackMaxNum').value) || 12;
-            let defMin = parseInt(document.getElementById('defenseMinNum').value) || 0;
-            let defMax = parseInt(document.getElementById('defenseMaxNum').value) || 12;
-            let opMin = parseInt(document.getElementById('opMinNum').value) || 0;
-            let opMax = parseInt(document.getElementById('opMaxNum').value) || 6;
+        const faction = document.getElementById('factionSelect').value;
+        if(faction !== 'all') result = result.filter(c => c.faction === faction);
+        const typeVal = document.getElementById('typeSelect').value;
+        if(typeVal !== 'all') result = result.filter(c => c.type === typeVal);
+        const costVal = document.getElementById('costSelect').value;
+        if(costVal !== 'all') { let [min,max] = costVal.split('-').map(Number); result = result.filter(c => c.cost >= min && c.cost <= max); }
+        const setVal = document.getElementById('setSelect').value;
+        if(setVal !== 'all') result = result.filter(c => c.setName === setVal);
+        const status = document.getElementById('statusSelect').value;
+        if(status === 'active') result = result.filter(c => !c.reserved && !c.isSpawn);
+        else if(status === 'reserve') result = result.filter(c => c.reserved);
+        else if(status === 'spawn') result = result.filter(c => c.isSpawn);
+        // 身材筛选可见性
+        const selectedTypes = typeVal !== 'all' ? [typeVal] : [...new Set(allCards.map(c=>c.type))];
+        const onlyUnits = selectedTypes.length > 0 && selectedTypes.every(t => unitTypes.includes(t));
+        const statsArea = document.getElementById('statsArea');
+        if(onlyUnits && typeVal !== 'all') statsArea.style.display = 'block';
+        else statsArea.style.display = 'none';
+        if(onlyUnits && typeVal !== 'all') {
+            let attMin = parseInt(document.getElementById('attackMin').value) || 0;
+            let attMax = parseInt(document.getElementById('attackMax').value) || 12;
+            let defMin = parseInt(document.getElementById('defenseMin').value) || 0;
+            let defMax = parseInt(document.getElementById('defenseMax').value) || 12;
+            let opMin = parseInt(document.getElementById('opMin').value) || 0;
+            let opMax = parseInt(document.getElementById('opMax').value) || 6;
             result = result.filter(c => {
                 if(!unitTypes.includes(c.type)) return false;
                 let att = c.attack ?? -1, def = c.defense ?? -1, op = c.operationCost ?? 0;
@@ -690,33 +608,31 @@
         }
         return result;
     }
-
-    function applyFiltersAndRender() {
-        filteredCards = filterCards();
+    function applyFilters() {
+        filteredCards = filterCardsLogic();
         currentPage = 1;
-        renderCardGrid();
+        renderCards();
         renderPagination();
     }
-
-    function renderCardGrid() {
+    function renderCards() {
         const start = (currentPage-1)*PAGE_SIZE;
-        const pageItems = filteredCards.slice(start, start+PAGE_SIZE);
+        const pageCards = filteredCards.slice(start, start+PAGE_SIZE);
         const container = document.getElementById('cardContainer');
-        if(!pageItems.length) { container.innerHTML = '<div style="grid-column:1/-1; text-align:center;">⚔️ 暂无卡牌</div>'; return; }
-        container.innerHTML = pageItems.map((card, idx) => {
+        if(!pageCards.length) { container.innerHTML = '<div class="loading-placeholder">⚔️ 暂无卡牌</div>'; return; }
+        container.innerHTML = pageCards.map((card, idx) => {
             const globalIdx = filteredCards.indexOf(card);
             const imgUrl = getCardImageUrl(card.image, 20);
-            const factionColor = getComputedStyle(document.documentElement).getPropertyValue(`--${card.faction}`).trim() || '#6b5a3e';
-            return `<div class="card-item" data-index="${globalIdx}" style="border-color: ${factionColor};">
-                        <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}" style="border-radius:12px;"></div>
-                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${card.reserved ? '<i class="reserve-icon-small"></i>' : ''}</div></div>
+            const factionColorHex = factionColor[card.faction] || '#6b6e5c';
+            const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
+            return `<div class="card-item" data-index="${globalIdx}" style="border-color: ${factionColorHex};">
+                        <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div>
+                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
                     </div>`;
         }).join('');
         document.querySelectorAll('.card-item').forEach(el => {
-            el.addEventListener('click', () => { let idx = parseInt(el.getAttribute('data-index')); if(!isNaN(idx)) openModal(idx); });
+            el.addEventListener('click', () => { let idx = parseInt(el.dataset.index); if(!isNaN(idx)) openModal(idx); });
         });
     }
-
     function renderPagination() {
         const total = filteredCards.length, pages = Math.ceil(total/PAGE_SIZE);
         const pagDiv = document.getElementById('pagination');
@@ -725,41 +641,47 @@
         for(let i=1;i<=pages;i++) btns += `<button class="page-btn ${i===currentPage?'active-page':''}" data-page="${i}">${i}</button>`;
         btns += `<button class="page-btn" data-page="next" ${currentPage===pages?'disabled':''}>▶</button>`;
         pagDiv.innerHTML = btns;
-        pagDiv.querySelectorAll('.page-btn').forEach(btn => btn.addEventListener('click', () => {
-            let p = btn.getAttribute('data-page');
-            if(p === 'prev') currentPage = Math.max(1, currentPage-1);
-            else if(p === 'next') currentPage = Math.min(pages, currentPage+1);
-            else currentPage = parseInt(p);
-            renderCardGrid(); renderPagination();
-        }));
+        pagDiv.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                let p = btn.dataset.page;
+                if(p === 'prev') currentPage = Math.max(1, currentPage-1);
+                else if(p === 'next') currentPage = Math.min(pages, currentPage+1);
+                else currentPage = parseInt(p);
+                renderCards(); renderPagination();
+            });
+        });
     }
-
     function openModal(index) {
         if(index<0 || index>=filteredCards.length) return;
         currentModalIndex = index;
         currentModalCard = filteredCards[index];
-        const card = currentModalCard;
-        const fKey = card.faction?.toLowerCase();
-        const iconHtml = fKey && factionsList.includes(fKey) ? `<img class="faction-icon" src="${fKey}.svg" onerror="this.style.display='none'">` : '';
+        const c = currentModalCard;
+        const fKey = c.faction;
+        const themeColor = factionColor[fKey] || '#6b6e5c';
+        const modalContent = document.getElementById('modalContent');
+        modalContent.style.borderColor = themeColor;
+        const iconHtml = `<img class="faction-icon-lg" src="${fKey}.svg" onerror="this.style.display='none'">`;
         document.getElementById('modalFactionIcon').innerHTML = iconHtml;
-        document.getElementById('modalFaction').innerText = factionNames[fKey] || card.faction || '中立';
-        document.getElementById('modalType').innerText = typeMap[card.type] || card.type;
-        document.getElementById('modalRarity').innerText = card.json?.rarity || card.rarity || '';
-        let statusLabel = card.reserved ? '<span class="reserve-badge-modal">📦 预备</span>' : (card.isSpawn ? '🌀 衍生' : '✨ 活跃');
-        document.getElementById('modalName').innerHTML = `${card.titleZh} <span style="font-size:0.7rem;">${statusLabel}</span>`;
-        document.getElementById('modalText').innerText = card.text;
-        let statLine = `💎 花费: ${card.cost}`;
-        if(card.attack !== undefined && card.defense !== undefined) statLine += ` &nbsp; ⚔️ ${card.attack} / 🛡️ ${card.defense}`;
-        if(card.operationCost !== undefined) statLine += ` &nbsp; ⚙️ 行动: ${card.operationCost}`;
-        document.getElementById('modalCostDefense').innerHTML = statLine;
-        document.getElementById('modalAttributes').innerHTML = (card.attributes?.length ? card.attributes.join(', ') : '无');
-        document.getElementById('modalSet').innerText = card.setName || '基础';
-        document.getElementById('modalStatus').innerHTML = card.reserved ? '预备' : (card.isSpawn ? '衍生' : '活跃');
-        document.getElementById('modalEnName').innerText = card.titleEn || '---';
-        updateModalImage(card);
+        document.getElementById('modalFaction').innerText = factionNames[fKey] || c.faction;
+        document.getElementById('modalType').innerText = typeMap[c.type] || c.type;
+        document.getElementById('modalRarity').innerText = c.json?.rarity || c.rarity || '';
+        let statusLabel = c.reserved ? '预备' : (c.isSpawn ? '衍生' : '活跃');
+        const reserveIconSpan = c.reserved ? '<span class="reserve-badge"></span>' : '';
+        document.getElementById('modalName').innerHTML = `${c.titleZh} ${reserveIconSpan} <span style="font-size:0.7rem; background:#2e2a1c; padding:0.2rem 0.6rem; border-radius:30px;">${statusLabel}</span>`;
+        document.getElementById('modalText').innerText = c.text;
+        let statLine = `💎 花费: ${c.cost}`;
+        if(c.attack !== undefined && c.defense !== undefined) statLine += ` &nbsp; ⚔️ ${c.attack} / 🛡️ ${c.defense}`;
+        if(c.operationCost !== undefined) statLine += ` &nbsp; ⚙️ 行动: ${c.operationCost}`;
+        const badgeDiv = document.getElementById('modalCostDefense');
+        badgeDiv.innerHTML = statLine;
+        badgeDiv.style.borderLeftColor = themeColor;
+        document.getElementById('modalAttributes').innerHTML = (c.attributes?.length ? c.attributes.join(', ') : '无');
+        document.getElementById('modalSet').innerText = c.setName;
+        document.getElementById('modalStatus').innerHTML = statusLabel;
+        document.getElementById('modalEnName').innerText = c.titleEn || '---';
+        document.getElementById('modalImg').src = getCardImageUrl(c.image, 100);
         document.getElementById('cardModal').style.display = 'flex';
     }
-    function updateModalImage(card) { document.getElementById('modalImg').src = getCardImageUrl(card.image, currentQuality); }
     function closeModal() { document.getElementById('cardModal').style.display = 'none'; }
     function navigateModal(delta) { let n = currentModalIndex + delta; if(n>=0 && n<filteredCards.length) openModal(n); }
 
@@ -769,19 +691,12 @@
         document.getElementById('prevCardBtn').addEventListener('click', () => navigateModal(-1));
         document.getElementById('nextCardBtn').addEventListener('click', () => navigateModal(1));
         document.getElementById('cardModal').addEventListener('click', (e) => { if(e.target === document.getElementById('cardModal')) closeModal(); });
-        document.querySelectorAll('.qual-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.qual-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentQuality = parseInt(btn.dataset.quality);
-                if(currentModalCard) updateModalImage(currentModalCard);
-            });
-        });
         document.getElementById('saveImgBtn').onclick = () => { let a = document.createElement('a'); a.href = document.getElementById('modalImg').src; a.download = 'kards_card.png'; a.click(); };
         document.getElementById('copyLinkBtn').onclick = () => { navigator.clipboard.writeText(document.getElementById('modalImg').src); alert('图片链接已复制'); };
         const menuBtn = document.getElementById('menuToggleBtn'), menuDiv = document.getElementById('navMenu');
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDiv.classList.toggle('open'); };
         document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !menuDiv.contains(e.target)) menuDiv.classList.remove('open'); });
+        document.querySelectorAll('.menu-link').forEach(l => l.addEventListener('click', () => menuDiv.classList.remove('open')));
     });
 </script>
 </body>
