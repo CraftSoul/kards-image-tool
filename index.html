@@ -24,7 +24,7 @@
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
         }
 
-        /* 阵营主题色变量 */
+        /* 阵营主题色 (用于卡片边框、选中项) */
         :root {
             --germany: #5A5F55;
             --britain: #857A60;
@@ -54,7 +54,6 @@
             overflow: hidden;
             box-shadow: 0 6px 14px rgba(0,0,0,0.3);
         }
-
         .nav-header-row {
             display: flex;
             align-items: center;
@@ -63,7 +62,6 @@
             background: rgba(0,0,0,0.2);
             border-bottom: 1px solid rgba(170, 142, 78, 0.3);
         }
-
         .nav-brand {
             font-size: 1.45rem;
             font-weight: 800;
@@ -72,9 +70,7 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            white-space: nowrap;
         }
-
         .menu-btn {
             background: rgba(210, 210, 225, 0.12);
             border: 1px solid #aa8e4e;
@@ -118,46 +114,45 @@
             background: rgba(210, 210, 225, 0.08);
             color: #eef0ff;
             text-align: center;
-            transition: 0.2s;
-            border: 1px solid transparent;
         }
-        .menu-link:hover { background: rgba(235, 235, 245, 0.2); border-color: #c9a53b; }
         .menu-link.active {
             background: #c9a53b;
             color: #1e1c10;
-            font-weight: 700;
         }
 
-        /* 筛选面板 */
+        /* 筛选面板 —— 无卡片样式，简洁换行 */
         .filter-panel {
-            background: rgba(12, 12, 8, 0.88);
-            backdrop-filter: blur(8px);
+            background: rgba(12, 12, 8, 0.85);
+            backdrop-filter: blur(6px);
             border: 1px solid #aa8e4e;
             border-radius: 28px;
             padding: 1rem 1.2rem;
             margin-bottom: 2rem;
         }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem 1.2rem;
+            margin-bottom: 1rem;
+        }
         .filter-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.7rem;
-            margin-bottom: 1rem;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(0,0,0,0.3);
+            padding: 0.3rem 0.8rem;
+            border-radius: 48px;
         }
-        .filter-card {
-            background: #1c1910b3;
-            border-radius: 20px;
-            padding: 0.5rem 0.8rem;
-            flex: 1 0 auto;
-            min-width: 130px;
-            border-left: 3px solid #d4af6a;
-        }
-        .filter-title {
+        .filter-label {
             font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-weight: bold;
             color: #e9dbbd;
-            margin-bottom: 0.4rem;
-            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: none;
+            padding: 0;
         }
         .filter-options {
             display: flex;
@@ -165,24 +160,32 @@
             gap: 0.5rem;
             align-items: center;
         }
+        /* 阵营选项：图标+文字，主题色背景仅在激活时 */
         .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             background: #2c281c;
-            padding: 0.2rem 0.8rem;
+            padding: 0.25rem 0.8rem;
             border-radius: 40px;
             font-size: 0.75rem;
             cursor: pointer;
             color: #f0e2c5;
             border: 1px solid #8f7a52;
+            transition: 0.1s;
             white-space: nowrap;
-            transition: all 0.1s;
+        }
+        .filter-chip img.faction-icon-small {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
         }
         .filter-chip.active {
             background: #c9a63b;
             color: #111;
             border-color: #fde096;
-            font-weight: 600;
         }
-        /* 阵营chip特殊颜色 (active时覆盖) */
+        /* 阵营激活专属色 */
         .filter-chip[data-faction="germany"].active { background: var(--germany); color: white; }
         .filter-chip[data-faction="britain"].active { background: var(--britain); color: white; }
         .filter-chip[data-faction="soviet"].active { background: var(--soviet); color: white; }
@@ -195,29 +198,43 @@
 
         .range-input {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             flex-wrap: wrap;
         }
         .range-input input[type="number"] {
-            width: 65px;
+            width: 60px;
             background: #252219;
             border: 1px solid #aa8e4e;
             color: #faf2da;
             border-radius: 30px;
-            padding: 0.3rem 0.5rem;
+            padding: 0.25rem 0.4rem;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
-        .search-box { flex: 2; min-width: 160px; }
+        .search-box {
+            flex: 2;
+            min-width: 160px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 48px;
+            padding: 0.2rem 0.8rem;
+            display: flex;
+            align-items: center;
+        }
         .search-box input {
             width: 100%;
-            background: #252219;
-            border: 1px solid #aa8e4e;
-            border-radius: 60px;
-            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
             color: white;
+            padding: 0.5rem 0.2rem;
             font-size: 0.85rem;
+            outline: none;
+        }
+        .stats-note {
+            font-size: 0.7rem;
+            color: #c9b06b;
+            margin-top: 6px;
+            padding-left: 0.5rem;
         }
 
         /* 卡片网格: 移动端每行5张 */
@@ -227,25 +244,26 @@
             gap: 0.9rem;
             margin-top: 1rem;
         }
-        @media (max-width: 750px) {
-            .card-grid { gap: 0.7rem; }
-        }
         @media (max-width: 640px) {
-            .card-grid { grid-template-columns: repeat(5, 1fr); gap: 0.6rem; }
+            .card-grid { gap: 0.6rem; }
         }
         @media (max-width: 550px) {
             .card-grid { gap: 0.5rem; }
-            .card-name { font-size: 0.7rem; }
+            .card-name { font-size: 0.65rem; }
         }
         .card-item {
-            background: linear-gradient(145deg, #1c231f, #131a16);
+            background: #131a16;
             border-radius: 16px;
             overflow: hidden;
             transition: transform 0.1s, box-shadow 0.2s;
             cursor: pointer;
-            border: 1px solid #8f7a52;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #6b5a3e;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
-        .card-item:hover { transform: translateY(-3px); border-color: #e6c175; }
+        /* 卡片边框采用阵营主题色 (动态) */
+        .card-item:hover { transform: translateY(-3px); filter: brightness(1.02); }
         .card-img {
             width: 100%;
             aspect-ratio: 300 / 420;
@@ -264,7 +282,7 @@
         }
         .card-info {
             padding: 0.4rem 0.5rem 0.6rem;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
         }
         .card-name {
             font-weight: 700;
@@ -275,27 +293,21 @@
             gap: 4px;
             color: #faf0cf;
         }
-        .card-name span:first-child {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .reserve-icon {
+        .reserve-icon-small {
             width: 16px;
             height: 16px;
             background: url('reserve.png') no-repeat center;
             background-size: contain;
             display: inline-block;
-            flex-shrink: 0;
         }
 
-        /* 模态框 垂直滚动适配 */
+        /* 模态框 白色文字 预备图标 */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.94);
             backdrop-filter: blur(12px);
             z-index: 1000;
             align-items: center;
@@ -303,16 +315,17 @@
             overflow-y: auto;
         }
         .modal-content {
-            background: #191f1b;
+            background: #181e1a;
             max-width: 500px;
             width: 92%;
             border-radius: 32px;
             display: flex;
             flex-direction: column;
             position: relative;
-            border: 1px solid #c6aa6b;
+            border: 1px solid #dbb45c;
             box-shadow: 0 28px 44px black;
             margin: 1.5rem auto;
+            color: #f5f0e0;
         }
         .modal-close {
             position: absolute;
@@ -397,7 +410,12 @@
         }
         .nav-left { left: 4px; }
         .nav-right { right: 4px; }
-        .faction-icon { width: 24px; height: 24px; vertical-align: middle; margin-right: 6px; }
+        .faction-icon {
+            width: 26px;
+            height: 26px;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
         .badge {
             background: #20281e;
             border-radius: 32px;
@@ -406,6 +424,15 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+        }
+        .reserve-badge-modal {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #4a3a28;
+            padding: 2px 8px;
+            border-radius: 40px;
+            font-size: 0.7rem;
         }
         .pagination {
             display: flex;
@@ -424,14 +451,13 @@
             font-size: 0.8rem;
         }
         .page-btn.active-page { background: #dbaa3a; color: #171e0c; }
-        .page-btn:disabled { opacity: 0.4; }
         @media (max-width: 560px) {
-            .filter-card { min-width: 100%; }
-            .filter-options { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+            .filter-row { flex-direction: column; align-items: stretch; }
+            .filter-group { justify-content: space-between; overflow-x: auto; flex-wrap: nowrap; }
+            .filter-options { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
             .filter-chip { white-space: nowrap; flex-shrink: 0; }
-            .card-name { font-size: 0.7rem; }
+            .search-box { width: 100%; }
         }
-        .stats-note { font-size: 0.7rem; color: #c9b06b; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -451,41 +477,41 @@
         </div>
     </div>
 
+    <!-- 筛选面板 无卡片样式，紧凑换行 -->
     <div class="filter-panel">
-        <div class="filter-group">
-            <div class="filter-card search-box">
-                <div class="filter-title">🔍 搜索 (卡名/文本/词条)</div>
-                <input type="text" id="searchInput" placeholder="例如: 第2步兵师">
+        <div class="filter-row">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 搜索卡名 / 文本 / 词条">
             </div>
-            <div class="filter-card">
-                <div class="filter-title">🏷️ 阵营</div>
+            <div class="filter-group">
+                <span class="filter-label">🏷️ 阵营</span>
                 <div class="filter-options" id="factionFilter"></div>
             </div>
-            <div class="filter-card">
-                <div class="filter-title">📦 类型</div>
+            <div class="filter-group">
+                <span class="filter-label">📦 类型</span>
                 <div class="filter-options" id="typeFilter"></div>
             </div>
         </div>
-        <div class="filter-group">
-            <div class="filter-card">
-                <div class="filter-title">💰 花费范围</div>
+        <div class="filter-row">
+            <div class="filter-group">
+                <span class="filter-label">💰 花费</span>
                 <div class="filter-options" id="costFilterGroup"></div>
             </div>
-            <div class="filter-card">
-                <div class="filter-title">💠 扩展包</div>
+            <div class="filter-group">
+                <span class="filter-label">💠 扩展包</span>
                 <div class="filter-options" id="setFilter"></div>
             </div>
-            <div class="filter-card">
-                <div class="filter-title">🗃️ 卡池</div>
+            <div class="filter-group">
+                <span class="filter-label">🗃️ 卡池</span>
                 <div class="filter-options" id="statusFilter"></div>
             </div>
         </div>
-        <!-- 身材筛选 (纯数字输入框) -->
+        <!-- 身材筛选 (纯数字输入) -->
         <div id="statsFilterGroup" style="display: none;">
-            <div class="filter-group">
-                <div class="filter-card"><div class="filter-title">⚔️ 攻击力</div><div class="range-input"><input type="number" id="attackMinNum" min="0" max="12" value="0" placeholder="min"><span>-</span><input type="number" id="attackMaxNum" min="0" max="12" value="12" placeholder="max"></div></div>
-                <div class="filter-card"><div class="filter-title">🛡️ 防御力</div><div class="range-input"><input type="number" id="defenseMinNum" min="0" max="12" value="0"><span>-</span><input type="number" id="defenseMaxNum" min="0" max="12" value="12"></div></div>
-                <div class="filter-card"><div class="filter-title">⚙️ 行动花费</div><div class="range-input"><input type="number" id="opMinNum" min="0" max="6" value="0"><span>-</span><input type="number" id="opMaxNum" min="0" max="6" value="6"></div></div>
+            <div class="filter-row">
+                <div class="filter-group"><span class="filter-label">⚔️ 攻击</span><div class="range-input"><input type="number" id="attackMinNum" min="0" max="12" value="0" placeholder="0"><span>-</span><input type="number" id="attackMaxNum" min="0" max="12" value="12" placeholder="12"></div></div>
+                <div class="filter-group"><span class="filter-label">🛡️ 防御</span><div class="range-input"><input type="number" id="defenseMinNum" min="0" max="12" value="0"><span>-</span><input type="number" id="defenseMaxNum" min="0" max="12" value="12"></div></div>
+                <div class="filter-group"><span class="filter-label">⚙️ 行动</span><div class="range-input"><input type="number" id="opMinNum" min="0" max="6" value="0"><span>-</span><input type="number" id="opMaxNum" min="0" max="6" value="6"></div></div>
             </div>
             <div class="stats-note">※ 仅当筛选类型全为战斗单位时生效</div>
         </div>
@@ -495,7 +521,7 @@
     <div class="pagination" id="pagination"></div>
 </div>
 
-<!-- 模态框 纵向 -->
+<!-- 模态框 -->
 <div id="cardModal" class="modal">
     <div class="modal-content">
         <span class="modal-close">&times;</span>
@@ -564,7 +590,18 @@
                 isSpawn: card.json?.set === "OnlySpawnable"
             }));
             initFiltersAndRender();
-        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div class="loading-placeholder">❌ 数据加载失败，请确保 data.json 存在</div>'; }
+        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem;">❌ data.json 加载失败</div>'; }
+    }
+
+    function renderFactionChips(containerId, values) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = values.map(f => {
+            const iconPath = `${f}.svg`;
+            return `<div class="filter-chip" data-faction="${f}"><img class="faction-icon-small" src="${iconPath}" onerror="this.style.display='none'"> ${factionNames[f]}</div>`;
+        }).join('');
+        container.querySelectorAll('[data-faction]').forEach(el => {
+            el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('active'); applyFiltersAndRender(); });
+        });
     }
 
     function renderChipGroup(containerId, values, key, nameMap) {
@@ -598,7 +635,7 @@
         const factionSet = [...new Set(allCards.map(c=>c.faction))];
         const typeSet = [...new Set(allCards.map(c=>c.type))];
         const setSet = [...new Set(allCards.map(c=>c.setName).filter(Boolean))];
-        renderChipGroup('factionFilter', factionSet, 'faction', factionNames);
+        renderFactionChips('factionFilter', factionSet);
         renderChipGroup('typeFilter', typeSet, 'type', typeMap);
         renderChipGroup('setFilter', setSet, 'set', null);
         const costDiv = document.getElementById('costFilterGroup');
@@ -608,7 +645,6 @@
         statusDiv.innerHTML = `<div class="filter-chip" data-status="active">活跃</div><div class="filter-chip" data-status="reserve">预备</div><div class="filter-chip" data-status="spawn">衍生</div>`;
         statusDiv.querySelectorAll('[data-status]').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); statusDiv.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); applyFiltersAndRender(); }); });
         document.getElementById('searchInput').addEventListener('input', () => applyFiltersAndRender());
-        // 数字输入监听
         ['attackMinNum','attackMaxNum','defenseMinNum','defenseMaxNum','opMinNum','opMaxNum'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('input', () => applyFiltersAndRender());
@@ -666,14 +702,14 @@
         const start = (currentPage-1)*PAGE_SIZE;
         const pageItems = filteredCards.slice(start, start+PAGE_SIZE);
         const container = document.getElementById('cardContainer');
-        if(!pageItems.length) { container.innerHTML = '<div class="loading-placeholder">⚔️ 暂无卡牌，调整筛选⚔️</div>'; return; }
+        if(!pageItems.length) { container.innerHTML = '<div style="grid-column:1/-1; text-align:center;">⚔️ 暂无卡牌</div>'; return; }
         container.innerHTML = pageItems.map((card, idx) => {
             const globalIdx = filteredCards.indexOf(card);
             const imgUrl = getCardImageUrl(card.image, 20);
-            const reserveMark = card.reserved ? '<i class="reserve-icon"></i>' : '';
-            return `<div class="card-item" data-index="${globalIdx}">
+            const factionColor = getComputedStyle(document.documentElement).getPropertyValue(`--${card.faction}`).trim() || '#6b5a3e';
+            return `<div class="card-item" data-index="${globalIdx}" style="border-color: ${factionColor};">
                         <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}" style="border-radius:12px;"></div>
-                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
+                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${card.reserved ? '<i class="reserve-icon-small"></i>' : ''}</div></div>
                     </div>`;
         }).join('');
         document.querySelectorAll('.card-item').forEach(el => {
@@ -689,15 +725,13 @@
         for(let i=1;i<=pages;i++) btns += `<button class="page-btn ${i===currentPage?'active-page':''}" data-page="${i}">${i}</button>`;
         btns += `<button class="page-btn" data-page="next" ${currentPage===pages?'disabled':''}>▶</button>`;
         pagDiv.innerHTML = btns;
-        pagDiv.querySelectorAll('.page-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                let p = btn.getAttribute('data-page');
-                if(p === 'prev') currentPage = Math.max(1, currentPage-1);
-                else if(p === 'next') currentPage = Math.min(pages, currentPage+1);
-                else currentPage = parseInt(p);
-                renderCardGrid(); renderPagination();
-            });
-        });
+        pagDiv.querySelectorAll('.page-btn').forEach(btn => btn.addEventListener('click', () => {
+            let p = btn.getAttribute('data-page');
+            if(p === 'prev') currentPage = Math.max(1, currentPage-1);
+            else if(p === 'next') currentPage = Math.min(pages, currentPage+1);
+            else currentPage = parseInt(p);
+            renderCardGrid(); renderPagination();
+        }));
     }
 
     function openModal(index) {
@@ -711,8 +745,8 @@
         document.getElementById('modalFaction').innerText = factionNames[fKey] || card.faction || '中立';
         document.getElementById('modalType').innerText = typeMap[card.type] || card.type;
         document.getElementById('modalRarity').innerText = card.json?.rarity || card.rarity || '';
-        let statusLabel = card.reserved ? '预备' : (card.isSpawn ? '衍生' : '活跃');
-        document.getElementById('modalName').innerHTML = `${card.titleZh} <span style="font-size:0.7rem; background:#332d1c; padding:0.2rem 0.6rem; border-radius:30px;">${statusLabel}</span>`;
+        let statusLabel = card.reserved ? '<span class="reserve-badge-modal">📦 预备</span>' : (card.isSpawn ? '🌀 衍生' : '✨ 活跃');
+        document.getElementById('modalName').innerHTML = `${card.titleZh} <span style="font-size:0.7rem;">${statusLabel}</span>`;
         document.getElementById('modalText').innerText = card.text;
         let statLine = `💎 花费: ${card.cost}`;
         if(card.attack !== undefined && card.defense !== undefined) statLine += ` &nbsp; ⚔️ ${card.attack} / 🛡️ ${card.defense}`;
@@ -720,7 +754,7 @@
         document.getElementById('modalCostDefense').innerHTML = statLine;
         document.getElementById('modalAttributes').innerHTML = (card.attributes?.length ? card.attributes.join(', ') : '无');
         document.getElementById('modalSet').innerText = card.setName || '基础';
-        document.getElementById('modalStatus').innerHTML = statusLabel;
+        document.getElementById('modalStatus').innerHTML = card.reserved ? '预备' : (card.isSpawn ? '衍生' : '活跃');
         document.getElementById('modalEnName').innerText = card.titleEn || '---';
         updateModalImage(card);
         document.getElementById('cardModal').style.display = 'flex';
@@ -748,7 +782,6 @@
         const menuBtn = document.getElementById('menuToggleBtn'), menuDiv = document.getElementById('navMenu');
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDiv.classList.toggle('open'); };
         document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !menuDiv.contains(e.target)) menuDiv.classList.remove('open'); });
-        document.querySelectorAll('.menu-link').forEach(l => l.addEventListener('click', () => menuDiv.classList.remove('open')));
     });
 </script>
 </body>
