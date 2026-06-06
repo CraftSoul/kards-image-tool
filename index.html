@@ -24,13 +24,27 @@
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
         }
 
+        /* 阵营主题色变量 (用于点缀) */
+        :root {
+            --germany: #5A5F55;
+            --britain: #857A60;
+            --soviet: #4F3826;
+            --usa: #434B32;
+            --japan: #90723C;
+            --france: #283454;
+            --italy: #555248;
+            --poland: #645633;
+            --finland: #C9C8BC;
+            --neutral: #6b6e5c;
+        }
+
         .app-container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 16px 20px 32px;
         }
 
-        /* 导航栏 (与seek风格完全一致) */
+        /* 导航栏 (与seek风格一致) */
         .nav-bar {
             background: rgba(20, 20, 15, 0.96);
             backdrop-filter: blur(16px);
@@ -127,7 +141,7 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
-        /* 筛选面板 (军用风格) */
+        /* 筛选面板 —— 优雅适应多行 */
         .filter-panel {
             background: rgba(12, 12, 8, 0.88);
             backdrop-filter: blur(8px);
@@ -140,15 +154,15 @@
         .filter-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem 1.8rem;
-            margin-bottom: 1.2rem;
+            gap: 0.8rem 1.5rem;
+            margin-bottom: 1rem;
             align-items: flex-start;
         }
         .filter-card {
             background: #1c1910b3;
             border-radius: 24px;
             padding: 0.5rem 1rem;
-            min-width: 140px;
+            min-width: 130px;
             flex: 1 0 auto;
             border-left: 3px solid #d4af6a;
             backdrop-filter: blur(2px);
@@ -169,38 +183,40 @@
         }
         .filter-chip {
             background: #2c281c;
-            padding: 0.25rem 0.9rem;
+            padding: 0.25rem 0.85rem;
             border-radius: 40px;
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.1s ease;
             color: #f0e2c5;
             border: 1px solid #8f7a52;
+            white-space: nowrap;
         }
+        /* 防止chip换行撑爆，但允许换行 */
         .filter-chip.active {
             background: #c9a63b;
             color: #111;
             border-color: #fde096;
             font-weight: 600;
-            box-shadow: 0 0 4px #ffdd88;
         }
         .range-input {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             flex-wrap: wrap;
         }
-        .range-input input {
-            width: 70px;
+        .range-input input[type="number"] {
+            width: 65px;
             background: #252219;
             border: 1px solid #aa8e4e;
             color: #faf2da;
             border-radius: 40px;
             padding: 0.25rem 0.5rem;
             text-align: center;
+            font-size: 0.8rem;
         }
-        input[type="range"] {
-            width: 130px;
+        .range-input input[type="range"] {
+            width: 120px;
             background: #4d422c;
             height: 3px;
             border-radius: 3px;
@@ -208,7 +224,7 @@
         }
         .search-box {
             flex: 2;
-            min-width: 200px;
+            min-width: 180px;
         }
         .search-box input {
             width: 100%;
@@ -220,15 +236,20 @@
             font-size: 0.9rem;
         }
 
-        /* 卡片网格 */
+        /* 卡片网格: 移动端更紧凑 */
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.2rem;
             margin-top: 1rem;
         }
+        @media (max-width: 560px) {
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+                gap: 0.9rem;
+            }
+        }
         .card-item {
-            background: #191e1c;
             background: linear-gradient(145deg, #1c231f, #131a16);
             border-radius: 20px;
             overflow: hidden;
@@ -242,6 +263,7 @@
             box-shadow: 0 16px 28px rgba(0,0,0,0.6);
             border-color: #e6c175;
         }
+        /* 卡片图片圆角矩形裁剪 (半径12px) */
         .card-img {
             width: 100%;
             aspect-ratio: 300 / 420;
@@ -256,17 +278,17 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            border-radius: 12px;
             transition: transform 0.2s;
         }
         .card-info {
-            padding: 0.7rem 0.8rem 1rem;
+            padding: 0.6rem 0.7rem 0.9rem;
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(4px);
-            position: relative;
         }
         .card-name {
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.9rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -279,8 +301,8 @@
             text-overflow: ellipsis;
         }
         .reserve-icon {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             background: url('reserve.png') no-repeat center;
             background-size: contain;
             display: inline-block;
@@ -288,7 +310,7 @@
             filter: drop-shadow(0 1px 2px black);
         }
 
-        /* 模态框 (武器库风格) */
+        /* 模态框 (圆角裁剪) */
         .modal {
             display: none;
             position: fixed;
@@ -327,7 +349,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.15s;
         }
         .modal-close:hover { background: #bb7944; color: white; }
         .modal-left {
@@ -337,7 +358,6 @@
             flex-direction: column;
             align-items: center;
             padding: 28px 20px;
-            position: relative;
         }
         .modal-right {
             flex: 1;
@@ -349,8 +369,8 @@
         }
         .modal-img {
             width: 100%;
-            max-width: 380px;
-            border-radius: 18px;
+            max-width: 360px;
+            border-radius: 12px;
             box-shadow: 0 10px 22px black;
             background: #1e241f;
         }
@@ -368,12 +388,10 @@
             color: #f7ebc6;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: 0.1s;
         }
         .qual-btn.active {
             background: #c9a63b;
             color: #161a0c;
-            border-color: #fde5a0;
         }
         .modal-actions {
             display: flex;
@@ -390,10 +408,8 @@
             cursor: pointer;
             font-size: 0.85rem;
             color: #f5efdb;
-            transition: 0.1s;
-            font-weight: 500;
         }
-        .action-btn:hover { background: #c9a63b; color: #1e1c0b; transform: scale(0.97);}
+        .action-btn:hover { background: #c9a63b; color: #1e1c0b; }
         .nav-btn {
             position: absolute;
             top: 50%;
@@ -405,7 +421,6 @@
             color: #ecd68a;
             padding: 6px 14px;
             border-radius: 40px;
-            transition: 0.1s;
             z-index: 20;
         }
         .nav-left { left: 8px; }
@@ -417,14 +432,6 @@
             vertical-align: middle;
             margin-right: 8px;
         }
-        .stat-row {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            border-top: 1px solid #4d5a44;
-            padding-top: 12px;
-            margin-top: 8px;
-        }
         .badge {
             background: #20281e;
             border-radius: 32px;
@@ -435,7 +442,6 @@
             gap: 8px;
             border-left: 2px solid #dbb45c;
         }
-        hr { border-color: #3a4a33; margin: 8px 0; }
         .pagination {
             display: flex;
             justify-content: center;
@@ -450,27 +456,18 @@
             border-radius: 40px;
             color: #f5eaca;
             cursor: pointer;
-            font-weight: 500;
         }
         .page-btn.active-page {
             background: #dbaa3a;
             color: #171e0c;
-            border-color: #fbe7a3;
         }
         .page-btn:disabled { opacity: 0.4; cursor: default; }
         @media (max-width: 720px) {
             .modal-content { flex-direction: column; max-height: 90vh; overflow-y: auto; }
-            .modal-left { padding: 20px; }
-            .app-container { padding: 12px 16px 24px; }
-            .filter-card { min-width: 110px; }
+            .filter-card { min-width: 100px; }
+            .filter-options { flex-wrap: wrap; }
         }
-        .loading-placeholder { grid-column:1/-1; text-align:center; padding: 3rem; color:#dccfaa;}
-        .status-msg {
-            background: #262216b3;
-            border-radius: 40px;
-            padding: 0.2rem 1rem;
-            display: inline-block;
-        }
+        .loading-placeholder { grid-column:1/-1; text-align:center; padding: 3rem; color:#dccfaa; }
     </style>
 </head>
 <body>
@@ -497,7 +494,7 @@
         <div class="filter-group">
             <div class="filter-card search-box">
                 <div class="filter-title">🔍 搜索 (卡名/文本/词条)</div>
-                <input type="text" id="searchInput" placeholder="例如: 第2步兵师">
+                <input type="text" id="searchInput" placeholder="输入关键词...">
             </div>
             <div class="filter-card">
                 <div class="filter-title">🏷️ 阵营</div>
@@ -510,7 +507,7 @@
         </div>
         <div class="filter-group">
             <div class="filter-card">
-                <div class="filter-title">💰 花费 (Kredits)</div>
+                <div class="filter-title">💰 花费范围</div>
                 <div class="filter-options" id="costFilterGroup"></div>
             </div>
             <div class="filter-card">
@@ -522,12 +519,12 @@
                 <div class="filter-options" id="statusFilter"></div>
             </div>
         </div>
-        <!-- 身材筛选区域 (动态显示) -->
+        <!-- 身材筛选区域 (仅当筛选类型中全是单位时才显示，使用数值输入框) -->
         <div id="statsFilterGroup" style="display: none;">
             <div class="filter-group">
-                <div class="filter-card"><div class="filter-title">⚔️ 攻击力</div><div class="range-input"><span>0</span><input type="range" id="attackMin" min="0" max="12" value="0"><span id="attackMinVal">0</span>-<span id="attackMaxVal">12</span><input type="range" id="attackMax" min="0" max="12" value="12"><span>12</span></div></div>
-                <div class="filter-card"><div class="filter-title">🛡️ 防御力</div><div class="range-input"><span>0</span><input type="range" id="defenseMin" min="0" max="12" value="0"><span id="defenseMinVal">0</span>-<span id="defenseMaxVal">12</span><input type="range" id="defenseMax" min="0" max="12" value="12"><span>12</span></div></div>
-                <div class="filter-card"><div class="filter-title">⚙️ 行动花费</div><div class="range-input"><span>0</span><input type="range" id="opMin" min="0" max="6" value="0"><span id="opMinVal">0</span>-<span id="opMaxVal">6</span><input type="range" id="opMax" min="0" max="6" value="6"><span>6</span></div></div>
+                <div class="filter-card"><div class="filter-title">⚔️ 攻击力</div><div class="range-input"><span>0</span><input type="range" id="attackMin" min="0" max="12" value="0"><input type="number" id="attackMinNum" min="0" max="12" value="0"><span>-</span><input type="number" id="attackMaxNum" min="0" max="12" value="12"><input type="range" id="attackMax" min="0" max="12" value="12"><span>12</span></div></div>
+                <div class="filter-card"><div class="filter-title">🛡️ 防御力</div><div class="range-input"><span>0</span><input type="range" id="defenseMin" min="0" max="12" value="0"><input type="number" id="defenseMinNum" min="0" max="12" value="0"><span>-</span><input type="number" id="defenseMaxNum" min="0" max="12" value="12"><input type="range" id="defenseMax" min="0" max="12" value="12"><span>12</span></div></div>
+                <div class="filter-card"><div class="filter-title">⚙️ 行动花费</div><div class="range-input"><span>0</span><input type="range" id="opMin" min="0" max="6" value="0"><input type="number" id="opMinNum" min="0" max="6" value="0"><span>-</span><input type="number" id="opMaxNum" min="0" max="6" value="6"><input type="range" id="opMax" min="0" max="6" value="6"><span>6</span></div></div>
             </div>
         </div>
     </div>
@@ -536,7 +533,7 @@
     <div class="pagination" id="pagination"></div>
 </div>
 
-<!-- 模态框 (详细展示) -->
+<!-- 模态框 -->
 <div id="cardModal" class="modal">
     <div class="modal-content">
         <span class="modal-close">&times;</span>
@@ -557,7 +554,7 @@
             <h2 id="modalName" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"></h2>
             <div><span id="modalFactionIcon"></span><span id="modalFaction"></span> &nbsp;| <span id="modalType"></span> &nbsp;| <span id="modalRarity"></span></div>
             <div id="modalCostDefense" class="badge"></div>
-            <div><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line;"></span></div>
+            <div><strong>📜 卡牌文本</strong><br><span id="modalText"></span></div>
             <div><strong>✨ 词条</strong> <span id="modalAttributes"></span></div>
             <div><strong>📚 扩展包</strong> <span id="modalSet"></span> &nbsp;| <strong>状态</strong> <span id="modalStatus"></span></div>
             <div><strong>🌍 英文名</strong> <span id="modalEnName"></span></div>
@@ -575,22 +572,17 @@
     let currentQuality = 100;
     let currentModalCard = null;
 
-    // 阵营与类型元数据
-    const factions = ["soviet","usa","poland","neutral","japan","italy","france","britain","finland","germany"];
+    const factionsList = ["soviet","usa","poland","neutral","japan","italy","france","britain","finland","germany"];
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const typeMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
     const costRanges = [{label:"0~3费", min:0,max:3},{label:"4~6费", min:4,max:6},{label:"7+费", min:7,max:12}];
 
-    // 辅助函数: 构建 weserv 图片 (q=20缩略 / q=100高清)
     function getCardImageUrl(imgName, quality=20) {
         if(!imgName) return "";
-        let url = `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/${imgName}&q=${quality}`;
-        if(quality === 100) url = `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/${imgName}&q=100`;
-        return url;
+        return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/${imgName}&q=${quality}`;
     }
 
-    // 加载data.json
     async function loadData() {
         try {
             const res = await fetch('data.json');
@@ -617,36 +609,6 @@
         } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div class="loading-placeholder">❌ 数据加载失败，确保 data.json 存在</div>'; }
     }
 
-    // 动态构建筛选器
-    function initFiltersAndRender() {
-        const factionSet = new Set(allCards.map(c=>c.faction));
-        const typeSet = new Set(allCards.map(c=>c.type));
-        const setSet = new Set(allCards.map(c=>c.setName).filter(Boolean));
-        renderChipGroup('factionFilter', [...factionSet], 'faction', factionNames);
-        renderChipGroup('typeFilter', [...typeSet], 'type', typeMap);
-        renderChipGroup('setFilter', [...setSet], 'set', null);
-        // 花费筛选 (多选按钮)
-        const costDiv = document.getElementById('costFilterGroup');
-        costDiv.innerHTML = costRanges.map(range => `<div class="filter-chip" data-cost-range="${range.min}-${range.max}">${range.label}</div>`).join('');
-        costDiv.querySelectorAll('[data-cost-range]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('active'); applyFiltersAndRender(); }));
-        // 卡池筛选
-        const statusDiv = document.getElementById('statusFilter');
-        statusDiv.innerHTML = `<div class="filter-chip" data-status="active">活跃</div><div class="filter-chip" data-status="reserve">预备</div><div class="filter-chip" data-status="spawn">衍生</div>`;
-        statusDiv.querySelectorAll('[data-status]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); toggleSingleChip(el, 'status'); applyFiltersAndRender(); }));
-        // 监听搜索、代价范围联动等
-        document.getElementById('searchInput').addEventListener('input', () => applyFiltersAndRender());
-        const statsSliders = ['attackMin','attackMax','defenseMin','defenseMax','opMin','opMax'];
-        statsSliders.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.addEventListener('input', () => { updateStatsLabels(); applyFiltersAndRender(); });
-        });
-        applyFiltersAndRender();
-    }
-    function toggleSingleChip(el, key) {
-        const parent = el.parentNode;
-        parent.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
-        el.classList.add('active');
-    }
     function renderChipGroup(containerId, values, key, nameMap) {
         const container = document.getElementById(containerId);
         container.innerHTML = values.map(val => `<div class="filter-chip" data-${key}="${val}">${nameMap?.[val] || val}</div>`).join('');
@@ -654,59 +616,86 @@
             el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('active'); applyFiltersAndRender(); });
         });
     }
+
     function getSelectedMulti(key) {
         const chips = document.querySelectorAll(`.filter-chip[data-${key}]`);
         let selected = [];
         chips.forEach(chip => { if(chip.classList.contains('active')) selected.push(chip.getAttribute(`data-${key}`)); });
-        if(selected.length === 0) return [];  // 不筛选
         return selected;
     }
+
     function getSelectedCostRanges() {
         const chips = document.querySelectorAll('[data-cost-range]');
         let ranges = [];
         chips.forEach(chip => { if(chip.classList.contains('active')) { let [min,max] = chip.getAttribute('data-cost-range').split('-').map(Number); ranges.push({min,max}); } });
         return ranges;
     }
+
     function getSelectedStatus() {
         const activeChip = document.querySelector('.filter-chip[data-status].active');
-        if(!activeChip) return null;
-        return activeChip.getAttribute('data-status');
+        return activeChip ? activeChip.getAttribute('data-status') : null;
     }
-    function updateStatsLabels() {
-        document.getElementById('attackMinVal').innerText = document.getElementById('attackMin').value;
-        document.getElementById('attackMaxVal').innerText = document.getElementById('attackMax').value;
-        document.getElementById('defenseMinVal').innerText = document.getElementById('defenseMin').value;
-        document.getElementById('defenseMaxVal').innerText = document.getElementById('defenseMax').value;
-        document.getElementById('opMinVal').innerText = document.getElementById('opMin').value;
-        document.getElementById('opMaxVal').innerText = document.getElementById('opMax').value;
+
+    function syncNumberInputs() {
+        const pairs = [
+            ['attackMin','attackMinNum'], ['attackMax','attackMaxNum'],
+            ['defenseMin','defenseMinNum'], ['defenseMax','defenseMaxNum'],
+            ['opMin','opMinNum'], ['opMax','opMaxNum']
+        ];
+        pairs.forEach(([rangeId, numId]) => {
+            const range = document.getElementById(rangeId);
+            const num = document.getElementById(numId);
+            if(range && num) {
+                num.value = range.value;
+                range.addEventListener('input', () => { num.value = range.value; applyFiltersAndRender(); });
+                num.addEventListener('input', () => { let v = parseInt(num.value) || 0; if(v>=parseInt(range.min) && v<=parseInt(range.max)) { range.value = v; applyFiltersAndRender(); } });
+            }
+        });
     }
+
+    function initFiltersAndRender() {
+        const factionSet = [...new Set(allCards.map(c=>c.faction))];
+        const typeSet = [...new Set(allCards.map(c=>c.type))];
+        const setSet = [...new Set(allCards.map(c=>c.setName).filter(Boolean))];
+        renderChipGroup('factionFilter', factionSet, 'faction', factionNames);
+        renderChipGroup('typeFilter', typeSet, 'type', typeMap);
+        renderChipGroup('setFilter', setSet, 'set', null);
+        const costDiv = document.getElementById('costFilterGroup');
+        costDiv.innerHTML = costRanges.map(range => `<div class="filter-chip" data-cost-range="${range.min}-${range.max}">${range.label}</div>`).join('');
+        costDiv.querySelectorAll('[data-cost-range]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); el.classList.toggle('active'); applyFiltersAndRender(); }));
+        const statusDiv = document.getElementById('statusFilter');
+        statusDiv.innerHTML = `<div class="filter-chip" data-status="active">活跃</div><div class="filter-chip" data-status="reserve">预备</div><div class="filter-chip" data-status="spawn">衍生</div>`;
+        statusDiv.querySelectorAll('[data-status]').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); statusDiv.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); applyFiltersAndRender(); }); });
+        document.getElementById('searchInput').addEventListener('input', () => applyFiltersAndRender());
+        syncNumberInputs();
+        applyFiltersAndRender();
+    }
+
     function filterCards() {
         let result = [...allCards];
         const search = document.getElementById('searchInput').value.trim().toLowerCase();
         if(search) result = result.filter(c => c.titleZh.toLowerCase().includes(search) || c.text.toLowerCase().includes(search) || (c.attributes && c.attributes.some(attr=>attr.toLowerCase().includes(search))));
-        const factionsSel = getSelectedMulti('faction');
+        let factionsSel = getSelectedMulti('faction');
         if(factionsSel.length) result = result.filter(c => factionsSel.includes(c.faction));
-        const typesSel = getSelectedMulti('type');
+        let typesSel = getSelectedMulti('type');
         if(typesSel.length) result = result.filter(c => typesSel.includes(c.type));
-        const setsSel = getSelectedMulti('set');
+        let setsSel = getSelectedMulti('set');
         if(setsSel.length) result = result.filter(c => setsSel.includes(c.setName));
-        const costRangesSel = getSelectedCostRanges();
-        if(costRangesSel.length) {
-            result = result.filter(c => costRangesSel.some(range => c.cost >= range.min && c.cost <= range.max));
-        }
-        const statusSel = getSelectedStatus();
+        let costRangesSel = getSelectedCostRanges();
+        if(costRangesSel.length) result = result.filter(c => costRangesSel.some(r => c.cost >= r.min && c.cost <= r.max));
+        let statusSel = getSelectedStatus();
         if(statusSel) {
             if(statusSel === 'active') result = result.filter(c => !c.reserved && !c.isSpawn);
             else if(statusSel === 'reserve') result = result.filter(c => c.reserved);
             else if(statusSel === 'spawn') result = result.filter(c => c.isSpawn);
         }
-        // 身材筛选显示逻辑 & 过滤
-        const selectedTypes = typesSel.length ? typesSel : [...new Set(allCards.map(c=>c.type))];
-        const hasUnitOnly = selectedTypes.some(t => unitTypes.includes(t));
+        // 判断是否显示身材筛选: 当前筛选类型全部为战斗单位才显示 (类型选择不为空时检查)
+        let selectedTypesNow = typesSel.length ? typesSel : [...new Set(allCards.map(c=>c.type))];
+        let onlyUnits = selectedTypesNow.length > 0 && selectedTypesNow.every(t => unitTypes.includes(t));
         const statsGroup = document.getElementById('statsFilterGroup');
-        if(hasUnitOnly && selectedTypes.length>0) statsGroup.style.display = 'flex';
+        if(onlyUnits && selectedTypesNow.length>0) statsGroup.style.display = 'flex';
         else statsGroup.style.display = 'none';
-        if(hasUnitOnly && statsGroup.style.display === 'flex') {
+        if(onlyUnits && statsGroup.style.display === 'flex') {
             const attMin = parseInt(document.getElementById('attackMin').value);
             const attMax = parseInt(document.getElementById('attackMax').value);
             const defMin = parseInt(document.getElementById('defenseMin').value);
@@ -714,20 +703,21 @@
             const opMin = parseInt(document.getElementById('opMin').value);
             const opMax = parseInt(document.getElementById('opMax').value);
             result = result.filter(c => {
-                if(!unitTypes.includes(c.type)) return true;
+                if(!unitTypes.includes(c.type)) return false;  // 仅当筛选中只有单位，非单位应当移除（因为只展示单位）
                 let att = c.attack ?? -1, def = c.defense ?? -1, op = c.operationCost ?? 0;
                 return (att >= attMin && att <= attMax) && (def >= defMin && def <= defMax) && (op >= opMin && op <= opMax);
             });
         }
         return result;
     }
+
     function applyFiltersAndRender() {
         filteredCards = filterCards();
         currentPage = 1;
         renderCardGrid();
         renderPagination();
-        document.getElementById('stats-info') && (document.getElementById('stats-info').innerHTML = `📚 共 ${filteredCards.length} 张`);
     }
+
     function renderCardGrid() {
         const start = (currentPage-1)*PAGE_SIZE;
         const pageItems = filteredCards.slice(start, start+PAGE_SIZE);
@@ -738,7 +728,7 @@
             const imgUrl = getCardImageUrl(card.image, 20);
             const reserveMark = card.reserved ? '<i class="reserve-icon"></i>' : '';
             return `<div class="card-item" data-index="${globalIdx}">
-                        <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div>
+                        <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}" style="border-radius:12px;"></div>
                         <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
                     </div>`;
         }).join('');
@@ -746,6 +736,7 @@
             el.addEventListener('click', () => { let idx = parseInt(el.getAttribute('data-index')); if(!isNaN(idx)) openModal(idx); });
         });
     }
+
     function renderPagination() {
         const total = filteredCards.length;
         const pages = Math.ceil(total/PAGE_SIZE);
@@ -765,14 +756,14 @@
             });
         });
     }
-    // 模态框展示
-    async function openModal(index) {
+
+    function openModal(index) {
         if(index<0 || index>=filteredCards.length) return;
         currentModalIndex = index;
         currentModalCard = filteredCards[index];
         const card = currentModalCard;
         const factionKey = card.faction?.toLowerCase();
-        const iconHtml = factionKey && factions.includes(factionKey) ? `<img class="faction-icon" src="${factionKey}.svg" onerror="this.style.display='none'">` : '';
+        const iconHtml = factionKey && factionsList.includes(factionKey) ? `<img class="faction-icon" src="${factionKey}.svg" onerror="this.style.display='none'">` : '';
         document.getElementById('modalFactionIcon').innerHTML = iconHtml;
         document.getElementById('modalFaction').innerText = factionNames[factionKey] || card.faction || '中立';
         document.getElementById('modalType').innerText = typeMap[card.type] || card.type;
@@ -791,23 +782,17 @@
         updateModalImage(card);
         document.getElementById('cardModal').style.display = 'flex';
     }
-    function updateModalImage(card) {
-        let quality = currentQuality;
-        let imgUrl = getCardImageUrl(card.image, quality);
-        document.getElementById('modalImg').src = imgUrl;
-        document.getElementById('modalImg').onerror = () => { document.getElementById('modalImg').src = getCardImageUrl(card.image, 50); };
-    }
+
+    function updateModalImage(card) { document.getElementById('modalImg').src = getCardImageUrl(card.image, currentQuality); }
     function closeModal() { document.getElementById('cardModal').style.display = 'none'; }
     function navigateModal(delta) { let newIdx = currentModalIndex + delta; if(newIdx>=0 && newIdx<filteredCards.length) openModal(newIdx); }
 
-    // 交互与品质切换
     window.addEventListener('load', () => {
         loadData();
-        const modal = document.getElementById('cardModal');
         document.querySelector('.modal-close').addEventListener('click', closeModal);
         document.getElementById('prevCardBtn').addEventListener('click', () => navigateModal(-1));
         document.getElementById('nextCardBtn').addEventListener('click', () => navigateModal(1));
-        modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+        document.getElementById('cardModal').addEventListener('click', (e) => { if(e.target === document.getElementById('cardModal')) closeModal(); });
         document.querySelectorAll('.qual-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.qual-btn').forEach(b => b.classList.remove('active'));
@@ -816,23 +801,13 @@
                 if(currentModalCard) updateModalImage(currentModalCard);
             });
         });
-        document.getElementById('saveImgBtn').addEventListener('click', () => {
-            let img = document.getElementById('modalImg');
-            let a = document.createElement('a'); a.href = img.src; a.download = 'kards_card.png'; a.click();
-        });
-        document.getElementById('copyLinkBtn').addEventListener('click', () => {
-            let src = document.getElementById('modalImg').src;
-            navigator.clipboard.writeText(src); alert('图片链接已复制');
-        });
-        // 菜单交互
+        document.getElementById('saveImgBtn').addEventListener('click', () => { let img = document.getElementById('modalImg'); let a = document.createElement('a'); a.href = img.src; a.download = 'kards_card.png'; a.click(); });
+        document.getElementById('copyLinkBtn').addEventListener('click', () => { navigator.clipboard.writeText(document.getElementById('modalImg').src); alert('链接已复制'); });
         const menuBtn = document.getElementById('menuToggleBtn');
         const navMenuDiv = document.getElementById('navMenu');
-        function toggleMenu() { navMenuDiv.classList.toggle('open'); }
-        menuBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+        menuBtn.addEventListener('click', (e) => { e.stopPropagation(); navMenuDiv.classList.toggle('open'); });
         document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !navMenuDiv.contains(e.target)) navMenuDiv.classList.remove('open'); });
         document.querySelectorAll('.menu-link').forEach(link => link.addEventListener('click', () => navMenuDiv.classList.remove('open')));
-        // 预先设置身材slider标签
-        updateStatsLabels();
     });
 </script>
 </body>
