@@ -37,17 +37,16 @@
             border-bottom: 1px solid #aa8e4e;
         }
 
-        .nav-container {
-            position: relative;
-            min-height: 56px;
-            width: 100%;
+        .nav-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            gap: 1rem;
+            min-width: 0;
         }
 
-        .nav-brand-fixed {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
+        .nav-brand {
             font-size: 1.4rem;
             font-weight: 800;
             letter-spacing: 2px;
@@ -57,98 +56,109 @@
             color: transparent;
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
             white-space: nowrap;
-            z-index: 10;
-            pointer-events: none;
+            flex-shrink: 0;
         }
 
-        .nav-scroll-area {
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            scrollbar-width: thin;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-            padding: 0.7rem 0 0.7rem 0;
-            margin-left: 0;
+        .menu-btn {
+            background: rgba(210, 210, 225, 0.15);
+            border: 1px solid #aa8e4e;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+        .menu-btn:hover {
+            background: rgba(235, 235, 245, 0.25);
+            transform: scale(0.96);
+        }
+        .menu-btn:active {
+            transform: scale(0.94);
+        }
+        .menu-btn span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background-color: #f2e2b0;
+            border-radius: 2px;
+            transition: 0.2s;
         }
 
-        .nav-scroll-area::-webkit-scrollbar {
-            height: 3px;
+        .nav-menu-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out, border-color 0.2s;
+            background: rgba(15, 15, 10, 0.98);
+            backdrop-filter: blur(12px);
+            border-top: 0px solid rgba(170, 142, 78, 0.3);
         }
-        .nav-scroll-area::-webkit-scrollbar-track {
-            background: #2d2a1c;
-        }
-        .nav-scroll-area::-webkit-scrollbar-thumb {
-            background: #b6964b;
-            border-radius: 20px;
-        }
-
-        .nav-links-inline {
-            display: inline-flex;
-            gap: 0.25rem;
-            padding-left: 7rem;
-            padding-right: 1rem;
+        .nav-menu-dropdown.open {
+            max-height: 320px;
+            border-top-width: 1px;
+            transition: max-height 0.4s ease-in;
         }
 
-        .nav-link {
-            display: inline-block;
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            padding: 0.8rem 1rem 1rem 1rem;
+            gap: 0.5rem;
+        }
+
+        .menu-link {
+            display: block;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.5rem 1.2rem;
+            font-size: 1rem;
+            padding: 0.7rem 1.2rem;
             border-radius: 40px;
-            background: rgba(210, 210, 225, 0.12);
+            background: rgba(210, 210, 225, 0.1);
             color: #eef0ff;
             transition: all 0.2s ease;
             letter-spacing: 0.5px;
-            backdrop-filter: blur(2px);
-            margin: 0 2px;
-            white-space: nowrap;
+            text-align: center;
+            border: 1px solid transparent;
         }
-        .nav-link:hover {
-            background: rgba(235, 235, 245, 0.25);
+        .menu-link:hover {
+            background: rgba(235, 235, 245, 0.2);
             color: #ffffff;
-            transform: translateY(-1px);
+            transform: translateX(4px);
+            border-color: #c9a53b;
         }
-        .nav-link.active {
+        .menu-link.active {
             background: #c9a53b;
             color: #1e1c10;
             font-weight: 700;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border-color: #e6c77a;
         }
 
         @media (max-width: 650px) {
             body {
-                padding-top: 62px;
+                padding-top: 65px;
             }
-            .nav-brand-fixed {
-                font-size: 1.1rem;
-                left: 0.8rem;
+            .nav-brand {
+                font-size: 1.2rem;
             }
-            .nav-links-inline {
-                padding-left: 6rem;
-                padding-right: 0.8rem;
+            .menu-btn {
+                width: 38px;
+                height: 38px;
             }
-            .nav-link {
-                padding: 0.45rem 1rem;
-                font-size: 0.8rem;
+            .menu-btn span {
+                width: 20px;
+                height: 2px;
             }
-            .nav-scroll-area {
-                padding: 0.55rem 0;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .nav-brand-fixed {
-                font-size: 1rem;
-                left: 0.7rem;
-            }
-            .nav-links-inline {
-                padding-left: 5.2rem;
-            }
-            .nav-link {
-                padding: 0.4rem 0.85rem;
-                font-size: 0.75rem;
+            .menu-link {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
             }
         }
 
@@ -496,15 +506,20 @@
 <body>
 <div class="card-panel">
     <div class="top-nav-bar">
-        <div class="nav-container">
-            <div class="nav-brand-fixed">KARDS 军械库</div>
-            <div class="nav-scroll-area">
-                <div class="nav-links-inline">
-                    <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌总览</a>
-                    <a class="nav-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
-                    <a class="nav-link active" href="#" data-target="seek">英文直检</a>
-                    <a class="nav-link" href="#" data-target="about">关于军械库</a>
-                </div>
+        <div class="nav-header-row">
+            <div class="nav-brand">KARDS 军械库</div>
+            <div class="menu-btn" id="menuToggleBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="nav-menu-dropdown" id="menuDropdown">
+            <div class="menu-links">
+                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">📋 卡牌总览</a>
+                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">🛠️ 卡组构筑</a>
+                <a class="menu-link active" href="#" data-target="seek">🔍 英文直检</a>
+                <a class="menu-link" href="#" data-target="about">📖 关于军械库</a>
             </div>
         </div>
     </div>
@@ -596,6 +611,56 @@
     const variantListDiv = document.getElementById('variantList');
     const variantCountBadge = document.getElementById('variantCountBadge');
     const variantToggle = document.getElementById('variantToggle');
+
+    // 菜单交互
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    
+    function toggleMenu() {
+        menuDropdown.classList.toggle('open');
+    }
+    
+    function closeMenu() {
+        menuDropdown.classList.remove('open');
+    }
+    
+    if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+    }
+    
+    document.addEventListener('click', function(event) {
+        const isClickInside = menuToggleBtn?.contains(event.target) || menuDropdown?.contains(event.target);
+        if (!isClickInside && menuDropdown?.classList.contains('open')) {
+            closeMenu();
+        }
+    });
+    
+    const menuLinks = document.querySelectorAll('.menu-link');
+    menuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            closeMenu();
+        });
+    });
+    
+    function setActiveMenuItem() {
+        const currentPath = window.location.pathname;
+        const currentPage = currentPath.split('/').pop() || 'seek.html';
+        menuLinks.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+            if (href === '#' && link.getAttribute('data-target') === 'seek') {
+                link.classList.add('active');
+            } else if (href && href.includes('builder') && currentPage.includes('builder')) {
+                link.classList.add('active');
+            } else if (href && href.includes('kards-image-tool') && !href.includes('builder') && currentPage === '' || currentPage === 'index.html' || currentPage === 'seek.html') {
+                if (link.getAttribute('data-target') === 'index') link.classList.add('active');
+            }
+        });
+    }
+    setActiveMenuItem();
 
     // 全局状态
     let currentVariants = [];
