@@ -72,7 +72,6 @@
             justify-content: center;
             gap: 5px;
             cursor: pointer;
-            transition: 0.2s;
         }
         .menu-btn span {
             display: block;
@@ -81,21 +80,13 @@
             background-color: #f2e2b0;
             border-radius: 2px;
         }
-        .menu-btn:active {
-            transform: scale(0.96);
-        }
-
         .nav-menu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.35s ease-out;
             background: rgba(10, 10, 8, 0.98);
-            backdrop-filter: blur(12px);
         }
-        .nav-menu.open {
-            max-height: 320px;
-            transition: max-height 0.4s ease-in;
-        }
+        .nav-menu.open { max-height: 320px; }
         .menu-links {
             display: flex;
             flex-direction: column;
@@ -115,94 +106,97 @@
             transition: 0.2s;
             border: 1px solid transparent;
         }
-        .menu-link:hover {
-            background: rgba(235, 235, 245, 0.2);
-            transform: translateX(5px);
-            border-color: #c9a53b;
-        }
+        .menu-link:hover { background: rgba(235, 235, 245, 0.2); border-color: #c9a53b; }
         .menu-link.active {
             background: #c9a53b;
             color: #1e1c10;
             font-weight: 700;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
-        /* 卡片主体区域 */
-        .card-panel {
+        .search-panel {
             background: transparent;
+            backdrop-filter: none;
+            border-radius: 0;
+            padding: 0 0 1rem 0;
+            margin-bottom: 1.8rem;
             border: none;
         }
 
-        .form-group {
-            margin-bottom: 1.3rem;
+        .input-row {
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
-            gap: 0.8rem 1.2rem;
+            gap: 1.2rem;
+            align-items: flex-end;
+            margin-bottom: 1.2rem;
         }
-        .label-icon {
-            color: #fff0c0;
-            font-weight: 600;
-            letter-spacing: 1px;
-            background: rgba(0,0,0,0.5);
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            border-left: 3px solid #dbb45c;
-        }
-        input, select, button {
-            background: #2e2b22;
-            border: 1px solid #8f7a52;
-            padding: 0.7rem 1rem;
-            border-radius: 0px;
-            font-size: 1rem;
-            color: #faf2da;
-            outline: none;
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-        input {
+        .input-group, .lang-group {
             flex: 2;
             min-width: 200px;
-            background: #252219;
         }
-        input:focus, select:focus {
-            border-color: #e4b363;
-            box-shadow: 0 0 6px rgba(228, 179, 99, 0.6);
-            background: #2f2a1e;
+        .lang-group {
+            flex: 1.5;
+            min-width: 200px;
         }
-        .lang-box {
+        .input-group label, .lang-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #f5e7c8;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+        }
+        .input-group input, .lang-group select {
+            width: 100%;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.8rem 1rem;
+            color: #f5efdb;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            transition: 0.1s;
+        }
+        .lang-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23dbb45c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.2rem;
+            font-size: 1rem;
+        }
+        .input-group input:focus, .lang-group select:focus {
+            border-color: #e6bc6a;
+            box-shadow: 0 0 0 2px rgba(220, 180, 80, 0.3);
+        }
+
+        .toggle-row {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: rgba(0,0,0,0.4);
-            padding: 0.2rem 0.8rem;
+            justify-content: flex-end;
             flex-wrap: wrap;
-        }
-        .lang-box label {
-            color: #ffe6aa;
-            font-weight: 500;
-        }
-        select {
-            background: #2c281e;
-            cursor: pointer;
-            width: auto;
-            min-width: 100px;
+            margin-top: 0.6rem;
+            gap: 0.8rem;
+            border-top: 1px dashed rgba(170, 142, 78, 0.4);
+            padding-top: 1rem;
         }
         .toggle-switch {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            background: rgba(0,0,0,0.55);
+            background: rgba(0,0,0,0.35);
             padding: 0.3rem 1rem 0.3rem 1.2rem;
             border-radius: 60px;
             backdrop-filter: blur(2px);
             border: 1px solid #ab8e4e;
+            margin-left: auto;
         }
         .toggle-switch span {
             color: #ffeaae;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .switch {
             position: relative;
@@ -237,7 +231,6 @@
             background-color: #e9cf95;
             transition: 0.2s;
             border-radius: 50%;
-            box-shadow: 0 1px 2px black;
         }
         input:checked + .slider {
             background-color: #7a6233;
@@ -246,132 +239,132 @@
             transform: translateX(24px);
             background-color: #fef0b6;
         }
+
+        .search-btn-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0 0.5rem;
+        }
+        .search-btn {
+            background: #6b5a39;
+            border: none;
+            font-weight: bold;
+            padding: 0.8rem 2.5rem;
+            border-radius: 60px;
+            font-size: 1.05rem;
+            color: #faf2da;
+            cursor: pointer;
+            transition: 0.1s linear;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .search-btn:hover {
+            background: #8f774b;
+            transform: scale(0.97);
+        }
+
         .variants-panel {
-            margin: 0.5rem 0 0.8rem;
-            background: #262216b3;
-            padding: 0.5rem 0.8rem;
-            backdrop-filter: blur(1px);
+            margin: 1.2rem 0 1rem;
+            background: rgba(38, 34, 22, 0.8);
+            backdrop-filter: blur(4px);
+            border-radius: 20px;
+            padding: 0.8rem 1.2rem;
             border: 1px solid #7d6a42;
         }
         .variants-header {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #dcc98a;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 0.5rem;
+            gap: 10px;
+            margin-bottom: 0.6rem;
             font-weight: bold;
+            flex-wrap: wrap;
         }
         .variants-badge {
             background: #5b4b2b;
             border-radius: 30px;
-            padding: 0.15rem 0.6rem;
+            padding: 0.2rem 0.8rem;
             font-size: 0.7rem;
             color: #ffefbf;
         }
         .variant-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
+            gap: 0.7rem;
         }
         .variant-chip {
             background: #312b1c;
             border: 1px solid #ad924d;
-            padding: 0.3rem 1rem;
-            font-size: 0.8rem;
+            border-radius: 40px;
+            padding: 0.45rem 1.3rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: #fddf9e;
             cursor: pointer;
-            transition: 0.1s linear;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            transition: 0.1s;
         }
         .variant-chip:hover {
             background: #7e643a;
             color: white;
-            transform: scale(0.96);
+            transform: translateY(-1px);
         }
         .variant-chip.active {
             background: #c7a252;
             color: #1f1c0f;
             border-color: #fbdd8b;
         }
-        button {
-            background: #6b5a39;
-            border: none;
-            font-weight: bold;
-            padding: 0.7rem 1.8rem;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-            transition: 0.1s linear;
-            letter-spacing: 1px;
-        }
-        button:hover {
-            background: #8f774b;
-            transform: scale(0.97);
-            color: white;
-        }
-        button:active {
-            transform: scale(0.96);
-        }
+
         .image-showcase {
-            margin: 1.2rem 0 1rem;
-            padding: 0.8rem;
+            margin: 1rem 0 1rem;
+            background: transparent;
+            border-radius: 12px;
+            padding: 0;
             text-align: center;
-        }
-        .img-wrapper {
-            background: rgba(0,0,0,0.35);
-            border-radius: 20px;
-            min-height: 240px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-            border: 1px dashed rgba(180, 150, 80, 0.6);
+            border: none;
         }
         #cardImage {
             max-width: 100%;
-            max-height: 380px;
-            border-radius: 12px;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.6);
-            background: #2b281f;
+            max-height: 460px;
+            border-radius: 20px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+            background: #1c1a10;
+            display: block;
+            margin: 0 auto;
         }
         .status-msg {
             color: #f3d48f;
-            background: #2a2419b3;
+            background: rgba(0,0,0,0.55);
             display: inline-block;
-            padding: 0.4rem 1.2rem;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            margin-top: 12px;
+            padding: 0.5rem 1.5rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            backdrop-filter: blur(8px);
         }
+
         .action-bar {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 2rem;
-            margin: 0.8rem 0 0.5rem;
+            gap: 1.2rem;
+            margin: 1.5rem 0 1rem;
         }
-        .btn-save {
-            background: #3e6b3e;
-            box-shadow: 0 3px 0 #1e3a1e;
+        .action-btn {
+            background: #2a2a1c;
+            border: 1px solid #aa8e4e;
+            border-radius: 60px;
+            padding: 0.7rem 1.8rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f5efdb;
+            cursor: pointer;
+            transition: 0.1s;
         }
-        .btn-save:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 0 #1e3a1e;
-        }
-        .btn-copy {
-            background: #5c5a3c;
-            box-shadow: 0 3px 0 #3b3922;
-        }
-        .btn-copy:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 0 #3b3922;
-        }
+        .action-btn:hover { background: #c9a63b; color: #1e1c0b; border-color: #eecb77; }
+
         .footer-simple {
-            margin-top: 2rem;
+            margin-top: 2.5rem;
             padding-top: 1rem;
             border-top: 1px solid #928451;
             display: flex;
@@ -391,60 +384,31 @@
             border-radius: 40px;
             transition: 0.2s;
         }
-        .footer-simple a:hover {
-            background: #b48b3f;
-            color: #181d0e;
-        }
-        .footer-simple img {
-            width: 18px;
-            height: 18px;
-            filter: invert(0.95);
-        }
+        .footer-simple a:hover { background: #b48b3f; color: #181d0e; }
+        .footer-simple img { width: 18px; height: 18px; filter: invert(0.95); }
+
         .loader {
             display: inline-block;
-            width: 28px;
-            height: 28px;
-            border: 3px solid #c0a56b;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #c0a56b;
             border-radius: 50%;
             border-top-color: #fae468;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        @media (max-width: 650px) {
-            .app-container {
-                padding: 12px 16px 24px;
-            }
-            .form-group {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .variant-list {
-                justify-content: center;
-            }
-            button {
-                width: 100%;
-            }
-            .lang-box select {
-                width: 100%;
-            }
-            .toggle-switch {
-                justify-content: space-between;
-            }
-            .action-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
-        @media (max-width: 480px) {
-            .nav-brand {
-                font-size: 1rem;
-            }
-            .menu-btn {
-                width: 36px;
-                height: 36px;
-            }
+        @media (max-width: 680px) {
+            .app-container { padding: 12px 12px 24px; }
+            .input-row { flex-direction: column; gap: 0.9rem; }
+            .input-group, .lang-group { width: 100%; }
+            .toggle-row { justify-content: stretch; }
+            .toggle-switch { margin-left: 0; width: 100%; justify-content: space-between; }
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .action-btn { text-align: center; }
+            .search-btn { width: 100%; }
         }
     </style>
 </head>
@@ -453,47 +417,30 @@
     <div class="nav-bar">
         <div class="nav-header-row">
             <div class="nav-brand">KARDS 军械库</div>
-            <div class="menu-btn" id="menuToggleBtn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div>
         </div>
         <div class="nav-menu" id="navMenu">
             <div class="menu-links">
-                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool" data-target="index">卡牌收藏</a>
-                <a class="menu-link" href="https://craftsoul.github.io/kards-image-tool/builder.html" target="_blank" data-target="builder">卡组构筑</a>
+                <a class="menu-link" href="index.html" data-target="index">卡牌收藏</a>
+                <a class="menu-link" href="builder.html" data-target="builder">卡组构筑</a>
                 <a class="menu-link active" href="#" data-target="seek">英文直检</a>
                 <a class="menu-link" href="#" data-target="about">关于军械库</a>
             </div>
         </div>
     </div>
 
-    <!-- 主功能卡片 -->
-    <div class="card-panel">
-        <div class="form-group">
-            <span class="label-icon">卡牌英名</span>
-            <input type="text" id="cardNameInput" placeholder="例:RESISTANCE" value="RESISTANCE">
-        </div>
-
-        <div class="form-group" style="justify-content: space-between; flex-wrap: wrap;">
-            <div class="lang-box">
-                <label>语言</label>
-                <select id="langSelect">
-                    <option value="zh-Hans">🇨🇳简体中文(zh-Hans)</option>
-                    <option value="zh-Hant">🇨🇳繁體中文(zh-Hant)</option>
-                    <option value="en-EN">🇬🇧English(en-En)</option>
-                    <option value="fr-FR">🇫🇷Français(fr-FR)</option>
-                    <option value="de-DE">🇩🇪Deutsch(de-DE)</option>
-                    <option value="pl-PL">🇵🇱Polski(pl-PL)</option>
-                    <option value="pt-BR">🇵🇹Português(pt-BR)</option>
-                    <option value="ru-RU">🇷🇺Pусский(ru-RU)</option>
-                    <option value="it-IT">🇮🇹Italiano(it-IT)</option>
-                    <option value="es-ES">🇪🇸Español(es-ES)</option>
-                    <option value="ko-KR">🇰🇷한국어(ko-KR)</option>
-                    <option value="ja-JP">🇯🇵日本語(ja-JP)</option>
-                </select>
+    <div class="search-panel">
+        <div class="input-row">
+            <div class="input-group">
+                <label>英文卡名</label>
+                <input type="text" id="cardNameInput" placeholder="例: RESISTANCE" value="RESISTANCE">
             </div>
+            <div class="lang-group">
+                <label>语言</label>
+                <select id="langSelect"></select>
+            </div>
+        </div>
+        <div class="toggle-row">
             <div class="toggle-switch">
                 <span>♠️ 变体检索</span>
                 <label class="switch">
@@ -502,474 +449,375 @@
                 </label>
             </div>
         </div>
-
-        <div id="variantsContainer" class="variants-panel" style="display: none;">
-            <div class="variants-header">
-                <span>📜 同名卡牌</span>
-                <span class="variants-badge" id="variantCountBadge">0</span>
-                <span style="font-size:0.7rem;">点击切换版本</span>
-            </div>
-            <div id="variantList" class="variant-list"></div>
+        <div class="search-btn-wrap">
+            <button id="fetchBtn" class="search-btn">⚡ 检索卡图</button>
         </div>
+    </div>
 
-        <div style="display: flex; justify-content: center; margin: 0.3rem 0 0.2rem;">
-            <button id="fetchBtn">🔍 检索卡图</button>
+    <!-- 变体面板 -->
+    <div id="variantsContainer" class="variants-panel" style="display: none;">
+        <div class="variants-header">
+            <span>📜 同名衍生版本</span>
+            <span class="variants-badge" id="variantCountBadge">0</span>
+            <span style="font-size:0.7rem;">点击切换版本</span>
         </div>
+        <div id="variantList" class="variant-list"></div>
+    </div>
 
-        <div class="image-showcase">
-            <div class="img-wrapper">
-                <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
-            </div>
-            <div id="imageStatus" class="status-msg">Waiting for orders.</div>
-        </div>
+    <div class="image-showcase">
+        <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
+        <div id="imageStatus" class="status-msg">输入英文名，点击检索</div>
+    </div>
 
-        <div class="action-bar">
-            <button id="saveBtn" class="btn-save">💾 保存图像(PNG)</button>
-            <button id="copyUrlBtn" class="btn-copy">🔗 复制图片链接</button>
-        </div>
+    <div class="action-bar">
+        <button id="saveBtn" class="action-btn">💾 保存图片</button>
+        <button id="copyUrlBtn" class="action-btn">🔗 复制链接</button>
+    </div>
 
-        <div class="footer-simple">
-            <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub
-            </a>
-            <a href="https://space.bilibili.com/3546775476505152" target="_blank">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili
-            </a>
-            <a href="https://www.douyin.com/user/MS4wLjABAAAAERwZXqP_VI8qTqzyV-A6aJircP4R6tiOBRCY5QCFQrAd_gZ8z-LsyNvUHuDipQ7S" target="_blank">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="抖音"> 抖音
-            </a>
-            <a href="https://www.zhihu.com/people/7-97-53-5-79" target="_blank">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="知乎"> 知乎
-            </a>
-        </div>
+    <div class="footer-simple">
+        <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a>
+        <a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
+        <a href="https://www.douyin.com/user/MS4wLjABAAAAERwZXqP_VI8qTqzyV-A6aJircP4R6tiOBRCY5QCFQrAd_gZ8z-LsyNvUHuDipQ7S" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="抖音"> 抖音</a>
+        <a href="https://www.zhihu.com/people/7-97-53-5-79" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="知乎"> 知乎</a>
     </div>
 </div>
 
 <script>
-    const cardNameInput = document.getElementById('cardNameInput');
-    const langSelect = document.getElementById('langSelect');
-    const fetchBtn = document.getElementById('fetchBtn');
-    const cardImage = document.getElementById('cardImage');
-    const imageStatus = document.getElementById('imageStatus');
-    const saveBtn = document.getElementById('saveBtn');
-    const copyUrlBtn = document.getElementById('copyUrlBtn');
-    const variantsContainer = document.getElementById('variantsContainer');
-    const variantListDiv = document.getElementById('variantList');
-    const variantCountBadge = document.getElementById('variantCountBadge');
-    const variantToggle = document.getElementById('variantToggle');
+    (function() {
+        const languages = [
+            { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' },
+            { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
+            { code: 'en-EN', label: 'English', flag: '🇺🇸' },
+            { code: 'fr-FR', label: 'Français', flag: '🇫🇷' },
+            { code: 'de-DE', label: 'Deutsch', flag: '🇩🇪' },
+            { code: 'pl-PL', label: 'Polski', flag: '🇵🇱' },
+            { code: 'pt-BR', label: 'Português', flag: '🇧🇷' },
+            { code: 'ru-RU', label: 'Pусский', flag: '🇷🇺' },
+            { code: 'it-IT', label: 'Italiano', flag: '🇮🇹' },
+            { code: 'es-ES', label: 'Español', flag: '🇪🇸' },
+            { code: 'ko-KR', label: '한국어', flag: '🇰🇷' },
+            { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
+        ];
 
-    // 菜单交互
-    const menuToggleBtn = document.getElementById('menuToggleBtn');
-    const navMenu = document.getElementById('navMenu');
-    function toggleMenu() {
-        navMenu.classList.toggle('open');
-    }
-    function closeMenu() {
-        navMenu.classList.remove('open');
-    }
-    if (menuToggleBtn) {
-        menuToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu();
+        // 填充下拉选项，添加国旗emoji
+        const langSelect = document.getElementById('langSelect');
+        languages.forEach(lang => {
+            const option = document.createElement('option');
+            option.value = lang.code;
+            option.textContent = `${lang.flag} ${lang.label} (${lang.code})`;
+            langSelect.appendChild(option);
         });
-    }
-    document.addEventListener('click', function(event) {
-        const isClickInside = menuToggleBtn?.contains(event.target) || navMenu?.contains(event.target);
-        if (!isClickInside && navMenu?.classList.contains('open')) {
-            closeMenu();
-        }
-    });
-    document.querySelectorAll('.menu-link').forEach(link => {
-        link.addEventListener('click', () => {
-            closeMenu();
-        });
-    });
-    function setActiveMenu() {
-        document.querySelectorAll('.menu-link').forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('data-target') === 'seek') {
-                link.classList.add('active');
-            }
-        });
-    }
-    setActiveMenu();
+        langSelect.value = 'zh-Hans';
 
-    let currentVariants = [];
-    let activeVariantId = null;
-    let currentRawCardName = '';
-    let currentBaseClean = '';
-    let currentLang = 'zh-Hans';
-    let isDiscovering = false;
-    let currentHighResImageUrl = '';
+        // DOM 元素
+        const cardNameInput = document.getElementById('cardNameInput');
+        const fetchBtn = document.getElementById('fetchBtn');
+        const cardImage = document.getElementById('cardImage');
+        const imageStatus = document.getElementById('imageStatus');
+        const saveBtn = document.getElementById('saveBtn');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
+        const variantsContainer = document.getElementById('variantsContainer');
+        const variantListDiv = document.getElementById('variantList');
+        const variantCountBadge = document.getElementById('variantCountBadge');
+        const variantToggle = document.getElementById('variantToggle');
 
-    function formatBaseName(rawName) {
-        if (!rawName || rawName.trim() === "") return "";
-        let processed = rawName.trim().toLowerCase();
-        processed = processed.replace(/[&!\/\\\'"(),-]/g, '');
-        processed = processed.replace(/[\.\s]+/g, '_');
-        processed = processed.replace(/^_+|_+$/g, '');
-        return processed;
-    }
-    
-    function buildHighResImageUrl(formattedName, lang) {
-        return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=100`;
-    }
-    
-    function buildDetectionUrl(formattedName, lang) {
-        return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=1&w=1&h=1`;
-    }
-    
-    function testImageExistsViaDetection(formattedName, lang) {
-        return new Promise((resolve) => {
-            const detectionUrl = buildDetectionUrl(formattedName, lang);
-            const img = new Image();
-            img.onload = () => resolve(true);
-            img.onerror = () => resolve(false);
-            img.src = detectionUrl;
-        });
-    }
-    
-    async function progressiveDiscover(baseClean, lang, includeVariants) {
-        const originalFormatted = baseClean;
-        const originalExists = await testImageExistsViaDetection(originalFormatted, lang);
-        let variantsList = [];
-        
-        if (originalExists) {
-            variantsList.push({
-                suffixKey: '',
-                displayName: '原版',
-                formattedName: originalFormatted,
-                isVeteran: false
-            });
-        } else {
-            return { variants: [] };
-        }
-        
-        if (!includeVariants) {
-            return { variants: variantsList };
-        }
-        
-        const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
-        const variantCandidates = suffixLetters.map(letter => ({ suffix: `_${letter}`, display: `变体 ${letter.toUpperCase()}` }));
-        
-        const variantPromises = variantCandidates.map(async (cand) => {
-            const testName = baseClean + cand.suffix;
-            const exists = await testImageExistsViaDetection(testName, lang);
-            if (exists) {
-                return {
-                    suffixKey: cand.suffix,
-                    displayName: cand.display,
-                    formattedName: testName,
-                    isVeteran: false
-                };
-            }
-            return null;
-        });
-        
-        const vetName = baseClean + '_vet';
-        const vetPromise = testImageExistsViaDetection(vetName, lang);
-        
-        const variantResults = await Promise.all(variantPromises);
-        const foundVariants = variantResults.filter(v => v !== null);
-        const hasVeteran = await vetPromise;
-        if (hasVeteran) {
-            foundVariants.push({
-                suffixKey: '_vet',
-                displayName: '⭐ 老兵',
-                formattedName: vetName,
-                isVeteran: true
-            });
-        }
-        
-        variantsList.push(...foundVariants);
-        variantsList.sort((a, b) => {
-            if (a.suffixKey === '') return -1;
-            if (b.suffixKey === '') return 1;
-            if (a.isVeteran && !b.isVeteran) return 1;
-            if (!a.isVeteran && b.isVeteran) return -1;
-            if (a.suffixKey < b.suffixKey) return -1;
-            return 1;
-        });
-        
-        return { variants: variantsList };
-    }
-    
-    async function loadCardByVariantItem(item, lang) {
-        if (!item || !item.formattedName) return false;
-        const highResUrl = buildHighResImageUrl(item.formattedName, lang);
-        currentHighResImageUrl = highResUrl;
-        setLoadingState(true);
-        const langDisplay = getLangDisplayName(lang);
-        imageStatus.innerHTML = `🔍 加载: ${item.formattedName}.avif (${langDisplay})`;
-        return new Promise((resolve) => {
-            const imgLoader = new Image();
-            imgLoader.onload = () => {
-                cardImage.src = highResUrl;
-                setLoadingState(false);
-                let extraFlag = '';
-                if (item.isVeteran) extraFlag = ' ⭐ 老兵';
-                else if (item.suffixKey !== '' && item.suffixKey !== '_vet') extraFlag = ` 🔹 ${item.displayName}`;
-                imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extraFlag} (${langDisplay})`;
-                imageStatus.style.color = "#f4e2aa";
-                cardImage.setAttribute('data-valid', 'true');
-                cardImage.setAttribute('data-current-name', item.formattedName);
-                cardImage.setAttribute('data-lang', lang);
-                cardImage.style.opacity = '1';
-                resolve(true);
-            };
-            imgLoader.onerror = () => {
-                setLoadingState(false);
-                showError(`加载失败: ${item.formattedName}.avif`);
-                cardImage.setAttribute('data-valid', 'false');
-                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 不可用 💀%3C/text%3E%3C/svg%3E";
-                currentHighResImageUrl = ''; // 清空无效url
-                resolve(false);
-            };
-            imgLoader.src = highResUrl;
-        });
-    }
-    
-    function getLangDisplayName(langCode) {
-        const map = {
-            'zh-Hans': '简体中文', 'zh-Hant': '繁體中文', 'en-EN': 'English',
-            'fr-FR': 'Français', 'de-DE': 'Deutsch', 'pl-PL': 'Polski', 'pt-BR': 'Português',
-            'ru-RU': 'Pусский', 'it-IT': 'Italiano', 'es-ES': 'Español', 'ko-KR': '한국어', 'ja-JP': '日本語'
-        };
-        return map[langCode] || langCode;
-    }
-    
-    function renderVariantPanel(variants, activeKey, onSelect) {
-        if (!variants || variants.length === 0) {
-            variantsContainer.style.display = 'none';
-            return;
-        }
-        if (variants.length === 1 && variants[0].suffixKey === '' && !variants[0].isVeteran) {
-            variantsContainer.style.display = 'none';
-            return;
-        }
-        variantsContainer.style.display = 'block';
-        variantCountBadge.innerText = variants.length;
-        variantListDiv.innerHTML = '';
-        variants.forEach(v => {
-            const chip = document.createElement('div');
-            chip.className = 'variant-chip';
-            if (v.suffixKey === activeKey) chip.classList.add('active');
-            let label = '';
-            if (v.isVeteran) label = '🎖️ 老兵';
-            else if (v.suffixKey === '') label = '📄 原版';
-            else label = `🃏 ${v.displayName}`;
-            chip.innerHTML = label;
-            chip.addEventListener('click', (e) => {
+        // 菜单逻辑
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const navMenu = document.getElementById('navMenu');
+        if (menuToggleBtn) {
+            menuToggleBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (onSelect) onSelect(v);
+                navMenu.classList.toggle('open');
             });
-            variantListDiv.appendChild(chip);
+        }
+        document.addEventListener('click', function(e) {
+            if (!menuToggleBtn?.contains(e.target) && !navMenu?.contains(e.target) && navMenu?.classList.contains('open')) {
+                navMenu.classList.remove('open');
+            }
         });
-    }
-    
-    async function advancedRetrieve(keepSelection = false, targetSuffix = null) {
-        if (isDiscovering) return;
-        const rawName = cardNameInput.value.trim();
-        if (!rawName) {
-            showError("请输入卡牌英文名");
-            return;
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.addEventListener('click', () => navMenu.classList.remove('open'));
+        });
+
+        // 状态变量
+        let currentVariants = [];
+        let activeVariantKey = null;
+        let currentBaseClean = '';
+        let currentRawCardName = '';
+        let currentLang = 'zh-Hans';
+        let currentHighResUrl = '';
+        let isDiscovering = false;
+
+        // 工具函数
+        function formatBaseName(rawName) {
+            if (!rawName || rawName.trim() === "") return "";
+            let processed = rawName.trim().toLowerCase();
+            processed = processed.replace(/[&!\/\\\'"(),-]/g, '');
+            processed = processed.replace(/[\.\s]+/g, '_');
+            processed = processed.replace(/^_+|_+$/g, '');
+            return processed;
         }
-        const lang = langSelect.value;
-        const baseClean = formatBaseName(rawName);
-        if (!baseClean) {
-            showError("卡名格式化失败");
-            return;
+
+        function buildHighResUrl(formattedName, lang) {
+            return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=100`;
         }
+
+        function buildDetectionUrl(formattedName, lang) {
+            return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${formattedName}.avif&q=1&w=1&h=1`;
+        }
+
+        function testImageExists(formattedName, lang) {
+            return new Promise((resolve) => {
+                const url = buildDetectionUrl(formattedName, lang);
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        async function progressiveDiscover(baseClean, lang, includeVariants) {
+            const originalExists = await testImageExists(baseClean, lang);
+            let variants = [];
+            if (originalExists) {
+                variants.push({ suffixKey: '', displayName: '原版', formattedName: baseClean, isVeteran: false });
+            } else {
+                return { variants: [] };
+            }
+            if (!includeVariants) return { variants };
+
+            const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
+            const variantChecks = suffixLetters.map(async (letter) => {
+                const testName = baseClean + '_' + letter;
+                const exists = await testImageExists(testName, lang);
+                if (exists) return { suffixKey: `_${letter}`, displayName: `变体 ${letter.toUpperCase()}`, formattedName: testName, isVeteran: false };
+                return null;
+            });
+            const vetExists = await testImageExists(baseClean + '_vet', lang);
+            const results = await Promise.all(variantChecks);
+            const found = results.filter(v => v !== null);
+            if (vetExists) {
+                found.push({ suffixKey: '_vet', displayName: '⭐ 老兵', formattedName: baseClean + '_vet', isVeteran: true });
+            }
+            variants.push(...found);
+            variants.sort((a,b) => {
+                if (a.suffixKey === '') return -1;
+                if (b.suffixKey === '') return 1;
+                if (a.isVeteran && !b.isVeteran) return 1;
+                if (!a.isVeteran && b.isVeteran) return -1;
+                return a.suffixKey.localeCompare(b.suffixKey);
+            });
+            return { variants };
+        }
+
+        async function loadCardVariant(item, lang) {
+            if (!item || !item.formattedName) return false;
+            const highResUrl = buildHighResUrl(item.formattedName, lang);
+            currentHighResUrl = highResUrl;
+            setLoading(true);
+            const langDisplay = getLangName(lang);
+            imageStatus.innerHTML = `⏳ 加载: ${item.formattedName}.avif (${langDisplay})`;
+            return new Promise((resolve) => {
+                const imgTest = new Image();
+                imgTest.onload = () => {
+                    cardImage.src = highResUrl;
+                    setLoading(false);
+                    let extra = '';
+                    if (item.isVeteran) extra = ' ⭐ 老兵';
+                    else if (item.suffixKey && item.suffixKey !== '' && !item.isVeteran) extra = ` 🔹 ${item.displayName}`;
+                    imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extra} (${langDisplay})`;
+                    cardImage.setAttribute('data-current-name', item.formattedName);
+                    cardImage.setAttribute('data-lang', lang);
+                    resolve(true);
+                };
+                imgTest.onerror = () => {
+                    setLoading(false);
+                    imageStatus.innerHTML = `❌ 关键防御: ${item.formattedName}.avif`;
+                    cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 图片不可用 💀%3C/text%3E%3C/svg%3E";
+                    currentHighResUrl = '';
+                    resolve(false);
+                };
+                imgTest.src = highResUrl;
+            });
+        }
+
+        function renderVariantPanel(variants, activeKey, onSelect) {
+            if (!variants || variants.length <= 1) {
+                variantsContainer.style.display = 'none';
+                return;
+            }
+            variantsContainer.style.display = 'block';
+            variantCountBadge.innerText = variants.length;
+            variantListDiv.innerHTML = '';
+            variants.forEach(v => {
+                const chip = document.createElement('div');
+                chip.className = 'variant-chip';
+                if (v.suffixKey === activeKey) chip.classList.add('active');
+                let label = '';
+                if (v.isVeteran) label = '🎖️ 老兵';
+                else if (v.suffixKey === '') label = '📄 原版';
+                else label = `🃏 ${v.displayName}`;
+                chip.innerText = label;
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (onSelect && v.suffixKey !== activeKey) onSelect(v);
+                });
+                variantListDiv.appendChild(chip);
+            });
+        }
+
+        async function performSearch(keepSelection = false, targetSuffix = null) {
+            if (isDiscovering) return;
+            const rawName = cardNameInput.value.trim();
+            if (!rawName) {
+                imageStatus.innerHTML = "⚠️ 请输入英文卡牌名称";
+                return;
+            }
+            const lang = langSelect.value;
+            const baseClean = formatBaseName(rawName);
+            if (!baseClean) {
+                imageStatus.innerHTML = "❌ 卡名格式化失败";
+                return;
+            }
+            currentRawCardName = rawName;
+            currentBaseClean = baseClean;
+            currentLang = lang;
+            isDiscovering = true;
+            setLoading(true);
+            imageStatus.innerHTML = `🔎 正在寻找敌人: ${baseClean} (${getLangName(lang)})`;
+            const includeVariants = variantToggle.checked;
+            const result = await progressiveDiscover(baseClean, lang, includeVariants);
+            isDiscovering = false;
+            if (!result.variants.length) {
+                setLoading(false);
+                imageStatus.innerHTML = `❌ 未找到 "${rawName}"`;
+                variantsContainer.style.display = 'none';
+                currentVariants = [];
+                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 %3C/text%3E%3C/svg%3E";
+                currentHighResUrl = '';
+                return;
+            }
+            currentVariants = result.variants;
+            let targetItem = null;
+            if (keepSelection && targetSuffix !== null) {
+                targetItem = currentVariants.find(v => v.suffixKey === targetSuffix);
+            }
+            if (!targetItem) {
+                targetItem = currentVariants.find(v => v.suffixKey === '') || currentVariants[0];
+            }
+            if (!targetItem) return;
+            activeVariantKey = targetItem.suffixKey;
+            await loadCardVariant(targetItem, lang);
+            const onSelect = async (selected) => {
+                if (selected.suffixKey === activeVariantKey) return;
+                activeVariantKey = selected.suffixKey;
+                await loadCardVariant(selected, lang);
+                renderVariantPanel(currentVariants, activeVariantKey, onSelect);
+            };
+            renderVariantPanel(currentVariants, activeVariantKey, onSelect);
+        }
+
+        function setLoading(isLoad) {
+            if (isLoad) {
+                imageStatus.innerHTML = '<span class="loader"></span> 正在寻找敌人 ...';
+                cardImage.style.opacity = '0.7';
+            } else {
+                cardImage.style.opacity = '1';
+            }
+        }
+
+        function getLangName(code) {
+            const found = languages.find(l => l.code === code);
+            return found ? found.label : code;
+        }
+
+        // 保存圆角图片
+        async function saveRoundedImage() {
+            const src = cardImage.src;
+            if (!src || src.includes("data:image/svg+xml") && (src.includes("等待") || src.includes("不存在") || src.includes("不可用"))) {
+                imageStatus.innerHTML = "⚠️ 无有效卡图";
+                return;
+            }
+            if (!cardImage.complete || cardImage.naturalWidth === 0) {
+                imageStatus.innerHTML = "⏳ 图片未完全加载，稍后重试";
+                return;
+            }
+            saveBtn.disabled = true;
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = "💾 生成中...";
+            try {
+                const resp = await fetch(src);
+                if (!resp.ok) throw new Error("fetch failed");
+                const blob = await resp.blob();
+                const bitmap = await createImageBitmap(blob);
+                const w = bitmap.width, h = bitmap.height;
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.save();
+                const radius = 14;
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(w - radius, 0);
+                ctx.quadraticCurveTo(w, 0, w, radius);
+                ctx.lineTo(w, h - radius);
+                ctx.quadraticCurveTo(w, h, w - radius, h);
+                ctx.lineTo(radius, h);
+                ctx.quadraticCurveTo(0, h, 0, h - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(bitmap, 0, 0);
+                ctx.restore();
+                const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
+                const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
+                const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
+                const fileName = `${namePart}_${shortLang}.png`;
+                const url = URL.createObjectURL(pngBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                imageStatus.innerHTML = `📦 保存成功: ${fileName}`;
+            } catch(e) {
+                imageStatus.innerHTML = `保存失败: ${e.message}`;
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
+            }
+        }
+
+        async function copyHighUrl() {
+            if (!currentHighResUrl) {
+                imageStatus.innerHTML = "⚠️ 没有可复制的图片链接，请先检索有效卡牌";
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(currentHighResUrl);
+                imageStatus.innerHTML = `🔗 链接已复制`;
+                setTimeout(() => {
+                    if (imageStatus.innerHTML.includes("链接已复制")) imageStatus.innerHTML = `✅ 就绪，继续检索`;
+                }, 1800);
+            } catch(err) {
+                imageStatus.innerHTML = `复制失败: ${err.message}`;
+            }
+        }
+
+        fetchBtn.onclick = (e) => { e.preventDefault(); performSearch(false, null); };
+        saveBtn.onclick = (e) => { e.preventDefault(); saveRoundedImage(); };
+        copyUrlBtn.onclick = (e) => { e.preventDefault(); copyHighUrl(); };
+        cardNameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(false, null); });
+        variantToggle.addEventListener('change', () => { if(currentBaseClean) performSearch(false, null); else if(cardNameInput.value.trim()) performSearch(false, null); });
+        langSelect.addEventListener('change', () => { if(currentBaseClean) performSearch(true, activeVariantKey); else if(cardNameInput.value.trim()) performSearch(false, null); });
         
-        currentRawCardName = rawName;
-        currentBaseClean = baseClean;
-        currentLang = lang;
-        isDiscovering = true;
-        
-        setLoadingState(true);
-        const includeVariants = variantToggle.checked;
-        imageStatus.innerHTML = `🔎 检测: ${baseClean} (${getLangDisplayName(lang)})`;
-        
-        const discoverResult = await progressiveDiscover(baseClean, lang, includeVariants);
-        isDiscovering = false;
-        
-        if (!discoverResult.variants.length) {
-            setLoadingState(false);
-            showError(`未找到: "${rawName}"`);
-            variantsContainer.style.display = 'none';
-            currentVariants = [];
-            cardImage.setAttribute('data-valid', 'false');
-            cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 %3C/text%3E%3C/svg%3E";
-            currentHighResImageUrl = '';
-            return;
-        }
-        
-        const variantsList = discoverResult.variants;
-        currentVariants = variantsList;
-        
-        let targetItem = null;
-        if (keepSelection && targetSuffix !== null) {
-            targetItem = variantsList.find(v => v.suffixKey === targetSuffix);
-        }
-        if (!targetItem) {
-            targetItem = variantsList.find(v => v.suffixKey === '') || variantsList[0];
-        }
-        if (!targetItem) return;
-        
-        activeVariantId = targetItem.suffixKey;
-        
-        await loadCardByVariantItem(targetItem, lang);
-        
-        const onSelectVariant = async (selectedItem) => {
-            if (selectedItem.suffixKey === activeVariantId) return;
-            activeVariantId = selectedItem.suffixKey;
-            await loadCardByVariantItem(selectedItem, lang);
-            renderVariantPanel(currentVariants, activeVariantId, onSelectVariant);
-        };
-        renderVariantPanel(currentVariants, activeVariantId, onSelectVariant);
-    }
-    
-    async function saveCardImage() {
-        const currentSrc = cardImage.src;
-        if (!currentSrc || (currentSrc.includes("data:image/svg+xml") && 
-            (currentSrc.includes("等待") || currentSrc.includes("不可用") || currentSrc.includes("不存在") || currentSrc.includes("⚙️") || currentSrc.includes("💀")))) {
-            imageStatus.innerHTML = "⚠️ 无有效卡图";
-            return;
-        }
-        if (!cardImage.complete || cardImage.naturalWidth === 0) {
-            imageStatus.innerHTML = "⛔ 图片未完全加载";
-            return;
-        }
-        saveBtn.disabled = true;
-        const originalText = saveBtn.innerText;
-        saveBtn.innerText = "💾 导出中...";
-        try {
-            const response = await fetch(cardImage.src);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const blob = await response.blob();
-            const imgBitmap = await createImageBitmap(blob);
-            const w = imgBitmap.width;
-            const h = imgBitmap.height;
-            const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, w, h);
-            
-            const radius = 12;
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(radius, 0);
-            ctx.lineTo(w - radius, 0);
-            ctx.quadraticCurveTo(w, 0, w, radius);
-            ctx.lineTo(w, h - radius);
-            ctx.quadraticCurveTo(w, h, w - radius, h);
-            ctx.lineTo(radius, h);
-            ctx.quadraticCurveTo(0, h, 0, h - radius);
-            ctx.lineTo(0, radius);
-            ctx.quadraticCurveTo(0, 0, radius, 0);
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(imgBitmap, 0, 0, w, h);
-            ctx.restore();
-            
-            const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-            let baseFileName = cardImage.getAttribute('data-current-name') || 'kards_card';
-            const currentLangAttr = cardImage.getAttribute('data-lang') || langSelect.value;
-            let langLabel = currentLangAttr.replace('-', '_');
-            const langMapShort = { 'zh_Hans':'SC', 'zh_Hant':'TC', 'en_EN':'EN', 'fr_FR':'FR', 'de_DE':'DE', 'pl_PL':'PL', 'pt_BR':'BR', 'ru_RU':'RU', 'it_IT':'IT', 'es_ES':'ES', 'ko_KR':'KR', 'ja_JP':'JP' };
-            let short = langMapShort[langLabel] || langLabel.toUpperCase();
-            const fileName = `${baseFileName}_${short}_rounded.png`;
-            const url = URL.createObjectURL(pngBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            imageStatus.innerHTML = `📦 已保存: ${fileName}`;
-        } catch (err) {
-            imageStatus.innerHTML = `保存失败: ${err.message}`;
-        } finally {
-            saveBtn.disabled = false;
-            saveBtn.innerText = originalText;
-        }
-    }
-    
-    async function copyImageUrl() {
-        if (!currentHighResImageUrl) {
-            imageStatus.innerHTML = "⚠️ 没有可用的图片链接，请先检索有效卡牌";
-            return;
-        }
-        try {
-            await navigator.clipboard.writeText(currentHighResImageUrl);
-            imageStatus.innerHTML = `🔗 链接已复制: ${currentHighResImageUrl.substring(0, 70)}...`;
-            setTimeout(() => {
-                if (imageStatus.innerHTML.includes("链接已复制")) {
-                    imageStatus.innerHTML = `✅ 已就绪，可继续检索`;
-                }
-            }, 2000);
-        } catch (err) {
-            imageStatus.innerHTML = `❌ 复制失败: ${err.message}`;
-        }
-    }
-    
-    function setLoadingState(isLoading) {
-        if (isLoading) {
-            imageStatus.innerHTML = '<div class="loader"></div><span> 解析中...</span>';
-            cardImage.style.opacity = '0.6';
-        } else {
-            cardImage.style.opacity = '1';
-        }
-    }
-    
-    function showError(msg) {
-        imageStatus.innerHTML = `⚠️ ${msg}`;
-        imageStatus.style.color = "#ffbc6e";
-        cardImage.style.opacity = '1';
-        cardImage.setAttribute('data-valid', 'false');
-        currentHighResImageUrl = '';
-    }
-    
-    fetchBtn.onclick = (e) => {
-        e.preventDefault();
-        advancedRetrieve(false, null);
-    };
-    saveBtn.onclick = (e) => {
-        e.preventDefault();
-        saveCardImage();
-    };
-    copyUrlBtn.onclick = (e) => {
-        e.preventDefault();
-        copyImageUrl();
-    };
-    cardNameInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            advancedRetrieve(false, null);
-        }
-    });
-    variantToggle.addEventListener('change', () => {
-        if (currentBaseClean && currentRawCardName) {
-            advancedRetrieve(false, null);
-        } else if (cardNameInput.value.trim()) {
-            advancedRetrieve(false, null);
-        }
-    });
-    langSelect.addEventListener('change', () => {
-        if (currentBaseClean && currentRawCardName) {
-            advancedRetrieve(true, activeVariantId);
-        } else if (cardNameInput.value.trim()) {
-            advancedRetrieve(false, null);
-        }
-    });
-    
-    setTimeout(() => {
-        if (cardNameInput.value.trim() === "RESISTANCE") {
-            advancedRetrieve(false, null);
-        }
-    }, 150);
+        setTimeout(() => { if(cardNameInput.value.trim() === "RESISTANCE") performSearch(false, null); }, 120);
+    })();
 </script>
 </body>
 </html>
