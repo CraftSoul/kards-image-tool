@@ -731,7 +731,6 @@
             return found ? found.label : code;
         }
 
-        // 保存圆角图片
         async function saveRoundedImage() {
             const src = cardImage.src;
             if (!src || src.includes("data:image/svg+xml") && (src.includes("等待") || src.includes("不存在") || src.includes("不可用"))) {
@@ -805,7 +804,24 @@
                     if (imageStatus.innerHTML.includes("链接已复制")) imageStatus.innerHTML = `✅ 就绪，继续检索`;
                 }, 1800);
             } catch(err) {
-                imageStatus.innerHTML = `复制失败: ${err.message}`;
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = currentHighResUrl;
+                    textarea.style.position = 'fixed';
+                    textarea.style.top = '-9999px';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    textarea.setSelectionRange(0, 99999);
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    imageStatus.innerHTML = `🔗 链接已复制`;
+                       setTimeout(() => {
+                           if (imageStatus.innerHTML.includes("链接已复制")) imageStatus.innerHTML = `✅ 就绪，继续检索`;
+                       }, 1800);
+                } catch(err) {
+                    imageStatus.innerHTML = `复制失败: ${err.message}`;
+                }
             }
         }
 

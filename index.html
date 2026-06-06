@@ -748,7 +748,16 @@
         document.querySelector('.modal-close').addEventListener('click', closeModal);
         document.getElementById('cardModal').addEventListener('click', (e) => { if(e.target === document.getElementById('cardModal')) closeModal(); });
         document.getElementById('saveImgBtn').onclick = () => { let a = document.createElement('a'); a.href = document.getElementById('modalImg').src; a.download = 'kards_card.png'; a.click(); };
-        document.getElementById('copyLinkBtn').onclick = () => { navigator.clipboard.writeText(document.getElementById('modalImg').src); alert('图片链接已复制'); };
+        document.getElementById('copyLinkBtn').onclick = () => { try{navigator.clipboard.writeText(document.getElementById('modalImg').src); alert('已复制');}catch(err){try{const textarea = document.createElement('textarea');
+                    textarea.value = document.getElementById('modalImg').src;
+                    textarea.style.position = 'fixed';
+                    textarea.style.top = '-9999px';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    textarea.setSelectionRange(0, 99999);
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textarea);}catch(err){alert(document.getElementById('modalImg').src);}} };
         const menuBtn = document.getElementById('menuToggleBtn'), menuDiv = document.getElementById('navMenu');
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDiv.classList.toggle('open'); };
         document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !menuDiv.contains(e.target)) menuDiv.classList.remove('open'); });
