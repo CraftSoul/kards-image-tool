@@ -450,7 +450,7 @@
             </div>
         </div>
         <div class="search-btn-wrap">
-            <button id="fetchBtn" class="search-btn">⚡ 检索卡图</button>
+            <button id="fetchBtn" class="search-btn">检索卡图</button>
         </div>
     </div>
 
@@ -800,9 +800,6 @@
             try {
                 await navigator.clipboard.writeText(currentHighResUrl);
                 imageStatus.innerHTML = `🔗 链接已复制`;
-                setTimeout(() => {
-                    if (imageStatus.innerHTML.includes("链接已复制")) imageStatus.innerHTML = `✅ 就绪，继续检索`;
-                }, 1800);
             } catch(err) {
                 try {
                     const textarea = document.createElement('textarea');
@@ -813,12 +810,9 @@
                     document.body.appendChild(textarea);
                     textarea.select();
                     textarea.setSelectionRange(0, 99999);
-                    const success = document.execCommand('copy');
+                    document.execCommand('copy');
                     document.body.removeChild(textarea);
                     imageStatus.innerHTML = `🔗 链接已复制`;
-                       setTimeout(() => {
-                           if (imageStatus.innerHTML.includes("链接已复制")) imageStatus.innerHTML = `✅ 就绪，继续检索`;
-                       }, 1800);
                 } catch(err) {
                     imageStatus.innerHTML = `复制失败: ${err.message}`;
                 }
