@@ -780,7 +780,7 @@
             const pngDataUrl = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = pngDataUrl;
-            a.download = `${currentModalCard?.titleZh || 'card'}_{currentModalLang}.png`;
+            a.download = `${currentModalCard?.titleZh || 'card'}_${currentModalLang}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
