@@ -24,7 +24,7 @@
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
         }
 
-        /* 阵营主题色变量 (统一小写匹配) */
+        /* 阵营主题色变量 */
         :root {
             --germany: #5A5F55;
             --britain: #857A60;
@@ -201,7 +201,7 @@
         .stats-item { flex: 1; min-width: 130px; }
         .stats-note { font-size: 0.7rem; color: #c9b06b; margin-top: 6px; }
 
-        /* 卡片网格: PC端自适应，移动端每行4张 */
+        /* 卡片网格: 移动端每行4张，PC端自适应 */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -213,7 +213,6 @@
         }
         @media (max-width: 480px) {
             .card-grid { gap: 0.6rem; }
-            .card-name { font-size: 0.65rem; }
         }
         .card-item {
             background: #111812;
@@ -221,7 +220,7 @@
             overflow: hidden;
             transition: transform 0.15s, box-shadow 0.2s;
             cursor: pointer;
-            border: 1.5px solid; /* 动态设置主题色 */
+            border: 2px solid; /* 增厚边框，主题色动态 */
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .card-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
@@ -239,7 +238,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            border-radius: 12px;
+            border-radius: 12px; /* 按比例圆角半径12px相对于原图500宽，此处百分比随容器缩放 */
         }
         .card-info {
             padding: 0.5rem 0.6rem 0.7rem;
@@ -266,8 +265,13 @@
             background-size: contain;
             display: inline-block;
         }
+        /* 移动端缩小字体 */
+        @media (max-width: 560px) {
+            .card-name { font-size: 0.65rem; }
+            .card-info { padding: 0.4rem 0.5rem 0.6rem; }
+        }
 
-        /* 模态框 - 移动端顶部留空、左右留白，纵向滚动，无切换按钮 */
+        /* 模态框 - 无翻页按钮，纵向，留白合适 */
         .modal {
             display: none;
             position: fixed;
@@ -289,7 +293,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            border: 2px solid; /* 主题色动态 */
+            border: 3px solid; /* 增厚主题色边框 */
             box-shadow: 0 20px 40px black;
             margin: 8px auto;
         }
@@ -353,24 +357,6 @@
             transition: 0.1s;
         }
         .action-btn:hover { background: #c9a63b; color: #1e1c0b; }
-        .nav-btn {
-            position: absolute;
-            top: 45%;
-            background: rgba(0,0,0,0.7);
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #ecd68a;
-            padding: 4px 12px;
-            border-radius: 40px;
-            z-index: 20;
-        }
-        .nav-left { left: -8px; }
-        .nav-right { right: -8px; }
-        @media (max-width: 560px) {
-            .nav-left { left: 0px; }
-            .nav-right { right: 0px; }
-        }
         .faction-icon-lg {
             width: 30px;
             height: 30px;
@@ -424,11 +410,45 @@
         }
         .page-btn.active-page { background: #dbaa3a; color: #171e0c; }
         .page-btn:disabled { opacity: 0.4; }
+
+        /* footer 样式 (与seek.html保持一致) */
+        .footer-simple {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #928451;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.2rem 2rem;
+            font-size: 0.85rem;
+        }
+        .footer-simple a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            color: #f8efcf;
+            background: rgba(0,0,0,0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: 0.2s;
+        }
+        .footer-simple a:hover {
+            background: #b48b3f;
+            color: #181d0e;
+        }
+        .footer-simple img {
+            width: 18px;
+            height: 18px;
+            filter: invert(0.95);
+        }
+
         @media (max-width: 560px) {
             .filter-grid { flex-direction: column; gap: 0.7rem; }
             .filter-item { min-width: 100%; }
             .modal-content { margin: 0 auto; }
-            .nav-left, .nav-right { top: 40%; }
+            .footer-simple { gap: 0.8rem; }
+            .footer-simple a { padding: 0.3rem 0.8rem; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -490,14 +510,28 @@
 
     <div id="cardContainer" class="card-grid">加载卡牌中...</div>
     <div class="pagination" id="pagination"></div>
+
+    <!-- footer 与 seek.html 保持一致 -->
+    <div class="footer-simple">
+        <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub
+        </a>
+        <a href="https://space.bilibili.com/3546775476505152" target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili
+        </a>
+        <a href="https://www.douyin.com/user/MS4wLjABAAAAERwZXqP_VI8qTqzyV-A6aJircP4R6tiOBRCY5QCFQrAd_gZ8z-LsyNvUHuDipQ7S" target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="抖音"> 抖音
+        </a>
+        <a href="https://www.zhihu.com/people/7-97-53-5-79" target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/zhihu.svg" alt="知乎"> 知乎
+        </a>
+    </div>
 </div>
 
-<!-- 模态框 -->
+<!-- 模态框 (无翻页按钮) -->
 <div id="cardModal" class="modal">
     <div class="modal-content" id="modalContent">
         <span class="modal-close">&times;</span>
-        <button class="nav-btn nav-left" id="prevCardBtn">◀</button>
-        <button class="nav-btn nav-right" id="nextCardBtn">▶</button>
         <div class="modal-left">
             <img id="modalImg" class="modal-img" alt="card art">
             <div class="modal-actions">
@@ -681,7 +715,6 @@
         const themeColor = factionColor[fKey] || '#6b6e5c';
         const modalContent = document.getElementById('modalContent');
         modalContent.style.borderColor = themeColor;
-        // 阵营图标: 小写.svg
         const iconHtml = `<img class="faction-icon-lg" src="${fKey}.svg" onerror="this.style.display='none'" alt="faction icon">`;
         document.getElementById('modalFactionIcon').innerHTML = iconHtml;
         document.getElementById('modalFaction').innerHTML = factionNames[fKey] || c.faction;
@@ -703,13 +736,10 @@
         document.getElementById('cardModal').style.display = 'flex';
     }
     function closeModal() { document.getElementById('cardModal').style.display = 'none'; }
-    function navigateModal(delta) { let n = currentModalIndex + delta; if(n>=0 && n<filteredCards.length) openModal(n); }
 
     window.addEventListener('load', () => {
         loadData();
         document.querySelector('.modal-close').addEventListener('click', closeModal);
-        document.getElementById('prevCardBtn').addEventListener('click', () => navigateModal(-1));
-        document.getElementById('nextCardBtn').addEventListener('click', () => navigateModal(1));
         document.getElementById('cardModal').addEventListener('click', (e) => { if(e.target === document.getElementById('cardModal')) closeModal(); });
         document.getElementById('saveImgBtn').onclick = () => { let a = document.createElement('a'); a.href = document.getElementById('modalImg').src; a.download = 'kards_card.png'; a.click(); };
         document.getElementById('copyLinkBtn').onclick = () => { navigator.clipboard.writeText(document.getElementById('modalImg').src); alert('图片链接已复制'); };
