@@ -35,6 +35,11 @@
             --poland: #645633;
             --finland: #C9C8BC;
             --neutral: #6b6e5c;
+            /* 稀有度颜色：铁、铜、银、金 */
+            --rarity-standard: #9e9e9e;
+            --rarity-limited: #cd7f32;
+            --rarity-special: #c0c0c0;
+            --rarity-elite: #ffd700;
         }
 
         .app-container {
@@ -289,7 +294,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        /* 新增：横向滚动容器，用于放置费用、类型、稀有度等标签，保持高度一致 */
         .deck-card-stats {
             display: flex;
             align-items: center;
@@ -323,7 +327,6 @@
             gap: 2px;
             flex-shrink: 0;
         }
-        /* 类型标签 (单位/指令/反制) */
         .card-type-badge {
             background: #2a2a1c;
             border-radius: 12px;
@@ -336,7 +339,7 @@
             gap: 4px;
             flex-shrink: 0;
         }
-        /* 稀有度标签 (按稀有度着色) */
+        /* 稀有度标签 - 铁铜银金颜色 */
         .card-rarity-badge {
             border-radius: 12px;
             padding: 2px 8px;
@@ -348,10 +351,10 @@
             flex-shrink: 0;
             background: rgba(0,0,0,0.6);
         }
-        .rarity-standard { color: #c0c0c0; border-left: 2px solid #a0a0a0; background: #2d2d24; }
-        .rarity-limited { color: #7ccf7c; border-left: 2px solid #4caf50; background: #2a3a2a; }
-        .rarity-special { color: #6ba5ff; border-left: 2px solid #3a7bd5; background: #25304a; }
-        .rarity-elite { color: #ffb347; border-left: 2px solid #ff8c00; background: #3a2a1a; }
+        .rarity-standard { color: var(--rarity-standard); border-left: 2px solid var(--rarity-standard); }
+        .rarity-limited { color: var(--rarity-limited); border-left: 2px solid var(--rarity-limited); }
+        .rarity-special { color: var(--rarity-special); border-left: 2px solid var(--rarity-special); }
+        .rarity-elite { color: var(--rarity-elite); border-left: 2px solid var(--rarity-elite); }
         
         .deck-card-qty {
             background: rgba(0,0,0,0.7);
@@ -577,6 +580,7 @@
             margin-top: 20px;
             padding-top: 16px;
             border-top: 1px solid #aa8e4e;
+            flex-wrap: wrap;
         }
         .type-summary-modal span {
             font-weight: bold;
@@ -587,6 +591,29 @@
         .unit-badge { color: #e8e4d0; }
         .order-badge { color: #f5c542; }
         .counter-badge { color: #a0a0a0; }
+        /* 稀有度统计样式 */
+        .rarity-stats-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            padding: 12px 0;
+            background: rgba(0,0,0,0.3);
+            border-radius: 24px;
+        }
+        .rarity-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .rarity-stat-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
         .legend {
             display: flex;
             gap: 20px;
@@ -855,9 +882,10 @@
 <div id="statsModal" class="modal-stats">
     <div class="modal-stats-content">
         <div class="modal-stats-close" id="statsModalClose">&times;</div>
-        <div class="modal-stats-title">📊 费用统计</div>
+        <div class="modal-stats-title">📊 卡组统计</div>
         <div class="legend"><span><span class="legend-dot" style="background:#e8e4d0;"></span>单位</span><span><span class="legend-dot" style="background:#f5c542;"></span>指令</span><span><span class="legend-dot" style="background:#5a5a5a;"></span>反制</span></div>
         <div id="modalHistogramBars" class="histogram-bars"></div>
+        <div id="modalRarityStats" class="rarity-stats-row"></div>
         <div id="modalTypeSummary" class="type-summary-modal"></div>
     </div>
 </div>
@@ -877,9 +905,9 @@
 
     // 类型中文映射
     const typeNameMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
-    // 稀有度显示及样式类
+    // 稀有度显示及样式类（无emoji）
     const rarityClassMap = { "Standard":"rarity-standard","Limited":"rarity-limited","Special":"rarity-special","Elite":"rarity-elite" };
-    const rarityDisplayMap = { "Standard":"⚙️ 普通","Limited":"📀 限定","Special":"✨ 特殊","Elite":"👑 精英" };
+    const rarityDisplayMap = { "Standard":"普通","Limited":"限定","Special":"特殊","Elite":"精英" };
 
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
@@ -1025,12 +1053,20 @@
     function showStatsModal() {
         const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
+        // 稀有度计数
+        let rarityCounts = { "Standard":0, "Limited":0, "Special":0, "Elite":0 };
+        
         for(let {card, count} of deckMap.values()) {
             const cat = getCostCategory(card.cost);
             const typeCat = getTypeCategory(card.type);
             if(typeCat === "unit") { costMap[cat].unit += count; unitTotal += count; }
             else if(typeCat === "order") { costMap[cat].order += count; orderTotal += count; }
             else { costMap[cat].counter += count; counterTotal += count; }
+            
+            // 累计稀有度
+            if(rarityCounts.hasOwnProperty(card.rarity)) {
+                rarityCounts[card.rarity] += count;
+            }
         }
         const maxHeight = Math.max(...Object.values(costMap).flatMap(v=>[v.unit, v.order, v.counter]), 1);
         
@@ -1052,7 +1088,16 @@
                     </div>`;
         }).join('');
         
+        // 稀有度统计HTML（铁铜银金颜色）
+        const rarityStatsHtml = `
+            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-standard);"></span>普通 <span style="color:var(--rarity-standard);">${rarityCounts.Standard}</span></div>
+            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-limited);"></span>限定 <span style="color:var(--rarity-limited);">${rarityCounts.Limited}</span></div>
+            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-special);"></span>特殊 <span style="color:var(--rarity-special);">${rarityCounts.Special}</span></div>
+            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-elite);"></span>精英 <span style="color:var(--rarity-elite);">${rarityCounts.Elite}</span></div>
+        `;
+        
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
+        document.getElementById('modalRarityStats').innerHTML = rarityStatsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `
             <span>单位 <span class="unit-badge">${unitTotal}</span></span>
             <span>指令 <span class="order-badge">${orderTotal}</span></span>
@@ -1069,11 +1114,16 @@
         document.getElementById('mobileToggleCount').innerText = total; 
     }
     
-    // 渲染卡组列表，带类型和稀有度标签，同一行横向滚动防止溢出
+    // 渲染卡组列表 - 按照 allCards 中的原始顺序排序
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId); if(!container) return; 
         if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:16px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
-        const entries = Array.from(deckMap.values()).sort((a,b)=> (a.card.cost - b.card.cost) || (a.card.titleZh.localeCompare(b.card.titleZh)));
+        // 按照 allCards 中的索引顺序排序（即在 data.json 中的出现顺序）
+        const entries = Array.from(deckMap.values()).sort((a, b) => {
+            const idxA = allCards.findIndex(c => c.id === a.card.id);
+            const idxB = allCards.findIndex(c => c.id === b.card.id);
+            return idxA - idxB;
+        });
         container.innerHTML = entries.map(entry => { 
             const c = entry.card; 
             const borderColor = factionColor[c.faction] || "#6b6e5c"; 
