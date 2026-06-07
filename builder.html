@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>KARDS 军械库 · 卡组构筑</title>
+    <title>KARDS 军械库</title>
     <style>
         * {
             margin: 0;
@@ -421,7 +421,6 @@
             .mobile-deck-toggle { display: flex; }
         }
 
-        /* 模态框样式 */
         .modal-stats {
             display: none;
             position: fixed;
@@ -640,7 +639,6 @@
             display: inline-block;
             flex-shrink: 0;
         }
-        /* 桌面端角标 */
         .card-badge-desktop {
             position: absolute;
             top: 6px;
@@ -682,7 +680,6 @@
         }
         .card-remove-icon:hover { background: #b6521a; color: white; }
         
-        /* 移动端卡片操作区 - 居中显示 */
         .card-mobile-actions {
             display: none;
             background: rgba(0,0,0,0.85);
@@ -697,7 +694,7 @@
             color: #ffeaad;
             font-size: 0.75rem;
             font-weight: bold;
-            padding: 4px 14px;
+            padding: 4px 8px;
             border-radius: 30px;
         }
         .mobile-remove-btn {
@@ -705,7 +702,7 @@
             border: none;
             color: #ffcf8a;
             border-radius: 30px;
-            padding: 4px 18px;
+            padding: 4px 8px;
             font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
@@ -763,13 +760,13 @@
 </head>
 <body>
 <div class="app-container">
-    <div class="nav-bar"><div class="nav-header-row"><div class="nav-brand">KARDS 军械库 · 卡组构筑</div><div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div></div>
+    <div class="nav-bar"><div class="nav-header-row"><div class="nav-brand">KARDS 军械库</div><div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div></div>
     <div class="nav-menu" id="navMenu"><div class="menu-links"><a class="menu-link" href="index.html">卡牌收藏</a><a class="menu-link active" href="#">卡组构筑</a><a class="menu-link" href="seek.html">英文直检</a><a class="menu-link" href="#">关于军械库</a></div></div></div>
 
     <div class="mobile-deck-toggle" id="mobileDeckToggle"><span class="toggle-text">卡组</span><span class="mobile-count-badge-toggle" id="mobileToggleCount">0</span><span>▶</span></div>
     <div class="mobile-overlay" id="mobileOverlay"></div>
     <div class="mobile-deck-panel" id="mobileDeckPanel">
-        <div class="mobile-deck-header"><span class="deck-title">📋 我的卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
+        <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
         <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
         <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
@@ -784,7 +781,7 @@
             <div class="pagination" id="pagination"></div>
         </div>
         <div class="deck-panel" id="deckPanel">
-            <div class="deck-header"><span class="deck-title">📋 我的卡组</span><button class="clear-deck" id="clearDeckBtn">清空卡组</button></div>
+            <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
             <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
             <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
@@ -798,7 +795,7 @@
 <div id="statsModal" class="modal-stats">
     <div class="modal-stats-content">
         <div class="modal-stats-close" id="statsModalClose">&times;</div>
-        <div class="modal-stats-title">📊 卡组费用分布</div>
+        <div class="modal-stats-title">📊 费用统计</div>
         <div class="legend">
             <span><span class="legend-dot" style="background:#e8e4d0;"></span>单位</span>
             <span><span class="legend-dot" style="background:#f5c542;"></span>指令</span>
@@ -954,15 +951,15 @@
                             <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="${tooltip}"></div>
                         </div>
                         <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
-                        <div class="cost-total">总计:${totalH}</div>
+                        <div class="cost-total">${totalH}</div>
                     </div>`;
         }).join('');
         
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `
-            <span>🎖️ 单位总数: <span class="unit-badge">${unitTotal}</span></span>
-            <span>📜 指令总数: <span class="order-badge">${orderTotal}</span></span>
-            <span>🛡️ 反制总数: <span class="counter-badge">${counterTotal}</span></span>
+            <span>🎖️ 单位: <span class="unit-badge">${unitTotal}</span></span>
+            <span>❕ 指令: <span class="order-badge">${orderTotal}</span></span>
+            <span>❔ 反制: <span class="counter-badge">${counterTotal}</span></span>
         `;
         document.getElementById('statsModal').style.display = 'flex';
     }
