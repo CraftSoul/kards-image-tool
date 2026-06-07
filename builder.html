@@ -327,6 +327,65 @@
         }
         .deck-remove-btn:hover { background: #b6521a; color: white; }
 
+        /* 移动端特有样式：卡片计数和移除控件在下方居中 */
+        .mobile-deck-panel .deck-card-row {
+            flex-wrap: wrap;
+            padding: 10px 12px;
+        }
+        .mobile-deck-panel .deck-card-icon {
+            width: 32px;
+            height: 32px;
+        }
+        .mobile-deck-panel .deck-card-details {
+            flex: 1;
+            min-width: 120px;
+        }
+        .mobile-deck-panel .deck-card-qty {
+            margin-left: 0;
+            order: 3;
+            width: auto;
+            min-width: 50px;
+        }
+        .mobile-deck-panel .deck-remove-btn {
+            order: 4;
+            width: 32px;
+            height: 32px;
+            font-size: 1.1rem;
+        }
+        /* 移动端下方控件行居中 */
+        .mobile-card-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(170, 142, 78, 0.3);
+        }
+        .mobile-card-actions .mobile-qty-badge {
+            background: rgba(0,0,0,0.7);
+            border-radius: 30px;
+            padding: 4px 16px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #ffe0a3;
+        }
+        .mobile-card-actions .mobile-remove-deck {
+            background: #5e3c1f;
+            border: none;
+            color: #ffcf8a;
+            border-radius: 30px;
+            padding: 4px 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .mobile-deck-panel .deck-card-row .deck-card-qty,
+        .mobile-deck-panel .deck-card-row .deck-remove-btn {
+            display: none;
+        }
+
         .mobile-deck-toggle {
             display: none;
             position: fixed;
@@ -493,16 +552,9 @@
             transition: transform 0.1s;
         }
         .bar-stack:hover { transform: scaleX(1.02); }
-        .bar-unit {
-            background-color: #e8e4d0;
-            transition: height 0.2s;
-        }
-        .bar-order {
-            background-color: #f5c542;
-        }
-        .bar-counter {
-            background-color: #5a5a5a;
-        }
+        .bar-unit { background-color: #e8e4d0; transition: height 0.2s; }
+        .bar-order { background-color: #f5c542; }
+        .bar-counter { background-color: #5a5a5a; }
         .bar-label {
             font-size: 0.7rem;
             color: #f5eaca;
@@ -510,15 +562,20 @@
             margin-top: 6px;
             font-weight: bold;
         }
-        .bar-tooltip {
+        /* 点击显示的提示框 */
+        .click-tooltip {
             font-size: 0.65rem;
             color: #ffefb9;
-            background: rgba(0,0,0,0.8);
-            padding: 4px 8px;
+            background: rgba(0,0,0,0.9);
+            padding: 4px 10px;
             border-radius: 16px;
             margin-top: 6px;
-            white-space: nowrap;
             text-align: center;
+            white-space: nowrap;
+            display: none;
+        }
+        .click-tooltip.show {
+            display: block;
         }
         .type-summary-modal {
             display: flex;
@@ -704,7 +761,7 @@
 
     <div class="builder-main">
         <div class="cards-section">
-            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名 / 文本 / 词条"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
+            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名 / 文本"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
             <div id="cardContainer" class="card-grid">加载中...</div>
             <div class="pagination" id="pagination"></div>
         </div>
@@ -846,7 +903,7 @@
             else { costMap[cat].counter += count; counterTotal += count; }
         }
         const maxHeight = Math.max(...Object.values(costMap).flatMap(v=>[v.unit, v.order, v.counter]), 1);
-        const barWidth = 100 / 8; // 百分比宽度，密铺
+        const barWidth = 100 / 8;
         
         const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
             const unitH = costMap[cost].unit, orderH = costMap[cost].order, counterH = costMap[cost].counter;
@@ -854,15 +911,15 @@
             const unitPercent = maxHeight ? (unitH / maxHeight) * 48 : 0;
             const orderPercent = maxHeight ? (orderH / maxHeight) * 48 : 0;
             const counterPercent = maxHeight ? (counterH / maxHeight) * 48 : 0;
-            const tooltip = `单位:${unitH}  指令:${orderH}  反制:${counterH}  总计:${totalH}`;
+            const tooltipText = `单位:${unitH}  指令:${orderH}  反制:${counterH}  总计:${totalH}`;
             return `<div class="histogram-bar-wrapper" style="width:${barWidth}%; max-width:60px; min-width:32px;">
-                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px; width:100%;">
-                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="${tooltip}"></div>
-                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="${tooltip}"></div>
-                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="${tooltip}"></div>
+                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px; width:100%;" data-tooltip="${tooltipText}">
+                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;"></div>
+                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;"></div>
+                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;"></div>
                         </div>
                         <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
-                        <div class="bar-tooltip">${tooltip}</div>
+                        <div class="click-tooltip" id="tooltip-${cost}"></div>
                     </div>`;
         }).join('');
         
@@ -872,13 +929,38 @@
             <span>📜 指令总数: <span class="order-badge">${orderTotal}</span></span>
             <span>🛡️ 反制总数: <span class="counter-badge">${counterTotal}</span></span>
         `;
+        
+        // 为每个柱状图添加点击显示详细数量
+        document.querySelectorAll('.bar-stack').forEach((bar, idx) => {
+            const tooltipDiv = bar.parentElement.querySelector('.click-tooltip');
+            const tooltipText = bar.getAttribute('data-tooltip');
+            if (tooltipDiv && tooltipText) {
+                bar.style.cursor = 'pointer';
+                bar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // 隐藏其他所有tooltip
+                    document.querySelectorAll('.click-tooltip').forEach(t => t.classList.remove('show'));
+                    tooltipDiv.innerHTML = tooltipText;
+                    tooltipDiv.classList.add('show');
+                });
+            }
+        });
+        
+        // 点击模态框其他区域关闭tooltip
+        document.getElementById('modalHistogramBars').addEventListener('click', (e) => {
+            if (!e.target.closest('.bar-stack')) {
+                document.querySelectorAll('.click-tooltip').forEach(t => t.classList.remove('show'));
+            }
+        });
+        
         document.getElementById('statsModal').style.display = 'flex';
     }
     
     function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
     function updateAllDecksUI() { 
-        renderDeckList('deckListContainer'); renderDeckList('mobileDeckList'); 
+        renderDeckList('deckListContainer'); 
+        renderMobileDeckList(); 
         const total = Array.from(deckMap.values()).reduce((s,e)=>s+e.count,0); 
         document.getElementById('mobileToggleCount').innerText = total; 
     }
@@ -900,6 +982,28 @@
                     </div>`; 
         }).join('');
         container.querySelectorAll('.deck-remove-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.id)); }));
+    }
+    
+    // 移动端专用渲染：计数和移除控件在下方居中
+    function renderMobileDeckList() {
+        const container = document.getElementById('mobileDeckList'); if(!container) return; 
+        if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:16px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
+        const entries = Array.from(deckMap.values()).sort((a,b)=> (a.card.cost - b.card.cost) || (a.card.titleZh.localeCompare(b.card.titleZh)));
+        container.innerHTML = entries.map(entry => { 
+            const c = entry.card; const borderColor = factionColor[c.faction] || "#6b6e5c"; 
+            return `<div class="deck-card-row" style="border-left-color: ${borderColor};">
+                        <div class="deck-card-icon" style="background-image: url('${c.faction}.svg');"></div>
+                        <div class="deck-card-details">
+                            <div class="deck-card-name">${c.titleZh}</div>
+                            <div class="cost-stats"><div class="kredits-cost"><span>${c.cost}</span><span>K</span></div></div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <span class="mobile-qty-badge">x${entry.count}</span>
+                            <button class="mobile-remove-deck" data-id="${c.id}">移除</button>
+                        </div>
+                    </div>`; 
+        }).join('');
+        container.querySelectorAll('.mobile-remove-deck').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.id)); }));
     }
     
     function initSidebars() {
