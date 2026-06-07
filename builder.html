@@ -264,23 +264,6 @@
             font-size: 1rem;
             color: #2c2818;
         }
-        .hq-cost-row {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-            margin-top: 4px;
-        }
-        .hq-cost {
-            background: #000000cc;
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-weight: bold;
-            color: #ffd966;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-        }
 
         /* 卡组列表中的矩形卡片条目 - 模仿图片风格：长矩形，费用右下角K字下显示行动花费，阵营图标右侧，主题色填充 */
         .deck-list {
@@ -602,6 +585,7 @@
             justify-content: center;
             margin-top: 1.5rem;
             gap: 6px;
+            flex-wrap: wrap;
         }
         .page-btn {
             background: #2d2a1d;
@@ -610,6 +594,7 @@
             border-radius: 40px;
             color: #f5eaca;
             cursor: pointer;
+            font-size: 0.8rem;
         }
         .footer-simple {
             margin-top: 2rem;
@@ -637,7 +622,7 @@
     <div class="mobile-overlay" id="mobileOverlay"></div>
     <div class="mobile-deck-panel" id="mobileDeckPanel"><div class="mobile-deck-header"><span class="deck-title">📋 我的卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
     <div class="nation-selector" id="mobileNationSelector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation" class="nation-select"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation" class="nation-select"></select></div></div>
-    <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div><div class="hq-cost-row"><div class="hq-cost"><span>0</span><span>K</span></div></div></div></div>
+    <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
     <div class="mobile-deck-list" id="mobileDeckList"></div><div class="deck-stats-badge" id="mobileStatsArea"></div><button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空卡组</button></div>
 
     <div class="builder-main">
@@ -721,7 +706,7 @@
     function renderDeckList(containerId, isMobile = false) {
         const container = document.getElementById(containerId); if(!container) return; if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:16px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
         const entries = Array.from(deckMap.values()).sort((a,b)=> (a.card.cost - b.card.cost) || (a.card.titleZh.localeCompare(b.card.titleZh)));
-        container.innerHTML = entries.map(entry => { const c = entry.card; const opCost = (c.operationCost !== undefined && c.operationCost !== null && unitTypes.includes(c.type)) ? c.operationCost : null; const borderColor = factionColor[c.faction] || "#6b6e5c"; const textColor = c.faction === "finland" ? "#111" : "#f9edc1"; return `<div class="deck-card-row" style="border-left-color: ${borderColor}; background:#0f0f0a;"><div class="deck-card-icon" style="background-image: url('${c.faction}.svg');"></div><div class="deck-card-details"><div class="deck-card-name-line"><span class="deck-card-name" style="color:${textColor};">${c.titleZh}</span></div><div class="cost-stats"><div class="kredits-cost"><span>${c.cost}</span><span>K</span></div>${opCost !== null ? `<div class="operation-cost"><span>⚙️</span><span>${opCost}</span></div>` : ''}</div></div><span class="deck-card-qty">x${entry.count}</span><button class="deck-remove-btn" data-id="${c.id}">−</button></div>`; }).join('');
+        container.innerHTML = entries.map(entry => { const c = entry.card; const opCost = (c.operationCost !== undefined && c.operationCost !== null && unitTypes.includes(c.type)) ? c.operationCost : null; const borderColor = factionColor[c.faction] || "#6b6e5c"; const textColor = "#f9edc1"; return `<div class="deck-card-row" style="border-left-color: ${borderColor}; background:#0f0f0a;"><div class="deck-card-icon" style="background-image: url('${c.faction}.svg');"></div><div class="deck-card-details"><div class="deck-card-name-line"><span class="deck-card-name" style="color:${textColor};">${c.titleZh}</span></div><div class="cost-stats"><div class="kredits-cost"><span>${c.cost}</span><span>K</span></div>${opCost !== null ? `<div class="operation-cost"><span>⚙️</span><span>${opCost}</span></div>` : ''}</div></div><span class="deck-card-qty">x${entry.count}</span><button class="deck-remove-btn" data-id="${c.id}">−</button></div>`; }).join('');
         container.querySelectorAll('.deck-remove-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.id)); }));
     }
     function updateDeckPanelUI() { renderDeckList('deckListContainer', false); const stats = getDeckStats(); document.getElementById('statsBadgeContainer').innerHTML = `<div class="stat-chip"><span>主国 ${factionNames[mainNation]||mainNation}</span><span>${stats.mainCount}</span></div><div class="stat-chip"><span>盟国 ${allyNation?factionNames[allyNation]:"无"}</span><span>${stats.allyCount}</span></div><div class="stat-chip"><span>其他</span><span>${stats.otherCount}</span></div>`; }
