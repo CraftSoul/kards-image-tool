@@ -134,7 +134,7 @@
             flex: 3;
             min-width: 0;
         }
-        /* 右侧面板 - 移动端默认在右侧，PC常驻 */
+        /* 右侧卡组栏 - PC常驻 */
         .deck-panel {
             width: 340px;
             flex-shrink: 0;
@@ -151,7 +151,6 @@
             top: 16px;
             overflow-y: auto;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: transform 0.2s;
         }
         .deck-header {
             display: flex;
@@ -159,7 +158,7 @@
             align-items: baseline;
             padding: 0 8px 12px;
             border-bottom: 2px solid #dbba6c;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
         }
         .deck-title {
@@ -180,36 +179,60 @@
         }
         .clear-deck:hover { background: #aa6f3c; color: white; }
         
-        /* 总部卡片 - 与卡组长条样式一致 */
-        .headquarters-card {
-            background: #f9f3df;
-            border-radius: 16px;
-            padding: 8px 12px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-            color: #1f2a0e;
-            border: 2px solid #d4af37;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        /* 总部样式 - 与卡牌长条一致 */
+        .headquarters-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            justify-content: center;
+            gap: 8px;
+            background: #f9f3df;
+            border-radius: 16px;
+            padding: 8px 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #d4af37;
+            background: linear-gradient(135deg, #fff7e8, #f5e7ce);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
-        .headquarters-icon {
-            font-size: 1.5rem;
+        .hq-icon {
+            width: 32px;
+            height: 32px;
+            background: #c9aa5b;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d2816;
+        }
+        .hq-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .hq-name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #2b341d;
+            letter-spacing: 1px;
+        }
+        .hq-stat {
+            background: #2a2416cc;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            color: #ffeaac;
         }
         
         .deck-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 60vh;
+            max-height: 55vh;
             overflow-y: auto;
             padding-right: 4px;
         }
-        /* 卡组长条样式 */
         .deck-card-row {
             display: flex;
             align-items: center;
@@ -234,18 +257,18 @@
             flex: 1;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         .deck-card-cost {
             background: #000000cc;
             border-radius: 8px;
-            min-width: 36px;
+            min-width: 34px;
             text-align: center;
-            padding: 2px 6px;
+            padding: 2px 5px;
             font-weight: bold;
             color: #ffd966;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -256,57 +279,46 @@
             color: #e6bc6e;
         }
         .deck-card-name {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #f9edc1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 140px;
-        }
-        /* 卡片右上角数量 + 移除按钮（右对齐区域） */
-        .deck-card-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
+            max-width: 130px;
         }
         .deck-card-qty {
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.7);
             border-radius: 30px;
-            padding: 3px 10px;
-            font-size: 0.75rem;
+            padding: 2px 8px;
+            font-size: 0.7rem;
             font-weight: bold;
             color: #ffe0a3;
-            min-width: 42px;
+            min-width: 38px;
             text-align: center;
-            backdrop-filter: blur(4px);
         }
         .deck-remove-btn {
             background: #5e3c1f;
             border: none;
             color: #ffcf8a;
             border-radius: 30px;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             line-height: 1;
             transition: 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .deck-remove-btn:hover { background: #b6521a; color: white; }
 
-        /* 移动端: 右侧面板默认收起，显示浮动按钮式切换 */
+        /* 移动端折叠 */
         .mobile-deck-toggle {
             display: none;
             background: #2f2b1c;
             border: 1px solid #c9a63b;
             border-radius: 60px;
-            padding: 10px 18px;
+            padding: 8px 16px;
             color: #fae7b3;
             font-weight: bold;
             margin-bottom: 16px;
@@ -314,56 +326,26 @@
             justify-content: space-between;
             align-items: center;
         }
-        /* PC端常驻，移动端特殊处理 */
         @media (max-width: 860px) {
             .builder-main {
                 flex-direction: column;
-                position: relative;
             }
-            /* 右侧面板浮动在右侧/可收起展开 - 更好的移动体验 */
             .deck-panel {
-                position: fixed;
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
                 width: 100%;
-                max-height: 65vh;
-                border-radius: 24px 24px 0 0;
-                z-index: 1000;
-                transform: translateY(100%);
-                transition: transform 0.3s ease-out;
-                margin: 0;
-                padding-bottom: 20px;
-                border-bottom: none;
-                border-left: 1px solid #c9aa5b;
-                border-right: 1px solid #c9aa5b;
-                background: rgba(8, 10, 6, 0.97);
-                backdrop-filter: blur(20px);
-                top: unset;
-                position: fixed;
+                position: relative;
+                top: 0;
+                max-height: none;
+                display: none;
             }
             .deck-panel.open-mobile {
-                transform: translateY(0);
+                display: flex;
             }
             .mobile-deck-toggle {
                 display: flex;
-                position: sticky;
-                top: 0;
-                background: #2f2b1cd9;
-                backdrop-filter: blur(8px);
-                z-index: 100;
-            }
-            /* 调整列表最大高度 */
-            .deck-list {
-                max-height: 45vh;
-            }
-            .cards-section {
-                margin-bottom: 10px;
             }
         }
 
-        /* 筛选器样式沿用 */
+        /* 筛选器样式 (复刻index) */
         .filter-panel {
             background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(8px);
@@ -400,6 +382,10 @@
             font-size: 0.85rem;
             cursor: pointer;
             outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23dbb45c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
         }
         .search-input { background-image: none; }
         .stats-group {
@@ -428,17 +414,18 @@
         @media (max-width: 680px) {
             .card-grid { grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
         }
+        /* 卡片样式：恢复预备标，去掉闪电+，显示右上角数量与移除按钮 */
         .card-item {
             background: #111812;
             border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.15s;
+            transition: transform 0.15s, box-shadow 0.2s;
             cursor: pointer;
             border: 2px solid;
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             position: relative;
         }
-        .card-item:hover { transform: translateY(-3px); }
+        .card-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .card-img {
             width: 100%;
             aspect-ratio: 500 / 702;
@@ -446,6 +433,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         .card-img img {
             width: 100%;
@@ -456,55 +444,64 @@
         .card-info {
             padding: 0.5rem 0.6rem 0.7rem;
             background: rgba(0,0,0,0.75);
-            position: relative;
         }
         .card-name {
             font-weight: 700;
             font-size: 0.75rem;
-            color: #faf0cf;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: #faf0cf;
         }
-        /* 卡片右上角显示当前数量 (黑色半透明底右对齐) 和移除按钮 */
-        .card-badge-actions {
+        .reserve-icon-sm {
+            width: 14px;
+            height: 14px;
+            background: url('reserve.png') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+        }
+        /* 右上角数量与移除按钮 */
+        .card-badge-overlay {
             position: absolute;
             top: 6px;
-            right: 8px;
+            right: 6px;
             display: flex;
-            align-items: center;
             gap: 6px;
-            background: rgba(0,0,0,0.65);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(4px);
-            padding: 2px 8px 2px 10px;
+            padding: 3px 8px;
             border-radius: 40px;
+            align-items: center;
             z-index: 5;
+            border: 0.5px solid #c9aa5b;
         }
         .card-deck-count {
-            background: transparent;
-            color: #ffdfa5;
-            font-weight: bold;
+            background: #000000cc;
+            color: #ffeaad;
             font-size: 0.7rem;
-            min-width: 24px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 30px;
+            min-width: 28px;
             text-align: center;
         }
-        .card-remove-btn-sm {
-            background: #8b3e1e;
+        .card-remove-icon {
+            background: #5e3019;
             border: none;
-            color: #ffe1aa;
+            color: #ffcf8a;
+            border-radius: 30px;
             width: 22px;
             height: 22px;
-            border-radius: 30px;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1rem;
-            line-height: 1;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: 0.1s;
         }
-        .card-remove-btn-sm:hover { background: #d45a1c; color: white; }
+        .card-remove-icon:hover { background: #b6521a; color: white; }
+        
         .footer-simple {
             margin-top: 2rem;
             padding-top: 1rem;
@@ -556,6 +553,7 @@
             border-radius: 40px;
             color: #f5eaca;
             cursor: pointer;
+            font-size: 0.8rem;
         }
         .page-btn.active-page { background: #dbaa3a; color: #171e0c; }
         .page-btn:disabled { opacity: 0.4; }
@@ -578,15 +576,13 @@
         </div>
     </div>
 
-    <!-- 移动端展开/收缩按钮（现在控制右侧面板升降） -->
     <div class="mobile-deck-toggle" id="mobileDeckToggle">
-        <span>📋 当前卡组</span>
+        <span>📚 当前卡组</span>
         <span id="mobileDeckCountSpan">0 张</span>
-        <span id="toggleArrow">▲</span>
+        <span>▼</span>
     </div>
 
     <div class="builder-main">
-        <!-- 左侧：卡牌库区 -->
         <div class="cards-section">
             <div class="filter-panel">
                 <div class="filter-grid">
@@ -610,15 +606,19 @@
             <div class="pagination" id="pagination"></div>
         </div>
 
-        <!-- 右侧卡组栏：总部与卡牌长条，按ID顺序排列 -->
+        <!-- 右侧卡组栏 -->
         <div class="deck-panel" id="deckPanel">
             <div class="deck-header">
                 <span class="deck-title">📋 我的卡组</span>
                 <button class="clear-deck" id="clearDeckBtn">清空卡组</button>
             </div>
-            <!-- 总部卡片样式与卡组长条一致 -->
-            <div class="headquarters-card">
-                <span class="headquarters-icon">🏛️</span> 总部 · 指挥部
+            <!-- 总部风格与卡牌长条一致 -->
+            <div class="headquarters-row">
+                <div class="hq-icon">🏛️</div>
+                <div class="hq-info">
+                    <span class="hq-name">总部 · 指挥部</span>
+                    <span class="hq-stat">生命 20</span>
+                </div>
             </div>
             <div class="deck-list" id="deckListContainer">
                 <div style="color:#ab9f7c; text-align:center; padding:16px;">暂无卡牌，点击左侧卡片加入</div>
@@ -635,7 +635,7 @@
 <div id="toastMsg" class="toast-msg" style="display: none;">已加入卡组</div>
 
 <script>
-    // ---------- 工具映射 ----------
+    // 数据与翻译映射
     const attrTranslation = { "blitz":"闪击","fury":"奋战","smokescreen":"烟幕","pincer":"钳击","salvage":"收缴","guard":"守护","heavyarmor1":"重甲1","heavyarmor2":"重甲2","heavyarmor3":"重甲3","alpine":"山地","mobilize":"动员","covert":"隐蔽","shock":"冲击","bond":"协力","ambush":"伏击","intel1":"情报1","intel2":"情报2","intel3":"情报3" };
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
@@ -651,16 +651,15 @@
         return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${imgName}&q=${quality}`;
     }
 
-    // 加载数据（复用结构，确保id为整数）
     async function loadData() {
         try {
             const res = await fetch('data.json');
-            if(!res.ok) throw new Error("data load fail");
+            if(!res.ok) throw new Error("data.json加载失败");
             const data = await res.json();
             allCards = (data.cards || []).map((card, idx) => {
                 let rawFaction = (card.json?.faction || card.faction || "").toLowerCase();
                 return {
-                    id: card.id ?? (idx + 1000),
+                    id: card.id ?? idx,   // 保证整型id
                     ...card,
                     type: card.json?.type || card.type,
                     faction: rawFaction,
@@ -680,9 +679,11 @@
                     importId: card.importId
                 };
             });
+            // 按原始顺序排序 (data.json中顺序)
+            allCards.sort((a,b) => (a.id - b.id));
             initFilters();
             applyFilters();
-        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div>❌ 加载失败</div>'; }
+        } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div>❌ 数据加载失败</div>'; }
     }
 
     function initFilters() {
@@ -693,8 +694,7 @@
         document.getElementById('typeSelect').innerHTML = '<option value="all">全部类型</option>' + typeOpts.map(t => `<option value="${t}">${typeMap[t] || t}</option>`).join('');
         document.getElementById('setSelect').innerHTML = '<option value="all">全部扩展</option>' + sets.map(s => `<option value="${s}">${s}</option>`).join('');
         ['factionSelect','typeSelect','costSelect','raritySelect','setSelect','statusSelect','searchInput'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.addEventListener('change', () => applyFilters());
+            document.getElementById(id).addEventListener('change', () => applyFilters());
         });
         document.getElementById('searchInput').addEventListener('input', () => applyFilters());
         ['attackExact','defenseExact','opExact'].forEach(id => {
@@ -749,39 +749,38 @@
         const start = (currentPage-1)*PAGE_SIZE;
         const pageCards = filteredCards.slice(start, start+PAGE_SIZE);
         const container = document.getElementById('cardContainer');
-        if(!pageCards.length) { container.innerHTML = '<div>未找到卡牌</div>'; return; }
+        if(!pageCards.length) { container.innerHTML = '<div class="loading-placeholder">未找到卡牌</div>'; return; }
         container.innerHTML = pageCards.map(card => {
             const imgUrl = getCardImageUrl(card.image, "zh-Hans", 20);
             const borderCol = factionColor[card.faction] || '#6b6e5c';
             const deckEntry = deckMap.get(card.id);
-            const currentCount = deckEntry ? deckEntry.count : 0;
+            const qtyInDeck = deckEntry ? deckEntry.count : 0;
+            const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
             return `<div class="card-item" data-card-id="${card.id}" style="border-color: ${borderCol};">
                         <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div>
-                        <div class="card-info">
-                            <div class="card-name"><span>${card.titleZh}</span></div>
-                            ${currentCount > 0 ? `<div class="card-badge-actions">
-                                <span class="card-deck-count">x${currentCount}</span>
-                                <button class="card-remove-btn-sm" data-id="${card.id}" data-action="remove">−</button>
-                            </div>` : `<div class="card-badge-actions" style="background:rgba(0,0,0,0.5);"><span class="card-deck-count">+</span></div>`}
+                        <div class="card-info"><div class="card-name"><span>${card.titleZh} ${reserveMark}</span></div></div>
+                        <div class="card-badge-overlay">
+                            <span class="card-deck-count">${qtyInDeck}</span>
+                            <button class="card-remove-icon" data-remove="${card.id}">−</button>
                         </div>
                     </div>`;
         }).join('');
-        // 绑定卡片添加(点击主体区域) 和 移除按钮事件
+        // 卡片点击加入卡组
         document.querySelectorAll('.card-item').forEach(el => {
-            const cardId = parseInt(el.dataset.cardId);
-            const card = allCards.find(c => c.id === cardId);
             el.addEventListener('click', (e) => {
-                if(e.target.classList.contains('card-remove-btn-sm')) return;
+                if(e.target.classList.contains('card-remove-icon')) return;
+                const cardId = parseInt(el.dataset.cardId);
+                const card = allCards.find(c => c.id === cardId);
                 if(card) addToDeck(card);
             });
-            const removeBtn = el.querySelector('.card-remove-btn-sm');
-            if(removeBtn) {
-                removeBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const cid = parseInt(removeBtn.dataset.id);
-                    removeFromDeck(cid, false);
-                });
-            }
+        });
+        // 移除按钮事件
+        document.querySelectorAll('.card-remove-icon').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const cardId = parseInt(btn.dataset.remove);
+                removeFromDeck(cardId, false);
+            });
         });
     }
     
@@ -804,21 +803,20 @@
         });
     }
 
-    // 卡组操作：按ID顺序排列（升序）
+    // 卡组管理：按data.json顺序排列（id顺序）
     function addToDeck(card) {
-        if(!card) return;
         let entry = deckMap.get(card.id);
         if(entry) entry.count += 1;
         else deckMap.set(card.id, { card: card, count: 1 });
         updateDeckUI();
-        renderCards(); 
+        renderCards();   // 刷新卡片上的数量显示
         showToast(`➕ 加入 ${card.titleZh}`);
     }
     function removeFromDeck(cardId, bulkRemove = false) {
         let entry = deckMap.get(cardId);
         if(!entry) return;
-        if(entry.count > 1 && !bulkRemove) entry.count -= 1;
-        else deckMap.delete(cardId);
+        if(entry.count > 1 && !bulkRemove) { entry.count -= 1; }
+        else { deckMap.delete(cardId); }
         updateDeckUI();
         renderCards();
         const card = allCards.find(c=>c.id === cardId);
@@ -835,9 +833,14 @@
             deckContainer.innerHTML = '<div style="color:#ab9f7c; text-align:center; padding:16px;">暂无卡牌，点击左侧卡片加入</div>';
             return;
         }
-        // 按照 id 升序排列（整数顺序）
-        const sorted = Array.from(deckMap.values()).sort((a,b) => a.card.id - b.card.id);
-        deckContainer.innerHTML = sorted.map(entry => {
+        // 按照 data.json 原始顺序 (即 allCards 的顺序) 排列卡组中的卡牌
+        const deckEntries = Array.from(deckMap.values());
+        deckEntries.sort((a,b) => {
+            const idxA = allCards.findIndex(c => c.id === a.card.id);
+            const idxB = allCards.findIndex(c => c.id === b.card.id);
+            return idxA - idxB;
+        });
+        deckContainer.innerHTML = deckEntries.map(entry => {
             const c = entry.card;
             const iconUrl = `${c.faction}.svg`;
             const borderLeftColor = factionColor[c.faction] || "#6b6e5c";
@@ -846,11 +849,9 @@
                         <div class="deck-card-info">
                             <div class="deck-card-cost"><span>${c.cost}</span><span class="cost-k-symbol">K</span></div>
                             <span class="deck-card-name">${c.titleZh}</span>
-                        </div>
-                        <div class="deck-card-actions">
                             <span class="deck-card-qty">x${entry.count}</span>
-                            <button class="deck-remove-btn" data-id="${c.id}">−</button>
                         </div>
+                        <button class="deck-remove-btn" data-id="${c.id}">−</button>
                     </div>`;
         }).join('');
         deckContainer.querySelectorAll('.deck-remove-btn').forEach(btn => {
@@ -866,19 +867,15 @@
         const toast = document.getElementById('toastMsg');
         toast.innerText = msg;
         toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 1000);
+        setTimeout(() => { toast.style.display = 'none'; }, 1200);
     }
 
-    // 移动端展开/收起右侧面板
     function initMobileDeck() {
         const deckPanel = document.getElementById('deckPanel');
         const toggleBtn = document.getElementById('mobileDeckToggle');
         if(toggleBtn) {
             toggleBtn.addEventListener('click', () => {
                 deckPanel.classList.toggle('open-mobile');
-                const arrow = document.getElementById('toggleArrow');
-                if(deckPanel.classList.contains('open-mobile')) arrow.innerHTML = '▼';
-                else arrow.innerHTML = '▲';
             });
         }
         deckPanel.classList.remove('open-mobile');
