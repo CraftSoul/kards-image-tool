@@ -217,7 +217,6 @@
             outline: none;
         }
 
-        /* 阵营计数栏 */
         .faction-stats {
             background: rgba(0,0,0,0.4);
             border-radius: 20px;
@@ -700,8 +699,10 @@
             background: #1a1c12;
             border-radius: 32px;
             border: 2px solid #c9aa5b;
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
             padding: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
@@ -733,10 +734,26 @@
             color: #f5efdb;
             font-size: 0.8rem;
         }
+        .switch-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .switch-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 40px;
+        }
+        .switch-item span { color: #e9dbbd; font-size: 0.75rem; }
         .img-gen-preview {
             text-align: center;
             margin-bottom: 16px;
-            max-height: 60vh;
+            max-height: 50vh;
             overflow: auto;
         }
         .img-gen-preview canvas {
@@ -1036,10 +1053,14 @@
         <div class="img-gen-controls">
             <div class="img-gen-control"><label>📐 每行数量</label><input type="number" id="imgCols" value="10" min="1" max="30"></div>
             <div class="img-gen-control"><label>🎨 画质 (1-100)</label><input type="range" id="imgQuality" min="1" max="100" value="20"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
-            <div class="img-gen-control"><label>🎨 背景色</label><select id="imgBgColor"><option value="white">白色</option><option value="black">黑色</option><option value="transparent">透明</option></select></div>
+            <div class="img-gen-control"><label>🌐 卡图语言</label><select id="imgLang"></select></div>
+        </div>
+        <div class="switch-row">
+            <div class="switch-item"><span>📦 空位填充</span><label class="switch"><input type="checkbox" id="fillEmptyToggle"><span class="slider"></span></label></div>
+            <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle"><span class="slider"></span></label></div>
         </div>
         <div class="img-gen-preview" id="imgGenPreview"></div>
-        <div class="img-gen-actions"><button id="downloadImgBtn" class="export-btn">💾 下载图片</button><button id="closeImgModal" class="import-btn">关闭</button></div>
+        <div class="img-gen-actions"><button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button><button id="downloadImgBtn" class="export-btn">💾 下载图片</button><button id="closeImgModal" class="import-btn">关闭</button></div>
     </div>
 </div>
 
@@ -1058,7 +1079,17 @@
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
 
-    function getCardImageUrl(imgName, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/${imgName}&q=${quality}` : ""; }
+    // 语言列表
+    const languages = [
+        { code: 'zh-Hans', label: '简体中文' }, { code: 'zh-Hant', label: '繁體中文' },
+        { code: 'en-EN', label: 'English' }, { code: 'fr-FR', label: 'Français' },
+        { code: 'de-DE', label: 'Deutsch' }, { code: 'pl-PL', label: 'Polski' },
+        { code: 'pt-BR', label: 'Português' }, { code: 'ru-RU', label: 'Pусский' },
+        { code: 'it-IT', label: 'Italiano' }, { code: 'es-ES', label: 'Español' },
+        { code: 'ko-KR', label: '한국어' }, { code: 'ja-JP', label: '日本語' }
+    ];
+
+    function getCardImageUrl(imgName, lang, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${imgName}&q=${quality}` : ""; }
     function getSearchableText(card) { const attrsTrans = translateAttributesForSearch(card.attributes || []); return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase(); }
 
     async function loadData() {
@@ -1093,6 +1124,12 @@
         document.getElementById('allyNationSelect').value = allyNation;
         document.getElementById('mobileMainNation').value = mainNation;
         document.getElementById('mobileAllyNation').value = allyNation;
+        
+        // 填充语言下拉
+        const langSelect = document.getElementById('imgLang');
+        langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.label}</option>`).join('');
+        langSelect.value = 'zh-Hans';
+        
         const updateNation = () => { mainNation = document.getElementById('mainNationSelect').value; allyNation = document.getElementById('allyNationSelect').value; document.getElementById('mobileMainNation').value = mainNation; document.getElementById('mobileAllyNation').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
         const updateMobile = () => { mainNation = document.getElementById('mobileMainNation').value; allyNation = document.getElementById('mobileAllyNation').value; document.getElementById('mainNationSelect').value = mainNation; document.getElementById('allyNationSelect').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
         document.getElementById('mainNationSelect').addEventListener('change', updateNation);
@@ -1140,7 +1177,7 @@
             const borderCol = factionColor[card.faction] || '#6b6e5c'; 
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
             const showBadge = qty > 0;
-            return `<div class="card-item" data-card-id="${card.id}" style="border-color:${borderCol};"><div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image)}" alt="${card.titleZh}"></div><div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div><div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}"><span class="card-deck-count">${qty}</span><button class="card-remove-icon" data-remove="${card.id}">−</button></div><div class="card-mobile-actions ${!showBadge ? 'hide-badge' : ''}"><span class="mobile-count-badge">${qty}</span><button class="mobile-remove-btn" data-remove="${card.id}">-</button></div></div>`; 
+            return `<div class="card-item" data-card-id="${card.id}" style="border-color:${borderCol};"><div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image, 'zh-Hans', 20)}" alt="${card.titleZh}"></div><div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div><div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}"><span class="card-deck-count">${qty}</span><button class="card-remove-icon" data-remove="${card.id}">−</button></div><div class="card-mobile-actions ${!showBadge ? 'hide-badge' : ''}"><span class="mobile-count-badge">${qty}</span><button class="mobile-remove-btn" data-remove="${card.id}">-</button></div></div>`; 
         }).join(''); 
         document.querySelectorAll('.card-item').forEach(el=>{ el.addEventListener('click',(e)=>{ if(e.target.classList.contains('card-remove-icon') || e.target.classList.contains('mobile-remove-btn')) return; const id = parseInt(el.dataset.cardId); const card = allCards.find(c=>c.id===id); if(card) addToDeck(card); }); }); 
         document.querySelectorAll('.card-remove-icon, .mobile-remove-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.remove)); })); 
@@ -1224,89 +1261,177 @@
         } catch(e) { alert(`导入失败: ${e.message}`); }
     }
 
-    // 图片生成
-    async function generateDeckImage(cols, quality, bgColor) {
+    // 绘制圆角矩形填充框
+    function drawPlaceholder(ctx, x, y, w, h, radius, textColor, bgColor) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + w - radius, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+        ctx.lineTo(x + w, y + h - radius);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        ctx.lineTo(x + radius, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fillStyle = bgColor;
+        ctx.fill();
+        ctx.fillStyle = textColor;
+        ctx.font = `bold ${Math.floor(h * 0.12)}px "Segoe UI", "Microsoft YaHei"`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("KARDS\n军械库", x + w/2, y + h/2);
+        ctx.restore();
+    }
+    
+    function drawStatsCard(ctx, x, y, w, h, radius, mainNation, allyNation, deckMap, factionNames) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + w - radius, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+        ctx.lineTo(x + w, y + h - radius);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        ctx.lineTo(x + radius, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fillStyle = "#1a1c12";
+        ctx.fill();
+        ctx.strokeStyle = "#c9aa5b";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // 统计信息
+        let mainCount = 0, allyCount = 0, otherCount = 0;
+        let rarityCounts = { Standard: 0, Limited: 0, Special: 0, Elite: 0 };
+        for (let { card, count } of deckMap.values()) {
+            if (card.faction === mainNation) mainCount += count;
+            else if (card.faction === allyNation) allyCount += count;
+            else otherCount += count;
+            if (rarityCounts.hasOwnProperty(card.rarity)) rarityCounts[card.rarity] += count;
+        }
+        const totalCards = Array.from(deckMap.values()).reduce((s, e) => s + e.count, 0);
+        
+        ctx.fillStyle = "#ffefbf";
+        ctx.font = `bold ${Math.floor(h * 0.08)}px "Segoe UI"`;
+        ctx.textAlign = "center";
+        ctx.fillText("卡组统计", x + w/2, y + h * 0.12);
+        
+        ctx.font = `${Math.floor(h * 0.055)}px "Segoe UI"`;
+        ctx.fillStyle = "#e9dbbd";
+        ctx.textAlign = "left";
+        const startY = y + h * 0.22;
+        const lineH = h * 0.08;
+        ctx.fillText(`主国 ${factionNames[mainNation]}: ${mainCount}`, x + w * 0.1, startY);
+        ctx.fillText(`盟国 ${factionNames[allyNation]}: ${allyCount}`, x + w * 0.1, startY + lineH);
+        ctx.fillText(`其他: ${otherCount}`, x + w * 0.1, startY + lineH * 2);
+        ctx.fillText(`总计: ${totalCards} 张`, x + w * 0.1, startY + lineH * 3);
+        ctx.fillText(`普通: ${rarityCounts.Standard}  限定: ${rarityCounts.Limited}`, x + w * 0.1, startY + lineH * 4.5);
+        ctx.fillText(`特殊: ${rarityCounts.Special}  精英: ${rarityCounts.Elite}`, x + w * 0.1, startY + lineH * 5.5);
+        ctx.restore();
+    }
+
+    async function generateDeckImage(cols, quality, lang, fillEmpty, addStatsCard) {
         const cards = [];
         for (let { card, count } of deckMap.values()) {
             for (let i = 0; i < count; i++) cards.push(card);
         }
         if (cards.length === 0) throw new Error("卡组为空");
+        
         const cardW = 500, cardH = 702, radius = 12;
-        const rows = Math.ceil(cards.length / cols);
+        let totalCards = cards.length;
+        if (addStatsCard) totalCards += 1;
+        const rows = Math.ceil(totalCards / cols);
         const canvas = document.createElement('canvas');
         canvas.width = cols * cardW;
         canvas.height = rows * cardH;
         const ctx = canvas.getContext('2d');
-        if (bgColor === 'white') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
-        else if (bgColor === 'black') { ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
-        else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        for (let i = 0; i < cards.length; i++) {
-            const card = cards[i];
-            const col = i % cols, row = Math.floor(i / cols);
-            const x = col * cardW, y = row * cardH;
-            const imgUrl = getCardImageUrl(card.image, quality);
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = imgUrl; });
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + cardW - radius, y);
-            ctx.quadraticCurveTo(x + cardW, y, x + cardW, y + radius);
-            ctx.lineTo(x + cardW, y + cardH - radius);
-            ctx.quadraticCurveTo(x + cardW, y + cardH, x + cardW - radius, y + cardH);
-            ctx.lineTo(x + radius, y + cardH);
-            ctx.quadraticCurveTo(x, y + cardH, x, y + cardH - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(img, x, y, cardW, cardH);
-            ctx.restore();
+        let cardIdx = 0;
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const x = col * cardW, y = row * cardH;
+                if (cardIdx < cards.length) {
+                    const card = cards[cardIdx];
+                    const imgUrl = getCardImageUrl(card.image, lang, quality);
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = imgUrl; });
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x + radius, y);
+                    ctx.lineTo(x + cardW - radius, y);
+                    ctx.quadraticCurveTo(x + cardW, y, x + cardW, y + radius);
+                    ctx.lineTo(x + cardW, y + cardH - radius);
+                    ctx.quadraticCurveTo(x + cardW, y + cardH, x + cardW - radius, y + cardH);
+                    ctx.lineTo(x + radius, y + cardH);
+                    ctx.quadraticCurveTo(x, y + cardH, x, y + cardH - radius);
+                    ctx.lineTo(x, y + radius);
+                    ctx.quadraticCurveTo(x, y, x + radius, y);
+                    ctx.closePath();
+                    ctx.clip();
+                    ctx.drawImage(img, x, y, cardW, cardH);
+                    ctx.restore();
+                    cardIdx++;
+                } else if (fillEmpty && cardIdx < totalCards) {
+                    // 空位填充
+                    drawPlaceholder(ctx, x, y, cardW, cardH, radius, "#e9dbbd", "#2a2a1c");
+                    cardIdx++;
+                } else if (addStatsCard && cardIdx === cards.length) {
+                    // 统计卡
+                    drawStatsCard(ctx, x, y, cardW, cardH, radius, mainNation, allyNation, deckMap, factionNames);
+                    cardIdx++;
+                }
+            }
         }
         return canvas;
+    }
+    
+    let currentPreviewCanvas = null;
+    async function updateImgPreview() {
+        const cols = parseInt(document.getElementById('imgCols').value);
+        const quality = parseInt(document.getElementById('imgQuality').value);
+        const lang = document.getElementById('imgLang').value;
+        const fillEmpty = document.getElementById('fillEmptyToggle').checked;
+        const addStatsCard = document.getElementById('statsCardToggle').checked;
+        const previewDiv = document.getElementById('imgGenPreview');
+        previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
+        try {
+            currentPreviewCanvas = await generateDeckImage(cols, quality, lang, fillEmpty, addStatsCard);
+            previewDiv.innerHTML = '';
+            previewDiv.appendChild(currentPreviewCanvas);
+        } catch(e) { previewDiv.innerHTML = `<div style="color:#ff8888;">生成失败: ${e.message}</div>`; }
     }
     
     async function showImgGenModal() {
         if (deckMap.size === 0) { alert("卡组为空，无法生成图片"); return; }
         const modal = document.getElementById('imgGenModal');
-        const previewDiv = document.getElementById('imgGenPreview');
-        const colsInput = document.getElementById('imgCols');
-        const qualitySlider = document.getElementById('imgQuality');
-        const qualityVal = document.getElementById('qualityVal');
-        const bgSelect = document.getElementById('imgBgColor');
-        let currentCanvas = null;
-        
-        const updatePreview = async () => {
-            previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
-            try {
-                const cols = parseInt(colsInput.value);
-                const quality = parseInt(qualitySlider.value);
-                const bg = bgSelect.value;
-                currentCanvas = await generateDeckImage(cols, quality, bg);
-                previewDiv.innerHTML = '';
-                previewDiv.appendChild(currentCanvas);
-            } catch(e) { previewDiv.innerHTML = `<div style="color:#ff8888;">生成失败: ${e.message}</div>`; }
-        };
-        
-        qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
-        colsInput.onchange = () => updatePreview();
-        qualitySlider.onchange = () => updatePreview();
-        bgSelect.onchange = () => updatePreview();
-        
         modal.style.display = 'flex';
-        await updatePreview();
+        await updateImgPreview();
         
+        document.getElementById('generatePreviewBtn').onclick = () => updateImgPreview();
         document.getElementById('downloadImgBtn').onclick = () => {
-            if (currentCanvas) {
+            if (currentPreviewCanvas) {
                 const link = document.createElement('a');
                 link.download = `deck_${new Date().toISOString().slice(0,19)}.png`;
-                link.href = currentCanvas.toDataURL();
+                link.href = currentPreviewCanvas.toDataURL();
                 link.click();
             }
         };
         document.getElementById('closeImgModal').onclick = () => { modal.style.display = 'none'; };
+        
+        // 监听开关变化自动刷新
+        document.getElementById('imgCols').onchange = () => updateImgPreview();
+        document.getElementById('imgQuality').oninput = () => { document.getElementById('qualityVal').innerText = document.getElementById('imgQuality').value; };
+        document.getElementById('imgQuality').onchange = () => updateImgPreview();
+        document.getElementById('imgLang').onchange = () => updateImgPreview();
+        document.getElementById('fillEmptyToggle').onchange = () => updateImgPreview();
+        document.getElementById('statsCardToggle').onchange = () => updateImgPreview();
     }
 
     function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
