@@ -217,7 +217,6 @@
             outline: none;
         }
 
-        /* 导入区域 - 保持同行 */
         .import-area {
             background: rgba(0,0,0,0.4);
             border-radius: 20px;
@@ -276,39 +275,15 @@
         }
         .stats-btn:hover { background: #e6c46a; transform: scale(1.02); }
 
-        /* 总部卡片 - 高度缩小，与卡牌行高一致 */
-        .headquarters-card {
-            background: linear-gradient(135deg, #e6dbbc, #cfbc88);
-            border-radius: 16px;
-            padding: 6px 12px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            border-left: 6px solid #b8860b;
-        }
-        .hq-icon-large { font-size: 1.5rem; }
-        .hq-info { flex: 1; }
-        .hq-name { font-weight: 800; font-size: 0.85rem; color: #2c2818; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .hq-reserve-icon {
-            width: 14px;
-            height: 14px;
-            background: url('reserve.png') no-repeat center;
-            background-size: contain;
-            display: inline-block;
-            margin-left: 4px;
-        }
-
         .deck-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 45vh;
+            max-height: 55vh;
             overflow-y: auto;
             padding-right: 4px;
         }
-        /* 卡牌行高度缩小 */
+        /* 总部作为卡牌行样式 */
         .deck-card-row {
             background: #0f0f0a;
             border-radius: 14px;
@@ -319,6 +294,10 @@
             border-left: 5px solid;
             transition: 0.1s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .headquarters-row {
+            border-left-color: #b8860b;
+            background: linear-gradient(135deg, #1e1c14, #14120c);
         }
         .deck-card-icon {
             width: 30px;
@@ -444,6 +423,9 @@
             justify-content: center;
         }
         .deck-remove-btn:hover { background: #b6521a; color: white; }
+        /* 总部不需要移除按钮 */
+        .headquarters-row .deck-remove-btn { display: none; }
+        .headquarters-row .deck-card-qty { visibility: hidden; }
 
         .mobile-deck-toggle {
             display: none;
@@ -636,14 +618,15 @@
             margin-top: 4px;
             text-align: center;
         }
+        /* 类型统计样式 */
         .type-summary-modal {
             display: flex;
             gap: 24px;
             justify-content: center;
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid #aa8e4e;
+            margin-top: 16px;
+            padding-bottom: 12px;
             flex-wrap: wrap;
+            border-bottom: 1px solid #aa8e4e;
         }
         .type-summary-modal span {
             font-weight: bold;
@@ -654,16 +637,14 @@
         .unit-badge { color: #e8e4d0; }
         .order-badge { color: #f5c542; }
         .counter-badge { color: #a0a0a0; }
-        /* 稀有度统计行 - 移除图例后仅保留数字统计，但保留用于显示数量 */
+        /* 稀有度统计行 - 移除色块点 */
         .rarity-stats-row {
             display: flex;
-            gap: 20px;
+            gap: 24px;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-top: 16px;
             flex-wrap: wrap;
-            padding: 12px 0;
-            background: rgba(0,0,0,0.3);
-            border-radius: 24px;
+            padding: 8px 0;
         }
         .rarity-stat {
             display: flex;
@@ -673,13 +654,11 @@
             font-weight: bold;
             color: #ffefb9;
         }
-        .rarity-stat-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
+        .rarity-stat span:first-child {
+            font-weight: normal;
         }
         .legend {
-            display: none; /* 隐藏原有图例，因为稀有度图例已移除 */
+            display: none;
         }
 
         .filter-panel {
@@ -909,7 +888,6 @@
         <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
         <div class="import-area"><div class="import-row"><input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码 %%15|bK;;bK;bKbK"><button id="mobileImportBtn" class="import-btn">📥 导入覆盖</button></div></div>
-        <div class="headquarters-card" id="mobileHeadquartersCard"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name" id="mobileHqName">总部</div></div></div>
         <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
         <div class="mobile-deck-list" id="mobileDeckList"></div>
         <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空</button>
@@ -925,7 +903,6 @@
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
             <div class="import-area"><div class="import-row"><input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码 如 %%15|bK;;bK;bKbK"><button id="importBtn" class="import-btn">📥 导入覆盖</button></div></div>
-            <div class="headquarters-card" id="desktopHeadquartersCard"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name" id="desktopHqName">总部</div></div></div>
             <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
             <div class="deck-list" id="deckListContainer"></div>
         </div>
@@ -937,15 +914,14 @@
     <div class="modal-stats-content">
         <div class="modal-stats-close" id="statsModalClose">&times;</div>
         <div class="modal-stats-title">📊 卡组统计</div>
-        <!-- 图例已移除，稀有度统计单独显示 -->
         <div id="modalHistogramBars" class="histogram-bars"></div>
-        <div id="modalRarityStats" class="rarity-stats-row"></div>
+        <!-- 先显示类型统计，再显示稀有度统计（交换位置） -->
         <div id="modalTypeSummary" class="type-summary-modal"></div>
+        <div id="modalRarityStats" class="rarity-stats-row"></div>
     </div>
 </div>
 
 <script>
-    // ================= 词条翻译映射 =================
     const attrTranslation = {
         "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴",
         "guard": "守护", "heavyarmor1": "重甲1", "heavyarmor2": "重甲2", "heavyarmor3": "重甲3",
@@ -1192,19 +1168,24 @@
                         <div class="cost-total">${totalH}</div>
                     </div>`;
         }).join('');
-        const rarityStatsHtml = `
-            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-standard);"></span>普通 <span style="color:var(--rarity-standard);">${rarityCounts.Standard}</span></div>
-            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-limited);"></span>限定 <span style="color:var(--rarity-limited);">${rarityCounts.Limited}</span></div>
-            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-special);"></span>特殊 <span style="color:var(--rarity-special);">${rarityCounts.Special}</span></div>
-            <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-elite);"></span>精英 <span style="color:var(--rarity-elite);">${rarityCounts.Elite}</span></div>
-        `;
-        document.getElementById('modalHistogramBars').innerHTML = barsHtml;
-        document.getElementById('modalRarityStats').innerHTML = rarityStatsHtml;
-        document.getElementById('modalTypeSummary').innerHTML = `
+        
+        // 类型统计（放前面）
+        const typeStatsHtml = `
             <span>单位 <span class="unit-badge">${unitTotal}</span></span>
             <span>指令 <span class="order-badge">${orderTotal}</span></span>
             <span>反制 <span class="counter-badge">${counterTotal}</span></span>
         `;
+        // 稀有度统计（无 dot 色块）
+        const rarityStatsHtml = `
+            <div class="rarity-stat"><span>普通</span> <span style="color:var(--rarity-standard); font-weight:bold;">${rarityCounts.Standard}</span></div>
+            <div class="rarity-stat"><span>限定</span> <span style="color:var(--rarity-limited); font-weight:bold;">${rarityCounts.Limited}</span></div>
+            <div class="rarity-stat"><span>特殊</span> <span style="color:var(--rarity-special); font-weight:bold;">${rarityCounts.Special}</span></div>
+            <div class="rarity-stat"><span>精英</span> <span style="color:var(--rarity-elite); font-weight:bold;">${rarityCounts.Elite}</span></div>
+        `;
+        
+        document.getElementById('modalHistogramBars').innerHTML = barsHtml;
+        document.getElementById('modalTypeSummary').innerHTML = typeStatsHtml;
+        document.getElementById('modalRarityStats').innerHTML = rarityStatsHtml;
         document.getElementById('statsModal').style.display = 'flex';
     }
     
@@ -1215,29 +1196,40 @@
         renderDeckList('mobileDeckList'); 
         const total = Array.from(deckMap.values()).reduce((s,e)=>s+e.count,0); 
         document.getElementById('mobileToggleCount').innerText = total;
-        // 更新总部预备标识（总部算作一张牌，显示预备标识但无实际预备卡牌效果，仅样式）
-        const isAnyReserve = Array.from(deckMap.values()).some(e => e.card.reserved);
-        const hqReserveHtml = isAnyReserve ? '<span class="hq-reserve-icon"></span>' : '';
-        document.getElementById('desktopHqName').innerHTML = `总部 ${hqReserveHtml}`;
-        document.getElementById('mobileHqName').innerHTML = `总部 ${hqReserveHtml}`;
     }
     
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId); if(!container) return; 
-        if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
+        // 构建列表：总部 + 卡牌
+        let html = '';
+        // 总部行（无预备标识，不显示数量，无移除按钮）
+        html += `<div class="deck-card-row headquarters-row" style="border-left-color: #b8860b;">
+                    <div class="deck-card-icon" style="background-image: url('default_hq.svg'); background-size: contain; background-color: #3a3320; border-radius: 8px;"></div>
+                    <div class="deck-card-details">
+                        <div class="deck-card-name" title="总部">🏛️ 总部</div>
+                        <div class="deck-card-stats"></div>
+                    </div>
+                    <span class="deck-card-qty"></span>
+                    <button class="deck-remove-btn" style="visibility: hidden;">−</button>
+                </div>`;
+        
+        if(deckMap.size===0) { 
+            container.innerHTML = html + '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>'; 
+            return; 
+        }
         const entries = Array.from(deckMap.values()).sort((a, b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
             const idxB = allCards.findIndex(c => c.id === b.card.id);
             return idxA - idxB;
         });
-        container.innerHTML = entries.map(entry => { 
+        entries.forEach(entry => { 
             const c = entry.card; 
             const borderColor = factionColor[c.faction] || "#6b6e5c"; 
             const typeDisplay = typeNameMap[c.type] || c.type;
             const rarityClass = rarityClassMap[c.rarity] || "rarity-standard";
             const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity;
             const reserveIcon = c.reserved ? '<i class="deck-card-reserve-icon"></i>' : '';
-            return `<div class="deck-card-row" style="border-left-color: ${borderColor};">
+            html += `<div class="deck-card-row" style="border-left-color: ${borderColor};">
                         <div class="deck-card-icon" style="background-image: url('${c.faction}.svg');"></div>
                         <div class="deck-card-details">
                             <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}${reserveIcon}</div>
@@ -1250,8 +1242,9 @@
                         <span class="deck-card-qty">x${entry.count}</span>
                         <button class="deck-remove-btn" data-id="${c.id}">−</button>
                     </div>`; 
-        }).join('');
-        container.querySelectorAll('.deck-remove-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.id)); }));
+        });
+        container.innerHTML = html;
+        container.querySelectorAll('.deck-remove-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); if(!isNaN(id)) removeFromDeck(id); }));
     }
     
     function initSidebars() {
