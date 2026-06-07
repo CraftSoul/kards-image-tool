@@ -279,7 +279,6 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            min-width: 0;
         }
         .deck-card-name {
             font-size: 0.85rem;
@@ -330,54 +329,6 @@
             flex-shrink: 0;
         }
         .deck-remove-btn:hover { background: #b6521a; color: white; }
-
-        /* 移动端卡片样式优化 */
-        @media (max-width: 680px) {
-            .card-item {
-                position: relative;
-            }
-            .card-badge-desktop {
-                display: none;
-            }
-            .card-mobile-actions {
-                display: flex;
-                justify-content: center;
-                gap: 12px;
-                background: rgba(0,0,0,0.85);
-                padding: 6px 8px;
-                border-top: 1px solid #c9aa5b;
-                margin-top: 0;
-            }
-            .card-mobile-actions.hide-badge {
-                display: none;
-            }
-            .mobile-count-badge {
-                background: #000000cc;
-                color: #ffeaad;
-                font-size: 0.7rem;
-                font-weight: bold;
-                padding: 4px 12px;
-                border-radius: 30px;
-                min-width: 44px;
-                text-align: center;
-            }
-            .mobile-remove-btn {
-                background: #5e3019;
-                border: none;
-                color: #ffcf8a;
-                border-radius: 30px;
-                padding: 4px 16px;
-                font-size: 0.75rem;
-                font-weight: bold;
-                cursor: pointer;
-            }
-            .mobile-remove-btn:hover { background: #b6521a; color: white; }
-            .card-name {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-        }
 
         .mobile-deck-toggle {
             display: none;
@@ -522,8 +473,8 @@
             display: flex;
             align-items: flex-end;
             justify-content: space-around;
-            gap: 2px;
-            margin: 20px 0 10px;
+            gap: 4px;
+            margin: 10px 0;
         }
         .histogram-bar-wrapper {
             flex: 1;
@@ -531,17 +482,17 @@
             flex-direction: column;
             align-items: center;
             min-width: 0;
-            cursor: pointer;
         }
         .bar-stack {
             display: flex;
             flex-direction: column-reverse;
             width: 100%;
             max-width: 52px;
-            min-width: 28px;
+            min-width: 32px;
             background: #2a2a1c;
             border-radius: 8px 8px 0 0;
             overflow: hidden;
+            cursor: pointer;
             transition: transform 0.1s;
         }
         .bar-stack:hover { transform: scaleX(1.02); }
@@ -562,23 +513,14 @@
             margin-top: 6px;
             font-weight: bold;
         }
-        .stats-detail-panel {
-            background: #2a2a1c;
+        .cost-total {
+            font-size: 0.7rem;
+            color: #ffefb9;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 6px;
             border-radius: 20px;
-            padding: 12px 16px;
-            margin: 16px 0 0;
+            margin-top: 4px;
             text-align: center;
-            border: 1px solid #aa8e4e;
-            min-height: 70px;
-        }
-        .stats-detail-text {
-            font-size: 0.85rem;
-            color: #ffefbf;
-        }
-        .stats-detail-text span {
-            font-weight: bold;
-            color: #f5c542;
-            margin: 0 4px;
         }
         .type-summary-modal {
             display: flex;
@@ -668,8 +610,6 @@
             cursor: pointer;
             border: 2px solid;
             position: relative;
-            display: flex;
-            flex-direction: column;
         }
         .card-img {
             width: 100%;
@@ -700,6 +640,7 @@
             display: inline-block;
             flex-shrink: 0;
         }
+        /* 桌面端角标 */
         .card-badge-desktop {
             position: absolute;
             top: 6px;
@@ -712,6 +653,7 @@
             border-radius: 40px;
             align-items: center;
             z-index: 5;
+            border: 0.5px solid #c9aa5b;
         }
         .card-badge-desktop.hide-badge { display: none; }
         .card-deck-count {
@@ -721,6 +663,8 @@
             font-weight: bold;
             padding: 2px 6px;
             border-radius: 30px;
+            min-width: 28px;
+            text-align: center;
         }
         .card-remove-icon {
             background: #5e3019;
@@ -729,23 +673,31 @@
             border-radius: 30px;
             width: 22px;
             height: 22px;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
+        .card-remove-icon:hover { background: #b6521a; color: white; }
+        
+        /* 移动端卡片操作区 - 居中显示 */
         .card-mobile-actions {
             display: none;
-            justify-content: center;
-            gap: 12px;
             background: rgba(0,0,0,0.85);
-            padding: 6px 8px;
+            padding: 8px 12px;
+            justify-content: center;
+            gap: 16px;
             border-top: 1px solid #c9aa5b;
         }
         .card-mobile-actions.hide-badge { display: none; }
         .mobile-count-badge {
             background: #000000cc;
             color: #ffeaad;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: bold;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 30px;
         }
         .mobile-remove-btn {
@@ -753,11 +705,19 @@
             border: none;
             color: #ffcf8a;
             border-radius: 30px;
-            padding: 4px 16px;
-            font-size: 0.75rem;
+            padding: 4px 18px;
+            font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
         }
+        .mobile-remove-btn:hover { background: #b6521a; color: white; }
+        
+        @media (max-width: 680px) {
+            .card-badge-desktop { display: none; }
+            .card-mobile-actions { display: flex; }
+            .card-name span:first-child { font-size: 0.7rem; }
+        }
+
         .pagination {
             display: flex;
             justify-content: center;
@@ -772,16 +732,33 @@
             border-radius: 40px;
             color: #f5eaca;
             cursor: pointer;
+            font-size: 0.8rem;
         }
+        .page-btn.active-page { background: #dbaa3a; color: #171e0c; }
+        .page-btn:disabled { opacity: 0.4; }
+
         .footer-simple {
             margin-top: 2rem;
             padding-top: 1rem;
             border-top: 1px solid #928451;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 2rem;
+            gap: 1.2rem 2rem;
+            font-size: 0.85rem;
         }
-        .footer-simple a { text-decoration: none; color: #f8efcf; background: rgba(0,0,0,0.4); padding: 0.4rem 1rem; border-radius: 40px; }
+        .footer-simple a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            color: #f8efcf;
+            background: rgba(0,0,0,0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+        }
+        .footer-simple a:hover { background: #b48b3f; }
+        .footer-simple img { width: 18px; height: 18px; filter: invert(0.95); }
     </style>
 </head>
 <body>
@@ -814,7 +791,7 @@
             <div class="deck-list" id="deckListContainer"></div>
         </div>
     </div>
-    <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">GitHub</a><a href="https://space.bilibili.com/3546775476505152" target="_blank">BiliBili</a></div>
+    <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a><a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a></div>
 </div>
 
 <!-- 统计模态框 -->
@@ -828,9 +805,6 @@
             <span><span class="legend-dot" style="background:#5a5a5a;"></span>反制</span>
         </div>
         <div id="modalHistogramBars" class="histogram-bars"></div>
-        <div id="statsDetailPanel" class="stats-detail-panel">
-            <div class="stats-detail-text">💡 点击任意费用柱查看详细数量</div>
-        </div>
         <div id="modalTypeSummary" class="type-summary-modal"></div>
     </div>
 </div>
@@ -899,6 +873,7 @@
         return res;
     }
     function applyFilters() { filteredCards = filterCardsLogic(); currentPage = 1; renderCards(); renderPagination(); }
+    
     function renderCards() { 
         const start = (currentPage-1)*PAGE_SIZE; const pageCards = filteredCards.slice(start, start+PAGE_SIZE); 
         const container = document.getElementById('cardContainer'); 
@@ -929,8 +904,12 @@
                 if(card) addToDeck(card); 
             }); 
         }); 
-        document.querySelectorAll('.card-remove-icon, .mobile-remove-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.remove)); })); 
+        document.querySelectorAll('.card-remove-icon, .mobile-remove-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ 
+            e.stopPropagation(); 
+            removeFromDeck(parseInt(btn.dataset.remove)); 
+        })); 
     }
+    
     function renderPagination() { 
         const total = filteredCards.length, pages = Math.ceil(total/PAGE_SIZE); 
         const pagDiv = document.getElementById('pagination'); 
@@ -949,8 +928,6 @@
     function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
     function getTypeCategory(type) { if(type === "order") return "order"; if(type === "countermeasure") return "countermeasure"; return "unit"; }
     
-    let currentCostData = null;
-    
     function showStatsModal() {
         const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
@@ -961,21 +938,23 @@
             else if(typeCat === "order") { costMap[cat].order += count; orderTotal += count; }
             else { costMap[cat].counter += count; counterTotal += count; }
         }
-        currentCostData = costMap;
         const maxHeight = Math.max(...Object.values(costMap).flatMap(v=>[v.unit, v.order, v.counter]), 1);
         
         const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
             const unitH = costMap[cost].unit, orderH = costMap[cost].order, counterH = costMap[cost].counter;
-            const unitPercent = (unitH / maxHeight) * 50;
-            const orderPercent = (orderH / maxHeight) * 50;
-            const counterPercent = (counterH / maxHeight) * 50;
-            return `<div class="histogram-bar-wrapper" data-cost="${cost}" style="width:12%; max-width:60px; min-width:32px;">
-                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px; width:100%;">
-                            <div class="bar-counter" style="height:${counterPercent}px;"></div>
-                            <div class="bar-order" style="height:${orderPercent}px;"></div>
-                            <div class="bar-unit" style="height:${unitPercent}px;"></div>
+            const totalH = unitH + orderH + counterH;
+            const unitPercent = maxHeight ? (unitH / maxHeight) * 48 : 0;
+            const orderPercent = maxHeight ? (orderH / maxHeight) * 48 : 0;
+            const counterPercent = maxHeight ? (counterH / maxHeight) * 48 : 0;
+            const tooltip = `单位:${unitH}  指令:${orderH}  反制:${counterH}`;
+            return `<div class="histogram-bar-wrapper">
+                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px;">
+                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="${tooltip}"></div>
+                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="${tooltip}"></div>
+                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="${tooltip}"></div>
                         </div>
                         <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
+                        <div class="cost-total">总计:${totalH}</div>
                     </div>`;
         }).join('');
         
@@ -985,25 +964,6 @@
             <span>📜 指令总数: <span class="order-badge">${orderTotal}</span></span>
             <span>🛡️ 反制总数: <span class="counter-badge">${counterTotal}</span></span>
         `;
-        
-        document.querySelectorAll('.histogram-bar-wrapper').forEach(wrapper => {
-            wrapper.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const cost = parseInt(wrapper.dataset.cost);
-                const data = currentCostData[cost];
-                const costLabel = cost === 7 ? '7K+ 费用' : `${cost}K 费用`;
-                document.getElementById('statsDetailPanel').innerHTML = `
-                    <div class="stats-detail-text">
-                        📊 ${costLabel} &nbsp;&nbsp;|&nbsp;&nbsp;
-                        单位: <span>${data.unit}</span> &nbsp;|&nbsp;
-                        指令: <span>${data.order}</span> &nbsp;|&nbsp;
-                        反制: <span>${data.counter}</span> &nbsp;|&nbsp;
-                        总计: <span>${data.unit + data.order + data.counter}</span>
-                    </div>
-                `;
-            });
-        });
-        
         document.getElementById('statsModal').style.display = 'flex';
     }
     
