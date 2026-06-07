@@ -217,6 +217,25 @@
             outline: none;
         }
 
+        /* 阵营计数栏 */
+        .faction-stats {
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            border: 1px solid rgba(170, 142, 78, 0.5);
+        }
+        .faction-stat {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #f5efdb;
+        }
+        .faction-stat span:first-child { color: #dbba6c; margin-right: 6px; }
+
         .import-area, .export-area {
             background: rgba(0,0,0,0.4);
             border-radius: 20px;
@@ -242,7 +261,7 @@
             font-family: monospace;
             min-width: 0;
         }
-        .import-btn, .export-btn {
+        .import-btn, .export-btn, .gen-img-btn {
             background: #5a6b3c;
             border: none;
             padding: 6px 14px;
@@ -256,8 +275,10 @@
             flex-shrink: 0;
         }
         .export-btn { background: #4a6a8a; }
+        .gen-img-btn { background: #8a6a3c; }
         .import-btn:hover { background: #7e9e4a; }
         .export-btn:hover { background: #6a8aaa; }
+        .gen-img-btn:hover { background: #aa8a4a; }
 
         .stats-header {
             display: flex;
@@ -282,7 +303,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 50vh;
+            max-height: 45vh;
             overflow-y: auto;
             padding-right: 4px;
         }
@@ -660,6 +681,75 @@
             display: none;
         }
 
+        /* 图片生成模态框 */
+        .img-gen-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(8px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .img-gen-content {
+            background: #1a1c12;
+            border-radius: 32px;
+            border: 2px solid #c9aa5b;
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .img-gen-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #aa8e4e;
+            align-items: flex-end;
+        }
+        .img-gen-control {
+            flex: 1;
+            min-width: 100px;
+        }
+        .img-gen-control label {
+            font-size: 0.7rem;
+            color: #e9dbbd;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .img-gen-control input, .img-gen-control select {
+            width: 100%;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 6px 12px;
+            color: #f5efdb;
+            font-size: 0.8rem;
+        }
+        .img-gen-preview {
+            text-align: center;
+            margin-bottom: 16px;
+            max-height: 60vh;
+            overflow: auto;
+        }
+        .img-gen-preview canvas {
+            max-width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .img-gen-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
         .filter-panel {
             background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(8px);
@@ -886,8 +976,9 @@
     <div class="mobile-deck-panel" id="mobileDeckPanel">
         <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
-        <div class="import-area"><div class="import-row"><input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码 %%15|bK;;bK;bKbK"><button id="mobileImportBtn" class="import-btn">📥 导入覆盖</button></div></div>
-        <div class="export-area"><div class="export-row"><button id="mobileExportBtn" class="export-btn">📤 导出卡组代码</button></div></div>
+        <div id="mobileFactionStats" class="faction-stats"></div>
+        <div class="import-area"><div class="import-row"><input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码"><button id="mobileImportBtn" class="import-btn">📥 导入</button></div></div>
+        <div class="export-area"><div class="export-row"><button id="mobileExportBtn" class="export-btn">📤 导出代码</button><button id="mobileGenImgBtn" class="gen-img-btn">🖼️ 生成图片</button></div></div>
         <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
         <div class="mobile-deck-list" id="mobileDeckList"></div>
         <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空</button>
@@ -920,8 +1011,9 @@
         <div class="deck-panel" id="deckPanel">
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
-            <div class="import-area"><div class="import-row"><input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码 如 %%15|bK;;bK;bKbK"><button id="importBtn" class="import-btn">📥 导入覆盖</button></div></div>
-            <div class="export-area"><div class="export-row"><button id="exportBtn" class="export-btn">📤 导出卡组代码</button></div></div>
+            <div id="desktopFactionStats" class="faction-stats"></div>
+            <div class="import-area"><div class="import-row"><input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码"><button id="importBtn" class="import-btn">📥 导入</button></div></div>
+            <div class="export-area"><div class="export-row"><button id="exportBtn" class="export-btn">📤 导出代码</button><button id="genImgBtn" class="gen-img-btn">🖼️ 生成图片</button></div></div>
             <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
             <div class="deck-list" id="deckListContainer"></div>
         </div>
@@ -939,17 +1031,21 @@
     </div>
 </div>
 
+<div id="imgGenModal" class="img-gen-modal">
+    <div class="img-gen-content">
+        <div class="img-gen-controls">
+            <div class="img-gen-control"><label>📐 每行数量</label><input type="number" id="imgCols" value="10" min="1" max="30"></div>
+            <div class="img-gen-control"><label>🎨 画质 (1-100)</label><input type="range" id="imgQuality" min="1" max="100" value="20"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
+            <div class="img-gen-control"><label>🎨 背景色</label><select id="imgBgColor"><option value="white">白色</option><option value="black">黑色</option><option value="transparent">透明</option></select></div>
+        </div>
+        <div class="img-gen-preview" id="imgGenPreview"></div>
+        <div class="img-gen-actions"><button id="downloadImgBtn" class="export-btn">💾 下载图片</button><button id="closeImgModal" class="import-btn">关闭</button></div>
+    </div>
+</div>
+
 <script>
-    const attrTranslation = {
-        "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴",
-        "guard": "守护", "heavyarmor1": "重甲1", "heavyarmor2": "重甲2", "heavyarmor3": "重甲3",
-        "alpine": "山地", "mobilize": "动员", "covert": "隐蔽", "shock": "冲击", "bond": "协力", "ambush": "伏击",
-        "intel1": "情报1", "intel2": "情报2", "intel3": "情报3"
-    };
-    function translateAttributesForSearch(attrs) {
-        if (!attrs || !attrs.length) return "";
-        return attrs.map(a => attrTranslation[a] || a).join(" ");
-    }
+    const attrTranslation = { "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴", "guard": "守护", "heavyarmor1": "重甲1", "heavyarmor2": "重甲2", "heavyarmor3": "重甲3", "alpine": "山地", "mobilize": "动员", "covert": "隐蔽", "shock": "冲击", "bond": "协力", "ambush": "伏击", "intel1": "情报1", "intel2": "情报2", "intel3": "情报3" };
+    function translateAttributesForSearch(attrs) { if (!attrs || !attrs.length) return ""; return attrs.map(a => attrTranslation[a] || a).join(" "); }
 
     const typeNameMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
@@ -960,13 +1056,10 @@
     const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland"];
     let allCards = [], filteredCards = [], deckMap = new Map();
     let currentPage = 1, PAGE_SIZE = 20;
-    let mainNation = "germany", allyNation = "";
+    let mainNation = "usa", allyNation = "finland";
 
-    function getCardImageUrl(imgName) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/${imgName}&q=20` : ""; }
-    function getSearchableText(card) {
-        const attrsTrans = translateAttributesForSearch(card.attributes || []);
-        return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase();
-    }
+    function getCardImageUrl(imgName, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/${imgName}&q=${quality}` : ""; }
+    function getSearchableText(card) { const attrsTrans = translateAttributesForSearch(card.attributes || []); return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase(); }
 
     async function loadData() {
         try {
@@ -974,28 +1067,11 @@
             const data = await res.json();
             allCards = (data.cards || []).map((card, idx) => {
                 let rawFaction = (card.json?.faction || card.faction || "").toLowerCase();
-                return { 
-                    id: card.id ?? idx, 
-                    ...card, 
-                    type: card.json?.type || card.type, 
-                    faction: rawFaction, 
-                    rarity: card.json?.rarity || card.rarity, 
-                    setName: card.json?.set || card.set || "基础", 
-                    cost: card.json?.kredits ?? (card.json?.cost ?? card.cost ?? 0), 
-                    text_zh: card.json?.text?.["zh-Hans"] || "无描述", 
-                    titleZh: card.json?.title?.["zh-Hans"] || card.title?.["zh-Hans"] || "无名", 
-                    image: card.json?.image || card.image, 
-                    reserved: !!card.reserved, 
-                    isSpawn: card.json?.set === "OnlySpawnable",
-                    attributes: card.json?.attributes || [],
-                    attack: card.json?.attack ?? card.attack,
-                    defense: card.json?.defense ?? card.defense,
-                    operationCost: card.json?.operationCost ?? card.operationCost,
-                    importId: card.importId || (card.json?.importId) || ""
-                };
+                return { id: card.id ?? idx, ...card, type: card.json?.type || card.type, faction: rawFaction, rarity: card.json?.rarity || card.rarity, setName: card.json?.set || card.set || "基础", cost: card.json?.kredits ?? (card.json?.cost ?? card.cost ?? 0), text_zh: card.json?.text?.["zh-Hans"] || "无描述", titleZh: card.json?.title?.["zh-Hans"] || card.title?.["zh-Hans"] || "无名", image: card.json?.image || card.image, reserved: !!card.reserved, isSpawn: card.json?.set === "OnlySpawnable", attributes: card.json?.attributes || [], attack: card.json?.attack ?? card.attack, defense: card.json?.defense ?? card.defense, operationCost: card.json?.operationCost ?? card.operationCost, importId: card.importId || (card.json?.importId) || "" };
             });
             initFiltersAndSelects();
             applyFilters();
+            updateFactionStats();
         } catch(e) { document.getElementById('cardContainer').innerHTML = '<div>数据加载失败</div>'; }
     }
 
@@ -1006,13 +1082,9 @@
         document.getElementById('factionSelect').innerHTML = '<option value="all">全部阵营</option>' + factions.map(f => `<option value="${f}">${factionNames[f]||f}</option>`).join('');
         document.getElementById('typeSelect').innerHTML = '<option value="all">全部类型</option>' + types.map(t => `<option value="${t}">${typeNameMap[t]||t}</option>`).join('');
         document.getElementById('setSelect').innerHTML = '<option value="all">全部扩展</option>' + sets.map(s => `<option value="${s}">${s}</option>`).join('');
-        
         ['factionSelect','typeSelect','costSelect','raritySelect','setSelect','statusSelect','searchInput'].forEach(id => document.getElementById(id)?.addEventListener('change',()=>applyFilters()));
         document.getElementById('searchInput')?.addEventListener('input',()=>applyFilters());
-        ['attackExact','defenseExact','opExact'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.addEventListener('input', () => applyFilters());
-        });
+        ['attackExact','defenseExact','opExact'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', () => applyFilters()); });
 
         const optionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         ['mainNationSelect', 'mobileMainNation'].forEach(id => { document.getElementById(id).innerHTML = optionsHtml; });
@@ -1021,8 +1093,8 @@
         document.getElementById('allyNationSelect').value = allyNation;
         document.getElementById('mobileMainNation').value = mainNation;
         document.getElementById('mobileAllyNation').value = allyNation;
-        const updateNation = () => { mainNation = document.getElementById('mainNationSelect').value; allyNation = document.getElementById('allyNationSelect').value; document.getElementById('mobileMainNation').value = mainNation; document.getElementById('mobileAllyNation').value = allyNation; updateAllDecksUI(); };
-        const updateMobile = () => { mainNation = document.getElementById('mobileMainNation').value; allyNation = document.getElementById('mobileAllyNation').value; document.getElementById('mainNationSelect').value = mainNation; document.getElementById('allyNationSelect').value = allyNation; updateAllDecksUI(); };
+        const updateNation = () => { mainNation = document.getElementById('mainNationSelect').value; allyNation = document.getElementById('allyNationSelect').value; document.getElementById('mobileMainNation').value = mainNation; document.getElementById('mobileAllyNation').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
+        const updateMobile = () => { mainNation = document.getElementById('mobileMainNation').value; allyNation = document.getElementById('mobileAllyNation').value; document.getElementById('mainNationSelect').value = mainNation; document.getElementById('allyNationSelect').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
         document.getElementById('mainNationSelect').addEventListener('change', updateNation);
         document.getElementById('allyNationSelect').addEventListener('change', updateNation);
         document.getElementById('mobileMainNation').addEventListener('change', updateMobile);
@@ -1053,13 +1125,7 @@
             let attExact = parseInt(document.getElementById('attackExact').value);
             let defExact = parseInt(document.getElementById('defenseExact').value);
             let opExact = parseInt(document.getElementById('opExact').value);
-            res = res.filter(c => {
-                if(!unitTypes.includes(c.type)) return false;
-                if(attExact !== -1 && (c.attack ?? -2) !== attExact) return false;
-                if(defExact !== -1 && (c.defense ?? -2) !== defExact) return false;
-                if(opExact !== -1 && (c.operationCost ?? -2) !== opExact) return false;
-                return true;
-            });
+            res = res.filter(c => { if(!unitTypes.includes(c.type)) return false; if(attExact !== -1 && (c.attack ?? -2) !== attExact) return false; if(defExact !== -1 && (c.defense ?? -2) !== defExact) return false; if(opExact !== -1 && (c.operationCost ?? -2) !== opExact) return false; return true; });
         }
         return res;
     }
@@ -1074,191 +1140,173 @@
             const borderCol = factionColor[card.faction] || '#6b6e5c'; 
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
             const showBadge = qty > 0;
-            return `<div class="card-item" data-card-id="${card.id}" style="border-color:${borderCol};">
-                        <div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image)}" alt="${card.titleZh}"></div>
-                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
-                        <div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}">
-                            <span class="card-deck-count">${qty}</span>
-                            <button class="card-remove-icon" data-remove="${card.id}">−</button>
-                        </div>
-                        <div class="card-mobile-actions ${!showBadge ? 'hide-badge' : ''}">
-                            <span class="mobile-count-badge">${qty}</span>
-                            <button class="mobile-remove-btn" data-remove="${card.id}">-</button>
-                        </div>
-                    </div>`; 
+            return `<div class="card-item" data-card-id="${card.id}" style="border-color:${borderCol};"><div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image)}" alt="${card.titleZh}"></div><div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div><div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}"><span class="card-deck-count">${qty}</span><button class="card-remove-icon" data-remove="${card.id}">−</button></div><div class="card-mobile-actions ${!showBadge ? 'hide-badge' : ''}"><span class="mobile-count-badge">${qty}</span><button class="mobile-remove-btn" data-remove="${card.id}">-</button></div></div>`; 
         }).join(''); 
-        document.querySelectorAll('.card-item').forEach(el=>{ 
-            el.addEventListener('click',(e)=>{ 
-                if(e.target.classList.contains('card-remove-icon') || e.target.classList.contains('mobile-remove-btn')) return; 
-                const id = parseInt(el.dataset.cardId); 
-                const card = allCards.find(c=>c.id===id); 
-                if(card) addToDeck(card); 
-            }); 
-        }); 
-        document.querySelectorAll('.card-remove-icon, .mobile-remove-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ 
-            e.stopPropagation(); 
-            removeFromDeck(parseInt(btn.dataset.remove)); 
-        })); 
+        document.querySelectorAll('.card-item').forEach(el=>{ el.addEventListener('click',(e)=>{ if(e.target.classList.contains('card-remove-icon') || e.target.classList.contains('mobile-remove-btn')) return; const id = parseInt(el.dataset.cardId); const card = allCards.find(c=>c.id===id); if(card) addToDeck(card); }); }); 
+        document.querySelectorAll('.card-remove-icon, .mobile-remove-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.remove)); })); 
     }
     
     function renderPagination() { 
         const total = filteredCards.length, pages = Math.ceil(total/PAGE_SIZE); 
         const pagDiv = document.getElementById('pagination'); 
         if(pages<=1) { pagDiv.innerHTML=''; return; } 
-        let html = `<button class="page-btn" data-page="prev" ${currentPage===1?'disabled':''}>◀</button>`; 
-        for(let i=1;i<=pages;i++) html += `<button class="page-btn ${i===currentPage?'active-page':''}" data-page="${i}">${i}</button>`; 
-        html += `<button class="page-btn" data-page="next" ${currentPage===pages?'disabled':''}>▶</button>`; 
-        pagDiv.innerHTML = html; 
-        pagDiv.querySelectorAll('.page-btn').forEach(btn=>btn.addEventListener('click',()=>{ let p = btn.dataset.page; if(p==='prev') currentPage = Math.max(1, currentPage-1); else if(p==='next') currentPage = Math.min(pages, currentPage+1); else currentPage = parseInt(p); renderCards(); renderPagination(); })); 
+        let html = `<button class="page-btn" data-page="prev" ${currentPage===1?'disabled':''}>◀</button>`; for(let i=1;i<=pages;i++) html += `<button class="page-btn ${i===currentPage?'active-page':''}" data-page="${i}">${i}</button>`; html += `<button class="page-btn" data-page="next" ${currentPage===pages?'disabled':''}>▶</button>`; pagDiv.innerHTML = html; pagDiv.querySelectorAll('.page-btn').forEach(btn=>btn.addEventListener('click',()=>{ let p = btn.dataset.page; if(p==='prev') currentPage = Math.max(1, currentPage-1); else if(p==='next') currentPage = Math.min(pages, currentPage+1); else currentPage = parseInt(p); renderCards(); renderPagination(); })); 
     }
     
-    function addToDeck(card) { let entry = deckMap.get(card.id); if(entry) entry.count++; else deckMap.set(card.id, { card, count: 1 }); updateAllDecksUI(); renderCards(); }
-    function removeFromDeck(cardId) { let entry = deckMap.get(cardId); if(entry) { if(entry.count>1) entry.count--; else deckMap.delete(cardId); updateAllDecksUI(); renderCards(); } }
-    function clearDeck() { deckMap.clear(); updateAllDecksUI(); renderCards(); }
+    function addToDeck(card) { let entry = deckMap.get(card.id); if(entry) entry.count++; else deckMap.set(card.id, { card, count: 1 }); updateAllDecksUI(); renderCards(); updateFactionStats(); }
+    function removeFromDeck(cardId) { let entry = deckMap.get(cardId); if(entry) { if(entry.count>1) entry.count--; else deckMap.delete(cardId); updateAllDecksUI(); renderCards(); updateFactionStats(); } }
+    function clearDeck() { deckMap.clear(); updateAllDecksUI(); renderCards(); updateFactionStats(); }
 
-    // ========= 导出卡组功能 =========
-    function getNationCode(faction) {
-        const idx = allNationOptions.indexOf(faction);
-        return idx + 1;
+    function updateFactionStats() {
+        let mainCount = 0, allyCount = 0, otherCount = 0;
+        for(let {card, count} of deckMap.values()) {
+            if(card.faction === mainNation) mainCount += count;
+            else if(card.faction === allyNation) allyCount += count;
+            else otherCount += count;
+        }
+        const html = `<div class="faction-stat"><span>主国 ${factionNames[mainNation]}:</span> ${mainCount}</div><div class="faction-stat"><span>盟国 ${factionNames[allyNation]}:</span> ${allyCount}</div><div class="faction-stat"><span>其他:</span> ${otherCount}</div>`;
+        const desktopDiv = document.getElementById('desktopFactionStats');
+        const mobileDiv = document.getElementById('mobileFactionStats');
+        if(desktopDiv) desktopDiv.innerHTML = html;
+        if(mobileDiv) mobileDiv.innerHTML = html;
     }
-    
+
+    function getNationCode(faction) { return allNationOptions.indexOf(faction) + 1; }
     function exportDeckCode() {
-        if (deckMap.size === 0) {
-            alert("卡组为空，无法导出");
-            return;
-        }
-        // 收集卡牌数量
-        const cardCountMap = new Map(); // importId -> 总张数
-        for (let { card, count } of deckMap.values()) {
-            if (card.importId) {
-                const existing = cardCountMap.get(card.importId) || 0;
-                cardCountMap.set(card.importId, existing + count);
-            }
-        }
-        // 构建四个区域的字符串
-        const regions = ["", "", "", ""]; // 索引0:1张区, 1:2张区, 2:3张区, 3:4张区
+        if (deckMap.size === 0) { alert("卡组为空，无法导出"); return null; }
+        const cardCountMap = new Map();
+        for (let { card, count } of deckMap.values()) { if (card.importId) { cardCountMap.set(card.importId, (cardCountMap.get(card.importId) || 0) + count); } }
+        const regions = ["", "", "", ""];
         for (let [importId, totalCount] of cardCountMap.entries()) {
-            // 除以4取余和商
             let remainder = totalCount % 4;
             let quotient = Math.floor(totalCount / 4);
-            if (remainder === 0) {
-                // 全部放进4张区
-                for (let i = 0; i < quotient; i++) regions[3] += importId;
-            } else {
-                // 余数放到对应的区域
-                regions[remainder - 1] += importId;
-                for (let i = 0; i < quotient; i++) regions[3] += importId;
-            }
+            if (remainder === 0) { for (let i = 0; i < quotient; i++) regions[3] += importId; }
+            else { regions[remainder - 1] += importId; for (let i = 0; i < quotient; i++) regions[3] += importId; }
         }
-        
-        const mainCode = getNationCode(mainNation);
-        const allyCode = getNationCode(allyNation);
-        const code = `%%${mainCode}${allyCode}|${regions[0]};${regions[1]};${regions[2]};${regions[3]}`;
-        return code;
+        return `%%${getNationCode(mainNation)}${getNationCode(allyNation)}|${regions[0]};${regions[1]};${regions[2]};${regions[3]}`;
     }
-    
     async function copyToClipboard(text) {
-        // 三层保险复制
-        try {
-            await navigator.clipboard.writeText(text);
-            return true;
-        } catch (e) {
-            try {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.top = '-9999px';
-                textarea.style.left = '-9999px';
-                document.body.appendChild(textarea);
-                textarea.select();
-                textarea.setSelectionRange(0, 99999);
-                const success = document.execCommand('copy');
-                document.body.removeChild(textarea);
-                if (success) return true;
-                throw new Error('execCommand failed');
-            } catch (err) {
-                alert('请手动复制：\n' + text);
-                return false;
-            }
+        try { await navigator.clipboard.writeText(text); return true; } catch(e) {
+            try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.top = '-9999px'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); if(ok) return true; throw new Error(); } catch(err) { alert('请手动复制：\n' + text); return false; }
         }
     }
+    async function exportAndCopy() { const code = exportDeckCode(); if(code) { await copyToClipboard(code); alert('卡组代码已复制！\n\n' + code); } }
     
-    async function exportAndCopy() {
-        const code = exportDeckCode();
-        await copyToClipboard(code);
-        alert('卡组代码已复制到剪贴板！\n\n' + code);
-    }
-    
-    // ========= 导入卡组解析 =========
     function parseDeckCode(rawCode) {
-        const startIdx = rawCode.indexOf('%%');
-        if (startIdx === -1) throw new Error('未找到 %% 起始标识');
+        const startIdx = rawCode.indexOf('%%'); if (startIdx === -1) throw new Error('未找到 %%');
         let code = rawCode.substring(startIdx + 2);
-        const pipeIdx = code.indexOf('|');
-        if (pipeIdx === -1) throw new Error('未找到 | 分隔符');
+        const pipeIdx = code.indexOf('|'); if (pipeIdx === -1) throw new Error('未找到 |');
         const nationPart = code.substring(0, pipeIdx).trim();
-        if (nationPart.length < 2) throw new Error('主盟国编号无效');
-        const mainIdx = parseInt(nationPart[0], 10);
-        const allyIdx = parseInt(nationPart[1], 10);
+        if (nationPart.length < 2) throw new Error('编号无效');
+        const mainIdx = parseInt(nationPart[0], 10), allyIdx = parseInt(nationPart[1], 10);
         if (isNaN(mainIdx) || mainIdx < 1 || mainIdx > 9) throw new Error('主国编号错误');
         if (isNaN(allyIdx) || allyIdx < 1 || allyIdx > 9) throw new Error('盟国编号错误');
-        const mainFaction = allNationOptions[mainIdx - 1];
-        const allyFaction = allNationOptions[allyIdx - 1];
-        
+        const mainFaction = allNationOptions[mainIdx - 1], allyFaction = allNationOptions[allyIdx - 1];
         const cardsPart = code.substring(pipeIdx + 1);
-        const regions = cardsPart.split(';');
-        while (regions.length < 4) regions.push('');
+        const regions = cardsPart.split(';'); while (regions.length < 4) regions.push('');
         const multipliers = [1, 2, 3, 4];
         const importIdMap = new Map();
-        for (let i = 0; i < 4; i++) {
-            const region = regions[i];
-            const mult = multipliers[i];
-            for (let j = 0; j < region.length; j += 2) {
-                const importId = region.substring(j, j+2);
-                if (importId.length === 2) {
-                    const curr = importIdMap.get(importId) || 0;
-                    importIdMap.set(importId, curr + mult);
-                }
-            }
-        }
+        for (let i = 0; i < 4; i++) { const region = regions[i]; const mult = multipliers[i]; for (let j = 0; j < region.length; j += 2) { const importId = region.substring(j, j+2); if (importId.length === 2) importIdMap.set(importId, (importIdMap.get(importId) || 0) + mult); } }
         const cardEntries = [];
-        for (let [importId, count] of importIdMap.entries()) {
-            const card = allCards.find(c => c.importId === importId);
-            if (card) cardEntries.push({ card, count });
-        }
+        for (let [importId, count] of importIdMap.entries()) { const card = allCards.find(c => c.importId === importId); if (card) cardEntries.push({ card, count }); }
         return { mainFaction, allyFaction, cardEntries };
     }
-    
     function importDeckFromCode(rawCode) {
         try {
             const { mainFaction, allyFaction, cardEntries } = parseDeckCode(rawCode);
             deckMap.clear();
-            mainNation = mainFaction;
-            allyNation = allyFaction;
-            document.getElementById('mainNationSelect').value = mainNation;
-            document.getElementById('allyNationSelect').value = allyNation;
-            document.getElementById('mobileMainNation').value = mainNation;
-            document.getElementById('mobileAllyNation').value = allyNation;
-            updateAllDecksUI();
-            for (let { card, count } of cardEntries) {
-                for (let i = 0; i < count; i++) addToDeck(card);
-            }
-            alert(`导入成功！共添加 ${cardEntries.reduce((s,e)=>s+e.count,0)} 张卡牌，${cardEntries.length} 种。`);
+            mainNation = mainFaction; allyNation = allyFaction;
+            document.getElementById('mainNationSelect').value = mainNation; document.getElementById('allyNationSelect').value = allyNation;
+            document.getElementById('mobileMainNation').value = mainNation; document.getElementById('mobileAllyNation').value = allyNation;
+            updateAllDecksUI(); updateFactionStats();
+            for (let { card, count } of cardEntries) for (let i = 0; i < count; i++) addToDeck(card);
+            alert(`导入成功！共 ${cardEntries.reduce((s,e)=>s+e.count,0)} 张`);
         } catch(e) { alert(`导入失败: ${e.message}`); }
     }
-    
-    function bindImportExportEvents() {
-        const importBtn = document.getElementById('importBtn');
-        const importInput = document.getElementById('importCode');
-        const mobileImportBtn = document.getElementById('mobileImportBtn');
-        const mobileImportInput = document.getElementById('mobileImportCode');
-        const exportBtn = document.getElementById('exportBtn');
-        const mobileExportBtn = document.getElementById('mobileExportBtn');
+
+    // 图片生成
+    async function generateDeckImage(cols, quality, bgColor) {
+        const cards = [];
+        for (let { card, count } of deckMap.values()) {
+            for (let i = 0; i < count; i++) cards.push(card);
+        }
+        if (cards.length === 0) throw new Error("卡组为空");
+        const cardW = 500, cardH = 702, radius = 12;
+        const rows = Math.ceil(cards.length / cols);
+        const canvas = document.createElement('canvas');
+        canvas.width = cols * cardW;
+        canvas.height = rows * cardH;
+        const ctx = canvas.getContext('2d');
+        if (bgColor === 'white') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+        else if (bgColor === 'black') { ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+        else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
         
-        if (importBtn) importBtn.onclick = () => { const code = importInput.value.trim(); if (code) importDeckFromCode(code); else alert('请输入卡组代码'); };
-        if (mobileImportBtn) mobileImportBtn.onclick = () => { const code = mobileImportInput.value.trim(); if (code) importDeckFromCode(code); else alert('请输入卡组代码'); };
-        if (exportBtn) exportBtn.onclick = () => exportAndCopy();
-        if (mobileExportBtn) mobileExportBtn.onclick = () => exportAndCopy();
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            const col = i % cols, row = Math.floor(i / cols);
+            const x = col * cardW, y = row * cardH;
+            const imgUrl = getCardImageUrl(card.image, quality);
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = imgUrl; });
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + cardW - radius, y);
+            ctx.quadraticCurveTo(x + cardW, y, x + cardW, y + radius);
+            ctx.lineTo(x + cardW, y + cardH - radius);
+            ctx.quadraticCurveTo(x + cardW, y + cardH, x + cardW - radius, y + cardH);
+            ctx.lineTo(x + radius, y + cardH);
+            ctx.quadraticCurveTo(x, y + cardH, x, y + cardH - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(img, x, y, cardW, cardH);
+            ctx.restore();
+        }
+        return canvas;
+    }
+    
+    async function showImgGenModal() {
+        if (deckMap.size === 0) { alert("卡组为空，无法生成图片"); return; }
+        const modal = document.getElementById('imgGenModal');
+        const previewDiv = document.getElementById('imgGenPreview');
+        const colsInput = document.getElementById('imgCols');
+        const qualitySlider = document.getElementById('imgQuality');
+        const qualityVal = document.getElementById('qualityVal');
+        const bgSelect = document.getElementById('imgBgColor');
+        let currentCanvas = null;
+        
+        const updatePreview = async () => {
+            previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
+            try {
+                const cols = parseInt(colsInput.value);
+                const quality = parseInt(qualitySlider.value);
+                const bg = bgSelect.value;
+                currentCanvas = await generateDeckImage(cols, quality, bg);
+                previewDiv.innerHTML = '';
+                previewDiv.appendChild(currentCanvas);
+            } catch(e) { previewDiv.innerHTML = `<div style="color:#ff8888;">生成失败: ${e.message}</div>`; }
+        };
+        
+        qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
+        colsInput.onchange = () => updatePreview();
+        qualitySlider.onchange = () => updatePreview();
+        bgSelect.onchange = () => updatePreview();
+        
+        modal.style.display = 'flex';
+        await updatePreview();
+        
+        document.getElementById('downloadImgBtn').onclick = () => {
+            if (currentCanvas) {
+                const link = document.createElement('a');
+                link.download = `deck_${new Date().toISOString().slice(0,19)}.png`;
+                link.href = currentCanvas.toDataURL();
+                link.click();
+            }
+        };
+        document.getElementById('closeImgModal').onclick = () => { modal.style.display = 'none'; };
     }
 
     function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
@@ -1283,87 +1331,27 @@
             const unitPercent = maxHeight ? (unitH / maxHeight) * 48 : 0;
             const orderPercent = maxHeight ? (orderH / maxHeight) * 48 : 0;
             const counterPercent = maxHeight ? (counterH / maxHeight) * 48 : 0;
-            return `<div class="histogram-bar-wrapper">
-                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px;">
-                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="反制:${counterH}"></div>
-                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="指令:${orderH}"></div>
-                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="单位:${unitH}"></div>
-                        </div>
-                        <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
-                        <div class="cost-total">${totalH}</div>
-                    </div>`;
+            return `<div class="histogram-bar-wrapper"><div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px;"><div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="反制:${counterH}"></div><div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="指令:${orderH}"></div><div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="单位:${unitH}"></div></div><div class="bar-label">${cost===7?'7K+':cost+'K'}</div><div class="cost-total">${totalH}</div></div>`;
         }).join('');
-        
-        const typeStatsHtml = `
-            <span>单位 <span class="unit-badge">${unitTotal}</span></span>
-            <span>指令 <span class="order-badge">${orderTotal}</span></span>
-            <span>反制 <span class="counter-badge">${counterTotal}</span></span>
-        `;
-        const rarityStatsHtml = `
-            <div class="rarity-stat"><span>普通</span> <span style="color:var(--rarity-standard); font-weight:bold;">${rarityCounts.Standard}</span></div>
-            <div class="rarity-stat"><span>限定</span> <span style="color:var(--rarity-limited); font-weight:bold;">${rarityCounts.Limited}</span></div>
-            <div class="rarity-stat"><span>特殊</span> <span style="color:var(--rarity-special); font-weight:bold;">${rarityCounts.Special}</span></div>
-            <div class="rarity-stat"><span>精英</span> <span style="color:var(--rarity-elite); font-weight:bold;">${rarityCounts.Elite}</span></div>
-        `;
-        
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
-        document.getElementById('modalTypeSummary').innerHTML = typeStatsHtml;
-        document.getElementById('modalRarityStats').innerHTML = rarityStatsHtml;
+        document.getElementById('modalTypeSummary').innerHTML = `<span>单位 <span class="unit-badge">${unitTotal}</span></span><span>指令 <span class="order-badge">${orderTotal}</span></span><span>反制 <span class="counter-badge">${counterTotal}</span></span>`;
+        document.getElementById('modalRarityStats').innerHTML = `<div class="rarity-stat"><span>普通</span> <span style="color:var(--rarity-standard);">${rarityCounts.Standard}</span></div><div class="rarity-stat"><span>限定</span> <span style="color:var(--rarity-limited);">${rarityCounts.Limited}</span></div><div class="rarity-stat"><span>特殊</span> <span style="color:var(--rarity-special);">${rarityCounts.Special}</span></div><div class="rarity-stat"><span>精英</span> <span style="color:var(--rarity-elite);">${rarityCounts.Elite}</span></div>`;
         document.getElementById('statsModal').style.display = 'flex';
     }
-    
     function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
     function updateAllDecksUI() { 
-        renderDeckList('deckListContainer'); 
-        renderDeckList('mobileDeckList'); 
+        renderDeckList('deckListContainer'); renderDeckList('mobileDeckList'); 
         const total = Array.from(deckMap.values()).reduce((s,e)=>s+e.count,0); 
         document.getElementById('mobileToggleCount').innerText = total;
     }
     
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId); if(!container) return; 
-        let html = '';
-        html += `<div class="deck-card-row headquarters-row" style="border-left-color: #b8860b;">
-                    <div class="deck-card-icon">🏛️</div>
-                    <div class="deck-card-details">
-                        <div class="deck-card-name" title="总部">总部</div>
-                        <div class="deck-card-stats"></div>
-                    </div>
-                    <span class="deck-card-qty"></span>
-                    <button class="deck-remove-btn" style="visibility: hidden;">−</button>
-                </div>`;
-        
-        if(deckMap.size===0) { 
-            container.innerHTML = html + '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>'; 
-            return; 
-        }
-        const entries = Array.from(deckMap.values()).sort((a, b) => {
-            const idxA = allCards.findIndex(c => c.id === a.card.id);
-            const idxB = allCards.findIndex(c => c.id === b.card.id);
-            return idxA - idxB;
-        });
-        entries.forEach(entry => { 
-            const c = entry.card; 
-            const borderColor = factionColor[c.faction] || "#6b6e5c"; 
-            const typeDisplay = typeNameMap[c.type] || c.type;
-            const rarityClass = rarityClassMap[c.rarity] || "rarity-standard";
-            const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity;
-            const reserveIcon = c.reserved ? '<i class="deck-card-reserve-icon"></i>' : '';
-            html += `<div class="deck-card-row" style="border-left-color: ${borderColor};">
-                        <div class="deck-card-icon" style="background-image: url('${c.faction}.svg'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-                        <div class="deck-card-details">
-                            <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}${reserveIcon}</div>
-                            <div class="deck-card-stats">
-                                <div class="kredits-cost"><span>${c.cost}</span><span>K</span></div>
-                                <div class="card-type-badge">${typeDisplay}</div>
-                                <div class="card-rarity-badge ${rarityClass}">${rarityDisplay}</div>
-                            </div>
-                        </div>
-                        <span class="deck-card-qty">x${entry.count}</span>
-                        <button class="deck-remove-btn" data-id="${c.id}">−</button>
-                    </div>`; 
-        });
+        let html = `<div class="deck-card-row headquarters-row" style="border-left-color: #b8860b;"><div class="deck-card-icon">🏛️</div><div class="deck-card-details"><div class="deck-card-name">总部</div><div class="deck-card-stats"></div></div><span class="deck-card-qty"></span><button class="deck-remove-btn" style="visibility: hidden;">−</button></div>`;
+        if(deckMap.size===0) { container.innerHTML = html + '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
+        const entries = Array.from(deckMap.values()).sort((a, b) => { const idxA = allCards.findIndex(c => c.id === a.card.id); const idxB = allCards.findIndex(c => c.id === b.card.id); return idxA - idxB; });
+        entries.forEach(entry => { const c = entry.card; const borderColor = factionColor[c.faction] || "#6b6e5c"; const typeDisplay = typeNameMap[c.type] || c.type; const rarityClass = rarityClassMap[c.rarity] || "rarity-standard"; const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity; const reserveIcon = c.reserved ? '<i class="deck-card-reserve-icon"></i>' : ''; html += `<div class="deck-card-row" style="border-left-color: ${borderColor};"><div class="deck-card-icon" style="background-image: url('${c.faction}.svg'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div><div class="deck-card-details"><div class="deck-card-name" title="${c.titleZh}">${c.titleZh}${reserveIcon}</div><div class="deck-card-stats"><div class="kredits-cost"><span>${c.cost}</span><span>K</span></div><div class="card-type-badge">${typeDisplay}</div><div class="card-rarity-badge ${rarityClass}">${rarityDisplay}</div></div></div><span class="deck-card-qty">x${entry.count}</span><button class="deck-remove-btn" data-id="${c.id}">−</button></div>`; });
         container.innerHTML = html;
         container.querySelectorAll('.deck-remove-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); if(!isNaN(id)) removeFromDeck(id); }));
     }
@@ -1378,6 +1366,8 @@
         document.getElementById('mobileStatsBtn')?.addEventListener('click',showStatsModal);
         document.getElementById('statsModalClose')?.addEventListener('click',closeStatsModal);
         document.getElementById('statsModal')?.addEventListener('click',(e)=>{ if(e.target === document.getElementById('statsModal')) closeStatsModal(); });
+        document.getElementById('genImgBtn')?.addEventListener('click', showImgGenModal);
+        document.getElementById('mobileGenImgBtn')?.addEventListener('click', showImgGenModal);
     }
     
     function initNav() { 
@@ -1385,6 +1375,13 @@
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDiv.classList.toggle('open'); }; 
         document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !menuDiv.contains(e.target)) menuDiv.classList.remove('open'); }); 
         document.getElementById('clearDeckBtn')?.addEventListener('click',()=>clearDeck()); 
+    }
+    
+    function bindImportExportEvents() {
+        document.getElementById('importBtn').onclick = () => { const code = document.getElementById('importCode').value.trim(); if(code) importDeckFromCode(code); else alert('请输入卡组代码'); };
+        document.getElementById('mobileImportBtn').onclick = () => { const code = document.getElementById('mobileImportCode').value.trim(); if(code) importDeckFromCode(code); else alert('请输入卡组代码'); };
+        document.getElementById('exportBtn').onclick = () => exportAndCopy();
+        document.getElementById('mobileExportBtn').onclick = () => exportAndCopy();
     }
     
     window.addEventListener('load', () => { loadData(); initNav(); initSidebars(); bindImportExportEvents(); });
