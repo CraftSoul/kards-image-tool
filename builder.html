@@ -278,7 +278,8 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
+            min-width: 0;
         }
         .deck-card-name {
             font-size: 0.85rem;
@@ -288,11 +289,27 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .cost-stats {
+        /* 新增：横向滚动容器，用于放置费用、类型、稀有度等标签，保持高度一致 */
+        .deck-card-stats {
             display: flex;
             align-items: center;
             gap: 8px;
-            flex-wrap: wrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            padding-bottom: 2px;
+        }
+        .deck-card-stats::-webkit-scrollbar {
+            height: 4px;
+        }
+        .deck-card-stats::-webkit-scrollbar-track {
+            background: #2a2a1c;
+            border-radius: 4px;
+        }
+        .deck-card-stats::-webkit-scrollbar-thumb {
+            background: #c9aa5b;
+            border-radius: 4px;
         }
         .kredits-cost {
             background: #000000cc;
@@ -304,7 +321,38 @@
             display: inline-flex;
             align-items: center;
             gap: 2px;
+            flex-shrink: 0;
         }
+        /* 类型标签 (单位/指令/反制) */
+        .card-type-badge {
+            background: #2a2a1c;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #f2e2b0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        /* 稀有度标签 (按稀有度着色) */
+        .card-rarity-badge {
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.6);
+        }
+        .rarity-standard { color: #c0c0c0; border-left: 2px solid #a0a0a0; background: #2d2d24; }
+        .rarity-limited { color: #7ccf7c; border-left: 2px solid #4caf50; background: #2a3a2a; }
+        .rarity-special { color: #6ba5ff; border-left: 2px solid #3a7bd5; background: #25304a; }
+        .rarity-elite { color: #ffb347; border-left: 2px solid #ff8c00; background: #3a2a1a; }
+        
         .deck-card-qty {
             background: rgba(0,0,0,0.7);
             border-radius: 30px;
@@ -315,6 +363,7 @@
             margin-left: auto;
             min-width: 42px;
             text-align: center;
+            flex-shrink: 0;
         }
         .deck-remove-btn {
             background: #5e3c1f;
@@ -544,6 +593,7 @@
             justify-content: center;
             margin-bottom: 16px;
             font-size: 0.7rem;
+            color: #ffefb9
         }
         .legend-dot {
             display: inline-block;
@@ -705,7 +755,7 @@
             color: #ffeaad;
             font-size: 0.75rem;
             font-weight: bold;
-            padding: 4px 6px;
+            padding: 3px 6px;
             border-radius: 4px;
         }
         .mobile-remove-btn {
@@ -713,7 +763,7 @@
             border: none;
             color: #ffcf8a;
             border-radius: 4px;
-            padding: 4px 6px;
+            padding: 3px 6px;
             font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
@@ -782,7 +832,7 @@
         <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
         <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
         <div class="mobile-deck-list" id="mobileDeckList"></div>
-        <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空卡组</button>
+        <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空</button>
     </div>
 
     <div class="builder-main">
@@ -824,6 +874,12 @@
         if (!attrs || !attrs.length) return "";
         return attrs.map(a => attrTranslation[a] || a).join(" ");
     }
+
+    // 类型中文映射
+    const typeNameMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
+    // 稀有度显示及样式类
+    const rarityClassMap = { "Standard":"rarity-standard","Limited":"rarity-limited","Special":"rarity-special","Elite":"rarity-elite" };
+    const rarityDisplayMap = { "Standard":"⚙️ 普通","Limited":"📀 限定","Special":"✨ 特殊","Elite":"👑 精英" };
 
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
@@ -875,7 +931,7 @@
         const types = [...new Set(allCards.map(c=>c.type))];
         const sets = [...new Set(allCards.map(c=>c.setName))];
         document.getElementById('factionSelect').innerHTML = '<option value="all">全部阵营</option>' + factions.map(f => `<option value="${f}">${factionNames[f]||f}</option>`).join('');
-        document.getElementById('typeSelect').innerHTML = '<option value="all">全部类型</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
+        document.getElementById('typeSelect').innerHTML = '<option value="all">全部类型</option>' + types.map(t => `<option value="${t}">${typeNameMap[t]||t}</option>`).join('');
         document.getElementById('setSelect').innerHTML = '<option value="all">全部扩展</option>' + sets.map(s => `<option value="${s}">${s}</option>`).join('');
         ['factionSelect','typeSelect','costSelect','raritySelect','setSelect','statusSelect','searchInput'].forEach(id => document.getElementById(id)?.addEventListener('change',()=>applyFilters()));
         document.getElementById('searchInput')?.addEventListener('input',()=>applyFilters());
@@ -1013,17 +1069,26 @@
         document.getElementById('mobileToggleCount').innerText = total; 
     }
     
+    // 渲染卡组列表，带类型和稀有度标签，同一行横向滚动防止溢出
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId); if(!container) return; 
         if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:16px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
         const entries = Array.from(deckMap.values()).sort((a,b)=> (a.card.cost - b.card.cost) || (a.card.titleZh.localeCompare(b.card.titleZh)));
         container.innerHTML = entries.map(entry => { 
-            const c = entry.card; const borderColor = factionColor[c.faction] || "#6b6e5c"; 
+            const c = entry.card; 
+            const borderColor = factionColor[c.faction] || "#6b6e5c"; 
+            const typeDisplay = typeNameMap[c.type] || c.type;
+            const rarityClass = rarityClassMap[c.rarity] || "rarity-standard";
+            const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity;
             return `<div class="deck-card-row" style="border-left-color: ${borderColor};">
                         <div class="deck-card-icon" style="background-image: url('${c.faction}.svg');"></div>
                         <div class="deck-card-details">
                             <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}</div>
-                            <div class="cost-stats"><div class="kredits-cost"><span>${c.cost}</span><span>K</span></div></div>
+                            <div class="deck-card-stats">
+                                <div class="kredits-cost"><span>💰 ${c.cost}</span><span>K</span></div>
+                                <div class="card-type-badge">📌 ${typeDisplay}</div>
+                                <div class="card-rarity-badge ${rarityClass}">${rarityDisplay}</div>
+                            </div>
                         </div>
                         <span class="deck-card-qty">x${entry.count}</span>
                         <button class="deck-remove-btn" data-id="${c.id}">−</button>
