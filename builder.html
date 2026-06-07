@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>KARDS 军械库 · 卡组构筑</title>
+    <title>KARDS 军械库 | 卡组构筑</title>
     <style>
         * {
             margin: 0;
@@ -35,7 +35,6 @@
             --poland: #645633;
             --finland: #C9C8BC;
             --neutral: #6b6e5c;
-            /* 稀有度颜色：铁、铜、银、金 */
             --rarity-standard: #9e9e9e;
             --rarity-limited: #cd7f32;
             --rarity-special: #c0c0c0;
@@ -218,6 +217,45 @@
             outline: none;
         }
 
+        /* 导入区域样式 */
+        .import-area {
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            padding: 10px 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(170, 142, 78, 0.5);
+        }
+        .import-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .import-input {
+            flex: 1;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.5rem 0.8rem;
+            color: #f5efdb;
+            font-size: 0.75rem;
+            outline: none;
+            font-family: monospace;
+        }
+        .import-btn {
+            background: #5a6b3c;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 40px;
+            color: #f5efdb;
+            font-weight: bold;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .import-btn:hover { background: #7e9e4a; }
+
         .stats-header {
             display: flex;
             justify-content: flex-end;
@@ -339,7 +377,6 @@
             gap: 4px;
             flex-shrink: 0;
         }
-        /* 稀有度标签 - 铁铜银金颜色 */
         .card-rarity-badge {
             border-radius: 12px;
             padding: 2px 8px;
@@ -591,7 +628,6 @@
         .unit-badge { color: #e8e4d0; }
         .order-badge { color: #f5c542; }
         .counter-badge { color: #a0a0a0; }
-        /* 稀有度统计样式 */
         .rarity-stats-row {
             display: flex;
             gap: 20px;
@@ -608,6 +644,7 @@
             gap: 6px;
             font-size: 0.9rem;
             font-weight: bold;
+            color: #ffefb9;
         }
         .rarity-stat-dot {
             width: 14px;
@@ -856,6 +893,8 @@
     <div class="mobile-deck-panel" id="mobileDeckPanel">
         <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
+        <!-- 移动端导入区域 -->
+        <div class="import-area"><div class="import-row"><input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码 %%15|bK;;bK;bKbK"><button id="mobileImportBtn" class="import-btn">📥 导入覆盖</button></div></div>
         <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
         <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
         <div class="mobile-deck-list" id="mobileDeckList"></div>
@@ -864,13 +903,15 @@
 
     <div class="builder-main">
         <div class="cards-section">
-            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本/词条(支持中英文关键词)"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
+            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本/词条"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
             <div id="cardContainer" class="card-grid">正在寻找敌人...</div>
             <div class="pagination" id="pagination"></div>
         </div>
         <div class="deck-panel" id="deckPanel">
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
+            <!-- 桌面端导入区域 -->
+            <div class="import-area"><div class="import-row"><input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码 如 %%15|bK;;bK;bKbK"><button id="importBtn" class="import-btn">📥 导入覆盖</button></div></div>
             <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
             <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
             <div class="deck-list" id="deckListContainer"></div>
@@ -891,7 +932,7 @@
 </div>
 
 <script>
-    // ================= 词条翻译映射（与index保持一致，增强搜索）=================
+    // ================= 词条翻译映射 =================
     const attrTranslation = {
         "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴",
         "guard": "守护", "heavyarmor1": "重甲1", "heavyarmor2": "重甲2", "heavyarmor3": "重甲3",
@@ -903,22 +944,17 @@
         return attrs.map(a => attrTranslation[a] || a).join(" ");
     }
 
-    // 类型中文映射
     const typeNameMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
-    // 稀有度显示及样式类（无emoji）
     const rarityClassMap = { "Standard":"rarity-standard","Limited":"rarity-limited","Special":"rarity-special","Elite":"rarity-elite" };
     const rarityDisplayMap = { "Standard":"普通","Limited":"限定","Special":"特殊","Elite":"精英" };
-
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
-    const allNationOptions = ["germany","britain","soviet","usa","japan","france","italy","poland","finland"];
+    const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland"]; // 索引1~9对应
     let allCards = [], filteredCards = [], deckMap = new Map();
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "germany", allyNation = "";
 
     function getCardImageUrl(imgName) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/${imgName}&q=20` : ""; }
-
-    // 增强搜索文本：包含卡名、简体文本 + 翻译后的词条（支持中英文搜索）
     function getSearchableText(card) {
         const attrsTrans = translateAttributesForSearch(card.attributes || []);
         return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase();
@@ -946,7 +982,8 @@
                     attributes: card.json?.attributes || [],
                     attack: card.json?.attack,
                     defense: card.json?.defense,
-                    operationCost: card.json?.operationCost
+                    operationCost: card.json?.operationCost,
+                    importId: card.importId || (card.json?.importId) || ""
                 };
             });
             initFiltersAndSelects();
@@ -1047,29 +1084,123 @@
     function removeFromDeck(cardId) { let entry = deckMap.get(cardId); if(entry) { if(entry.count>1) entry.count--; else deckMap.delete(cardId); updateAllDecksUI(); renderCards(); } }
     function clearDeck() { deckMap.clear(); updateAllDecksUI(); renderCards(); }
 
+    // ========= 导入卡组解析 =========
+    function parseDeckCode(rawCode) {
+        // 找到第一个 %% 的位置
+        const startIdx = rawCode.indexOf('%%');
+        if (startIdx === -1) throw new Error('未找到 %% 起始标识');
+        let code = rawCode.substring(startIdx + 2); // 去掉 %%
+        const pipeIdx = code.indexOf('|');
+        if (pipeIdx === -1) throw new Error('未找到 | 分隔符');
+        const nationPart = code.substring(0, pipeIdx).trim();
+        if (nationPart.length < 2) throw new Error('主盟国编号无效');
+        const mainIdx = parseInt(nationPart[0], 10);
+        const allyIdx = parseInt(nationPart[1], 10);
+        if (isNaN(mainIdx) || mainIdx < 1 || mainIdx > 9) throw new Error('主国编号错误');
+        if (isNaN(allyIdx) || allyIdx < 1 || allyIdx > 9) throw new Error('盟国编号错误');
+        const mainFaction = allNationOptions[mainIdx - 1];
+        const allyFaction = allNationOptions[allyIdx - 1];
+        
+        const cardsPart = code.substring(pipeIdx + 1);
+        const regions = cardsPart.split(';');
+        // 补齐4个区域
+        while (regions.length < 4) regions.push('');
+        const multipliers = [1, 2, 3, 4];
+        const importIdMap = new Map(); // importId -> 总数量
+        for (let i = 0; i < 4; i++) {
+            const region = regions[i];
+            const mult = multipliers[i];
+            // 每两个字符为一个importId
+            for (let j = 0; j < region.length; j += 2) {
+                const importId = region.substring(j, j+2);
+                if (importId.length === 2) {
+                    const curr = importIdMap.get(importId) || 0;
+                    importIdMap.set(importId, curr + mult);
+                }
+            }
+        }
+        // 转换为卡牌条目
+        const cardEntries = [];
+        for (let [importId, count] of importIdMap.entries()) {
+            const card = allCards.find(c => c.importId === importId);
+            if (card) {
+                cardEntries.push({ card, count });
+            } else {
+                console.warn(`未知importId: ${importId}`);
+            }
+        }
+        return { mainFaction, allyFaction, cardEntries };
+    }
+    
+    function importDeckFromCode(rawCode) {
+        try {
+            const { mainFaction, allyFaction, cardEntries } = parseDeckCode(rawCode);
+            // 清空当前卡组
+            deckMap.clear();
+            // 设置主盟国
+            mainNation = mainFaction;
+            allyNation = allyFaction;
+            // 更新下拉框并触发事件
+            document.getElementById('mainNationSelect').value = mainNation;
+            document.getElementById('allyNationSelect').value = allyNation;
+            document.getElementById('mobileMainNation').value = mainNation;
+            document.getElementById('mobileAllyNation').value = allyNation;
+            // 手动触发更新函数
+            const updateNation = () => {
+                // 已经同步值，只需刷新UI
+                updateAllDecksUI();
+            };
+            updateNation();
+            // 添加卡牌
+            for (let { card, count } of cardEntries) {
+                for (let i = 0; i < count; i++) {
+                    addToDeck(card);
+                }
+            }
+            alert(`导入成功！共添加 ${cardEntries.reduce((s,e)=>s+e.count,0)} 张卡牌，${cardEntries.length} 种。`);
+        } catch(e) {
+            alert(`导入失败: ${e.message}`);
+        }
+    }
+    
+    // 绑定导入按钮
+    function bindImportEvents() {
+        const importBtn = document.getElementById('importBtn');
+        const importInput = document.getElementById('importCode');
+        const mobileImportBtn = document.getElementById('mobileImportBtn');
+        const mobileImportInput = document.getElementById('mobileImportCode');
+        if (importBtn) {
+            importBtn.onclick = () => {
+                const code = importInput.value.trim();
+                if (code) importDeckFromCode(code);
+                else alert('请输入卡组代码');
+            };
+        }
+        if (mobileImportBtn) {
+            mobileImportBtn.onclick = () => {
+                const code = mobileImportInput.value.trim();
+                if (code) importDeckFromCode(code);
+                else alert('请输入卡组代码');
+            };
+        }
+    }
+
     function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
     function getTypeCategory(type) { if(type === "order") return "order"; if(type === "countermeasure") return "countermeasure"; return "unit"; }
     
     function showStatsModal() {
         const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
-        // 稀有度计数
         let rarityCounts = { "Standard":0, "Limited":0, "Special":0, "Elite":0 };
-        
         for(let {card, count} of deckMap.values()) {
             const cat = getCostCategory(card.cost);
             const typeCat = getTypeCategory(card.type);
             if(typeCat === "unit") { costMap[cat].unit += count; unitTotal += count; }
             else if(typeCat === "order") { costMap[cat].order += count; orderTotal += count; }
             else { costMap[cat].counter += count; counterTotal += count; }
-            
-            // 累计稀有度
-            if(rarityCounts.hasOwnProperty(card.rarity)) {
-                rarityCounts[card.rarity] += count;
-            }
+            if(rarityCounts.hasOwnProperty(card.rarity)) rarityCounts[card.rarity] += count;
         }
         const maxHeight = Math.max(...Object.values(costMap).flatMap(v=>[v.unit, v.order, v.counter]), 1);
-        
         const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
             const unitH = costMap[cost].unit, orderH = costMap[cost].order, counterH = costMap[cost].counter;
             const totalH = unitH + orderH + counterH;
@@ -1087,15 +1218,12 @@
                         <div class="cost-total">${totalH}</div>
                     </div>`;
         }).join('');
-        
-        // 稀有度统计HTML（铁铜银金颜色）
         const rarityStatsHtml = `
             <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-standard);"></span>普通 <span style="color:var(--rarity-standard);">${rarityCounts.Standard}</span></div>
             <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-limited);"></span>限定 <span style="color:var(--rarity-limited);">${rarityCounts.Limited}</span></div>
             <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-special);"></span>特殊 <span style="color:var(--rarity-special);">${rarityCounts.Special}</span></div>
             <div class="rarity-stat"><span class="rarity-stat-dot" style="background:var(--rarity-elite);"></span>精英 <span style="color:var(--rarity-elite);">${rarityCounts.Elite}</span></div>
         `;
-        
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
         document.getElementById('modalRarityStats').innerHTML = rarityStatsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `
@@ -1114,11 +1242,9 @@
         document.getElementById('mobileToggleCount').innerText = total; 
     }
     
-    // 渲染卡组列表 - 按照 allCards 中的原始顺序排序
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId); if(!container) return; 
         if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:16px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
-        // 按照 allCards 中的索引顺序排序（即在 data.json 中的出现顺序）
         const entries = Array.from(deckMap.values()).sort((a, b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
             const idxB = allCards.findIndex(c => c.id === b.card.id);
@@ -1135,8 +1261,8 @@
                         <div class="deck-card-details">
                             <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}</div>
                             <div class="deck-card-stats">
-                                <div class="kredits-cost"><span>💰 ${c.cost}</span><span>K</span></div>
-                                <div class="card-type-badge">📌 ${typeDisplay}</div>
+                                <div class="kredits-cost"><span>${c.cost}</span><span>K</span></div>
+                                <div class="card-type-badge">${typeDisplay}</div>
                                 <div class="card-rarity-badge ${rarityClass}">${rarityDisplay}</div>
                             </div>
                         </div>
@@ -1166,7 +1292,7 @@
         document.getElementById('clearDeckBtn')?.addEventListener('click',()=>clearDeck()); 
     }
     
-    window.addEventListener('load', () => { loadData(); initNav(); initSidebars(); });
+    window.addEventListener('load', () => { loadData(); initNav(); initSidebars(); bindImportEvents(); });
 </script>
 </body>
 </html>
