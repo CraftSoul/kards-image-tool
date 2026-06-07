@@ -125,7 +125,6 @@
             font-weight: 700;
         }
 
-        /* 双栏布局 */
         .builder-main {
             display: flex;
             gap: 24px;
@@ -181,7 +180,6 @@
         }
         .clear-deck:hover { background: #aa6f3c; color: white; }
         
-        /* 总部样式 - 与卡牌长条一致，无生命值 */
         .headquarters-row {
             display: flex;
             align-items: center;
@@ -300,7 +298,7 @@
         }
         .deck-remove-btn:hover { background: #b6521a; color: white; }
 
-        /* 移动端侧边栏 - 右侧滑出样式 */
+        /* 移动端侧边栏 - 矩形触发器 */
         .mobile-deck-toggle {
             display: none;
             position: fixed;
@@ -310,8 +308,8 @@
             background: #2f2b1c;
             border: 1px solid #c9a63b;
             border-right: none;
-            border-radius: 40px 0 0 40px;
-            padding: 12px 8px;
+            border-radius: 8px 0 0 8px;
+            padding: 12px 10px;
             color: #fae7b3;
             font-weight: bold;
             cursor: pointer;
@@ -319,9 +317,9 @@
             flex-direction: column;
             align-items: center;
             gap: 8px;
-            font-size: 1.2rem;
             backdrop-filter: blur(8px);
             box-shadow: -2px 2px 8px rgba(0,0,0,0.3);
+            min-width: 48px;
         }
         .mobile-deck-toggle .toggle-text {
             writing-mode: vertical-rl;
@@ -332,10 +330,12 @@
         .mobile-deck-toggle .mobile-count-badge-toggle {
             background: #c9a53b;
             color: #1e1c10;
-            border-radius: 40px;
+            border-radius: 20px;
             padding: 4px 6px;
             font-size: 0.7rem;
             font-weight: bold;
+            min-width: 28px;
+            text-align: center;
         }
         
         /* 移动端侧边栏面板 */
@@ -404,7 +404,7 @@
                 flex-direction: column;
             }
             .deck-panel {
-                display: none;  /* PC面板隐藏 */
+                display: none;
             }
             .mobile-deck-toggle {
                 display: flex;
@@ -480,6 +480,7 @@
         @media (max-width: 680px) {
             .card-grid { grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
         }
+        /* 卡片样式 - 与index一致，文字不换行 */
         .card-item {
             background: #111812;
             border-radius: 12px;
@@ -517,6 +518,14 @@
             justify-content: space-between;
             align-items: center;
             color: #faf0cf;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-name span:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .reserve-icon-sm {
             width: 14px;
@@ -524,7 +533,9 @@
             background: url('reserve.png') no-repeat center;
             background-size: contain;
             display: inline-block;
+            flex-shrink: 0;
         }
+        /* 数量为0时不显示计数和移除控件 */
         .card-badge-desktop {
             position: absolute;
             top: 6px;
@@ -538,6 +549,9 @@
             align-items: center;
             z-index: 5;
             border: 0.5px solid #c9aa5b;
+        }
+        .card-badge-desktop.hide-badge {
+            display: none;
         }
         .card-deck-count {
             background: #000000cc;
@@ -573,6 +587,9 @@
             justify-content: center;
             gap: 12px;
             border-top: 1px solid #c9aa5b;
+        }
+        .card-mobile-actions.hide-badge {
+            display: none;
         }
         .mobile-count-badge {
             background: #000000cc;
@@ -661,11 +678,11 @@
         </div>
     </div>
 
-    <!-- 移动端侧边栏触发器 -->
+    <!-- 移动端侧边栏触发器 - 矩形 -->
     <div class="mobile-deck-toggle" id="mobileDeckToggle">
         <span class="toggle-text">卡组</span>
         <span class="mobile-count-badge-toggle" id="mobileToggleCount">0</span>
-        <span>◀</span>
+        <span>▶</span>
     </div>
     
     <!-- 移动端侧边栏面板 -->
@@ -852,14 +869,15 @@
             const deckEntry = deckMap.get(card.id);
             const qtyInDeck = deckEntry ? deckEntry.count : 0;
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
+            const showBadge = qtyInDeck > 0;
             return `<div class="card-item" data-card-id="${card.id}" style="border-color: ${borderCol};">
                         <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div>
                         <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
-                        <div class="card-badge-desktop">
+                        <div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}">
                             <span class="card-deck-count">${qtyInDeck}</span>
                             <button class="card-remove-icon" data-remove="${card.id}">−</button>
                         </div>
-                        <div class="card-mobile-actions">
+                        <div class="card-mobile-actions ${!showBadge ? 'hide-badge' : ''}">
                             <span class="mobile-count-badge">${qtyInDeck}</span>
                             <button class="mobile-remove-btn" data-remove="${card.id}">-</button>
                         </div>
@@ -919,8 +937,8 @@
     function clearDeck() { deckMap.clear(); updateAllDecksUI(); renderCards(); }
     
     function updateAllDecksUI() {
-        updateDeckUI();          // PC面板
-        updateMobileDeckUI();   // 移动端面板
+        updateDeckUI();
+        updateMobileDeckUI();
         const totalCount = Array.from(deckMap.values()).reduce((sum, e) => sum + e.count, 0);
         document.getElementById('totalDeckCount').innerText = totalCount;
         document.getElementById('mobileTotalCount').innerText = totalCount;
@@ -998,7 +1016,6 @@
         });
     }
 
-    // 移动端侧边栏控制
     function initMobileSidebar() {
         const toggleBtn = document.getElementById('mobileDeckToggle');
         const panel = document.getElementById('mobileDeckPanel');
