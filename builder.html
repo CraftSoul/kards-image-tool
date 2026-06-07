@@ -345,7 +345,7 @@
             }
         }
 
-        /* 筛选器样式 (复刻index) */
+        /* 筛选器样式 (完全复用index) */
         .filter-panel {
             background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(8px);
@@ -407,14 +407,14 @@
         }
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
             gap: 1rem;
             margin-top: 1rem;
         }
         @media (max-width: 680px) {
             .card-grid { grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
         }
-        /* 卡片样式：恢复预备标，去掉闪电+，显示右上角数量与移除按钮 */
+        /* 卡片样式与index一致，但加入计数&移除区域 */
         .card-item {
             background: #111812;
             border-radius: 12px;
@@ -460,14 +460,14 @@
             background-size: contain;
             display: inline-block;
         }
-        /* 右上角数量与移除按钮 */
-        .card-badge-overlay {
+        /* PC端：右上角计数+移除按钮 (黑色半透明底) */
+        .card-badge-desktop {
             position: absolute;
             top: 6px;
             right: 6px;
             display: flex;
             gap: 6px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(4px);
             padding: 3px 8px;
             border-radius: 40px;
@@ -501,6 +501,42 @@
             transition: 0.1s;
         }
         .card-remove-icon:hover { background: #b6521a; color: white; }
+        
+        /* 移动端卡片底部栏：计数与移除居中显示 */
+        .card-mobile-actions {
+            display: none;
+            background: rgba(0,0,0,0.8);
+            padding: 6px 8px;
+            justify-content: center;
+            gap: 12px;
+            border-top: 1px solid #c9aa5b;
+        }
+        .mobile-count-badge {
+            background: #000000cc;
+            color: #ffeaad;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 30px;
+        }
+        .mobile-remove-btn {
+            background: #5e3019;
+            border: none;
+            color: #ffcf8a;
+            border-radius: 30px;
+            padding: 4px 16px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        @media (max-width: 680px) {
+            .card-badge-desktop {
+                display: none;
+            }
+            .card-mobile-actions {
+                display: flex;
+            }
+        }
         
         .footer-simple {
             margin-top: 2rem;
@@ -612,7 +648,6 @@
                 <span class="deck-title">📋 我的卡组</span>
                 <button class="clear-deck" id="clearDeckBtn">清空卡组</button>
             </div>
-            <!-- 总部风格与卡牌长条一致 -->
             <div class="headquarters-row">
                 <div class="hq-icon">🏛️</div>
                 <div class="hq-info">
@@ -629,13 +664,13 @@
 
     <div class="footer-simple">
         <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a>
-        <a href="https://space.bilibili.com/3546776475505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
+        <a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
     </div>
 </div>
 <div id="toastMsg" class="toast-msg" style="display: none;">已加入卡组</div>
 
 <script>
-    // 数据与翻译映射
+    // 词条翻译映射（同index）
     const attrTranslation = { "blitz":"闪击","fury":"奋战","smokescreen":"烟幕","pincer":"钳击","salvage":"收缴","guard":"守护","heavyarmor1":"重甲1","heavyarmor2":"重甲2","heavyarmor3":"重甲3","alpine":"山地","mobilize":"动员","covert":"隐蔽","shock":"冲击","bond":"协力","ambush":"伏击","intel1":"情报1","intel2":"情报2","intel3":"情报3" };
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
@@ -656,10 +691,11 @@
             const res = await fetch('data.json');
             if(!res.ok) throw new Error("data.json加载失败");
             const data = await res.json();
+            // 保留data.json原始顺序，仅补全id（若没有则使用索引）
             allCards = (data.cards || []).map((card, idx) => {
                 let rawFaction = (card.json?.faction || card.faction || "").toLowerCase();
                 return {
-                    id: card.id ?? idx,   // 保证整型id
+                    id: card.id ?? idx,   // 整型标识
                     ...card,
                     type: card.json?.type || card.type,
                     faction: rawFaction,
@@ -679,8 +715,7 @@
                     importId: card.importId
                 };
             });
-            // 按原始顺序排序 (data.json中顺序)
-            allCards.sort((a,b) => (a.id - b.id));
+            // 确保顺序为data.json原始顺序 (已保留)
             initFilters();
             applyFilters();
         } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div>❌ 数据加载失败</div>'; }
@@ -758,24 +793,36 @@
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
             return `<div class="card-item" data-card-id="${card.id}" style="border-color: ${borderCol};">
                         <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div>
-                        <div class="card-info"><div class="card-name"><span>${card.titleZh} ${reserveMark}</span></div></div>
-                        <div class="card-badge-overlay">
+                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
+                        <div class="card-badge-desktop">
                             <span class="card-deck-count">${qtyInDeck}</span>
                             <button class="card-remove-icon" data-remove="${card.id}">−</button>
                         </div>
+                        <div class="card-mobile-actions">
+                            <span class="mobile-count-badge">数量: ${qtyInDeck}</span>
+                            <button class="mobile-remove-btn" data-remove="${card.id}">移除</button>
+                        </div>
                     </div>`;
         }).join('');
-        // 卡片点击加入卡组
+        // 卡片主体点击加入卡组
         document.querySelectorAll('.card-item').forEach(el => {
             el.addEventListener('click', (e) => {
-                if(e.target.classList.contains('card-remove-icon')) return;
+                if(e.target.classList.contains('card-remove-icon') || e.target.classList.contains('mobile-remove-btn')) return;
                 const cardId = parseInt(el.dataset.cardId);
                 const card = allCards.find(c => c.id === cardId);
                 if(card) addToDeck(card);
             });
         });
-        // 移除按钮事件
+        // 桌面端移除按钮
         document.querySelectorAll('.card-remove-icon').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const cardId = parseInt(btn.dataset.remove);
+                removeFromDeck(cardId, false);
+            });
+        });
+        // 移动端移除按钮
+        document.querySelectorAll('.mobile-remove-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const cardId = parseInt(btn.dataset.remove);
@@ -803,13 +850,13 @@
         });
     }
 
-    // 卡组管理：按data.json顺序排列（id顺序）
+    // 卡组管理: 完全依照data.json原始顺序排列
     function addToDeck(card) {
         let entry = deckMap.get(card.id);
         if(entry) entry.count += 1;
         else deckMap.set(card.id, { card: card, count: 1 });
         updateDeckUI();
-        renderCards();   // 刷新卡片上的数量显示
+        renderCards();   // 刷新卡片上的数字
         showToast(`➕ 加入 ${card.titleZh}`);
     }
     function removeFromDeck(cardId, bulkRemove = false) {
@@ -833,7 +880,7 @@
             deckContainer.innerHTML = '<div style="color:#ab9f7c; text-align:center; padding:16px;">暂无卡牌，点击左侧卡片加入</div>';
             return;
         }
-        // 按照 data.json 原始顺序 (即 allCards 的顺序) 排列卡组中的卡牌
+        // 按照 allCards 原始顺序排列卡组中的卡牌
         const deckEntries = Array.from(deckMap.values());
         deckEntries.sort((a,b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
