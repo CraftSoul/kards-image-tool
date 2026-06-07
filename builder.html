@@ -532,6 +532,7 @@
         .type-summary-modal span {
             font-weight: bold;
             font-size: 1rem;
+            color: #ffefb9;
             margin-left: 6px;
         }
         .unit-badge { color: #e8e4d0; }
@@ -578,7 +579,7 @@
             margin-bottom: 0.3rem;
             font-weight: 600;
         }
-        select, .search-input {
+        select {
             width: 100%;
             background: #1e1c16;
             border: 1px solid #aa8e4e;
@@ -590,6 +591,20 @@
             outline: none;
             appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23dbb45c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        .search-input {
+            width: 100%;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.55rem 1rem;
+            color: #f5efdb;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
             background-repeat: no-repeat;
             background-position: right 1rem center;
         }
@@ -694,15 +709,15 @@
             color: #ffeaad;
             font-size: 0.75rem;
             font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 30px;
+            padding: 4px 6px;
+            border-radius: 4px;
         }
         .mobile-remove-btn {
             background: #5e3019;
             border: none;
             color: #ffcf8a;
-            border-radius: 30px;
-            padding: 4px 8px;
+            border-radius: 4px;
+            padding: 4px 6px;
             font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
@@ -776,8 +791,8 @@
 
     <div class="builder-main">
         <div class="cards-section">
-            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名 / 文本"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
-            <div id="cardContainer" class="card-grid">加载中...</div>
+            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本/词条"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
+            <div id="cardContainer" class="card-grid">正在寻找敌人...</div>
             <div class="pagination" id="pagination"></div>
         </div>
         <div class="deck-panel" id="deckPanel">
@@ -957,9 +972,9 @@
         
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `
-            <span>🎖️ 单位: <span class="unit-badge">${unitTotal}</span></span>
-            <span>❕ 指令: <span class="order-badge">${orderTotal}</span></span>
-            <span>❔ 反制: <span class="counter-badge">${counterTotal}</span></span>
+            <span>单位 <span class="unit-badge">${unitTotal}</span></span>
+            <span>指令 <span class="order-badge">${orderTotal}</span></span>
+            <span>反制 <span class="counter-badge">${counterTotal}</span></span>
         `;
         document.getElementById('statsModal').style.display = 'flex';
     }
