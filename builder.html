@@ -187,10 +187,10 @@
             background: rgba(0,0,0,0.5);
             border-radius: 20px;
             padding: 10px 12px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             border: 1px solid rgba(170, 142, 78, 0.5);
         }
         .nation-row {
@@ -217,19 +217,19 @@
             outline: none;
         }
 
-        /* 导入区域样式 */
+        /* 导入区域 - 保持同行 */
         .import-area {
             background: rgba(0,0,0,0.4);
             border-radius: 20px;
             padding: 10px 12px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             border: 1px solid rgba(170, 142, 78, 0.5);
         }
         .import-row {
             display: flex;
             gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
         .import-input {
             flex: 1;
@@ -241,6 +241,7 @@
             font-size: 0.75rem;
             outline: none;
             font-family: monospace;
+            min-width: 0;
         }
         .import-btn {
             background: #5a6b3c;
@@ -253,13 +254,14 @@
             cursor: pointer;
             transition: 0.2s;
             white-space: nowrap;
+            flex-shrink: 0;
         }
         .import-btn:hover { background: #7e9e4a; }
 
         .stats-header {
             display: flex;
             justify-content: flex-end;
-            margin: 12px 0 10px;
+            margin: 8px 0 10px;
         }
         .stats-btn {
             background: #c9a53b;
@@ -274,43 +276,53 @@
         }
         .stats-btn:hover { background: #e6c46a; transform: scale(1.02); }
 
+        /* 总部卡片 - 高度缩小，与卡牌行高一致 */
         .headquarters-card {
             background: linear-gradient(135deg, #e6dbbc, #cfbc88);
-            border-radius: 20px;
-            padding: 12px 14px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            padding: 6px 12px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            border-left: 8px solid #b8860b;
+            gap: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border-left: 6px solid #b8860b;
         }
-        .hq-icon-large { font-size: 2rem; }
+        .hq-icon-large { font-size: 1.5rem; }
         .hq-info { flex: 1; }
-        .hq-name { font-weight: 800; font-size: 1rem; color: #2c2818; }
+        .hq-name { font-weight: 800; font-size: 0.85rem; color: #2c2818; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .hq-reserve-icon {
+            width: 14px;
+            height: 14px;
+            background: url('reserve.png') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            margin-left: 4px;
+        }
 
         .deck-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             max-height: 45vh;
             overflow-y: auto;
             padding-right: 4px;
         }
+        /* 卡牌行高度缩小 */
         .deck-card-row {
             background: #0f0f0a;
-            border-radius: 16px;
-            padding: 8px 12px;
+            border-radius: 14px;
+            padding: 6px 10px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            border-left: 6px solid;
+            gap: 10px;
+            border-left: 5px solid;
             transition: 0.1s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
         .deck-card-icon {
-            width: 36px;
-            height: 36px;
+            width: 30px;
+            height: 30px;
             flex-shrink: 0;
             background-size: contain;
             background-repeat: no-repeat;
@@ -321,21 +333,32 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             min-width: 0;
         }
         .deck-card-name {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: #f9edc1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .deck-card-reserve-icon {
+            width: 12px;
+            height: 12px;
+            background: url('reserve.png') no-repeat center;
+            background-size: contain;
+            display: inline-block;
+            flex-shrink: 0;
         }
         .deck-card-stats {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             overflow-x: auto;
             overflow-y: hidden;
             white-space: nowrap;
@@ -343,7 +366,7 @@
             padding-bottom: 2px;
         }
         .deck-card-stats::-webkit-scrollbar {
-            height: 4px;
+            height: 3px;
         }
         .deck-card-stats::-webkit-scrollbar-track {
             background: #2a2a1c;
@@ -355,11 +378,11 @@
         }
         .kredits-cost {
             background: #000000cc;
-            border-radius: 12px;
-            padding: 2px 8px;
+            border-radius: 10px;
+            padding: 1px 6px;
             font-weight: bold;
             color: #ffd966;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             display: inline-flex;
             align-items: center;
             gap: 2px;
@@ -367,9 +390,9 @@
         }
         .card-type-badge {
             background: #2a2a1c;
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-size: 0.65rem;
+            border-radius: 10px;
+            padding: 1px 6px;
+            font-size: 0.6rem;
             font-weight: 600;
             color: #f2e2b0;
             display: inline-flex;
@@ -378,9 +401,9 @@
             flex-shrink: 0;
         }
         .card-rarity-badge {
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-size: 0.65rem;
+            border-radius: 10px;
+            padding: 1px 6px;
+            font-size: 0.6rem;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
@@ -396,12 +419,12 @@
         .deck-card-qty {
             background: rgba(0,0,0,0.7);
             border-radius: 30px;
-            padding: 2px 10px;
-            font-size: 0.7rem;
+            padding: 1px 8px;
+            font-size: 0.65rem;
             font-weight: bold;
             color: #ffe0a3;
             margin-left: auto;
-            min-width: 42px;
+            min-width: 36px;
             text-align: center;
             flex-shrink: 0;
         }
@@ -410,12 +433,15 @@
             border: none;
             color: #ffcf8a;
             border-radius: 30px;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .deck-remove-btn:hover { background: #b6521a; color: white; }
 
@@ -490,7 +516,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .mobile-overlay {
             position: fixed;
@@ -628,6 +654,7 @@
         .unit-badge { color: #e8e4d0; }
         .order-badge { color: #f5c542; }
         .counter-badge { color: #a0a0a0; }
+        /* 稀有度统计行 - 移除图例后仅保留数字统计，但保留用于显示数量 */
         .rarity-stats-row {
             display: flex;
             gap: 20px;
@@ -652,19 +679,7 @@
             border-radius: 3px;
         }
         .legend {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 16px;
-            font-size: 0.7rem;
-            color: #ffefb9
-        }
-        .legend-dot {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            margin-right: 4px;
+            display: none; /* 隐藏原有图例，因为稀有度图例已移除 */
         }
 
         .filter-panel {
@@ -893,9 +908,8 @@
     <div class="mobile-deck-panel" id="mobileDeckPanel">
         <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
-        <!-- 移动端导入区域 -->
         <div class="import-area"><div class="import-row"><input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码 %%15|bK;;bK;bKbK"><button id="mobileImportBtn" class="import-btn">📥 导入覆盖</button></div></div>
-        <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
+        <div class="headquarters-card" id="mobileHeadquartersCard"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name" id="mobileHqName">总部</div></div></div>
         <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
         <div class="mobile-deck-list" id="mobileDeckList"></div>
         <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空</button>
@@ -910,9 +924,8 @@
         <div class="deck-panel" id="deckPanel">
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
-            <!-- 桌面端导入区域 -->
             <div class="import-area"><div class="import-row"><input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码 如 %%15|bK;;bK;bKbK"><button id="importBtn" class="import-btn">📥 导入覆盖</button></div></div>
-            <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
+            <div class="headquarters-card" id="desktopHeadquartersCard"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name" id="desktopHqName">总部</div></div></div>
             <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
             <div class="deck-list" id="deckListContainer"></div>
         </div>
@@ -924,7 +937,7 @@
     <div class="modal-stats-content">
         <div class="modal-stats-close" id="statsModalClose">&times;</div>
         <div class="modal-stats-title">📊 卡组统计</div>
-        <div class="legend"><span><span class="legend-dot" style="background:#e8e4d0;"></span>单位</span><span><span class="legend-dot" style="background:#f5c542;"></span>指令</span><span><span class="legend-dot" style="background:#5a5a5a;"></span>反制</span></div>
+        <!-- 图例已移除，稀有度统计单独显示 -->
         <div id="modalHistogramBars" class="histogram-bars"></div>
         <div id="modalRarityStats" class="rarity-stats-row"></div>
         <div id="modalTypeSummary" class="type-summary-modal"></div>
@@ -949,7 +962,7 @@
     const rarityDisplayMap = { "Standard":"普通","Limited":"限定","Special":"特殊","Elite":"精英" };
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
-    const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland"]; // 索引1~9对应
+    const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland"];
     let allCards = [], filteredCards = [], deckMap = new Map();
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "germany", allyNation = "";
@@ -980,9 +993,6 @@
                     reserved: !!card.reserved, 
                     isSpawn: card.json?.set === "OnlySpawnable",
                     attributes: card.json?.attributes || [],
-                    attack: card.json?.attack,
-                    defense: card.json?.defense,
-                    operationCost: card.json?.operationCost,
                     importId: card.importId || (card.json?.importId) || ""
                 };
             });
@@ -1084,12 +1094,10 @@
     function removeFromDeck(cardId) { let entry = deckMap.get(cardId); if(entry) { if(entry.count>1) entry.count--; else deckMap.delete(cardId); updateAllDecksUI(); renderCards(); } }
     function clearDeck() { deckMap.clear(); updateAllDecksUI(); renderCards(); }
 
-    // ========= 导入卡组解析 =========
     function parseDeckCode(rawCode) {
-        // 找到第一个 %% 的位置
         const startIdx = rawCode.indexOf('%%');
         if (startIdx === -1) throw new Error('未找到 %% 起始标识');
-        let code = rawCode.substring(startIdx + 2); // 去掉 %%
+        let code = rawCode.substring(startIdx + 2);
         const pipeIdx = code.indexOf('|');
         if (pipeIdx === -1) throw new Error('未找到 | 分隔符');
         const nationPart = code.substring(0, pipeIdx).trim();
@@ -1103,14 +1111,12 @@
         
         const cardsPart = code.substring(pipeIdx + 1);
         const regions = cardsPart.split(';');
-        // 补齐4个区域
         while (regions.length < 4) regions.push('');
         const multipliers = [1, 2, 3, 4];
-        const importIdMap = new Map(); // importId -> 总数量
+        const importIdMap = new Map();
         for (let i = 0; i < 4; i++) {
             const region = regions[i];
             const mult = multipliers[i];
-            // 每两个字符为一个importId
             for (let j = 0; j < region.length; j += 2) {
                 const importId = region.substring(j, j+2);
                 if (importId.length === 2) {
@@ -1119,15 +1125,10 @@
                 }
             }
         }
-        // 转换为卡牌条目
         const cardEntries = [];
         for (let [importId, count] of importIdMap.entries()) {
             const card = allCards.find(c => c.importId === importId);
-            if (card) {
-                cardEntries.push({ card, count });
-            } else {
-                console.warn(`未知importId: ${importId}`);
-            }
+            if (card) cardEntries.push({ card, count });
         }
         return { mainFaction, allyFaction, cardEntries };
     }
@@ -1135,54 +1136,28 @@
     function importDeckFromCode(rawCode) {
         try {
             const { mainFaction, allyFaction, cardEntries } = parseDeckCode(rawCode);
-            // 清空当前卡组
             deckMap.clear();
-            // 设置主盟国
             mainNation = mainFaction;
             allyNation = allyFaction;
-            // 更新下拉框并触发事件
             document.getElementById('mainNationSelect').value = mainNation;
             document.getElementById('allyNationSelect').value = allyNation;
             document.getElementById('mobileMainNation').value = mainNation;
             document.getElementById('mobileAllyNation').value = allyNation;
-            // 手动触发更新函数
-            const updateNation = () => {
-                // 已经同步值，只需刷新UI
-                updateAllDecksUI();
-            };
-            updateNation();
-            // 添加卡牌
+            updateAllDecksUI();
             for (let { card, count } of cardEntries) {
-                for (let i = 0; i < count; i++) {
-                    addToDeck(card);
-                }
+                for (let i = 0; i < count; i++) addToDeck(card);
             }
             alert(`导入成功！共添加 ${cardEntries.reduce((s,e)=>s+e.count,0)} 张卡牌，${cardEntries.length} 种。`);
-        } catch(e) {
-            alert(`导入失败: ${e.message}`);
-        }
+        } catch(e) { alert(`导入失败: ${e.message}`); }
     }
     
-    // 绑定导入按钮
     function bindImportEvents() {
         const importBtn = document.getElementById('importBtn');
         const importInput = document.getElementById('importCode');
         const mobileImportBtn = document.getElementById('mobileImportBtn');
         const mobileImportInput = document.getElementById('mobileImportCode');
-        if (importBtn) {
-            importBtn.onclick = () => {
-                const code = importInput.value.trim();
-                if (code) importDeckFromCode(code);
-                else alert('请输入卡组代码');
-            };
-        }
-        if (mobileImportBtn) {
-            mobileImportBtn.onclick = () => {
-                const code = mobileImportInput.value.trim();
-                if (code) importDeckFromCode(code);
-                else alert('请输入卡组代码');
-            };
-        }
+        if (importBtn) importBtn.onclick = () => { const code = importInput.value.trim(); if (code) importDeckFromCode(code); else alert('请输入卡组代码'); };
+        if (mobileImportBtn) mobileImportBtn.onclick = () => { const code = mobileImportInput.value.trim(); if (code) importDeckFromCode(code); else alert('请输入卡组代码'); };
     }
 
     function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
@@ -1207,12 +1182,11 @@
             const unitPercent = maxHeight ? (unitH / maxHeight) * 48 : 0;
             const orderPercent = maxHeight ? (orderH / maxHeight) * 48 : 0;
             const counterPercent = maxHeight ? (counterH / maxHeight) * 48 : 0;
-            const tooltip = `单位:${unitH}  指令:${orderH}  反制:${counterH}`;
             return `<div class="histogram-bar-wrapper">
                         <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px;">
-                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="${tooltip}"></div>
-                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="${tooltip}"></div>
-                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="${tooltip}"></div>
+                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="反制:${counterH}"></div>
+                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="指令:${orderH}"></div>
+                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="单位:${unitH}"></div>
                         </div>
                         <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
                         <div class="cost-total">${totalH}</div>
@@ -1237,14 +1211,20 @@
     function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
     function updateAllDecksUI() { 
-        renderDeckList('deckListContainer'); renderDeckList('mobileDeckList'); 
+        renderDeckList('deckListContainer'); 
+        renderDeckList('mobileDeckList'); 
         const total = Array.from(deckMap.values()).reduce((s,e)=>s+e.count,0); 
-        document.getElementById('mobileToggleCount').innerText = total; 
+        document.getElementById('mobileToggleCount').innerText = total;
+        // 更新总部预备标识（总部算作一张牌，显示预备标识但无实际预备卡牌效果，仅样式）
+        const isAnyReserve = Array.from(deckMap.values()).some(e => e.card.reserved);
+        const hqReserveHtml = isAnyReserve ? '<span class="hq-reserve-icon"></span>' : '';
+        document.getElementById('desktopHqName').innerHTML = `总部 ${hqReserveHtml}`;
+        document.getElementById('mobileHqName').innerHTML = `总部 ${hqReserveHtml}`;
     }
     
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId); if(!container) return; 
-        if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:16px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
+        if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
         const entries = Array.from(deckMap.values()).sort((a, b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
             const idxB = allCards.findIndex(c => c.id === b.card.id);
@@ -1256,10 +1236,11 @@
             const typeDisplay = typeNameMap[c.type] || c.type;
             const rarityClass = rarityClassMap[c.rarity] || "rarity-standard";
             const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity;
+            const reserveIcon = c.reserved ? '<i class="deck-card-reserve-icon"></i>' : '';
             return `<div class="deck-card-row" style="border-left-color: ${borderColor};">
                         <div class="deck-card-icon" style="background-image: url('${c.faction}.svg');"></div>
                         <div class="deck-card-details">
-                            <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}</div>
+                            <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}${reserveIcon}</div>
                             <div class="deck-card-stats">
                                 <div class="kredits-cost"><span>${c.cost}</span><span>K</span></div>
                                 <div class="card-type-badge">${typeDisplay}</div>
