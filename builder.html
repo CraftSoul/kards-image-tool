@@ -213,11 +213,9 @@
             outline: none;
         }
 
-        /* 统计按钮和直方图 */
         .stats-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             margin: 12px 0 10px;
         }
         .stats-btn {
@@ -232,90 +230,6 @@
             transition: 0.2s;
         }
         .stats-btn:hover { background: #e6c46a; transform: scale(1.02); }
-        .histogram-container {
-            background: #1a1c12;
-            border-radius: 20px;
-            padding: 12px;
-            margin-top: 8px;
-            margin-bottom: 12px;
-            border: 1px solid #aa8e4e;
-            display: none;
-        }
-        .histogram-container.show {
-            display: block;
-        }
-        .histogram-title {
-            font-size: 0.7rem;
-            color: #e9d49c;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .histogram-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 6px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .histogram-bar-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 36px;
-        }
-        .bar-stack {
-            display: flex;
-            flex-direction: column-reverse;
-            width: 28px;
-            background: #2a2a1c;
-            border-radius: 6px 6px 0 0;
-            overflow: hidden;
-            margin-bottom: 4px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .bar-stack:hover { transform: scaleX(1.05); }
-        .bar-unit {
-            background-color: #e8e4d0;
-            transition: height 0.2s;
-        }
-        .bar-order {
-            background-color: #f5c542;
-        }
-        .bar-counter {
-            background-color: #2c2c2c;
-        }
-        .bar-label {
-            font-size: 0.65rem;
-            color: #f5eaca;
-            text-align: center;
-        }
-        .bar-tooltip {
-            font-size: 0.6rem;
-            color: #ffefb9;
-            background: rgba(0,0,0,0.7);
-            padding: 2px 6px;
-            border-radius: 12px;
-            margin-top: 2px;
-            white-space: nowrap;
-        }
-        .type-summary {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid #aa8e4e;
-            font-size: 0.7rem;
-        }
-        .type-summary span {
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-left: 4px;
-        }
-        .unit-badge { color: #e8e4d0; }
-        .order-badge { color: #f5c542; }
-        .counter-badge { color: #9a9a9a; }
 
         .headquarters-card {
             background: linear-gradient(135deg, #e6dbbc, #cfbc88);
@@ -328,17 +242,9 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             border-left: 8px solid #b8860b;
         }
-        .hq-icon-large {
-            font-size: 2rem;
-        }
-        .hq-info {
-            flex: 1;
-        }
-        .hq-name {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #2c2818;
-        }
+        .hq-icon-large { font-size: 2rem; }
+        .hq-info { flex: 1; }
+        .hq-name { font-weight: 800; font-size: 1rem; color: #2c2818; }
 
         .deck-list {
             display: flex;
@@ -374,12 +280,6 @@
             flex-direction: column;
             gap: 4px;
         }
-        .deck-card-name-line {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
         .deck-card-name {
             font-size: 0.85rem;
             font-weight: 600;
@@ -398,16 +298,6 @@
             font-weight: bold;
             color: #ffd966;
             font-size: 0.7rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-        }
-        .operation-cost {
-            background: #3a3520;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 0.65rem;
-            color: #e6cf8b;
             display: inline-flex;
             align-items: center;
             gap: 2px;
@@ -526,6 +416,139 @@
             .builder-main { flex-direction: column; }
             .deck-panel { display: none; }
             .mobile-deck-toggle { display: flex; }
+        }
+
+        /* 模态框样式 */
+        .modal-stats {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-stats-content {
+            background: #1a1c12;
+            border-radius: 32px;
+            border: 2px solid #c9aa5b;
+            max-width: 700px;
+            width: 100%;
+            padding: 20px 24px 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .modal-stats-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #e9d49c;
+            background: rgba(0,0,0,0.5);
+            width: 32px;
+            height: 32px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-stats-close:hover { background: #c9a53b; color: #1e1c10; }
+        .modal-stats-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffefbf;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .histogram-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 2px;
+            margin: 20px 0;
+        }
+        .histogram-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0;
+        }
+        .bar-stack {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 100%;
+            max-width: 48px;
+            min-width: 28px;
+            background: #2a2a1c;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .bar-stack:hover { transform: scaleX(1.02); }
+        .bar-unit {
+            background-color: #e8e4d0;
+            transition: height 0.2s;
+        }
+        .bar-order {
+            background-color: #f5c542;
+        }
+        .bar-counter {
+            background-color: #5a5a5a;
+        }
+        .bar-label {
+            font-size: 0.7rem;
+            color: #f5eaca;
+            text-align: center;
+            margin-top: 6px;
+            font-weight: bold;
+        }
+        .bar-tooltip {
+            font-size: 0.65rem;
+            color: #ffefb9;
+            background: rgba(0,0,0,0.8);
+            padding: 4px 8px;
+            border-radius: 16px;
+            margin-top: 6px;
+            white-space: nowrap;
+            text-align: center;
+        }
+        .type-summary-modal {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #aa8e4e;
+        }
+        .type-summary-modal span {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-left: 6px;
+        }
+        .unit-badge { color: #e8e4d0; }
+        .order-badge { color: #f5c542; }
+        .counter-badge { color: #a0a0a0; }
+        .legend {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 0.7rem;
+        }
+        .legend-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 4px;
         }
 
         .filter-panel {
@@ -674,16 +697,14 @@
         <div class="mobile-deck-header"><span class="deck-title">📋 我的卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
         <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
-        <div class="stats-header"><span></span><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
-        <div id="mobileHistogram" class="histogram-container"></div>
+        <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
         <div class="mobile-deck-list" id="mobileDeckList"></div>
-        <div class="type-summary" id="mobileTypeSummary"></div>
         <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空卡组</button>
     </div>
 
     <div class="builder-main">
         <div class="cards-section">
-            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名 / 文本"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
+            <div class="filter-panel"><div class="filter-grid"><div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名 / 文本 / 词条"></div><div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div><div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div><div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div><div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div><div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div><div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div></div></div>
             <div id="cardContainer" class="card-grid">加载中...</div>
             <div class="pagination" id="pagination"></div>
         </div>
@@ -691,13 +712,26 @@
             <div class="deck-header"><span class="deck-title">📋 我的卡组</span><button class="clear-deck" id="clearDeckBtn">清空卡组</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
             <div class="headquarters-card"><div class="hq-icon-large">🏛️</div><div class="hq-info"><div class="hq-name">总部</div></div></div>
-            <div class="stats-header"><span></span><button class="stats-btn" id="statsBtn">📊 统计</button></div>
-            <div id="pcHistogram" class="histogram-container"></div>
+            <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
             <div class="deck-list" id="deckListContainer"></div>
-            <div class="type-summary" id="pcTypeSummary"></div>
         </div>
     </div>
     <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank">GitHub</a><a href="https://space.bilibili.com/3546775476505152" target="_blank">BiliBili</a></div>
+</div>
+
+<!-- 统计模态框 -->
+<div id="statsModal" class="modal-stats">
+    <div class="modal-stats-content">
+        <div class="modal-stats-close" id="statsModalClose">&times;</div>
+        <div class="modal-stats-title">📊 卡组费用分布</div>
+        <div class="legend">
+            <span><span class="legend-dot" style="background:#e8e4d0;"></span>单位</span>
+            <span><span class="legend-dot" style="background:#f5c542;"></span>指令</span>
+            <span><span class="legend-dot" style="background:#5a5a5a;"></span>反制</span>
+        </div>
+        <div id="modalHistogramBars" class="histogram-bars"></div>
+        <div id="modalTypeSummary" class="type-summary-modal"></div>
+    </div>
 </div>
 
 <script>
@@ -801,7 +835,7 @@
     function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
     function getTypeCategory(type) { if(type === "order") return "order"; if(type === "countermeasure") return "countermeasure"; return "unit"; }
     
-    function renderHistogram(containerId, typeSummaryId) {
+    function showStatsModal() {
         const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
         for(let {card, count} of deckMap.values()) {
@@ -812,34 +846,43 @@
             else { costMap[cat].counter += count; counterTotal += count; }
         }
         const maxHeight = Math.max(...Object.values(costMap).flatMap(v=>[v.unit, v.order, v.counter]), 1);
+        const barWidth = 100 / 8; // 百分比宽度，密铺
+        
         const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
             const unitH = costMap[cost].unit, orderH = costMap[cost].order, counterH = costMap[cost].counter;
-            const unitPercent = maxHeight ? (unitH / maxHeight) * 40 : 0;
-            const orderPercent = maxHeight ? (orderH / maxHeight) * 40 : 0;
-            const counterPercent = maxHeight ? (counterH / maxHeight) * 40 : 0;
-            const tooltip = `单位:${unitH} 指令:${orderH} 反制:${counterH}`;
-            return `<div class="histogram-bar-wrapper">
-                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px">
-                            <div class="bar-counter" style="height:${counterPercent}px; background:#4a4a4a;" title="反制:${counterH}"></div>
-                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="指令:${orderH}"></div>
-                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="单位:${unitH}"></div>
+            const totalH = unitH + orderH + counterH;
+            const unitPercent = maxHeight ? (unitH / maxHeight) * 48 : 0;
+            const orderPercent = maxHeight ? (orderH / maxHeight) * 48 : 0;
+            const counterPercent = maxHeight ? (counterH / maxHeight) * 48 : 0;
+            const tooltip = `单位:${unitH}  指令:${orderH}  反制:${counterH}  总计:${totalH}`;
+            return `<div class="histogram-bar-wrapper" style="width:${barWidth}%; max-width:60px; min-width:32px;">
+                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px; width:100%;">
+                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="${tooltip}"></div>
+                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="${tooltip}"></div>
+                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="${tooltip}"></div>
                         </div>
                         <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
                         <div class="bar-tooltip">${tooltip}</div>
                     </div>`;
         }).join('');
-        document.getElementById(containerId).innerHTML = `<div class="histogram-title">📊 费用分布 (悬停看详情)</div><div class="histogram-bars">${barsHtml}</div>`;
-        document.getElementById(containerId).classList.add('show');
-        document.getElementById(typeSummaryId).innerHTML = `<span>🎖️ 单位: <span class="unit-badge">${unitTotal}</span></span><span>📜 指令: <span class="order-badge">${orderTotal}</span></span><span>🛡️ 反制: <span class="counter-badge">${counterTotal}</span></span>`;
+        
+        document.getElementById('modalHistogramBars').innerHTML = barsHtml;
+        document.getElementById('modalTypeSummary').innerHTML = `
+            <span>🎖️ 单位总数: <span class="unit-badge">${unitTotal}</span></span>
+            <span>📜 指令总数: <span class="order-badge">${orderTotal}</span></span>
+            <span>🛡️ 反制总数: <span class="counter-badge">${counterTotal}</span></span>
+        `;
+        document.getElementById('statsModal').style.display = 'flex';
     }
+    
+    function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
     function updateAllDecksUI() { 
         renderDeckList('deckListContainer'); renderDeckList('mobileDeckList'); 
         const total = Array.from(deckMap.values()).reduce((s,e)=>s+e.count,0); 
         document.getElementById('mobileToggleCount').innerText = total; 
-        const histPc = document.getElementById('pcHistogram'); const histMob = document.getElementById('mobileHistogram');
-        histPc.classList.remove('show'); histMob.classList.remove('show');
     }
+    
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId); if(!container) return; 
         if(deckMap.size===0) { container.innerHTML = '<div style="color:#ab9f7c;text-align:center;padding:16px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
@@ -849,7 +892,7 @@
             return `<div class="deck-card-row" style="border-left-color: ${borderColor};">
                         <div class="deck-card-icon" style="background-image: url('${c.faction}.svg');"></div>
                         <div class="deck-card-details">
-                            <div class="deck-card-name-line"><span class="deck-card-name">${c.titleZh}</span></div>
+                            <div class="deck-card-name">${c.titleZh}</div>
                             <div class="cost-stats"><div class="kredits-cost"><span>${c.cost}</span><span>K</span></div></div>
                         </div>
                         <span class="deck-card-qty">x${entry.count}</span>
@@ -865,15 +908,19 @@
         close?.addEventListener('click',()=>{ panel.classList.remove('open'); overlay.classList.remove('show'); });
         overlay?.addEventListener('click',()=>{ panel.classList.remove('open'); overlay.classList.remove('show'); });
         document.getElementById('mobileClearDeck')?.addEventListener('click',()=>clearDeck());
-        document.getElementById('statsBtn')?.addEventListener('click',()=>renderHistogram('pcHistogram','pcTypeSummary'));
-        document.getElementById('mobileStatsBtn')?.addEventListener('click',()=>renderHistogram('mobileHistogram','mobileTypeSummary'));
+        document.getElementById('statsBtn')?.addEventListener('click',showStatsModal);
+        document.getElementById('mobileStatsBtn')?.addEventListener('click',showStatsModal);
+        document.getElementById('statsModalClose')?.addEventListener('click',closeStatsModal);
+        document.getElementById('statsModal')?.addEventListener('click',(e)=>{ if(e.target === document.getElementById('statsModal')) closeStatsModal(); });
     }
+    
     function initNav() { 
         const menuBtn = document.getElementById('menuToggleBtn'), menuDiv = document.getElementById('navMenu'); 
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDiv.classList.toggle('open'); }; 
         document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !menuDiv.contains(e.target)) menuDiv.classList.remove('open'); }); 
         document.getElementById('clearDeckBtn')?.addEventListener('click',()=>clearDeck()); 
     }
+    
     window.addEventListener('load', () => { loadData(); initNav(); initSidebars(); });
 </script>
 </body>
