@@ -1058,14 +1058,14 @@
 <div id="imgGenModal" class="img-gen-modal">
     <div class="img-gen-content">
         <div class="img-gen-controls">
-            <div class="img-gen-control"><label>📐 每行数量</label><input type="number" id="imgCols" value="10" min="1" max="30"></div>
-            <div class="img-gen-control"><label>🎨 画质 (1-100)</label><input type="range" id="imgQuality" min="1" max="100" value="20"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
+            <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="30"></div>
+            <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 卡图语言</label><select id="imgLang"></select></div>
         </div>
         <div class="switch-row">
             <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label></div>
             <div class="switch-item"><span>🎨 背景色</span><select id="bgColorSelect"><option value="white">白色</option><option value="black">黑色</option><option value="transparent">透明</option><option value="custom">自定义</option></select></div>
-            <div class="switch-item" id="customColorDiv" style="display:none;"><span>🎨 自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
+            <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
         </div>
         <div class="img-gen-preview" id="imgGenPreview"></div>
         <div class="img-gen-actions"><button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button><button id="downloadImgBtn" class="export-btn">💾 下载图片</button><button id="closeImgModal" class="import-btn">关闭</button></div>
@@ -1087,7 +1087,6 @@
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
 
-    // 语言列表（带emoji）
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
         { code: 'en-EN', label: 'English', flag: '🇺🇸' }, { code: 'fr-FR', label: 'Français', flag: '🇫🇷' },
@@ -1133,7 +1132,6 @@
         document.getElementById('mobileMainNation').value = mainNation;
         document.getElementById('mobileAllyNation').value = allyNation;
         
-        // 填充语言下拉（带emoji）
         const langSelect = document.getElementById('imgLang');
         langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
         langSelect.value = 'zh-Hans';
@@ -1145,7 +1143,6 @@
         document.getElementById('mobileMainNation').addEventListener('change', updateMobile);
         document.getElementById('mobileAllyNation').addEventListener('change', updateMobile);
         
-        // 背景色自定义显示
         const bgSelect = document.getElementById('bgColorSelect');
         const customDiv = document.getElementById('customColorDiv');
         bgSelect.addEventListener('change', () => { customDiv.style.display = bgSelect.value === 'custom' ? 'flex' : 'none'; });
@@ -1275,7 +1272,6 @@
         } catch(e) { alert(`导入失败: ${e.message}`); }
     }
 
-    // 绘制阵营图标并返回Promise
     function drawFactionIcon(ctx, x, y, size, faction) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -1289,7 +1285,6 @@
         });
     }
 
-    // 统计卡绘制（带阵营SVG图标和稀有度颜色，垂直居中对齐）
     async function drawStatsCard(ctx, x, y, w, h, radius) {
         ctx.save();
         ctx.beginPath();
@@ -1309,7 +1304,6 @@
         ctx.lineWidth = 2;
         ctx.stroke();
         
-        // 统计信息
         let mainCount = 0, allyCount = 0, otherCount = 0;
         let rarityCounts = { Standard: 0, Limited: 0, Special: 0, Elite: 0 };
         for (let { card, count } of deckMap.values()) {
@@ -1331,14 +1325,12 @@
         const lineH = h * 0.085;
         const iconSize = Math.floor(h * 0.07);
         
-        // 主国行 - 图标和文字垂直居中对齐
-        const mainIconY = startY - iconSize/2;
+        const mainIconY = startY - iconSize;
         await drawFactionIcon(ctx, x + w * 0.08, mainIconY, iconSize, mainNation);
         ctx.fillStyle = factionColor[mainNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[mainNation]}: ${mainCount}`, x + w * 0.08 + iconSize + 8, startY);
         
-        // 盟国行
-        const allyIconY = startY + lineH - iconSize/2;
+        const allyIconY = startY + lineH - iconSize;
         await drawFactionIcon(ctx, x + w * 0.08, allyIconY, iconSize, allyNation);
         ctx.fillStyle = factionColor[allyNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[allyNation]}: ${allyCount}`, x + w * 0.08 + iconSize + 8, startY + lineH);
@@ -1353,24 +1345,22 @@
         ctx.fillStyle = "#e9dbbd";
         ctx.fillText(`总计: ${totalCards} 张`, x + w * 0.08 + iconSize + 8, startY + lineH * lineOffset);
         
-        // 稀有度（使用对应颜色，两列布局）
         const rarityY = startY + lineH * (lineOffset + 1.3);
         const col2X = x + w * 0.55;
         
-        ctx.fillStyle = "var(--rarity-standard)";
+        ctx.fillStyle = "#9e9e9e";
         ctx.fillText(`普通: ${rarityCounts.Standard}`, x + w * 0.08 + iconSize + 8, rarityY);
-        ctx.fillStyle = "var(--rarity-limited)";
+        ctx.fillStyle = "#cd7f32";
         ctx.fillText(`限定: ${rarityCounts.Limited}`, col2X, rarityY);
         
-        ctx.fillStyle = "var(--rarity-special)";
+        ctx.fillStyle = "#c0c0c0";
         ctx.fillText(`特殊: ${rarityCounts.Special}`, x + w * 0.08 + iconSize + 8, rarityY + lineH);
-        ctx.fillStyle = "var(--rarity-elite)";
+        ctx.fillStyle = "ffd700";
         ctx.fillText(`精英: ${rarityCounts.Elite}`, col2X, rarityY + lineH);
         
         ctx.restore();
     }
 
-    // 按卡组顺序获取展开的卡牌列表
     function getExpandedCardList() {
         const entries = Array.from(deckMap.values()).sort((a, b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
@@ -1397,7 +1387,6 @@
         canvas.height = rows * cardH;
         const ctx = canvas.getContext('2d');
         
-        // 背景处理
         if (bgColor === 'transparent') {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         } else if (bgColor === 'white') {
