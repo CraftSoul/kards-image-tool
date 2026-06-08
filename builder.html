@@ -1275,8 +1275,21 @@
         } catch(e) { alert(`导入失败: ${e.message}`); }
     }
 
-    // 统计卡绘制（优化版，使用阵营主题色和稀有度颜色）
-    function drawStatsCard(ctx, x, y, w, h, radius) {
+    // 统计卡绘制（带阵营SVG图标和稀有度颜色）
+    function drawFactionIcon(ctx, x, y, size, faction) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                ctx.drawImage(img, x, y, size, size);
+                resolve();
+            };
+            img.onerror = () => resolve();
+            img.src = `${faction}.svg`;
+        });
+    }
+
+    async function drawStatsCard(ctx, x, y, w, h, radius) {
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -1315,29 +1328,40 @@
         ctx.textAlign = "left";
         const startY = y + h * 0.24;
         const lineH = h * 0.08;
+        const iconSize = Math.floor(h * 0.07);
+        const textX = x + w * 0.1 + iconSize + 6;
         
-        // 主国（使用阵营主题色）
+        // 主国图标和文字
+        await drawFactionIcon(ctx, x + w * 0.1, startY - iconSize/2, iconSize, mainNation);
         ctx.fillStyle = factionColor[mainNation] || "#c9aa5b";
-        ctx.fillText(`主国 ${factionNames[mainNation]}: ${mainCount}`, x + w * 0.1, startY);
-        // 盟国
+        ctx.fillText(`主国 ${factionNames[mainNation]}: ${mainCount}`, textX, startY);
+        
+        // 盟国图标和文字
+        await drawFactionIcon(ctx, x + w * 0.1, startY + lineH - iconSize/2, iconSize, allyNation);
         ctx.fillStyle = factionColor[allyNation] || "#c9aa5b";
-        ctx.fillText(`盟国 ${factionNames[allyNation]}: ${allyCount}`, x + w * 0.1, startY + lineH);
+        ctx.fillText(`盟国 ${factionNames[allyNation]}: ${allyCount}`, textX, startY + lineH);
+        
+        let lineOffset = 2;
         if (otherCount > 0) {
             ctx.fillStyle = "#a0a0a0";
-            ctx.fillText(`其他: ${otherCount}`, x + w * 0.1, startY + lineH * 2);
+            ctx.fillText(`其他: ${otherCount}`, x + w * 0.1 + iconSize + 6, startY + lineH * 2);
+            lineOffset = 3;
         }
-        ctx.fillStyle = "#e9dbbd";
-        ctx.fillText(`总计: ${totalCards} 张`, x + w * 0.1, startY + lineH * (otherCount > 0 ? 3 : 2.5));
         
-        // 稀有度（使用稀有度颜色）
+        ctx.fillStyle = "#e9dbbd";
+        ctx.fillText(`总计: ${totalCards} 张`, x + w * 0.1 + iconSize + 6, startY + lineH * lineOffset);
+        
+        // 稀有度（使用对应颜色）
+        const rarityY = startY + lineH * (lineOffset + 1.2);
         ctx.fillStyle = "var(--rarity-standard)";
-        ctx.fillText(`普通: ${rarityCounts.Standard}`, x + w * 0.1, startY + lineH * (otherCount > 0 ? 4.5 : 4));
+        ctx.fillText(`普通: ${rarityCounts.Standard}`, x + w * 0.1 + iconSize + 6, rarityY);
         ctx.fillStyle = "var(--rarity-limited)";
-        ctx.fillText(`限定: ${rarityCounts.Limited}`, x + w * 0.1 + w * 0.35, startY + lineH * (otherCount > 0 ? 4.5 : 4));
+        ctx.fillText(`限定: ${rarityCounts.Limited}`, x + w * 0.1 + iconSize + 6 + w * 0.35, rarityY);
+        
         ctx.fillStyle = "var(--rarity-special)";
-        ctx.fillText(`特殊: ${rarityCounts.Special}`, x + w * 0.1, startY + lineH * (otherCount > 0 ? 5.5 : 5));
+        ctx.fillText(`特殊: ${rarityCounts.Special}`, x + w * 0.1 + iconSize + 6, rarityY + lineH);
         ctx.fillStyle = "var(--rarity-elite)";
-        ctx.fillText(`精英: ${rarityCounts.Elite}`, x + w * 0.1 + w * 0.35, startY + lineH * (otherCount > 0 ? 5.5 : 5));
+        ctx.fillText(`精英: ${rarityCounts.Elite}`, x + w * 0.1 + iconSize + 6 + w * 0.35, rarityY + lineH);
         
         ctx.restore();
     }
@@ -1413,7 +1437,7 @@
                     ctx.restore();
                     cardIdx++;
                 } else if (addStatsCard && cardIdx === cards.length) {
-                    drawStatsCard(ctx, x, y, cardW, cardH, radius);
+                    await drawStatsCard(ctx, x, y, cardW, cardH, radius);
                     cardIdx++;
                 }
             }
