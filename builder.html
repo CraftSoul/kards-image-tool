@@ -1275,13 +1275,13 @@
         } catch(e) { alert(`导入失败: ${e.message}`); }
     }
 
-    // 统计卡绘制（带阵营SVG图标和稀有度颜色）
+    // 统计卡绘制（带阵营SVG图标和稀有度颜色，文字垂直居中对齐）
     function drawFactionIcon(ctx, x, y, size, faction) {
         return new Promise((resolve) => {
             const img = new Image();
             img.crossOrigin = "Anonymous";
             img.onload = () => {
-                ctx.drawImage(img, x, y, size, size);
+                ctx.drawImage(img, x, y - size/2, size, size);
                 resolve();
             };
             img.onerror = () => resolve();
@@ -1326,42 +1326,54 @@
         
         ctx.font = `${Math.floor(h * 0.055)}px "Segoe UI"`;
         ctx.textAlign = "left";
-        const startY = y + h * 0.24;
+        const startY = y + h * 0.26;
         const lineH = h * 0.08;
         const iconSize = Math.floor(h * 0.07);
-        const textX = x + w * 0.1 + iconSize + 6;
+        const textX = x + w * 0.1 + iconSize + 8;
         
-        // 主国图标和文字
-        await drawFactionIcon(ctx, x + w * 0.1, startY - iconSize/2, iconSize, mainNation);
+        // 主国图标和文字（垂直对齐）
+        await drawFactionIcon(ctx, x + w * 0.1, startY, iconSize, mainNation);
         ctx.fillStyle = factionColor[mainNation] || "#c9aa5b";
         ctx.fillText(`主国 ${factionNames[mainNation]}: ${mainCount}`, textX, startY);
         
         // 盟国图标和文字
-        await drawFactionIcon(ctx, x + w * 0.1, startY + lineH - iconSize/2, iconSize, allyNation);
+        await drawFactionIcon(ctx, x + w * 0.1, startY + lineH, iconSize, allyNation);
         ctx.fillStyle = factionColor[allyNation] || "#c9aa5b";
         ctx.fillText(`盟国 ${factionNames[allyNation]}: ${allyCount}`, textX, startY + lineH);
         
         let lineOffset = 2;
         if (otherCount > 0) {
             ctx.fillStyle = "#a0a0a0";
-            ctx.fillText(`其他: ${otherCount}`, x + w * 0.1 + iconSize + 6, startY + lineH * 2);
+            ctx.fillText(`其他: ${otherCount}`, x + w * 0.1 + iconSize + 8, startY + lineH * 2);
             lineOffset = 3;
         }
         
         ctx.fillStyle = "#e9dbbd";
-        ctx.fillText(`总计: ${totalCards} 张`, x + w * 0.1 + iconSize + 6, startY + lineH * lineOffset);
+        ctx.fillText(`总计: ${totalCards} 张`, x + w * 0.1 + iconSize + 8, startY + lineH * lineOffset);
         
-        // 稀有度（使用对应颜色）
-        const rarityY = startY + lineH * (lineOffset + 1.2);
+        // 稀有度（使用对应颜色，单独着色数字部分）
+        const rarityStartY = startY + lineH * (lineOffset + 1);
+        // 普通
+        ctx.fillStyle = "#e9dbbd";
+        ctx.fillText("普通:", x + w * 0.1 + iconSize + 8, rarityStartY);
         ctx.fillStyle = "var(--rarity-standard)";
-        ctx.fillText(`普通: ${rarityCounts.Standard}`, x + w * 0.1 + iconSize + 6, rarityY);
+        ctx.fillText(`${rarityCounts.Standard}`, x + w * 0.1 + iconSize + 8 + 42, rarityStartY);
+        // 限定
+        ctx.fillStyle = "#e9dbbd";
+        ctx.fillText("限定:", x + w * 0.1 + iconSize + 8 + 110, rarityStartY);
         ctx.fillStyle = "var(--rarity-limited)";
-        ctx.fillText(`限定: ${rarityCounts.Limited}`, x + w * 0.1 + iconSize + 6 + w * 0.35, rarityY);
+        ctx.fillText(`${rarityCounts.Limited}`, x + w * 0.1 + iconSize + 8 + 152, rarityStartY);
         
+        // 特殊
+        ctx.fillStyle = "#e9dbbd";
+        ctx.fillText("特殊:", x + w * 0.1 + iconSize + 8, rarityStartY + lineH);
         ctx.fillStyle = "var(--rarity-special)";
-        ctx.fillText(`特殊: ${rarityCounts.Special}`, x + w * 0.1 + iconSize + 6, rarityY + lineH);
+        ctx.fillText(`${rarityCounts.Special}`, x + w * 0.1 + iconSize + 8 + 42, rarityStartY + lineH);
+        // 精英
+        ctx.fillStyle = "#e9dbbd";
+        ctx.fillText("精英:", x + w * 0.1 + iconSize + 8 + 110, rarityStartY + lineH);
         ctx.fillStyle = "var(--rarity-elite)";
-        ctx.fillText(`精英: ${rarityCounts.Elite}`, x + w * 0.1 + iconSize + 6 + w * 0.35, rarityY + lineH);
+        ctx.fillText(`${rarityCounts.Elite}`, x + w * 0.1 + iconSize + 8 + 152, rarityStartY + lineH);
         
         ctx.restore();
     }
