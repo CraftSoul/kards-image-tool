@@ -750,6 +750,13 @@
             border-radius: 40px;
         }
         .switch-item span { color: #e9dbbd; font-size: 0.75rem; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3222; transition: 0.2s; border-radius: 34px; border: 1px solid #b19458; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 2px; background-color: #e9cf95; transition: 0.2s; border-radius: 50%; }
+        input:checked + .slider { background-color: #7a6233; }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #fef0b6; }
+        
         .img-gen-preview {
             text-align: center;
             margin-bottom: 16px;
@@ -1262,7 +1269,7 @@
     }
 
     // 绘制圆角矩形填充框
-    function drawPlaceholder(ctx, x, y, w, h, radius, textColor, bgColor) {
+    function drawPlaceholder(ctx, x, y, w, h, radius) {
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -1275,17 +1282,17 @@
         ctx.lineTo(x, y + radius);
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
-        ctx.fillStyle = bgColor;
+        ctx.fillStyle = "#2a2a1c";
         ctx.fill();
-        ctx.fillStyle = textColor;
-        ctx.font = `bold ${Math.floor(h * 0.12)}px "Segoe UI", "Microsoft YaHei"`;
+        ctx.fillStyle = "#e9dbbd";
+        ctx.font = `bold ${Math.floor(h * 0.1)}px "Segoe UI", "Microsoft YaHei"`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("KARDS\n军械库", x + w/2, y + h/2);
         ctx.restore();
     }
     
-    function drawStatsCard(ctx, x, y, w, h, radius, mainNation, allyNation, deckMap, factionNames) {
+    function drawStatsCard(ctx, x, y, w, h, radius) {
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -1316,14 +1323,14 @@
         const totalCards = Array.from(deckMap.values()).reduce((s, e) => s + e.count, 0);
         
         ctx.fillStyle = "#ffefbf";
-        ctx.font = `bold ${Math.floor(h * 0.08)}px "Segoe UI"`;
+        ctx.font = `bold ${Math.floor(h * 0.09)}px "Segoe UI"`;
         ctx.textAlign = "center";
         ctx.fillText("卡组统计", x + w/2, y + h * 0.12);
         
         ctx.font = `${Math.floor(h * 0.055)}px "Segoe UI"`;
         ctx.fillStyle = "#e9dbbd";
         ctx.textAlign = "left";
-        const startY = y + h * 0.22;
+        const startY = y + h * 0.24;
         const lineH = h * 0.08;
         ctx.fillText(`主国 ${factionNames[mainNation]}: ${mainCount}`, x + w * 0.1, startY);
         ctx.fillText(`盟国 ${factionNames[allyNation]}: ${allyCount}`, x + w * 0.1, startY + lineH);
@@ -1334,11 +1341,24 @@
         ctx.restore();
     }
 
-    async function generateDeckImage(cols, quality, lang, fillEmpty, addStatsCard) {
-        const cards = [];
-        for (let { card, count } of deckMap.values()) {
-            for (let i = 0; i < count; i++) cards.push(card);
+    // 按卡组顺序获取展开的卡牌列表（每个count展开成多张，保持deckMap中的原始顺序）
+    function getExpandedCardList() {
+        const entries = Array.from(deckMap.values()).sort((a, b) => {
+            const idxA = allCards.findIndex(c => c.id === a.card.id);
+            const idxB = allCards.findIndex(c => c.id === b.card.id);
+            return idxA - idxB;
+        });
+        const result = [];
+        for (const entry of entries) {
+            for (let i = 0; i < entry.count; i++) {
+                result.push(entry.card);
+            }
         }
+        return result;
+    }
+
+    async function generateDeckImage(cols, quality, lang, fillEmpty, addStatsCard) {
+        const cards = getExpandedCardList();
         if (cards.length === 0) throw new Error("卡组为空");
         
         const cardW = 500, cardH = 702, radius = 12;
@@ -1379,12 +1399,10 @@
                     ctx.restore();
                     cardIdx++;
                 } else if (fillEmpty && cardIdx < totalCards) {
-                    // 空位填充
-                    drawPlaceholder(ctx, x, y, cardW, cardH, radius, "#e9dbbd", "#2a2a1c");
+                    drawPlaceholder(ctx, x, y, cardW, cardH, radius);
                     cardIdx++;
                 } else if (addStatsCard && cardIdx === cards.length) {
-                    // 统计卡
-                    drawStatsCard(ctx, x, y, cardW, cardH, radius, mainNation, allyNation, deckMap, factionNames);
+                    drawStatsCard(ctx, x, y, cardW, cardH, radius);
                     cardIdx++;
                 }
             }
@@ -1412,7 +1430,7 @@
         if (deckMap.size === 0) { alert("卡组为空，无法生成图片"); return; }
         const modal = document.getElementById('imgGenModal');
         modal.style.display = 'flex';
-        await updateImgPreview();
+        // 不自动生成，等待用户点击生成预览按钮
         
         document.getElementById('generatePreviewBtn').onclick = () => updateImgPreview();
         document.getElementById('downloadImgBtn').onclick = () => {
@@ -1425,13 +1443,10 @@
         };
         document.getElementById('closeImgModal').onclick = () => { modal.style.display = 'none'; };
         
-        // 监听开关变化自动刷新
-        document.getElementById('imgCols').onchange = () => updateImgPreview();
-        document.getElementById('imgQuality').oninput = () => { document.getElementById('qualityVal').innerText = document.getElementById('imgQuality').value; };
-        document.getElementById('imgQuality').onchange = () => updateImgPreview();
-        document.getElementById('imgLang').onchange = () => updateImgPreview();
-        document.getElementById('fillEmptyToggle').onchange = () => updateImgPreview();
-        document.getElementById('statsCardToggle').onchange = () => updateImgPreview();
+        // 滑块显示实时数值
+        const qualitySlider = document.getElementById('imgQuality');
+        const qualityVal = document.getElementById('qualityVal');
+        qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
     }
 
     function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
