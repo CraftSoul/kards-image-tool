@@ -679,8 +679,6 @@
         .legend {
             display: none;
         }
-
-        /* 图片生成模态框 */
         .img-gen-modal {
             display: none;
             position: fixed;
@@ -1325,12 +1323,12 @@
         const lineH = h * 0.085;
         const iconSize = Math.floor(h * 0.07);
         
-        const mainIconY = startY - iconSize;
+        const mainIconY = startY - iconSize*0.7;
         await drawFactionIcon(ctx, x + w * 0.08, mainIconY, iconSize, mainNation);
         ctx.fillStyle = factionColor[mainNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[mainNation]}: ${mainCount}`, x + w * 0.08 + iconSize + 8, startY);
         
-        const allyIconY = startY + lineH - iconSize;
+        const allyIconY = startY + lineH - iconSize*0.7;
         await drawFactionIcon(ctx, x + w * 0.08, allyIconY, iconSize, allyNation);
         ctx.fillStyle = factionColor[allyNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[allyNation]}: ${allyCount}`, x + w * 0.08 + iconSize + 8, startY + lineH);
@@ -1355,7 +1353,7 @@
         
         ctx.fillStyle = "#c0c0c0";
         ctx.fillText(`特殊: ${rarityCounts.Special}`, x + w * 0.08 + iconSize + 8, rarityY + lineH);
-        ctx.fillStyle = "ffd700";
+        ctx.fillStyle = "#ffd700";
         ctx.fillText(`精英: ${rarityCounts.Elite}`, col2X, rarityY + lineH);
         
         ctx.restore();
