@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>关于军械库 | KARDS 军械库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #2b2b1f;
+            background-image: 
+                radial-gradient(circle at 20% 40%, rgba(80, 70, 40, 0.4) 2%, transparent 2.5%),
+                radial-gradient(circle at 70% 85%, rgba(60, 50, 30, 0.5) 1.8%, transparent 2.2%),
+                radial-gradient(circle at 45% 20%, rgba(110, 90, 50, 0.3) 3%, transparent 3.5%),
+                repeating-linear-gradient(45deg, #5e5536 0px, #5e5536 2px, #7e6e48 2px, #7e6e48 8px),
+                repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
+            background-blend-mode: overlay, normal;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 20px 32px;
+        }
+
+        .nav-bar {
+            background: rgba(20, 20, 15, 0.96);
+            backdrop-filter: blur(16px);
+            border: 1px solid #aa8e4e;
+            border-radius: 20px;
+            margin-bottom: 28px;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+        }
+
+        .nav-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(170, 142, 78, 0.3);
+        }
+
+        .nav-brand {
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+
+        .menu-btn {
+            background: rgba(210, 210, 225, 0.12);
+            border: 1px solid #aa8e4e;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .menu-btn span {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background-color: #f2e2b0;
+            border-radius: 2px;
+        }
+        .nav-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out;
+            background: rgba(10, 10, 8, 0.98);
+        }
+        .nav-menu.open { max-height: 320px; }
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px 20px 20px;
+        }
+        .menu-link {
+            display: block;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 12px 20px;
+            border-radius: 60px;
+            background: rgba(210, 210, 225, 0.08);
+            color: #eef0ff;
+            text-align: center;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .menu-link:hover { background: rgba(235, 235, 245, 0.2); border-color: #c9a53b; }
+        .menu-link.active {
+            background: #c9a53b;
+            color: #1e1c10;
+            font-weight: 700;
+        }
+
+        .about-section {
+            background: rgba(30, 28, 20, 0.68);
+            backdrop-filter: blur(8px);
+            border-radius: 32px;
+            padding: 2rem 1.8rem;
+            border: 1px solid rgba(170, 142, 78, 0.5);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+        }
+
+        .content-block {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            transition: all 0.2s;
+        }
+        .content-block.image-text {
+            flex-direction: row;
+        }
+        .content-block.text-image {
+            flex-direction: row-reverse;
+        }
+
+        .block-image {
+            flex: 1.2;
+            min-width: 0;
+        }
+        .block-image img {
+            width: 100%;
+            max-width: 380px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            display: block;
+            margin: 0 auto;
+            transition: transform 0.2s ease;
+            background: #2d291b;
+            border: 1px solid #c7aa60;
+        }
+        .block-image img:hover {
+            transform: scale(1.01);
+        }
+        .block-text {
+            flex: 1.4;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 1.2rem 1.6rem;
+            border-radius: 24px;
+            border-left: 4px solid #dbb45c;
+            backdrop-filter: blur(4px);
+        }
+        .block-text h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #f9efcf, #e6cc8a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.2px;
+        }
+        .block-text p {
+            font-size: 1rem;
+            line-height: 1.55;
+            color: #f3ecda;
+            margin-bottom: 0.5rem;
+        }
+        .block-text a {
+            color: #fad974;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px dotted #e6bc6a;
+            transition: 0.15s;
+        }
+        .block-text a:hover {
+            color: #ffefb3;
+            border-bottom-color: #ffda8a;
+        }
+
+        .divider-line {
+            margin: 1rem 0 2rem;
+            text-align: center;
+        }
+        .divider-line span {
+            display: inline-block;
+            width: 60px;
+            height: 2px;
+            background: #bba463;
+            border-radius: 2px;
+            margin: 0 8px;
+        }
+
+        .footer-simple {
+            margin-top: 2.8rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid #928451;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.2rem 2rem;
+            font-size: 0.85rem;
+        }
+        .footer-simple a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            color: #f8efcf;
+            background: rgba(0,0,0,0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: 0.2s;
+        }
+        .footer-simple a:hover { background: #b48b3f; color: #181d0e; }
+        .footer-simple img { width: 18px; height: 18px; filter: invert(0.95); }
+
+        @media (max-width: 780px) {
+            .app-container { padding: 12px 16px 24px; }
+            .about-section { padding: 1.5rem; }
+            .content-block {
+                flex-direction: column !important;
+                gap: 1.5rem;
+                margin-bottom: 2.5rem;
+            }
+            .block-image img {
+                max-width: 280px;
+            }
+            .block-text {
+                width: 100%;
+                text-align: center;
+            }
+            .block-text h2 { font-size: 1.45rem; }
+        }
+
+        @media (max-width: 480px) {
+            .block-text { padding: 1rem; }
+            .block-text h2 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="nav-bar">
+        <div class="nav-header-row">
+            <div class="nav-brand">KARDS 军械库</div>
+            <div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <div class="menu-links">
+                <a class="menu-link" href="index.html" data-target="index">卡牌收藏</a>
+                <a class="menu-link" href="builder.html" data-target="builder">卡组构筑</a>
+                <a class="menu-link" href="seek.html" data-target="seek">英文直检</a>
+                <a class="menu-link active" href="#" data-target="about">关于军械库</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <!-- 官方政策声明 -->
+        <div class="content-block image-text" id="block1">
+            <div class="block-image">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/zh-Hans/sincerely_yours.avif&q=100" alt="sincerely yours 卡牌示例" loading="lazy">
+            </div>
+            <div class="block-text">
+                <h2>📜 声明</h2>
+                <p>KARDS 军械库遵循1939 Games的 <a href="https://support.kards.com/hc/en-us/articles/360027838532-KARDS-Community-License" target="_blank" rel="noopener noreferrer">"Community content policy" (社区内容政策)</a> ，使用<a href="https://www.1939games.com/" target="_blank" rel="noopener noreferrer">1939 Games</a> 拥有的资产。1939 Games 并未直接支持或赞助本项目。所有卡牌图像版权归 1939 Games 所有，本项目仅作非商业学习与工具用途。</p>
+                <p>沙漠之狐向你致敬！</p>
+            </div>
+        </div>
+
+        <!-- 卡牌收藏介绍 -->
+        <div class="content-block text-image" id="block2">
+            <div class="block-image">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/de-DE/spoils_of_war.avif&q=100" alt="Spoils of War 卡牌示意" loading="lazy">
+            </div>
+            <div class="block-text">
+                <h2>📚 卡牌收藏</h2>
+                <p>通过Weserv从官网获取卡图，轻量迅速，全语言支持。</p>
+            </div>
+        </div>
+
+        <!-- 卡组构筑 -->
+        <div class="content-block image-text" id="block3">
+            <div class="block-image">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/ja-JP/reorganize.avif&q=100" alt="Reorganize 卡牌示例" loading="lazy">
+            </div>
+            <div class="block-text">
+                <h2>🛠️ 卡组构筑</h2>
+                <p>完全无限制的卡组编辑器，支持导入&导出卡组代码、生成卡组图片(支持自定义参数，如质量、规格)。</p>
+                <p>送你一套全盛德美跳：%%15|;;bK;bKbKbKbKbKbKbKbKbK</p>
+            </div>
+        </div>
+
+        <!-- 英文直检 -->
+        <div class="content-block text-image" id="block4">
+            <div class="block-image">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/fr-FR/resistance.avif&q=100" alt="Résistance 卡面 含旧版抵抗" loading="lazy">
+            </div>
+            <div class="block-text">
+                <h2>⚡ 英文直检</h2>
+                <p>最灵活、轻量的检索方式，无需维护卡牌 JSON 数据，直接依据命名规则探测卡图。支持自动发现同名版本，甚至包含旧版“抵抗”。</p>
+            </div>
+        </div>
+
+    <div class="footer-simple">
+        <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a>
+        <a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const navMenu = document.getElementById('navMenu');
+        if (menuToggleBtn) {
+            menuToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navMenu.classList.toggle('open');
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (!menuToggleBtn?.contains(e.target) && !navMenu?.contains(e.target) && navMenu?.classList.contains('open')) {
+                navMenu.classList.remove('open');
+            }
+        });
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('open');
+            });
+        });
+        const currentPath = window.location.pathname;
+    })();
+</script>
+</body>
+</html>
