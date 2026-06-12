@@ -460,13 +460,14 @@
             font-size: 0.8rem;
         }
         .footer-simple {
-            margin-top: 2rem;
-            padding-top: 1rem;
+            margin-top: 2.8rem;
+            padding-top: 1.2rem;
             border-top: 1px solid #928451;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 1.2rem 2rem;
+            font-size: 0.85rem;
         }
         .footer-simple a {
             display: inline-flex;
@@ -477,6 +478,7 @@
             background: rgba(0,0,0,0.4);
             padding: 0.4rem 1rem;
             border-radius: 40px;
+            transition: 0.2s;
         }
         .footer-simple a:hover { background: #b48b3f; color: #181d0e; }
         .footer-simple img { width: 18px; height: 18px; filter: invert(0.95); }
@@ -516,21 +518,17 @@
 <div id="cardModal" class="modal"><div class="modal-content" id="modalContent"><span class="modal-close">&times;</span><div class="modal-left"><img id="modalImg" class="modal-img" alt="card art"><div style="margin:8px 0 0; display:flex; gap:8px; align-items:center;"><span style="color:#e9dbbd;">🎨 卡图版本</span><select id="modalVersionSelect" class="version-select"></select></div><div class="lang-switch" id="modalLangSwitch"></div><div class="modal-actions"><button class="action-btn" id="saveImgBtn">💾 保存图片</button><button class="action-btn" id="copyLinkBtn">🔗 复制链接</button></div></div><div class="modal-right"><div style="display:flex; align-items:center; gap:6px;"><span id="modalFactionIcon"></span><h2 id="modalName" style="font-size:1.3rem; margin:0;"></h2></div><div class="detail-line"><span id="modalFaction"></span> | <span id="modalType"></span> | <span id="modalRarity"></span></div><div id="modalCostDefense" class="badge-stat"></div><div class="detail-line"><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line;"></span></div><div class="detail-line"><strong>✨ 词条</strong> <span id="modalAttributes"></span></div><div class="detail-line"><strong>📦 扩展包</strong> <span id="modalSet"></span></div><div class="detail-line"><strong>🌐 英文名</strong> <span id="modalEnName"></span></div><div class="detail-line"><strong>🔧 导入代码</strong> <span id="modalImportId"></span></div></div></div></div>
 
 <script>
-    const CURRENT_CARD_VERSION = "v51";
+    const VERSION = "v51";
     
-    function generateVersionList(currentVer) {
-        const match = currentVer.match(/v(\d+)/i);
-        if (!match) return [currentVer];
-        let currentNum = parseInt(match[1], 10);
-        let startNum = Math.max(1, currentNum - 9);
+    function generateVersionList() {
         let versions = [];
-        for (let i = startNum; i <= currentNum; i++) {
-            versions.push(`v${i}`);
+        for (let i = 0; i <= 10; i++) {
+            versions.push(`v${VERSION-i}`);
         }
         return versions;
     }
-    const AVAILABLE_VERSIONS = generateVersionList(CURRENT_CARD_VERSION);  // 例如 ["v42","v43"..."v51"]
-    const DEFAULT_VERSION = CURRENT_CARD_VERSION;
+    const AVAILABLE_VERSIONS = generateVersionList();
+    const DEFAULT_VERSION = VERSION;
 
     const attrTranslation = {
         "blitz":"闪击","fury":"奋战","smokescreen":"烟幕","pincer":"钳击","salvage":"收缴",
