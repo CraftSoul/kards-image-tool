@@ -518,7 +518,7 @@
 <div id="cardModal" class="modal"><div class="modal-content" id="modalContent"><span class="modal-close">&times;</span><div class="modal-left"><img id="modalImg" class="modal-img" alt="card art"><div style="margin:8px 0 0; display:flex; gap:8px; align-items:center;"><span style="color:#e9dbbd;">🎨 卡图版本</span><select id="modalVersionSelect" class="version-select"></select></div><div class="lang-switch" id="modalLangSwitch"></div><div class="modal-actions"><button class="action-btn" id="saveImgBtn">💾 保存图片</button><button class="action-btn" id="copyLinkBtn">🔗 复制链接</button></div></div><div class="modal-right"><div style="display:flex; align-items:center; gap:6px;"><span id="modalFactionIcon"></span><h2 id="modalName" style="font-size:1.3rem; margin:0;"></h2></div><div class="detail-line"><span id="modalFaction"></span> | <span id="modalType"></span> | <span id="modalRarity"></span></div><div id="modalCostDefense" class="badge-stat"></div><div class="detail-line"><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line;"></span></div><div class="detail-line"><strong>✨ 词条</strong> <span id="modalAttributes"></span></div><div class="detail-line"><strong>📦 扩展包</strong> <span id="modalSet"></span></div><div class="detail-line"><strong>🌐 英文名</strong> <span id="modalEnName"></span></div><div class="detail-line"><strong>🔧 导入代码</strong> <span id="modalImportId"></span></div></div></div></div>
 
 <script>
-    const VERSION = "v51";
+    const VERSION = 51;
     
     function generateVersionList() {
         let versions = [];
@@ -528,7 +528,7 @@
         return versions;
     }
     const AVAILABLE_VERSIONS = generateVersionList();
-    const DEFAULT_VERSION = VERSION;
+    const DEFAULT_VERSION = `v${VERSION}`;
 
     const attrTranslation = {
         "blitz":"闪击","fury":"奋战","smokescreen":"烟幕","pincer":"钳击","salvage":"收缴",
