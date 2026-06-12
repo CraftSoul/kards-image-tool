@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>KARDS军械库 | 卡牌收藏</title>
+    <title>KARDS 军械库 | 卡牌收藏</title>
     <style>
         * {
             margin: 0;
@@ -186,6 +186,8 @@
             border-color: #b69654;
             font-size: 0.7rem;
             padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            cursor: pointer;
         }
         .row-filters {
             display: flex;
@@ -476,6 +478,8 @@
             padding: 0.4rem 1rem;
             border-radius: 40px;
         }
+        .footer-simple a:hover { background: #b48b3f; color: #181d0e; }
+        .footer-simple img { width: 18px; height: 18px; filter: invert(0.95); }
     </style>
 </head>
 <body>
@@ -491,10 +495,10 @@
             <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div>
         </div>
 
-        <div class="filter-group"><div class="filter-group-title">🏳 阵营 (多选) <span class="reset-chip" data-filter-type="faction">✖ 清除</span></div><div class="multi-select-btns" id="factionMultiContainer"></div></div>
-        <div class="filter-group"><div class="filter-group-title">♠️ 类型 (多选) <span class="reset-chip" data-filter-type="type">✖ 清除</span></div><div class="multi-select-btns" id="typeMultiContainer"></div></div>
-        <div class="filter-group"><div class="filter-group-title">💰 花费 (多选) <span class="reset-chip" data-filter-type="cost">✖ 清除</span></div><div class="multi-select-btns" id="costMultiContainer"></div></div>
-        <div class="filter-group"><div class="filter-group-title">🃏 稀有度 (多选) <span class="reset-chip" data-filter-type="rarity">✖ 清除</span></div><div class="multi-select-btns" id="rarityMultiContainer"></div></div>
+        <div class="filter-group"><div class="filter-group-title">🏳 阵营 <span class="reset-chip" data-filter-type="faction">✖ 清除</span></div><div class="multi-select-btns" id="factionMultiContainer"></div></div>
+        <div class="filter-group"><div class="filter-group-title">♠️ 类型 <span class="reset-chip" data-filter-type="type">✖ 清除</span></div><div class="multi-select-btns" id="typeMultiContainer"></div></div>
+        <div class="filter-group"><div class="filter-group-title">💰 花费 <span class="reset-chip" data-filter-type="cost">✖ 清除</span></div><div class="multi-select-btns" id="costMultiContainer"></div></div>
+        <div class="filter-group"><div class="filter-group-title">🃏 稀有度 <span class="reset-chip" data-filter-type="rarity">✖ 清除</span></div><div class="multi-select-btns" id="rarityMultiContainer"></div></div>
 
         <div id="statsArea" style="display: none;">
             <div class="stats-group"><div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><input type="number" id="attackExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="20"></div>
@@ -512,7 +516,28 @@
 <div id="cardModal" class="modal"><div class="modal-content" id="modalContent"><span class="modal-close">&times;</span><div class="modal-left"><img id="modalImg" class="modal-img" alt="card art"><div style="margin:8px 0 0; display:flex; gap:8px; align-items:center;"><span style="color:#e9dbbd;">🎨 卡图版本</span><select id="modalVersionSelect" class="version-select"></select></div><div class="lang-switch" id="modalLangSwitch"></div><div class="modal-actions"><button class="action-btn" id="saveImgBtn">💾 保存图片</button><button class="action-btn" id="copyLinkBtn">🔗 复制链接</button></div></div><div class="modal-right"><div style="display:flex; align-items:center; gap:6px;"><span id="modalFactionIcon"></span><h2 id="modalName" style="font-size:1.3rem; margin:0;"></h2></div><div class="detail-line"><span id="modalFaction"></span> | <span id="modalType"></span> | <span id="modalRarity"></span></div><div id="modalCostDefense" class="badge-stat"></div><div class="detail-line"><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line;"></span></div><div class="detail-line"><strong>✨ 词条</strong> <span id="modalAttributes"></span></div><div class="detail-line"><strong>📦 扩展包</strong> <span id="modalSet"></span></div><div class="detail-line"><strong>🌐 英文名</strong> <span id="modalEnName"></span></div><div class="detail-line"><strong>🔧 导入代码</strong> <span id="modalImportId"></span></div></div></div></div>
 
 <script>
-    const attrTranslation = { "blitz":"闪击","fury":"奋战","smokescreen":"烟幕","pincer":"钳击","salvage":"收缴","guard":"守护","heavyarmor1":"重甲1","heavyarmor2":"重甲2","heavyarmor3":"重甲3","alpine":"山地","mobilize":"动员","covert":"隐蔽","shock":"冲击","bond":"协力","ambush":"伏击","intel1":"情报1","intel2":"情报2","intel3":"情报3" };
+    const CURRENT_CARD_VERSION = "v51";
+    
+    function generateVersionList(currentVer) {
+        const match = currentVer.match(/v(\d+)/i);
+        if (!match) return [currentVer];
+        let currentNum = parseInt(match[1], 10);
+        let startNum = Math.max(1, currentNum - 9);
+        let versions = [];
+        for (let i = startNum; i <= currentNum; i++) {
+            versions.push(`v${i}`);
+        }
+        return versions;
+    }
+    const AVAILABLE_VERSIONS = generateVersionList(CURRENT_CARD_VERSION);  // 例如 ["v42","v43"..."v51"]
+    const DEFAULT_VERSION = CURRENT_CARD_VERSION;
+
+    const attrTranslation = {
+        "blitz":"闪击","fury":"奋战","smokescreen":"烟幕","pincer":"钳击","salvage":"收缴",
+        "guard":"守护","heavyarmor1":"重甲1","heavyarmor2":"重甲2","heavyarmor3":"重甲3",
+        "alpine":"山地","mobilize":"动员","covert":"隐蔽","shock":"冲击","bond":"协力","ambush":"伏击",
+        "intel1":"情报1","intel2":"情报2","intel3":"情报3"
+    };
     function translateAttributes(attrs) { if(!attrs?.length) return "无"; let hasVeteran=false, filtered=[]; for(let a of attrs){ if(a==="OnlySpawnable"||a.startsWith("BecomesVeteran:")) hasVeteran=true; else if(a.startsWith("VeteranOf:")) filtered.push("老兵"); else filtered.push(attrTranslation[a]||a); } if(hasVeteran) filtered.push("晋升老兵"); return [...new Set(filtered)].join(", "); }
     const rarityNames = { "Standard":"普通","Limited":"限定","Special":"特殊","Elite":"精英" };
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国","anzac":"澳新军团" };
@@ -521,10 +546,13 @@
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
     let allCards = [], filteredCards = [];
     let currentPage = 1, PAGE_SIZE = 20;
-    let currentModalCard = null, currentModalLang = "zh-Hans", currentModalVersion = null;
-    let availableVersions = ["v48"]; // 动态从数据提取
+    let currentModalCard = null, currentModalLang = "zh-Hans", currentModalVersion = DEFAULT_VERSION;
 
-    function getCardImageUrl(imgName, lang, version) { if(!imgName) return ""; const ver = version || availableVersions[availableVersions.length-1]; return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${imgName}&q=90`; }
+    function getCardImageUrl(imgName, lang, version, quality = 20) {
+        if(!imgName) return "";
+        const ver = version || DEFAULT_VERSION;
+        return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${imgName}&q=${quality}`;
+    }
 
     async function loadData() {
         try {
@@ -550,22 +578,10 @@
                     rawJson: j
                 };
             });
-            extractVersionRange();
             initMultiFilters();
             initStaticFilters();
             applyFilters();
         } catch(e) { console.error(e); document.getElementById('cardContainer').innerHTML = '<div>❌ 数据加载失败</div>'; }
-    }
-
-    function extractVersionRange() {
-        // 模拟从imageUrl或硬编码，也可扩展：实际可以从任意图片路径推断，这里使用固定范围支持v38~v48，并动态取最高
-        const maxGuess = 48;
-        let minVer = 38;
-        availableVersions = [];
-        for(let i=minVer; i<=maxGuess; i++) availableVersions.push(`v${i}`);
-        // 确保v48存在
-        if(!availableVersions.includes("v48")) availableVersions.push("v48");
-        availableVersions.sort();
     }
 
     let selectedFilters = { factions: new Set(), types: new Set(), costs: new Set(), rarities: new Set() };
@@ -664,10 +680,10 @@
         const start = (currentPage-1)*PAGE_SIZE;
         const pageCards = filteredCards.slice(start, start+PAGE_SIZE);
         const container = document.getElementById('cardContainer');
-        if(!pageCards.length) { container.innerHTML = '<div>未找到卡牌</div>'; return; }
+        if(!pageCards.length) { container.innerHTML = '<div>未找到</div>'; return; }
         container.innerHTML = pageCards.map((card, idx) => {
             const globalIdx = filteredCards.indexOf(card);
-            const imgUrl = getCardImageUrl(card.image, "zh-Hans", availableVersions[availableVersions.length-1]);
+            const imgUrl = getCardImageUrl(card.image, "zh-Hans", DEFAULT_VERSION, 20);
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
             return `<div class="card-item" data-index="${globalIdx}" style="border-color: ${factionColor[card.faction] || '#6b6e5c'};"><div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${card.titleZh}"></div><div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div></div>`;
         }).join('');
@@ -675,13 +691,71 @@
     }
     function renderPagination() { const total=filteredCards.length, pages=Math.ceil(total/PAGE_SIZE); const pagDiv=document.getElementById('pagination'); if(pages<=1){pagDiv.innerHTML='';return;} let btns=`<button class="page-btn" data-page="prev" ${currentPage===1?'disabled':''}>◀</button>`; for(let i=1;i<=pages;i++) btns+=`<button class="page-btn ${i===currentPage?'active-page':''}" data-page="${i}">${i}</button>`; btns+=`<button class="page-btn" data-page="next" ${currentPage===pages?'disabled':''}>▶</button>`; pagDiv.innerHTML=btns; pagDiv.querySelectorAll('.page-btn').forEach(btn=>btn.addEventListener('click',()=>{let p=btn.dataset.page; if(p==='prev') currentPage=Math.max(1,currentPage-1); else if(p==='next') currentPage=Math.min(pages,currentPage+1); else currentPage=parseInt(p); renderCards(); renderPagination();}));}
     
-    function openModal(index) { const card=filteredCards[index]; if(!card) return; currentModalCard=card; currentModalLang="zh-Hans"; currentModalVersion=availableVersions[availableVersions.length-1]; updateModalContentAndImage(); buildModalVersionSelect(); buildLangSwitch(); document.getElementById('cardModal').style.display='flex'; }
-    function updateModalContentAndImage() { if(!currentModalCard) return; const c=currentModalCard; const themeColor=factionColor[c.faction]||'#6b6e5c'; document.getElementById('modalContent').style.borderColor=themeColor; document.getElementById('modalFactionIcon').innerHTML=`<img class="faction-icon-lg" src="${c.faction}.svg" onerror="this.style.display='none'">`; document.getElementById('modalFaction').innerHTML=factionNames[c.faction]||c.faction; document.getElementById('modalType').innerHTML=typeMap[c.type]||c.type; document.getElementById('modalRarity').innerHTML=rarityNames[c.rarity]||c.rarity; const reserveSpan=c.reserved?'<span class="reserve-badge"></span>':''; let titleText=c.titleMap?.[currentModalLang]||c.titleZh; document.getElementById('modalName').innerHTML=`${titleText} ${reserveSpan}`; let textContent=c.textMap?.[currentModalLang]||c.text_zh||"无描述"; document.getElementById('modalText').innerHTML=textContent; let statLine=`💰 花费: ${c.cost}`; if(c.attack!==undefined) statLine+=` &nbsp; ⚔️ ${c.attack} / 🛡️ ${c.defense}`; if(c.operationCost!==undefined) statLine+=` &nbsp; ⚙️ 油费: ${c.operationCost}`; document.getElementById('modalCostDefense').innerHTML=statLine; document.getElementById('modalCostDefense').style.borderLeftColor=themeColor; document.getElementById('modalAttributes').innerHTML=translateAttributes(c.attributes); document.getElementById('modalSet').innerHTML=c.setName; document.getElementById('modalEnName').innerHTML=c.titleEn||'---'; document.getElementById('modalImportId').innerHTML=c.importId||'---'; const imgUrl=getCardImageUrl(c.image, currentModalLang, currentModalVersion); document.getElementById('modalImg').src=imgUrl; }
-    function buildModalVersionSelect() { const select=document.getElementById('modalVersionSelect'); select.innerHTML=availableVersions.map(v=>`<option value="${v}" ${currentModalVersion===v?'selected':''}>${v.toUpperCase()}</option>`).join(''); select.onchange=(e)=>{ currentModalVersion=e.target.value; updateModalContentAndImage(); }; }
-    function buildLangSwitch() { const container=document.getElementById('modalLangSwitch'); const languages=["zh-Hans","zh-Hant","en-EN","fr-FR","de-DE","pl-PL","pt-BR","ru-RU","it-IT","es-ES","ko-KR","ja-JP"]; const langNames={"zh-Hans":"简中","zh-Hant":"繁中","en-EN":"EN","fr-FR":"FR","de-DE":"DE","pl-PL":"PL","pt-BR":"PT","ru-RU":"RU","it-IT":"IT","es-ES":"ES","ko-KR":"KR","ja-JP":"JP"}; container.innerHTML=languages.map(l=>`<button class="lang-btn ${currentModalLang===l?'active':''}" data-lang="${l}">${langNames[l]}</button>`).join(''); container.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',()=>{currentModalLang=btn.dataset.lang; updateModalContentAndImage(); buildLangSwitch();})); }
-    async function saveCardAsRoundedPng() { const imgEl=document.getElementById('modalImg'); if(!imgEl?.complete||imgEl.naturalWidth===0){alert("图片未加载完成");return;} const img=new Image(); img.crossOrigin="Anonymous"; img.src=imgEl.src; await new Promise((r,j)=> {img.onload=r; img.onerror=j;}); const w=img.width,h=img.height,canvas=document.createElement('canvas'); canvas.width=w;canvas.height=h; const ctx=canvas.getContext('2d'); ctx.beginPath(); const r=12; ctx.moveTo(r,0); ctx.lineTo(w-r,0); ctx.quadraticCurveTo(w,0,w,r); ctx.lineTo(w,h-r); ctx.quadraticCurveTo(w,h,w-r,h); ctx.lineTo(r,h); ctx.quadraticCurveTo(0,h,0,h-r); ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0); ctx.clip(); ctx.drawImage(img,0,0,w,h); const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download=`${currentModalCard?.titleZh||'card'}_${currentModalLang}.png`; a.click(); }
+    function openModal(index) { const card=filteredCards[index]; if(!card) return; currentModalCard=card; currentModalLang="zh-Hans"; currentModalVersion = DEFAULT_VERSION; updateModalContentAndImage(); buildModalVersionSelect(); buildLangSwitch(); document.getElementById('cardModal').style.display='flex'; }
+    
+    function updateModalContentAndImage() { 
+        if(!currentModalCard) return; 
+        const c=currentModalCard; 
+        const themeColor=factionColor[c.faction]||'#6b6e5c'; 
+        document.getElementById('modalContent').style.borderColor=themeColor; 
+        document.getElementById('modalFactionIcon').innerHTML=`<img class="faction-icon-lg" src="${c.faction}.svg" onerror="this.style.display='none'">`; 
+        document.getElementById('modalFaction').innerHTML=factionNames[c.faction]||c.faction; 
+        document.getElementById('modalType').innerHTML=typeMap[c.type]||c.type; 
+        document.getElementById('modalRarity').innerHTML=rarityNames[c.rarity]||c.rarity; 
+        const reserveSpan=c.reserved?'<span class="reserve-badge"></span>':''; 
+        let titleText=c.titleMap?.[currentModalLang]||c.titleZh; 
+        document.getElementById('modalName').innerHTML=`${titleText} ${reserveSpan}`; 
+        let textContent=c.textMap?.[currentModalLang]||c.text_zh||"无描述"; 
+        document.getElementById('modalText').innerHTML=textContent; 
+        let statLine=`💰 花费: ${c.cost}`; 
+        if(c.attack!==undefined) statLine+=` &nbsp; ⚔️ ${c.attack} / 🛡️ ${c.defense}`; 
+        if(c.operationCost!==undefined) statLine+=` &nbsp; ⚙️ 油费: ${c.operationCost}`; 
+        document.getElementById('modalCostDefense').innerHTML=statLine; 
+        document.getElementById('modalCostDefense').style.borderLeftColor=themeColor; 
+        document.getElementById('modalAttributes').innerHTML=translateAttributes(c.attributes); 
+        document.getElementById('modalSet').innerHTML=c.setName; 
+        document.getElementById('modalEnName').innerHTML=c.titleEn||'---'; 
+        document.getElementById('modalImportId').innerHTML=c.importId||'---'; 
+        const imgUrl=getCardImageUrl(c.image, currentModalLang, currentModalVersion, 100); 
+        document.getElementById('modalImg').src=imgUrl; 
+    }
+    
+    function buildModalVersionSelect() { 
+        const select=document.getElementById('modalVersionSelect'); 
+        select.innerHTML=AVAILABLE_VERSIONS.map(v=>`<option value="${v}" ${currentModalVersion===v?'selected':''}>${v.toUpperCase()}</option>`).join(''); 
+        select.onchange=(e)=>{ currentModalVersion=e.target.value; updateModalContentAndImage(); }; 
+    }
+    
+    function buildLangSwitch() { 
+        const container=document.getElementById('modalLangSwitch'); 
+        const languages=["zh-Hans","zh-Hant","en-EN","fr-FR","de-DE","pl-PL","pt-BR","ru-RU","it-IT","es-ES","ko-KR","ja-JP"]; 
+        const langNames={"zh-Hans":"简中","zh-Hant":"繁中","en-EN":"EN","fr-FR":"FR","de-DE":"DE","pl-PL":"PL","pt-BR":"PT","ru-RU":"RU","it-IT":"IT","es-ES":"ES","ko-KR":"KR","ja-JP":"JP"}; 
+        container.innerHTML=languages.map(l=>`<button class="lang-btn ${currentModalLang===l?'active':''}" data-lang="${l}">${langNames[l]}</button>`).join(''); 
+        container.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',()=>{currentModalLang=btn.dataset.lang; updateModalContentAndImage(); buildLangSwitch();})); 
+    }
+    
+    async function saveCardAsRoundedPng() { 
+        const imgEl=document.getElementById('modalImg'); 
+        if(!imgEl?.complete||imgEl.naturalWidth===0){alert("图片未加载完成");return;} 
+        const img=new Image(); img.crossOrigin="Anonymous"; img.src=imgEl.src; 
+        await new Promise((r,j)=> {img.onload=r; img.onerror=j;}); 
+        const w=img.width,h=img.height,canvas=document.createElement('canvas'); canvas.width=w;canvas.height=h; 
+        const ctx=canvas.getContext('2d'); ctx.beginPath(); const rad=12; ctx.moveTo(rad,0); ctx.lineTo(w-rad,0); ctx.quadraticCurveTo(w,0,w,rad); ctx.lineTo(w,h-rad); ctx.quadraticCurveTo(w,h,w-rad,h); ctx.lineTo(rad,h); ctx.quadraticCurveTo(0,h,0,h-rad); ctx.lineTo(0,rad); ctx.quadraticCurveTo(0,0,rad,0); ctx.clip(); ctx.drawImage(img,0,0,w,h); 
+        const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download=`${currentModalCard?.titleZh||'card'}_${currentModalLang}.png`; a.click(); 
+    }
     function closeModal(){document.getElementById('cardModal').style.display='none';}
-    window.addEventListener('load',()=>{ loadData(); document.querySelector('.modal-close').addEventListener('click',closeModal); document.getElementById('cardModal').addEventListener('click',(e)=>{if(e.target===document.getElementById('cardModal')) closeModal();}); document.getElementById('saveImgBtn').onclick=(e)=>{saveCardAsRoundedPng();}; document.getElementById('copyLinkBtn').onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById('modalImg').src); alert('已复制');}catch(e){alert(document.getElementById('modalImg').src);}}; const menuBtn=document.getElementById('menuToggleBtn'),menuDiv=document.getElementById('navMenu'); menuBtn.onclick=(e)=>{e.stopPropagation(); menuDiv.classList.toggle('open');}; document.addEventListener('click',(e)=>{if(!menuBtn.contains(e.target)&&!menuDiv.contains(e.target)) menuDiv.classList.remove('open');}); document.querySelectorAll('.menu-link').forEach(l=>l.addEventListener('click',()=>menuDiv.classList.remove('open'))); });
+    
+    window.addEventListener('load',()=>{ 
+        loadData(); 
+        document.querySelector('.modal-close').addEventListener('click',closeModal); 
+        document.getElementById('cardModal').addEventListener('click',(e)=>{if(e.target===document.getElementById('cardModal')) closeModal();}); 
+        document.getElementById('saveImgBtn').onclick=(e)=>{saveCardAsRoundedPng();}; 
+        document.getElementById('copyLinkBtn').onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById('modalImg').src); alert('已复制');}catch(e){alert(document.getElementById('modalImg').src);}}; 
+        const menuBtn=document.getElementById('menuToggleBtn'),menuDiv=document.getElementById('navMenu'); 
+        menuBtn.onclick=(e)=>{e.stopPropagation(); menuDiv.classList.toggle('open');}; 
+        document.addEventListener('click',(e)=>{if(!menuBtn.contains(e.target)&&!menuDiv.contains(e.target)) menuDiv.classList.remove('open');}); 
+        document.querySelectorAll('.menu-link').forEach(l=>l.addEventListener('click',()=>menuDiv.classList.remove('open'))); 
+    });
 </script>
 </body>
 </html>
