@@ -733,6 +733,35 @@
             color: #f5efdb;
             font-size: 0.8rem;
         }
+        .img-gen-control input[type="range"] {
+            width: 100%;
+            padding: 0;
+            background: #1e1c16;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .img-gen-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c9a53b;
+            cursor: pointer;
+            border: none;
+        }
+
+        .img-gen-control input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c9a53b;
+            cursor: pointer;
+            border: none;
+        }
         .switch-row {
             display: flex;
             gap: 16px;
@@ -773,7 +802,6 @@
             justify-content: center;
         }
 
-        /* 多选筛选器样式 (与 index.html 保持一致) */
         .filter-panel {
             background: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(8px);
@@ -1070,7 +1098,6 @@
 
     <div class="builder-main">
         <div class="cards-section">
-            <!-- 筛选器部分 - 重构为多选 chip 样式 -->
             <div class="filter-panel">
                 <div class="row-filters">
                     <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本/词条"></div>
@@ -1122,8 +1149,8 @@
 <div id="imgGenModal" class="img-gen-modal">
     <div class="img-gen-content">
         <div class="img-gen-controls">
-            <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="30"></div>
-            <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
+            <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
+            <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width: 100%; margin: 0;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 卡图语言</label><select id="imgLang"></select></div>
         </div>
         <div class="switch-row">
@@ -1151,7 +1178,6 @@
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
 
-    // 多选筛选状态
     let selectedFilters = { factions: new Set(), types: new Set(), costs: new Set(), rarities: new Set() };
 
     const languages = [
@@ -1163,7 +1189,7 @@
         { code: 'ko-KR', label: '한국어', flag: '🇰🇷' }, { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
     ];
 
-    function getCardImageUrl(imgName, lang, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v49/${lang}/${imgName}&q=${quality}` : ""; }
+    function getCardImageUrl(imgName, lang, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v51/${lang}/${imgName}&q=${quality}` : ""; }
     function getSearchableText(card) { const attrsTrans = translateAttributesForSearch(card.attributes || []); return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase(); }
 
     async function loadData() {
@@ -1181,7 +1207,6 @@
         } catch(e) { document.getElementById('cardContainer').innerHTML = '<div>数据加载失败</div>'; }
     }
 
-    // 多选筛选器初始化
     function initMultiFilters() {
         const factions = [...new Set(allCards.map(c=>c.faction))];
         const types = [...new Set(allCards.map(c=>c.type))];
@@ -1228,7 +1253,6 @@
         document.getElementById('searchInput').addEventListener('input',()=>applyFilters());
         ['attackExact','defenseExact','opExact'].forEach(id => document.getElementById(id).addEventListener('input',()=>applyFilters()));
 
-        // 初始化主国/盟国下拉选项
         const optionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         ['mainNationSelect', 'mobileMainNation'].forEach(id => { document.getElementById(id).innerHTML = optionsHtml; });
         ['allyNationSelect', 'mobileAllyNation'].forEach(id => { document.getElementById(id).innerHTML = optionsHtml; });
@@ -1257,12 +1281,8 @@
         let res = [...allCards]; 
         const search = document.getElementById('searchInput').value.trim().toLowerCase(); 
         if(search) res = res.filter(c => getSearchableText(c).includes(search));
-        
-        // 多选阵营
         if(selectedFilters.factions.size) res = res.filter(c => selectedFilters.factions.has(c.faction));
-        // 多选类型
         if(selectedFilters.types.size) res = res.filter(c => selectedFilters.types.has(c.type));
-        // 多选费用
         if(selectedFilters.costs.size) {
             res = res.filter(c => {
                 for(let costVal of selectedFilters.costs) {
@@ -1271,7 +1291,6 @@
                 } return false;
             });
         }
-        // 多选稀有度
         if(selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
         
         const setVal = document.getElementById('setSelect').value;
@@ -1281,7 +1300,6 @@
         else if(status === 'reserve') res = res.filter(c => c.reserved);
         else if(status === 'spawn') res = res.filter(c => c.isSpawn);
 
-        // 单位属性精确筛选：当且仅当筛选类型中全是单位类型且至少一个类型被选中时生效
         const activeTypesSet = selectedFilters.types;
         const onlyUnits = activeTypesSet.size > 0 && [...activeTypesSet].every(t => unitTypes.includes(t));
         const statsArea = document.getElementById('statsArea');
@@ -1346,7 +1364,6 @@
         if(mobileDiv) mobileDiv.innerHTML = html;
     }
 
-    // 阵营编号：1-9 为数字，10 变为 'a'
     function getNationCode(faction) {
         const idx = allNationOptions.indexOf(faction);
         if (idx === -1) return '1';
