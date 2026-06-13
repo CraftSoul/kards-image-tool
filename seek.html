@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>KARDS军械库 | 英文直检</title>
+    <title>KARDS 军械库 | 英文直检</title>
     <style>
         * {
             margin: 0;
@@ -129,15 +129,15 @@
             align-items: flex-end;
             margin-bottom: 1.2rem;
         }
-        .input-group, .lang-group {
+        .input-group, .lang-group, .version-group {
             flex: 2;
-            min-width: 200px;
+            min-width: 180px;
         }
-        .lang-group {
+        .lang-group, .version-group {
             flex: 1.5;
-            min-width: 200px;
+            min-width: 160px;
         }
-        .input-group label, .lang-group label {
+        .input-group label, .lang-group label, .version-group label {
             display: block;
             font-size: 0.8rem;
             text-transform: uppercase;
@@ -146,7 +146,7 @@
             margin-bottom: 0.4rem;
             font-weight: 700;
         }
-        .input-group input, .lang-group select {
+        .input-group input, .lang-group select, .version-group select {
             width: 100%;
             background: #1e1c16;
             border: 1px solid #aa8e4e;
@@ -158,7 +158,7 @@
             outline: none;
             transition: 0.1s;
         }
-        .lang-group select {
+        .lang-group select, .version-group select {
             cursor: pointer;
             appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23dbb45c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
@@ -167,7 +167,7 @@
             padding-right: 2.2rem;
             font-size: 1rem;
         }
-        .input-group input:focus, .lang-group select:focus {
+        .input-group input:focus, .lang-group select:focus, .version-group select:focus {
             border-color: #e6bc6a;
             box-shadow: 0 0 0 2px rgba(220, 180, 80, 0.3);
         }
@@ -403,7 +403,7 @@
         @media (max-width: 680px) {
             .app-container { padding: 12px 12px 24px; }
             .input-row { flex-direction: column; gap: 0.9rem; }
-            .input-group, .lang-group { width: 100%; }
+            .input-group, .lang-group, .version-group { width: 100%; }
             .toggle-row { justify-content: stretch; }
             .toggle-switch { margin-left: 0; width: 100%; justify-content: space-between; }
             .action-bar { flex-direction: column; align-items: stretch; }
@@ -440,6 +440,10 @@
             <div class="lang-group">
                 <label>语言</label>
                 <select id="langSelect"></select>
+            </div>
+            <div class="version-group">
+                <label>游戏版本</label>
+                <select id="versionSelect"></select>
             </div>
         </div>
         <div class="toggle-row">
@@ -478,12 +482,24 @@
 
     <div class="footer-simple">
         <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a>
-        <a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
+        <a href="https://space.bilibili.com/3546776476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
     </div>
 </div>
 
 <script>
     (function() {
+        const LATEST_VERSION_NUM = 51;
+        function generateVersionList() {
+            let versions = [];
+            for (let i = 0; i <= 10; i++) {
+                versions.push(`v${LATEST_VERSION_NUM-i}`);
+            }
+            return versions;
+        }
+        const AVAILABLE_VERSIONS = generateVersionList();
+        const DEFAULT_VERSION = `v${LATEST_VERSION_NUM}`;
+
+        // 语言列表
         const languages = [
             { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' },
             { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -499,17 +515,9 @@
             { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
         ];
 
-        // 填充下拉选项，添加国旗emoji
-        const langSelect = document.getElementById('langSelect');
-        languages.forEach(lang => {
-            const option = document.createElement('option');
-            option.value = lang.code;
-            option.textContent = `${lang.flag} ${lang.label} (${lang.code})`;
-            langSelect.appendChild(option);
-        });
-        langSelect.value = 'zh-Hans';
-
         // DOM 元素
+        const langSelect = document.getElementById('langSelect');
+        const versionSelect = document.getElementById('versionSelect');
         const cardNameInput = document.getElementById('cardNameInput');
         const fetchBtn = document.getElementById('fetchBtn');
         const cardImage = document.getElementById('cardImage');
@@ -521,7 +529,24 @@
         const variantCountBadge = document.getElementById('variantCountBadge');
         const variantToggle = document.getElementById('variantToggle');
 
-        // 菜单逻辑
+        // 填充语言下拉
+        languages.forEach(lang => {
+            const option = document.createElement('option');
+            option.value = lang.code;
+            option.textContent = `${lang.flag} ${lang.label} (${lang.code})`;
+            langSelect.appendChild(option);
+        });
+        langSelect.value = 'zh-Hans';
+
+        // 填充版本下拉
+        AVAILABLE_VERSIONS.forEach(ver => {
+            const option = document.createElement('option');
+            option.value = ver;
+            option.textContent = ver.toUpperCase();
+            if (ver === DEFAULT_VERSION) option.selected = true;
+            versionSelect.appendChild(option);
+        });
+
         const menuToggleBtn = document.getElementById('menuToggleBtn');
         const navMenu = document.getElementById('navMenu');
         if (menuToggleBtn) {
@@ -539,16 +564,42 @@
             link.addEventListener('click', () => navMenu.classList.remove('open'));
         });
 
-        // 状态变量
         let currentVariants = [];
         let activeVariantKey = null;
         let currentBaseClean = '';
         let currentRawCardName = '';
         let currentLang = 'zh-Hans';
+        let currentVersion = DEFAULT_VERSION;      // 当前检索使用的版本
         let currentHighResUrl = '';
         let isDiscovering = false;
 
-        // 工具函数
+        function buildImageUrl(formattedName, lang, version, quality = 100) {
+            if (!formattedName) return '';
+            const ver = version || DEFAULT_VERSION;
+            let q = Math.min(100, Math.max(1, quality));
+            if (q <= 1) {
+                return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${formattedName}.avif&q=1&w=1&h=1`;
+            }
+            return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${formattedName}.avif&q=${q}`;
+        }
+
+        function buildHighResUrl(formattedName, lang, version) {
+            return buildImageUrl(formattedName, lang, version, 100);
+        }
+        function buildDetectionUrl(formattedName, lang, version) {
+            return buildImageUrl(formattedName, lang, version, 1);
+        }
+
+        function testImageExists(formattedName, lang, version) {
+            return new Promise((resolve) => {
+                const url = buildDetectionUrl(formattedName, lang, version);
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
         function formatBaseName(rawName) {
             if (!rawName || rawName.trim() === "") return "";
             let processed = rawName.trim().toLowerCase();
@@ -558,26 +609,8 @@
             return processed;
         }
 
-        function buildHighResUrl(formattedName, lang) {
-            return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v51/${lang}/${formattedName}.avif&q=100`;
-        }
-
-        function buildDetectionUrl(formattedName, lang) {
-            return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v51/${lang}/${formattedName}.avif&q=1&w=1&h=1`;
-        }
-
-        function testImageExists(formattedName, lang) {
-            return new Promise((resolve) => {
-                const url = buildDetectionUrl(formattedName, lang);
-                const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
-                img.src = url;
-            });
-        }
-
-        async function progressiveDiscover(baseClean, lang, includeVariants) {
-            const originalExists = await testImageExists(baseClean, lang);
+        async function progressiveDiscover(baseClean, lang, version, includeVariants) {
+            const originalExists = await testImageExists(baseClean, lang, version);
             let variants = [];
             if (originalExists) {
                 variants.push({ suffixKey: '', displayName: '原版', formattedName: baseClean, isVeteran: false });
@@ -589,11 +622,11 @@
             const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];
             const variantChecks = suffixLetters.map(async (letter) => {
                 const testName = baseClean + '_' + letter;
-                const exists = await testImageExists(testName, lang);
+                const exists = await testImageExists(testName, lang, version);
                 if (exists) return { suffixKey: `_${letter}`, displayName: `变体 ${letter.toUpperCase()}`, formattedName: testName, isVeteran: false };
                 return null;
             });
-            const vetExists = await testImageExists(baseClean + '_vet', lang);
+            const vetExists = await testImageExists(baseClean + '_vet', lang, version);
             const results = await Promise.all(variantChecks);
             const found = results.filter(v => v !== null);
             if (vetExists) {
@@ -610,13 +643,13 @@
             return { variants };
         }
 
-        async function loadCardVariant(item, lang) {
+        async function loadCardVariant(item, lang, version) {
             if (!item || !item.formattedName) return false;
-            const highResUrl = buildHighResUrl(item.formattedName, lang);
+            const highResUrl = buildHighResUrl(item.formattedName, lang, version);
             currentHighResUrl = highResUrl;
             setLoading(true);
             const langDisplay = getLangName(lang);
-            imageStatus.innerHTML = `⏳ 加载: ${item.formattedName}.avif (${langDisplay})`;
+            imageStatus.innerHTML = `⏳ 加载: ${item.formattedName}.avif (${langDisplay} | ${version})`;
             return new Promise((resolve) => {
                 const imgTest = new Image();
                 imgTest.onload = () => {
@@ -625,14 +658,15 @@
                     let extra = '';
                     if (item.isVeteran) extra = ' ⭐ 老兵';
                     else if (item.suffixKey && item.suffixKey !== '' && !item.isVeteran) extra = ` 🔹 ${item.displayName}`;
-                    imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extra} (${langDisplay})`;
+                    imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extra} (${langDisplay} | ${version})`;
                     cardImage.setAttribute('data-current-name', item.formattedName);
                     cardImage.setAttribute('data-lang', lang);
+                    cardImage.setAttribute('data-version', version);
                     resolve(true);
                 };
                 imgTest.onerror = () => {
                     setLoading(false);
-                    imageStatus.innerHTML = `❌ 关键防御: ${item.formattedName}.avif`;
+                    imageStatus.innerHTML = `❌ 加载失败: ${item.formattedName}.avif (版本 ${version})`;
                     cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 图片不可用 💀%3C/text%3E%3C/svg%3E";
                     currentHighResUrl = '';
                     resolve(false);
@@ -674,6 +708,7 @@
                 return;
             }
             const lang = langSelect.value;
+            const version = versionSelect.value;
             const baseClean = formatBaseName(rawName);
             if (!baseClean) {
                 imageStatus.innerHTML = "❌ 卡名格式化失败";
@@ -682,15 +717,16 @@
             currentRawCardName = rawName;
             currentBaseClean = baseClean;
             currentLang = lang;
+            currentVersion = version;
             isDiscovering = true;
             setLoading(true);
-            imageStatus.innerHTML = `🔎 正在寻找敌人: ${baseClean} (${getLangName(lang)})`;
+            imageStatus.innerHTML = `🔎 正在寻找敌人: ${baseClean} (${getLangName(lang)} | ${version})`;
             const includeVariants = variantToggle.checked;
-            const result = await progressiveDiscover(baseClean, lang, includeVariants);
+            const result = await progressiveDiscover(baseClean, lang, version, includeVariants);
             isDiscovering = false;
             if (!result.variants.length) {
                 setLoading(false);
-                imageStatus.innerHTML = `❌ 未找到 "${rawName}"`;
+                imageStatus.innerHTML = `❌ 未找到 "${rawName}" 于版本 ${version}`;
                 variantsContainer.style.display = 'none';
                 currentVariants = [];
                 cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 %3C/text%3E%3C/svg%3E";
@@ -707,11 +743,11 @@
             }
             if (!targetItem) return;
             activeVariantKey = targetItem.suffixKey;
-            await loadCardVariant(targetItem, lang);
+            await loadCardVariant(targetItem, lang, version);
             const onSelect = async (selected) => {
                 if (selected.suffixKey === activeVariantKey) return;
                 activeVariantKey = selected.suffixKey;
-                await loadCardVariant(selected, lang);
+                await loadCardVariant(selected, lang, version);
                 renderVariantPanel(currentVariants, activeVariantKey, onSelect);
             };
             renderVariantPanel(currentVariants, activeVariantKey, onSelect);
@@ -719,7 +755,7 @@
 
         function setLoading(isLoad) {
             if (isLoad) {
-                imageStatus.innerHTML = '<span class="loader"></span> 正在寻找敌人 ...';
+                imageStatus.innerHTML = '<span class="loader"></span> 正在检索...';
                 cardImage.style.opacity = '0.7';
             } else {
                 cardImage.style.opacity = '1';
@@ -773,8 +809,9 @@
                 const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
                 const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
                 const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
+                const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
                 const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
-                const fileName = `${namePart}_${shortLang}.png`;
+                const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
                 const url = URL.createObjectURL(pngBlob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -825,6 +862,7 @@
         cardNameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(false, null); });
         variantToggle.addEventListener('change', () => { if(currentBaseClean) performSearch(false, null); else if(cardNameInput.value.trim()) performSearch(false, null); });
         langSelect.addEventListener('change', () => { if(currentBaseClean) performSearch(true, activeVariantKey); else if(cardNameInput.value.trim()) performSearch(false, null); });
+        versionSelect.addEventListener('change', () => { if(currentBaseClean) performSearch(true, activeVariantKey); else if(cardNameInput.value.trim()) performSearch(false, null); });
         
         setTimeout(() => { if(cardNameInput.value.trim() === "RESISTANCE") performSearch(false, null); }, 120);
     })();
