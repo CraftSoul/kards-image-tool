@@ -34,6 +34,7 @@
             --italy: #555248;
             --poland: #645633;
             --finland: #C9C8BC;
+            --anzac: #9E6F34;
             --neutral: #6b6e5c;
             --rarity-standard: #9e9e9e;
             --rarity-limited: #cd7f32;
@@ -102,7 +103,7 @@
             transition: max-height 0.35s ease-out;
             background: rgba(10, 10, 8, 0.98);
         }
-        .nav-menu.open { max-height: 320px; }
+        .nav-menu.open { max-height: 400px; }
         .menu-links {
             display: flex;
             flex-direction: column;
@@ -542,236 +543,6 @@
             .mobile-deck-toggle { display: flex; }
         }
 
-        .modal-stats {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(12px);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-stats-content {
-            background: #1a1c12;
-            border-radius: 32px;
-            border: 2px solid #c9aa5b;
-            max-width: 750px;
-            width: 100%;
-            padding: 20px 24px 28px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            position: relative;
-        }
-        .modal-stats-close {
-            position: absolute;
-            top: 12px;
-            right: 18px;
-            font-size: 28px;
-            cursor: pointer;
-            color: #e9d49c;
-            background: rgba(0,0,0,0.5);
-            width: 32px;
-            height: 32px;
-            border-radius: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-stats-close:hover { background: #c9a53b; color: #1e1c10; }
-        .modal-stats-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ffefbf;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .histogram-bars {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            gap: 4px;
-            margin: 10px 0;
-        }
-        .histogram-bar-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 0;
-        }
-        .bar-stack {
-            display: flex;
-            flex-direction: column-reverse;
-            width: 100%;
-            max-width: 52px;
-            min-width: 32px;
-            background: #2a2a1c;
-            border-radius: 8px 8px 0 0;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .bar-stack:hover { transform: scaleX(1.02); }
-        .bar-unit {
-            background-color: #e8e4d0;
-            transition: height 0.2s;
-        }
-        .bar-order {
-            background-color: #f5c542;
-        }
-        .bar-counter {
-            background-color: #5a5a5a;
-        }
-        .bar-label {
-            font-size: 0.7rem;
-            color: #f5eaca;
-            text-align: center;
-            margin-top: 6px;
-            font-weight: bold;
-        }
-        .cost-total {
-            font-size: 0.7rem;
-            color: #ffefb9;
-            background: rgba(0,0,0,0.6);
-            padding: 2px 6px;
-            border-radius: 20px;
-            margin-top: 4px;
-            text-align: center;
-        }
-        .type-summary-modal {
-            display: flex;
-            gap: 24px;
-            justify-content: center;
-            margin-top: 16px;
-            padding-bottom: 12px;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #aa8e4e;
-        }
-        .type-summary-modal span {
-            font-weight: bold;
-            font-size: 1rem;
-            color: #ffefb9;
-            margin-left: 6px;
-        }
-        .unit-badge { color: #e8e4d0; }
-        .order-badge { color: #f5c542; }
-        .counter-badge { color: #a0a0a0; }
-        .rarity-stats-row {
-            display: flex;
-            gap: 24px;
-            justify-content: center;
-            margin-top: 16px;
-            flex-wrap: wrap;
-            padding: 8px 0;
-        }
-        .rarity-stat {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #ffefb9;
-        }
-        .legend {
-            display: none;
-        }
-        .img-gen-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(8px);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .img-gen-content {
-            background: #1a1c12;
-            border-radius: 32px;
-            border: 2px solid #c9aa5b;
-            max-width: 900px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
-        .img-gen-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #aa8e4e;
-            align-items: flex-end;
-        }
-        .img-gen-control {
-            flex: 1;
-            min-width: 100px;
-        }
-        .img-gen-control label {
-            font-size: 0.7rem;
-            color: #e9dbbd;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .img-gen-control input, .img-gen-control select {
-            width: 100%;
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 6px 12px;
-            color: #f5efdb;
-            font-size: 0.8rem;
-        }
-        .switch-row {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-        .switch-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0,0,0,0.3);
-            padding: 6px 12px;
-            border-radius: 40px;
-        }
-        .switch-item span { color: #e9dbbd; font-size: 0.75rem; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3222; transition: 0.2s; border-radius: 34px; border: 1px solid #b19458; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 2px; background-color: #e9cf95; transition: 0.2s; border-radius: 50%; }
-        input:checked + .slider { background-color: #7a6233; }
-        input:checked + .slider:before { transform: translateX(20px); background-color: #fef0b6; }
-        
-        .img-gen-preview {
-            text-align: center;
-            margin-bottom: 16px;
-            max-height: 50vh;
-            overflow: auto;
-        }
-        .img-gen-preview canvas {
-            max-width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-        .img-gen-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
         .filter-panel {
             background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(8px);
@@ -780,11 +551,11 @@
             margin-bottom: 1.5rem;
             border: 1px solid rgba(170, 142, 78, 0.5);
         }
-        .filter-grid {
+        .row-filters {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
-            align-items: flex-end;
+            margin-bottom: 1.2rem;
         }
         .filter-item {
             flex: 1;
@@ -798,7 +569,7 @@
             margin-bottom: 0.3rem;
             font-weight: 600;
         }
-        select {
+        select, .search-input {
             width: 100%;
             background: #1e1c16;
             border: 1px solid #aa8e4e;
@@ -808,21 +579,81 @@
             font-size: 0.85rem;
             cursor: pointer;
             outline: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23dbb45c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
         }
-        .search-input {
-            width: 100%;
+        .search-input { background-image: none; }
+        .filter-group {
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed rgba(170,142,78,0.3);
+            padding-bottom: 0.6rem;
+        }
+        .filter-group-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e9dbbd;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .multi-select-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .filter-chip {
             background: #1e1c16;
             border: 1px solid #aa8e4e;
             border-radius: 40px;
-            padding: 0.55rem 1rem;
-            color: #f5efdb;
-            font-size: 0.85rem;
-            outline: none;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.8rem;
+            color: #e9dbbd;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
+        .filter-chip.active {
+            background: #c9a53b;
+            color: #1e1c10;
+            border-color: #c9a53b;
+            font-weight: 600;
+        }
+        .filter-chip img {
+            width: 18px;
+            height: 18px;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+        }
+        .reset-chip {
+            background: #2a2618;
+            border-color: #b69654;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .stats-group {
+            margin-top: 0.8rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed rgba(170, 142, 78, 0.4);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .stats-item { flex: 1; min-width: 100px; }
+        .exact-input {
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.4rem 0.8rem;
+            width: 100%;
+            color: #f5efdb;
+            text-align: center;
+        }
+        .stats-note { font-size: 0.7rem; color: #c9b06b; margin-top: 6px; }
+
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -986,12 +817,16 @@
         }
         .footer-simple a:hover { background: #b48b3f; }
         .footer-simple img { width: 18px; height: 18px; filter: invert(0.95); }
+
+        .img-gen-control input[type="range"] {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="nav-bar"><div class="nav-header-row"><div class="nav-brand">KARDS 军械库</div><div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div></div>
-    <div class="nav-menu" id="navMenu"><div class="menu-links"><a class="menu-link" href="index.html">卡牌收藏</a><a class="menu-link active" href="#">卡组构筑</a><a class="menu-link" href="seek.html">英文直检</a><a class="menu-link" href="about.html">关于军械库</a></div></div></div>
+    <div class="nav-menu" id="navMenu"><div class="menu-links"><a class="menu-link" href="index.html">卡牌收藏</a><a class="menu-link active" href="#">卡组构筑</a><a class="menu-link" href="seek.html">英文直检</a><a class="menu-link" href="https://craftsoul.github.io/kards-duel" data-target="duel">击剑大厅</a><a class="menu-link" href="pack.html" data-target="pack">模拟开包</a><a class="menu-link" href="about.html">关于军械库</a></div></div></div>
 
     <div class="mobile-deck-toggle" id="mobileDeckToggle"><span class="toggle-text">卡组</span><span class="mobile-count-badge-toggle" id="mobileToggleCount">0</span><span>◀</span></div>
     <div class="mobile-overlay" id="mobileOverlay"></div>
@@ -1009,15 +844,15 @@
     <div class="builder-main">
         <div class="cards-section">
             <div class="filter-panel">
-                <div class="filter-grid">
+                <div class="row-filters">
                     <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本/词条"></div>
-                    <div class="filter-item"><div class="filter-label">🏳 阵营</div><select id="factionSelect"></select></div>
-                    <div class="filter-item"><div class="filter-label">♠️ 类型</div><select id="typeSelect"></select></div>
-                    <div class="filter-item"><div class="filter-label">💰 花费</div><select id="costSelect"><option value="all">全部费用</option><option value="0">0K</option><option value="1">1K</option><option value="2">2K</option><option value="3">3K</option><option value="4">4K</option><option value="5">5K</option><option value="6">6K</option><option value="7">7K+</option></select></div>
-                    <div class="filter-item"><div class="filter-label">🃏 稀有度</div><select id="raritySelect"><option value="all">全部</option><option value="Standard">普通</option><option value="Limited">限定</option><option value="Special">特殊</option><option value="Elite">精英</option></select></div>
-                    <div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"></select></div>
+                    <div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"><option value="all">全部扩展</option></select></div>
                     <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div>
                 </div>
+                <div class="filter-group"><div class="filter-group-title">🏳 阵营 <span class="reset-chip" data-filter-type="faction">✖ 清除</span></div><div class="multi-select-btns" id="factionMultiContainer"></div></div>
+                <div class="filter-group"><div class="filter-group-title">♠️ 类型 <span class="reset-chip" data-filter-type="type">✖ 清除</span></div><div class="multi-select-btns" id="typeMultiContainer"></div></div>
+                <div class="filter-group"><div class="filter-group-title">💰 花费 <span class="reset-chip" data-filter-type="cost">✖ 清除</span></div><div class="multi-select-btns" id="costMultiContainer"></div></div>
+                <div class="filter-group"><div class="filter-group-title">🃏 稀有度 <span class="reset-chip" data-filter-type="rarity">✖ 清除</span></div><div class="multi-select-btns" id="rarityMultiContainer"></div></div>
                 <div id="statsArea" style="display: none;">
                     <div class="stats-group">
                         <div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><input type="number" id="attackExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div>
@@ -1040,7 +875,7 @@
             <div class="deck-list" id="deckListContainer"></div>
         </div>
     </div>
-    <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a><a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a></div>
+    <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a><a href="https://space.bilibili.com/3546776475505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a></div>
 </div>
 
 <div id="statsModal" class="modal-stats">
@@ -1078,12 +913,14 @@
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
     const rarityClassMap = { "Standard":"rarity-standard","Limited":"rarity-limited","Special":"rarity-special","Elite":"rarity-elite" };
     const rarityDisplayMap = { "Standard":"普通","Limited":"限定","Special":"特殊","Elite":"精英" };
-    const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国" };
-    const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","neutral":"#6b6e5c" };
-    const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland"];
+    const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国","anzac":"澳新军团" };
+    const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","anzac":"#9E6F34","neutral":"#6b6e5c" };
+    const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland","anzac"];
     let allCards = [], filteredCards = [], deckMap = new Map();
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
+
+    let selectedFilters = { factions: new Set(), types: new Set(), costs: new Set(), rarities: new Set() };
 
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -1094,8 +931,54 @@
         { code: 'ko-KR', label: '한국어', flag: '🇰🇷' }, { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
     ];
 
-    function getCardImageUrl(imgName, lang, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v48/${lang}/${imgName}&q=${quality}` : ""; }
+    function getCardImageUrl(imgName, lang, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v49/${lang}/${imgName}&q=${quality}` : ""; }
     function getSearchableText(card) { const attrsTrans = translateAttributesForSearch(card.attributes || []); return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase(); }
+
+    function toggleSet(set, val, chip) { if(set.has(val)) set.delete(val); else set.add(val); updateChipActive(chip, set.has(val)); }
+    function updateChipActive(chip, active) { if(active) chip.classList.add('active'); else chip.classList.remove('active'); }
+    function updateChipsActive(type) { document.querySelectorAll(`.filter-chip[data-filter="${type}"]`).forEach(chip => { const val = chip.dataset.val; const set = (type==='faction'?selectedFilters.factions:type==='type'?selectedFilters.types:type==='cost'?selectedFilters.costs:selectedFilters.rarities); updateChipActive(chip, set.has(val)); }); }
+
+    function initMultiFilters() {
+        const factions = [...new Set(allCards.map(c=>c.faction))];
+        const types = [...new Set(allCards.map(c=>c.type))];
+        const costOptions = ["0","1","2","3","4","5","6","7+"];
+        const rarityOptions = ["Standard","Limited","Special","Elite"];
+        const factionContainer = document.getElementById('factionMultiContainer');
+        factionContainer.innerHTML = factions.map(f => `<div class="filter-chip" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]||f}</div>`).join('');
+        document.getElementById('typeMultiContainer').innerHTML = types.map(t => `<div class="filter-chip" data-filter="type" data-val="${t}">${typeNameMap[t]||t}</div>`).join('');
+        document.getElementById('costMultiContainer').innerHTML = costOptions.map(c => `<div class="filter-chip" data-filter="cost" data-val="${c}">${c==='7+'?'7K+':c+'K'}</div>`).join('');
+        document.getElementById('rarityMultiContainer').innerHTML = rarityOptions.map(r => `<div class="filter-chip" data-filter="rarity" data-val="${r}">${rarityDisplayMap[r]||r}</div>`).join('');
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const type = chip.dataset.filter, val = chip.dataset.val;
+                if(type === 'faction') toggleSet(selectedFilters.factions, val, chip);
+                else if(type === 'type') toggleSet(selectedFilters.types, val, chip);
+                else if(type === 'cost') toggleSet(selectedFilters.costs, val, chip);
+                else if(type === 'rarity') toggleSet(selectedFilters.rarities, val, chip);
+                applyFilters();
+            });
+        });
+        document.querySelectorAll('.reset-chip').forEach(reset => {
+            reset.addEventListener('click', (e) => {
+                const filterType = reset.dataset.filterType;
+                if(filterType === 'faction') { selectedFilters.factions.clear(); updateChipsActive('faction'); }
+                if(filterType === 'type') { selectedFilters.types.clear(); updateChipsActive('type'); }
+                if(filterType === 'cost') { selectedFilters.costs.clear(); updateChipsActive('cost'); }
+                if(filterType === 'rarity') { selectedFilters.rarities.clear(); updateChipsActive('rarity'); }
+                applyFilters();
+            });
+        });
+    }
+
+    function initStaticFilters() {
+        const sets = [...new Set(allCards.map(c=>c.setName).filter(Boolean))];
+        const setSelect = document.getElementById('setSelect');
+        setSelect.innerHTML = '<option value="all">全部扩展</option>'+sets.map(s=>`<option value="${s}">${s}</option>`).join('');
+        ['setSelect','statusSelect','searchInput'].forEach(id => document.getElementById(id)?.addEventListener('change',()=>applyFilters()));
+        document.getElementById('searchInput')?.addEventListener('input',()=>applyFilters());
+        ['attackExact','defenseExact','opExact'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', () => applyFilters()); });
+    }
 
     async function loadData() {
         try {
@@ -1105,23 +988,15 @@
                 let rawFaction = (card.json?.faction || card.faction || "").toLowerCase();
                 return { id: card.id ?? idx, ...card, type: card.json?.type || card.type, faction: rawFaction, rarity: card.json?.rarity || card.rarity, setName: card.json?.set || card.set || "基础", cost: card.json?.kredits ?? (card.json?.cost ?? card.cost ?? 0), text_zh: card.json?.text?.["zh-Hans"] || "无描述", titleZh: card.json?.title?.["zh-Hans"] || card.title?.["zh-Hans"] || "无名", image: card.json?.image || card.image, reserved: !!card.reserved, isSpawn: card.json?.set === "OnlySpawnable", attributes: card.json?.attributes || [], attack: card.json?.attack ?? card.attack, defense: card.json?.defense ?? card.defense, operationCost: card.json?.operationCost ?? card.operationCost, importId: card.importId || (card.json?.importId) || "" };
             });
-            initFiltersAndSelects();
+            initMultiFilters();
+            initStaticFilters();
+            initNationSelects();
             applyFilters();
             updateFactionStats();
         } catch(e) { document.getElementById('cardContainer').innerHTML = '<div>数据加载失败</div>'; }
     }
 
-    function initFiltersAndSelects() {
-        const factions = [...new Set(allCards.map(c=>c.faction))];
-        const types = [...new Set(allCards.map(c=>c.type))];
-        const sets = [...new Set(allCards.map(c=>c.setName))];
-        document.getElementById('factionSelect').innerHTML = '<option value="all">全部阵营</option>' + factions.map(f => `<option value="${f}">${factionNames[f]||f}</option>`).join('');
-        document.getElementById('typeSelect').innerHTML = '<option value="all">全部类型</option>' + types.map(t => `<option value="${t}">${typeNameMap[t]||t}</option>`).join('');
-        document.getElementById('setSelect').innerHTML = '<option value="all">全部扩展</option>' + sets.map(s => `<option value="${s}">${s}</option>`).join('');
-        ['factionSelect','typeSelect','costSelect','raritySelect','setSelect','statusSelect','searchInput'].forEach(id => document.getElementById(id)?.addEventListener('change',()=>applyFilters()));
-        document.getElementById('searchInput')?.addEventListener('input',()=>applyFilters());
-        ['attackExact','defenseExact','opExact'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', () => applyFilters()); });
-
+    function initNationSelects() {
         const optionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         ['mainNationSelect', 'mobileMainNation'].forEach(id => { document.getElementById(id).innerHTML = optionsHtml; });
         ['allyNationSelect', 'mobileAllyNation'].forEach(id => { document.getElementById(id).innerHTML = optionsHtml; });
@@ -1130,10 +1005,6 @@
         document.getElementById('mobileMainNation').value = mainNation;
         document.getElementById('mobileAllyNation').value = allyNation;
         
-        const langSelect = document.getElementById('imgLang');
-        langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
-        langSelect.value = 'zh-Hans';
-        
         const updateNation = () => { mainNation = document.getElementById('mainNationSelect').value; allyNation = document.getElementById('allyNationSelect').value; document.getElementById('mobileMainNation').value = mainNation; document.getElementById('mobileAllyNation').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
         const updateMobile = () => { mainNation = document.getElementById('mobileMainNation').value; allyNation = document.getElementById('mobileAllyNation').value; document.getElementById('mainNationSelect').value = mainNation; document.getElementById('allyNationSelect').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
         document.getElementById('mainNationSelect').addEventListener('change', updateNation);
@@ -1141,39 +1012,58 @@
         document.getElementById('mobileMainNation').addEventListener('change', updateMobile);
         document.getElementById('mobileAllyNation').addEventListener('change', updateMobile);
         
+        const langSelect = document.getElementById('imgLang');
+        langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
+        langSelect.value = 'zh-Hans';
+        
         const bgSelect = document.getElementById('bgColorSelect');
         const customDiv = document.getElementById('customColorDiv');
         bgSelect.addEventListener('change', () => { customDiv.style.display = bgSelect.value === 'custom' ? 'flex' : 'none'; });
     }
 
-    function filterCardsLogic() { 
-        let res = [...allCards]; 
-        const search = document.getElementById('searchInput').value.trim().toLowerCase(); 
-        if(search) res = res.filter(c => getSearchableText(c).includes(search)); 
-        const f = document.getElementById('factionSelect').value; if(f!=='all') res = res.filter(c=>c.faction===f);
-        const t = document.getElementById('typeSelect').value; if(t!=='all') res = res.filter(c=>c.type===t);
-        const costVal = document.getElementById('costSelect').value; if(costVal!=='all') { if(costVal==='7') res = res.filter(c=>c.cost>=7); else res = res.filter(c=>c.cost===parseInt(costVal)); }
-        const r = document.getElementById('raritySelect').value; if(r!=='all') res = res.filter(c=>c.rarity===r);
-        const set = document.getElementById('setSelect').value; if(set!=='all') res = res.filter(c=>c.setName===set);
+    function filterCardsLogic() {
+        let result = [...allCards];
+        const search = document.getElementById('searchInput').value.trim().toLowerCase();
+        if(search) result = result.filter(c => getSearchableText(c).includes(search));
+        if(selectedFilters.factions.size) result = result.filter(c => selectedFilters.factions.has(c.faction));
+        if(selectedFilters.types.size) result = result.filter(c => selectedFilters.types.has(c.type));
+        if(selectedFilters.costs.size) {
+            result = result.filter(c => {
+                for(let costVal of selectedFilters.costs) {
+                    if(costVal === '7+' && c.cost >= 7) return true;
+                    if(costVal !== '7+' && c.cost === parseInt(costVal)) return true;
+                } return false;
+            });
+        }
+        if(selectedFilters.rarities.size) result = result.filter(c => selectedFilters.rarities.has(c.rarity));
+        const setVal = document.getElementById('setSelect').value;
+        if(setVal !== 'all') result = result.filter(c => c.setName === setVal);
         const status = document.getElementById('statusSelect').value;
-        if(status==='active') res = res.filter(c=>!c.reserved&&!c.isSpawn);
-        else if(status==='reserve') res = res.filter(c=>c.reserved);
-        else if(status==='spawn') res = res.filter(c=>c.isSpawn);
-        
-        const selectedType = document.getElementById('typeSelect').value;
-        const onlyUnits = selectedType !== 'all' && unitTypes.includes(selectedType);
+        if(status === 'active') result = result.filter(c => !c.reserved && !c.isSpawn);
+        else if(status === 'reserve') result = result.filter(c => c.reserved);
+        else if(status === 'spawn') result = result.filter(c => c.isSpawn);
+
+        const activeTypes = selectedFilters.types.size ? [...selectedFilters.types] : [...new Set(allCards.map(c=>c.type))];
+        const onlyUnits = activeTypes.length > 0 && activeTypes.every(t => unitTypes.includes(t));
         const statsArea = document.getElementById('statsArea');
-        if(onlyUnits && selectedType !== 'all') statsArea.style.display = 'block';
+        if(onlyUnits && selectedFilters.types.size > 0) statsArea.style.display = 'block';
         else statsArea.style.display = 'none';
         
-        if(onlyUnits && selectedType !== 'all') {
+        if(onlyUnits && selectedFilters.types.size > 0) {
             let attExact = parseInt(document.getElementById('attackExact').value);
             let defExact = parseInt(document.getElementById('defenseExact').value);
             let opExact = parseInt(document.getElementById('opExact').value);
-            res = res.filter(c => { if(!unitTypes.includes(c.type)) return false; if(attExact !== -1 && (c.attack ?? -2) !== attExact) return false; if(defExact !== -1 && (c.defense ?? -2) !== defExact) return false; if(opExact !== -1 && (c.operationCost ?? -2) !== opExact) return false; return true; });
+            result = result.filter(c => {
+                if(!unitTypes.includes(c.type)) return false;
+                if(attExact !== -1 && (c.attack ?? -2) !== attExact) return false;
+                if(defExact !== -1 && (c.defense ?? -2) !== defExact) return false;
+                if(opExact !== -1 && (c.operationCost ?? -2) !== opExact) return false;
+                return true;
+            });
         }
-        return res;
+        return result;
     }
+
     function applyFilters() { filteredCards = filterCardsLogic(); currentPage = 1; renderCards(); renderPagination(); }
     
     function renderCards() { 
@@ -1217,7 +1107,18 @@
         if(mobileDiv) mobileDiv.innerHTML = html;
     }
 
-    function getNationCode(faction) { return allNationOptions.indexOf(faction) + 1; }
+    function getNationCode(faction) {
+        const idx = allNationOptions.indexOf(faction);
+        if (idx === 9) return 'a';
+        return (idx + 1).toString();
+    }
+    function getNationFromCode(code) {
+        if (code === 'a') return allNationOptions[9];
+        const idx = parseInt(code, 10) - 1;
+        if (idx >= 0 && idx < allNationOptions.length) return allNationOptions[idx];
+        throw new Error('无效编号');
+    }
+
     function exportDeckCode() {
         if (deckMap.size === 0) { alert("卡组为空，无法导出"); return null; }
         const cardCountMap = new Map();
@@ -1244,10 +1145,10 @@
         const pipeIdx = code.indexOf('|'); if (pipeIdx === -1) throw new Error('未找到 |');
         const nationPart = code.substring(0, pipeIdx).trim();
         if (nationPart.length < 2) throw new Error('编号无效');
-        const mainIdx = parseInt(nationPart[0], 10), allyIdx = parseInt(nationPart[1], 10);
-        if (isNaN(mainIdx) || mainIdx < 1 || mainIdx > 9) throw new Error('主国编号错误');
-        if (isNaN(allyIdx) || allyIdx < 1 || allyIdx > 9) throw new Error('盟国编号错误');
-        const mainFaction = allNationOptions[mainIdx - 1], allyFaction = allNationOptions[allyIdx - 1];
+        const mainCode = nationPart[0];
+        const allyCode = nationPart[1];
+        const mainFaction = getNationFromCode(mainCode);
+        const allyFaction = getNationFromCode(allyCode);
         const cardsPart = code.substring(pipeIdx + 1);
         const regions = cardsPart.split(';'); while (regions.length < 4) regions.push('');
         const multipliers = [1, 2, 3, 4];
