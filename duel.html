@@ -109,7 +109,6 @@
             font-weight: 700;
         }
 
-        /* 取消卡片样式 */
         .card-panel {
             background: transparent;
             backdrop-filter: none;
@@ -134,9 +133,55 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #e9dbbd;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
             font-weight: 600;
         }
+
+        /* 发布区控件纵向排列左对齐 */
+        .publish-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+        .publish-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .publish-row .filter-item {
+            flex: none;
+            min-width: unset;
+        }
+        .publish-row .filter-item input,
+        .publish-row .filter-item select,
+        .publish-row .filter-item textarea {
+            width: 100%;
+        }
+        .publish-row .filter-item textarea {
+            max-width: 100%;
+        }
+        .publish-row .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.5rem;
+            align-items: center;
+        }
+        .publish-row .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .publish-row .radio-group input[type="radio"] {
+            width: auto;
+            margin-right: 2px;
+        }
+        .publish-row .tag {
+            font-size: 0.8rem;
+            padding: 2px 12px;
+        }
+
         .row-filters {
             display: flex;
             flex-wrap: wrap;
@@ -475,6 +520,16 @@
             .card-header h3 { font-size: 1rem; }
             .row-filters { flex-direction: column; }
             .major-nav { flex-wrap: wrap; }
+            .publish-row .radio-group { gap: 0.5rem; }
+        }
+        @media (min-width: 601px) {
+            .publish-row .filter-item input,
+            .publish-row .filter-item select {
+                max-width: 360px;
+            }
+            .publish-row .filter-item textarea {
+                max-width: 480px;
+            }
         }
     </style>
 </head>
@@ -500,22 +555,29 @@
     <!-- 发布区 -->
     <div class="card-panel">
         <h2>⚔️ 发布击剑申请</h2>
-        <form id="publishForm">
-            <div class="row-filters">
+        <form id="publishForm" class="publish-form">
+            <!-- 战斗代码 -->
+            <div class="publish-row">
+                <div class="filter-label">战斗代码 / 游戏ID</div>
                 <div class="filter-item">
-                    <div class="filter-label">战斗代码 / 游戏ID</div>
                     <input type="text" name="code" placeholder="e.g. 114514 或 Player#1234" required>
                 </div>
-                <div class="filter-item">
-                    <div class="filter-label">资历</div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <label><input type="radio" name="tier" value="老逼" checked> <span class="tag gold" style="font-size:0.8rem;">老逼</span></label>
-                        <label><input type="radio" name="tier" value="中逼"> <span class="tag silver" style="font-size:0.8rem;">中逼</span></label>
-                        <label><input type="radio" name="tier" value="小逼"> <span class="tag bronze" style="font-size:0.8rem;">小逼</span></label>
-                    </div>
+            </div>
+
+            <!-- 资历 -->
+            <div class="publish-row">
+                <div class="filter-label">资历</div>
+                <div class="radio-group">
+                    <label><input type="radio" name="tier" value="老逼" checked> <span class="tag gold">老逼</span></label>
+                    <label><input type="radio" name="tier" value="中逼"> <span class="tag silver">中逼</span></label>
+                    <label><input type="radio" name="tier" value="小逼"> <span class="tag bronze">小逼</span></label>
                 </div>
+            </div>
+
+            <!-- 时效 -->
+            <div class="publish-row">
+                <div class="filter-label">时效</div>
                 <div class="filter-item">
-                    <div class="filter-label">时效</div>
                     <select name="expiry" id="expirySelect">
                         <option value="3600">1小时后过期</option>
                         <option value="10800">3小时后过期</option>
@@ -523,29 +585,36 @@
                     </select>
                 </div>
             </div>
-            <div class="filter-item" style="margin: 12px 0;">
+
+            <!-- 可选描述 -->
+            <div class="publish-row">
                 <div class="filter-label">可选描述</div>
-                <textarea name="desc" rows="2" style="width:100%;"></textarea>
+                <div class="filter-item">
+                    <textarea name="desc" rows="2" style="width:100%;"></textarea>
+                </div>
             </div>
 
-            <fieldset style="border:2px solid #6b6e5c; border-radius:60px; padding:16px 20px; margin:16px 0;">
-                <legend style="font-weight:600; padding:0 16px; color:#e9dbbd;">选择卡组 ban 位</legend>
-                <!-- 主国导航栏 -->
-                <div class="major-nav" id="majorNav">
-                    <div class="major-nav-item" data-major="苏" onclick="selectMajor('苏')"><img src="soviet.svg" onerror="this.style.display='none'"> 苏联</div>
-                    <div class="major-nav-item" data-major="德" onclick="selectMajor('德')"><img src="germany.svg" onerror="this.style.display='none'"> 德国</div>
-                    <div class="major-nav-item" data-major="英" onclick="selectMajor('英')"><img src="britain.svg" onerror="this.style.display='none'"> 英国</div>
-                    <div class="major-nav-item" data-major="美" onclick="selectMajor('美')"><img src="usa.svg" onerror="this.style.display='none'"> 美国</div>
-                    <div class="major-nav-item" data-major="日" onclick="selectMajor('日')"><img src="japan.svg" onerror="this.style.display='none'"> 日本</div>
-                </div>
-                <!-- 盟国ban位 -->
-                <div id="allySU" class="ally-box"><div class="ally-header"><span>苏联 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('su',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('su',false)">取消</span></span></div><div class="checkbox-grid" id="suAllies"></div></div>
-                <div id="allyDE" class="ally-box"><div class="ally-header"><span>德国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('de',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('de',false)">取消</span></span></div><div class="checkbox-grid" id="deAllies"></div></div>
-                <div id="allyUK" class="ally-box"><div class="ally-header"><span>英国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('uk',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('uk',false)">取消</span></span></div><div class="checkbox-grid" id="ukAllies"></div></div>
-                <div id="allyUS" class="ally-box"><div class="ally-header"><span>美国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('us',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('us',false)">取消</span></span></div><div class="checkbox-grid" id="usAllies"></div></div>
-                <div id="allyJP" class="ally-box"><div class="ally-header"><span>日本 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('jp',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('jp',false)">取消</span></span></div><div class="checkbox-grid" id="jpAllies"></div></div>
-            </fieldset>
-            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
+            <!-- Ban位 -->
+            <div class="publish-row">
+                <fieldset style="border:2px solid #6b6e5c; border-radius:60px; padding:16px 20px; margin:0;">
+                    <legend style="font-weight:600; padding:0 16px; color:#e9dbbd;">选择卡组 ban 位</legend>
+                    <div class="major-nav" id="majorNav">
+                        <div class="major-nav-item" data-major="苏" onclick="selectMajor('苏')"><img src="soviet.svg" onerror="this.style.display='none'"> 苏联</div>
+                        <div class="major-nav-item" data-major="德" onclick="selectMajor('德')"><img src="germany.svg" onerror="this.style.display='none'"> 德国</div>
+                        <div class="major-nav-item" data-major="英" onclick="selectMajor('英')"><img src="britain.svg" onerror="this.style.display='none'"> 英国</div>
+                        <div class="major-nav-item" data-major="美" onclick="selectMajor('美')"><img src="usa.svg" onerror="this.style.display='none'"> 美国</div>
+                        <div class="major-nav-item" data-major="日" onclick="selectMajor('日')"><img src="japan.svg" onerror="this.style.display='none'"> 日本</div>
+                    </div>
+                    <div id="allySU" class="ally-box"><div class="ally-header"><span>苏联 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('su',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('su',false)">取消</span></span></div><div class="checkbox-grid" id="suAllies"></div></div>
+                    <div id="allyDE" class="ally-box"><div class="ally-header"><span>德国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('de',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('de',false)">取消</span></span></div><div class="checkbox-grid" id="deAllies"></div></div>
+                    <div id="allyUK" class="ally-box"><div class="ally-header"><span>英国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('uk',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('uk',false)">取消</span></span></div><div class="checkbox-grid" id="ukAllies"></div></div>
+                    <div id="allyUS" class="ally-box"><div class="ally-header"><span>美国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('us',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('us',false)">取消</span></span></div><div class="checkbox-grid" id="usAllies"></div></div>
+                    <div id="allyJP" class="ally-box"><div class="ally-header"><span>日本 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('jp',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('jp',false)">取消</span></span></div><div class="checkbox-grid" id="jpAllies"></div></div>
+                </fieldset>
+            </div>
+
+            <!-- 按钮 -->
+            <div class="publish-row" style="flex-direction:row; gap:12px; flex-wrap:wrap;">
                 <button type="submit">发布申请</button>
                 <button type="reset" class="btn-secondary">重置</button>
             </div>
