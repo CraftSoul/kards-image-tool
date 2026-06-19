@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>KARDS 军械库 | 击剑大厅</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            background: #2b2b1f;
+            background-image:
+                radial-gradient(circle at 20% 40%, rgba(80, 70, 40, 0.4) 2%, transparent 2.5%),
+                radial-gradient(circle at 70% 85%, rgba(60, 50, 30, 0.5) 1.8%, transparent 2.2%),
+                radial-gradient(circle at 45% 20%, rgba(110, 90, 50, 0.3) 3%, transparent 3.5%),
+                repeating-linear-gradient(45deg, #5e5536 0px, #5e5536 2px, #7e6e48 2px, #7e6e48 8px),
+                repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
+            background-blend-mode: overlay, normal;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            color: #f5efdb;
+            padding: 16px;
+        }
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-bar {
+            background: rgba(20, 20, 15, 0.96);
+            backdrop-filter: blur(16px);
+            border: 1px solid #aa8e4e;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+        }
+        .nav-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(170, 142, 78, 0.3);
+        }
+        .nav-brand {
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #f9f9fc, #e6dbb0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+        .menu-btn {
+            background: rgba(210, 210, 225, 0.12);
+            border: 1px solid #aa8e4e;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .menu-btn span {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background-color: #f2e2b0;
+            border-radius: 2px;
+        }
+        .nav-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out;
+            background: rgba(10, 10, 8, 0.98);
+        }
+        .nav-menu.open {
+            max-height: 400px;
+        }
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px 20px 20px;
+        }
+        .menu-link {
+            display: block;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 12px 20px;
+            border-radius: 60px;
+            background: rgba(210, 210, 225, 0.08);
+            color: #eef0ff;
+            text-align: center;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .menu-link:hover {
+            background: rgba(235, 235, 245, 0.2);
+            border-color: #c9a53b;
+        }
+        .menu-link.active {
+            background: #c9a53b;
+            color: #1e1c10;
+            font-weight: 700;
+        }
+
+        /* 取消卡片样式 */
+        .card-panel {
+            background: transparent;
+            backdrop-filter: none;
+            border-radius: 0;
+            padding: 0 0 1.2rem 0;
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        .card-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f5efdb;
+            border-bottom: 1px solid rgba(170, 142, 78, 0.3);
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e9dbbd;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+        }
+        .row-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 140px;
+        }
+        select, input, textarea, button {
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.6rem 1rem;
+            color: #f5efdb;
+            font-size: 0.85rem;
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+        }
+        textarea { border-radius: 20px; resize: vertical; }
+        button {
+            background: #c9a53b;
+            color: #1e1c10;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            width: auto;
+            padding: 0.6rem 2rem;
+            transition: 0.15s;
+        }
+        button:hover { background: #dbb84a; }
+        .btn-secondary {
+            background: #3a3528;
+            color: #e9dbbd;
+            border: 1px solid #aa8e4e;
+        }
+        .btn-secondary:hover { background: #5a4e32; }
+
+        .major-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 14px;
+            border-radius: 60px;
+            border: 1px solid #6b6e5c;
+            margin: 8px 0 12px;
+        }
+        .major-nav-item {
+            flex: 1 0 auto;
+            text-align: center;
+            padding: 8px 16px;
+            border-radius: 60px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 2px solid transparent;
+            min-width: 60px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            background: #2d2a1d;
+            color: #e9dbbd;
+        }
+        .major-nav-item img {
+            width: 20px;
+            height: 20px;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+        }
+        .major-nav-item[data-major="苏"] { background: #4F3826; color: #f0e6d0; }
+        .major-nav-item[data-major="苏"].active { background: #c9a53b; color: #1e1c10; border-color: #c9a53b; }
+
+        .major-nav-item[data-major="德"] { background: #5A5F55; color: #f0f0e8; }
+        .major-nav-item[data-major="德"].active { background: #c9a53b; color: #1e1c10; border-color: #c9a53b; }
+
+        .major-nav-item[data-major="英"] { background: #857A60; color: #f5efe0; }
+        .major-nav-item[data-major="英"].active { background: #c9a53b; color: #1e1c10; border-color: #c9a53b; }
+
+        .major-nav-item[data-major="美"] { background: #434B32; color: #e8f0d8; }
+        .major-nav-item[data-major="美"].active { background: #c9a53b; color: #1e1c10; border-color: #c9a53b; }
+
+        .major-nav-item[data-major="日"] { background: #90723C; color: #f5edd0; }
+        .major-nav-item[data-major="日"].active { background: #c9a53b; color: #1e1c10; border-color: #c9a53b; }
+
+        .ally-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            padding: 14px 18px;
+            margin: 10px 0 0;
+            border-left: 4px solid #aa8e4e;
+            display: none;
+        }
+        .ally-box .ally-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #e9dbbd;
+            font-size: 0.9rem;
+        }
+        .checkbox-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .checkbox-grid .chip {
+            background: #1e1c16;
+            border: 1px solid #6b6e5c;
+            border-radius: 40px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.8rem;
+            color: #e9dbbd;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.1s;
+        }
+        .checkbox-grid .chip.active {
+            background: #c9a53b;
+            color: #1e1c10;
+            border-color: #c9a53b;
+            font-weight: 600;
+        }
+        .checkbox-grid .chip img {
+            width: 18px;
+            height: 18px;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+        }
+        .select-all-btn, .deselect-all-btn {
+            background: #3a3528;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 2px 14px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: #e9dbbd;
+            display: inline-block;
+        }
+        .select-all-btn:hover, .deselect-all-btn:hover { background: #5a4e32; }
+
+        .card-item {
+            background: #111812;
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.2rem;
+            border: 2px solid #3a3f3a;
+            transition: 0.15s;
+        }
+        .card-item:hover { border-color: #c9a53b; }
+        .card-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .card-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #faf0cf;
+        }
+        .tag {
+            display: inline-block;
+            border-radius: 40px;
+            padding: 2px 16px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .tag.gold { background: #c4a24b; color: #1f2b30; }
+        .tag.silver { background: #9099a5; color: #1f2b30; }
+        .tag.bronze { background: #b87b4b; color: #1f2b30; }
+        .expiry {
+            background: #2d2a1d;
+            border-radius: 40px;
+            padding: 2px 14px;
+            font-size: 0.8rem;
+            color: #e9dbbd;
+        }
+        .card-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            gap: 12px;
+        }
+        .time-left {
+            background: #1e1c16;
+            border-radius: 40px;
+            padding: 4px 18px;
+            font-size: 0.85rem;
+            border: 1px solid #5a4e32;
+        }
+        .delete-btn {
+            background: #3a2a22;
+            border: 1px solid #8a5a4a;
+            border-radius: 40px;
+            padding: 4px 20px;
+            color: #f5efdb;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.15s;
+        }
+        .delete-btn:hover { background: #8a3a2a; border-color: #c95a3a; }
+
+        .exclusion-area {
+            background: #1a1c16;
+            border-radius: 32px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            border-left: 4px solid #aa8e4e;
+        }
+        .exclusion-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 10px; color: #c9b06b; }
+        .major-nested-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 16px;
+            margin-bottom: 6px;
+        }
+        .outer-major-circle {
+            background: #2d2a1d;
+            font-weight: 700;
+            padding: 4px 18px;
+            border-radius: 40px;
+            border: 2px solid #aa8e4e;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .inner-ally-circle {
+            background: #1e1c16;
+            padding: 2px 14px;
+            border-radius: 40px;
+            border: 1px solid #6b6e5c;
+            display: inline-flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .banned-ally { color: #e9a68a; font-weight: 600; }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 24px;
+            margin-bottom: 14px;
+        }
+        .filter-major-group, .filter-ally-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+        }
+        .filter-major-item, .filter-ally-item {
+            padding: 6px 18px;
+            border-radius: 40px;
+            background: #2d2a1d;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            font-size: 0.85rem;
+            color: #e9dbbd;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .filter-major-item.selected, .filter-ally-item.selected {
+            background: #c9a53b;
+            color: #1e1c10;
+            border-color: #c9a53b;
+        }
+        .filter-major-item img, .filter-ally-item img {
+            width: 18px;
+            height: 18px;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+        }
+
+        .footer-simple {
+            margin-top: 2.8rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid #928451;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.2rem 2rem;
+            font-size: 0.85rem;
+        }
+        .footer-simple a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            color: #f8efcf;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: 0.2s;
+        }
+        .footer-simple a:hover {
+            background: #b48b3f;
+            color: #181d0e;
+        }
+        .footer-simple img {
+            width: 18px;
+            height: 18px;
+            filter: invert(0.95);
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 2rem;
+            color: #e9dbbd;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+        .empty-text {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #a09070;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 60px;
+        }
+
+        @media (max-width: 600px) {
+            .card-header h3 { font-size: 1rem; }
+            .row-filters { flex-direction: column; }
+            .major-nav { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="nav-bar">
+        <div class="nav-header-row">
+            <div class="nav-brand">KARDS 军械库</div>
+            <div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <div class="menu-links">
+                <a class="menu-link" href="index.html">卡牌收藏</a>
+                <a class="menu-link" href="builder.html">卡组构筑</a>
+                <a class="menu-link" href="seek.html">英文直检</a>
+                <a class="menu-link active" href="#">击剑大厅</a>
+                <a class="menu-link" href="pack.html">模拟开包</a>
+                <a class="menu-link" href="about.html">关于军械库</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发布区 -->
+    <div class="card-panel">
+        <h2>⚔️ 发布击剑申请</h2>
+        <form id="publishForm">
+            <div class="row-filters">
+                <div class="filter-item">
+                    <div class="filter-label">战斗代码 / 游戏ID</div>
+                    <input type="text" name="code" placeholder="e.g. 114514 或 Player#1234" required>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-label">资历</div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <label><input type="radio" name="tier" value="老逼" checked> <span class="tag gold" style="font-size:0.8rem;">老逼</span></label>
+                        <label><input type="radio" name="tier" value="中逼"> <span class="tag silver" style="font-size:0.8rem;">中逼</span></label>
+                        <label><input type="radio" name="tier" value="小逼"> <span class="tag bronze" style="font-size:0.8rem;">小逼</span></label>
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-label">时效</div>
+                    <select name="expiry" id="expirySelect">
+                        <option value="3600">1小时后过期</option>
+                        <option value="10800">3小时后过期</option>
+                        <option value="86400">1天后过期</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-item" style="margin: 12px 0;">
+                <div class="filter-label">可选描述</div>
+                <textarea name="desc" rows="2" style="width:100%;"></textarea>
+            </div>
+
+            <fieldset style="border:2px solid #6b6e5c; border-radius:60px; padding:16px 20px; margin:16px 0;">
+                <legend style="font-weight:600; padding:0 16px; color:#e9dbbd;">选择卡组 ban 位</legend>
+                <!-- 主国导航栏 -->
+                <div class="major-nav" id="majorNav">
+                    <div class="major-nav-item" data-major="苏" onclick="selectMajor('苏')"><img src="soviet.svg" onerror="this.style.display='none'"> 苏联</div>
+                    <div class="major-nav-item" data-major="德" onclick="selectMajor('德')"><img src="germany.svg" onerror="this.style.display='none'"> 德国</div>
+                    <div class="major-nav-item" data-major="英" onclick="selectMajor('英')"><img src="britain.svg" onerror="this.style.display='none'"> 英国</div>
+                    <div class="major-nav-item" data-major="美" onclick="selectMajor('美')"><img src="usa.svg" onerror="this.style.display='none'"> 美国</div>
+                    <div class="major-nav-item" data-major="日" onclick="selectMajor('日')"><img src="japan.svg" onerror="this.style.display='none'"> 日本</div>
+                </div>
+                <!-- 盟国ban位 -->
+                <div id="allySU" class="ally-box"><div class="ally-header"><span>苏联 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('su',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('su',false)">取消</span></span></div><div class="checkbox-grid" id="suAllies"></div></div>
+                <div id="allyDE" class="ally-box"><div class="ally-header"><span>德国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('de',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('de',false)">取消</span></span></div><div class="checkbox-grid" id="deAllies"></div></div>
+                <div id="allyUK" class="ally-box"><div class="ally-header"><span>英国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('uk',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('uk',false)">取消</span></span></div><div class="checkbox-grid" id="ukAllies"></div></div>
+                <div id="allyUS" class="ally-box"><div class="ally-header"><span>美国 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('us',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('us',false)">取消</span></span></div><div class="checkbox-grid" id="usAllies"></div></div>
+                <div id="allyJP" class="ally-box"><div class="ally-header"><span>日本 · ban 以下盟国</span><span><span class="select-all-btn" onclick="toggleAll('jp',true)">全选</span><span class="deselect-all-btn" onclick="toggleAll('jp',false)">取消</span></span></div><div class="checkbox-grid" id="jpAllies"></div></div>
+            </fieldset>
+            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
+                <button type="submit">发布申请</button>
+                <button type="reset" class="btn-secondary">重置</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 筛选区 -->
+    <div class="card-panel">
+        <h2>🔍 筛选申请</h2>
+        <form id="filterForm">
+            <div class="filter-row">
+                <span class="filter-label" style="min-width:70px;">资历</span>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <label><input type="checkbox" name="filter_tier" value="老逼" checked> 老逼</label>
+                    <label><input type="checkbox" name="filter_tier" value="中逼" checked> 中逼</label>
+                    <label><input type="checkbox" name="filter_tier" value="小逼" checked> 小逼</label>
+                </div>
+            </div>
+            <div class="filter-row">
+                <span class="filter-label" style="min-width:70px;">时效</span>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <label><input type="radio" name="filter_expiry" value="all" checked> 全部</label>
+                    <label><input type="radio" name="filter_expiry" value="1h"> 1小时内</label>
+                    <label><input type="radio" name="filter_expiry" value="3h"> 3小时内</label>
+                    <label><input type="radio" name="filter_expiry" value="today"> 今日</label>
+                </div>
+            </div>
+            <div class="filter-row">
+                <span class="filter-label" style="min-width:70px;">预期卡组</span>
+                <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
+                    <div class="filter-major-group" id="filterMajorGroup">
+                        <span class="filter-major-item selected" data-major="" onclick="selectFilterMajor('')">任意主国</span>
+                        <span class="filter-major-item" data-major="苏" onclick="selectFilterMajor('苏')"><img src="soviet.svg" onerror="this.style.display='none'"> 苏联</span>
+                        <span class="filter-major-item" data-major="德" onclick="selectFilterMajor('德')"><img src="germany.svg" onerror="this.style.display='none'"> 德国</span>
+                        <span class="filter-major-item" data-major="英" onclick="selectFilterMajor('英')"><img src="britain.svg" onerror="this.style.display='none'"> 英国</span>
+                        <span class="filter-major-item" data-major="美" onclick="selectFilterMajor('美')"><img src="usa.svg" onerror="this.style.display='none'"> 美国</span>
+                        <span class="filter-major-item" data-major="日" onclick="selectFilterMajor('日')"><img src="japan.svg" onerror="this.style.display='none'"> 日本</span>
+                    </div>
+                    <div class="filter-ally-group" id="filterAllyGroup">
+                        <span class="filter-ally-item selected" data-ally="" onclick="selectFilterAlly('')">任意盟国</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:16px;"><button type="submit">应用筛选</button></div>
+        </form>
+    </div>
+
+    <!-- 击剑列表 -->
+    <div class="card-panel" style="padding-top:0;">
+        <h2>📋 击剑申请</h2>
+        <div id="cardsList"><div class="loading-text">正在寻找敌人 ...</div></div>
+    </div>
+
+    <div class="footer-simple">
+        <a href="https://github.com/CraftSoul/kards-duel" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a>
+        <a href="https://space.bilibili.com/3546776475505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
+    </div>
+</div>
+
+<script>
+    // ========== 云端配置 ==========
+    const BIN_ID = '699165fa43b1c97be9803227';
+    const API_KEY = '$2a$10$3LnTLPNHEK/IU.4sdAXkMOdTVG3bLzFpB/EoQun9xru69bYCn1JOO';
+    let cards = [];
+    let nextId = 1;
+    let selectedMajor = null;
+    let selectedFilterMajor = '';
+    let selectedFilterAlly = '';
+
+    const ALL_ALLIES_RAW = ['苏','德','英','美','日','意','法','波','芬','澳'];
+    const MAJORS = ['苏','德','英','美','日'];
+
+    const factionIconMap = {
+        '苏': 'soviet.svg', '德': 'germany.svg', '英': 'britain.svg', '美': 'usa.svg', '日': 'japan.svg',
+        '意': 'italy.svg', '法': 'france.svg', '波': 'poland.svg', '芬': 'finland.svg', '澳': 'anzac.svg'
+    };
+
+    // 初始化盟国复选框
+    function initAllyCheckboxes() {
+        const map = { su:'suAllies', de:'deAllies', uk:'ukAllies', us:'usAllies', jp:'jpAllies' };
+        for (let [key, elemId] of Object.entries(map)) {
+            const container = document.getElementById(elemId);
+            if(container) {
+                container.innerHTML = ALL_ALLIES_RAW.map(ally => {
+                    const icon = factionIconMap[ally] || '';
+                    return `<span class="chip" data-ally="${ally}" data-group="${key}" onclick="toggleAllyChip(this)"><img src="${icon}" onerror="this.style.display='none'" width="18" height="18"> ${ally}</span>`;
+                }).join('');
+            }
+        }
+        // 筛选区的盟国列表
+        const allyGroup = document.getElementById('filterAllyGroup');
+        if(allyGroup) {
+            let html = '<span class="filter-ally-item selected" data-ally="" onclick="selectFilterAlly(\'\')">任意盟国</span>';
+            ALL_ALLIES_RAW.forEach(ally => {
+                const icon = factionIconMap[ally] || '';
+                html += `<span class="filter-ally-item" data-ally="${ally}" onclick="selectFilterAlly('${ally}')"><img src="${icon}" onerror="this.style.display='none'" width="18" height="18"> ${ally}</span>`;
+            });
+            allyGroup.innerHTML = html;
+        }
+    }
+
+    function toggleAllyChip(el) {
+        el.classList.toggle('active');
+        const group = el.dataset.group;
+        const ally = el.dataset.ally;
+        const checkbox = document.querySelector(`input[name="ally_${group}"][value="${ally}"]`);
+        if(checkbox) checkbox.checked = el.classList.contains('active');
+    }
+
+    // ========== 云端存取 ==========
+    async function loadCardsFromCloud() {
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+            if(!res.ok) throw new Error();
+            const data = await res.json();
+            if(data.record && Array.isArray(data.record.cards)) cards = data.record.cards;
+            else if(Array.isArray(data.record)) cards = data.record;
+            else cards = [];
+            nextId = cards.reduce((max,c)=>Math.max(max, c.id||0),0)+1;
+        } catch(e) { cards = []; nextId=1; }
+        renderCards();
+    }
+    async function saveCardsToCloud() {
+        const now = Date.now();
+        cards = cards.filter(c=>c.expiresAt > now);
+        try {
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+                body:JSON.stringify({ cards })
+            });
+        } catch(e) { console.warn(e); }
+        renderCards();
+    }
+
+    // 发布
+    document.getElementById('publishForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = document.querySelector('input[name="code"]').value.trim();
+        if(!code) return alert('请输入战斗代码或游戏ID');
+        const desc = document.querySelector('textarea[name="desc"]').value;
+        const tier = document.querySelector('input[name="tier"]:checked')?.value;
+        const expirySec = parseInt(document.getElementById('expirySelect').value);
+        const excluded = [];
+        const map = {苏:'ally_su',德:'ally_de',英:'ally_uk',美:'ally_us',日:'ally_jp'};
+        for(let major of MAJORS) {
+            const container = document.getElementById(map[major].replace('ally_','')+'Allies');
+            if(container) {
+                container.querySelectorAll('.chip.active').forEach(chip => {
+                    excluded.push({ major, ally: chip.dataset.ally });
+                });
+            }
+        }
+        const now = Date.now();
+        const newCard = {
+            id: nextId++, code, desc, tier, excluded, createdAt: now,
+            expiresAt: now + expirySec * 1000,
+            expiryLabel: expirySec === 3600 ? '1小时' : (expirySec === 10800 ? '3小时' : '1天')
+        };
+        cards.push(newCard);
+        await saveCardsToCloud();
+        e.target.reset();
+        document.querySelectorAll('.ally-box').forEach(b=>b.style.display='none');
+        document.querySelectorAll('.major-nav-item').forEach(el=>el.classList.remove('active'));
+        selectedMajor=null;
+        document.querySelectorAll('.checkbox-grid .chip').forEach(c=>c.classList.remove('active'));
+        renderCards();
+    });
+
+    async function deleteCard(id) {
+        if(!confirm('确定删除此申请？')) return;
+        cards = cards.filter(c=>c.id !== id);
+        await saveCardsToCloud();
+        renderCards();
+    }
+
+    function selectMajor(major) {
+        document.querySelectorAll('.major-nav-item').forEach(el=>el.classList.toggle('active', el.dataset.major===major));
+        selectedMajor=major;
+        ['allySU','allyDE','allyUK','allyUS','allyJP'].forEach(id=>document.getElementById(id).style.display='none');
+        const map = {苏:'allySU',德:'allyDE',英:'allyUK',美:'allyUS',日:'allyJP'};
+        if(map[major]) document.getElementById(map[major]).style.display='block';
+    }
+    function toggleAll(m, checked) {
+        const prefix = {su:'su', de:'de', uk:'uk', us:'us', jp:'jp'}[m];
+        const container = document.getElementById(`${prefix}Allies`);
+        if(container) {
+            container.querySelectorAll('.chip').forEach(chip => {
+                chip.classList.toggle('active', checked);
+                const cb = document.querySelector(`input[name="ally_${prefix}"][value="${chip.dataset.ally}"]`);
+                if(cb) cb.checked = checked;
+            });
+        }
+    }
+    function getTimeLeft(expiresAt) {
+        const diff = expiresAt - Date.now();
+        if(diff<=0) return '已过期';
+        const min = Math.floor(diff/60000);
+        if(min<60) return `${min}分钟`;
+        const hour = Math.floor(min/60);
+        const remainMin = min%60;
+        return `${hour}小时${remainMin>0?`${remainMin}分`:''}`;
+    }
+
+    function selectFilterMajor(major) {
+        selectedFilterMajor = major;
+        document.querySelectorAll('#filterMajorGroup .filter-major-item').forEach(el=>el.classList.toggle('selected', el.dataset.major===major));
+        renderCards();
+    }
+    function selectFilterAlly(ally) {
+        selectedFilterAlly = ally;
+        document.querySelectorAll('#filterAllyGroup .filter-ally-item').forEach(el=>el.classList.toggle('selected', el.dataset.ally===ally));
+        renderCards();
+    }
+
+    function renderCards() {
+        const now = Date.now();
+        cards = cards.filter(c=>c.expiresAt > now);
+        const container = document.getElementById('cardsList');
+        if(!container) return;
+        const filterTiers = Array.from(document.querySelectorAll('input[name="filter_tier"]:checked')).map(cb=>cb.value);
+        const filterExpiry = document.querySelector('input[name="filter_expiry"]:checked')?.value;
+        let filtered = cards.filter(c=> {
+            if(!filterTiers.includes(c.tier)) return false;
+            if(filterExpiry !== 'all') {
+                const totalHours = (c.expiresAt - c.createdAt)/3600000;
+                const ageHours = (now - c.createdAt)/3600000;
+                if(filterExpiry === '1h' && (totalHours>1.1 || ageHours>1)) return false;
+                if(filterExpiry === '3h' && (totalHours>3.1 || ageHours>3)) return false;
+                if(filterExpiry === 'today' && (totalHours>24 || ageHours>24)) return false;
+            }
+            return true;
+        });
+        // 卡组筛选
+        if(selectedFilterMajor && selectedFilterAlly) {
+            filtered = filtered.filter(c=> !c.excluded.some(ex=>ex.major===selectedFilterMajor && ex.ally===selectedFilterAlly));
+        } else if(selectedFilterMajor && !selectedFilterAlly) {
+            filtered = filtered.filter(c=> {
+                const excludedMajors = c.excluded.filter(ex=>ex.major===selectedFilterMajor).map(ex=>ex.ally);
+                return !ALL_ALLIES_RAW.every(ally=>excludedMajors.includes(ally));
+            });
+        } else if(!selectedFilterMajor && selectedFilterAlly) {
+            filtered = filtered.filter(c=> !MAJORS.every(m=>c.excluded.some(ex=>ex.major===m && ex.ally===selectedFilterAlly)));
+        }
+
+        if(filtered.length===0) {
+            container.innerHTML = '<div class="empty-text">未找到</div>';
+            return;
+        }
+        container.innerHTML = filtered.map(c=>{
+            const tierClass = c.tier==='老逼'?'gold':(c.tier==='中逼'?'silver':'bronze');
+            const timeLeft = getTimeLeft(c.expiresAt);
+            const grouped = {};
+            c.excluded.forEach(({major,ally})=>{ if(!grouped[major]) grouped[major]=[]; grouped[major].push(ally); });
+            let groupsHtml = '';
+            for(let maj of MAJORS) {
+                if(grouped[maj] && grouped[maj].length) {
+                    const allies = [...new Set(grouped[maj])];
+                    const isFull = ALL_ALLIES_RAW.every(a=>allies.includes(a));
+                    if(isFull) {
+                        const icon = factionIconMap[maj] || '';
+                        groupsHtml += `<div class="major-nested-group"><span class="major-alone" style="display:inline-flex;align-items:center;gap:6px;background:#2d2a1d;padding:4px 18px;border-radius:40px;border:2px solid #c9a53b;font-weight:700;"><img src="${icon}" onerror="this.style.display='none'" width="18" height="18"> ${maj}</span></div>`;
+                    } else {
+                        const icon = factionIconMap[maj] || '';
+                        groupsHtml += `<div class="major-nested-group"><span class="outer-major-circle" style="display:inline-flex;align-items:center;gap:8px;background:#2d2a1d;padding:4px 18px;border-radius:40px;border:2px solid #aa8e4e;font-weight:700;"><img src="${icon}" onerror="this.style.display='none'" width="18" height="18"> ${maj}<span class="inner-ally-circle" style="background:#1e1c16;padding:2px 14px;border-radius:40px;border:1px solid #6b6e5c;display:inline-flex;gap:6px;flex-wrap:wrap;">${allies.map(a=>`<span class="banned-ally" style="color:#e9a68a;font-weight:600;">${a}</span>`).join('')}</span></span></div>`;
+                    }
+                }
+            }
+            const exclusionHtml = c.excluded.length ? `<div class="exclusion-area"><div class="exclusion-title">🚫 ban位</div>${groupsHtml}</div>` : '';
+            return `<div class="card-item" data-id="${c.id}">
+                <div class="card-header"><h3>${escapeHtml(c.code)}</h3><span class="tag ${tierClass}">${c.tier}</span><span class="expiry">${c.expiryLabel}</span></div>
+                ${c.desc ? `<div style="margin:6px 0 4px;color:#d0c8b0;">${escapeHtml(c.desc)}</div>` : ''}
+                ${exclusionHtml}
+                <div class="card-footer"><span class="time-left">⏳ ${timeLeft}</span><button class="delete-btn" onclick="deleteCard(${c.id})">删除</button></div>
+            </div>`;
+        }).join('');
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m=>({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]||m)); }
+
+    // 导航折叠
+    document.getElementById('menuToggleBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('navMenu').classList.toggle('open');
+    });
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('navMenu');
+        if (!document.getElementById('menuToggleBtn').contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.remove('open');
+        }
+    });
+
+    document.getElementById('filterForm').addEventListener('submit', (e)=>{ e.preventDefault(); renderCards(); });
+    document.querySelectorAll('input[name="filter_tier"], input[name="filter_expiry"]').forEach(el=>el.addEventListener('change', ()=>renderCards()));
+
+    window.selectMajor=selectMajor; window.toggleAll=toggleAll; window.selectFilterMajor=selectFilterMajor; window.selectFilterAlly=selectFilterAlly; window.deleteCard=deleteCard; window.toggleAllyChip=toggleAllyChip;
+
+    window.addEventListener('load', ()=>{
+        initAllyCheckboxes();
+        loadCardsFromCloud().then(()=>{
+            setInterval(()=>{
+                const before = cards.length;
+                cards = cards.filter(c=>c.expiresAt > Date.now());
+                if(cards.length !== before) saveCardsToCloud();
+                else renderCards();
+            }, 60000);
+        });
+    });
+</script>
+</body>
+</html>

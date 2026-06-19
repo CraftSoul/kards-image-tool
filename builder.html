@@ -1116,7 +1116,7 @@
 <body>
 <div class="app-container">
     <div class="nav-bar"><div class="nav-header-row"><div class="nav-brand">KARDS 军械库</div><div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div></div>
-    <div class="nav-menu" id="navMenu"><div class="menu-links"><a class="menu-link" href="index.html">卡牌收藏</a><a class="menu-link active" href="#">卡组构筑</a><a class="menu-link" href="seek.html">英文直检</a><a class="menu-link" href="https://craftsoul.github.io/kards-duel" data-target="duel">击剑大厅</a><a class="menu-link" href="pack.html" data-target="pack">模拟开包</a><a class="menu-link" href="about.html">关于军械库</a></div></div></div>
+    <div class="nav-menu" id="navMenu"><div class="menu-links"><a class="menu-link" href="index.html">卡牌收藏</a><a class="menu-link active" href="#">卡组构筑</a><a class="menu-link" href="seek.html">英文直检</a><a class="menu-link" href="duel.html" data-target="duel">击剑大厅</a><a class="menu-link" href="pack.html" data-target="pack">模拟开包</a><a class="menu-link" href="about.html">关于军械库</a></div></div></div>
 
     <div class="mobile-deck-toggle" id="mobileDeckToggle"><span class="toggle-text">卡组</span><span class="mobile-count-badge-toggle" id="mobileToggleCount">0</span><span>◀</span></div>
     <div class="mobile-overlay" id="mobileOverlay"></div>
@@ -2033,9 +2033,9 @@
             
             return `<div class="histogram-bar-wrapper">
                         <div class="bar-stack" style="height:48px;background:transparent;">
-                            <div class="bar-counter" style="height:${counterH}px; background:#5a5a5a;" title="反制:${counter}"></div>
-                            <div class="bar-order" style="height:${orderH}px; background:#f5c542;" title="指令:${order}"></div>
                             <div class="bar-unit" style="height:${unitH}px; background:#e8e4d0;" title="单位:${unit}"></div>
+                            <div class="bar-order" style="height:${orderH}px; background:#f5c542;" title="指令:${order}"></div>
+                            <div class="bar-counter" style="height:${counterH}px; background:#5a5a5a;" title="反制:${counter}"></div>
                         </div>
                         <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
                         <div class="cost-total">${total}</div>
@@ -2119,7 +2119,7 @@
         mainIcon.crossOrigin = "Anonymous";
         mainIcon.src = `${mainNation}.svg`;
         await new Promise(r => { mainIcon.onload = r; mainIcon.onerror = r; });
-        ctx.drawImage(mainIcon, x + w * 0.05, startY - iconSize*0.5, iconSize, iconSize);
+        ctx.drawImage(mainIcon, x + w * 0.05, startY - iconSize*0.7, iconSize, iconSize);
         ctx.fillStyle = factionColor[mainNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[mainNation]}: ${mainCount}`, x + w * 0.05 + iconSize + 5, startY + 2);
 
@@ -2128,7 +2128,7 @@
         allyIcon.crossOrigin = "Anonymous";
         allyIcon.src = `${allyNation}.svg`;
         await new Promise(r => { allyIcon.onload = r; allyIcon.onerror = r; });
-        ctx.drawImage(allyIcon, x + w * 0.05, startY + lineH - iconSize*0.5, iconSize, iconSize);
+        ctx.drawImage(allyIcon, x + w * 0.05, startY + lineH - iconSize*0.7, iconSize, iconSize);
         ctx.fillStyle = factionColor[allyNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[allyNation]}: ${allyCount}`, x + w * 0.05 + iconSize + 5, startY + lineH + 2);
 
