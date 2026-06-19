@@ -505,7 +505,7 @@
             margin-top: 8px;
             border-top: 1px solid rgba(170, 142, 78, 0.3);
             padding-top: 12px;
-            display: none; /* 默认隐藏，JS控制显示 */
+            display: none;
         }
         .related-section.visible {
             display: block;
@@ -710,7 +710,7 @@
                 </div>
             </div>
 
-            <!-- 词条（静态定义） -->
+            <!-- 词条 -->
             <div class="filter-group">
                 <div class="filter-group-title collapse-toggle" data-target="attrBody">
                     ✨ 词条 <span class="reset-chip" data-filter-type="attribute">✖ 清除</span>
@@ -721,7 +721,7 @@
                 </div>
             </div>
 
-            <!-- 扩展包（静态定义，带图标） -->
+            <!-- 扩展包 -->
             <div class="filter-group">
                 <div class="filter-group-title collapse-toggle" data-target="setBody">
                     📦 扩展包 <span class="reset-chip" data-filter-type="set">✖ 清除</span>
@@ -803,7 +803,7 @@
         const AVAILABLE_VERSIONS = generateVersionList();
         const DEFAULT_VERSION = `v${VERSION}`;
 
-        // 词条翻译（修正重甲大小写）
+        // 词条翻译
         const attrTranslation = {
             "blitz": "闪击",
             "fury": "奋战",
@@ -843,7 +843,7 @@
             "OceaniaStorm": "澳新风暴"
         };
 
-        // 扩展包图标映射（来自txt）
+        // 扩展包图标映射
         const setIconMap = {
             "Base": "https://www.datocms-assets.com/120590/1732572097-set-icon-base.svg",
             "Allegiance": "https://www.datocms-assets.com/120590/1732572215-set-icon-allegiance.svg",
@@ -1019,7 +1019,7 @@
                     }
                 }
 
-                // 建立老兵关系（修正逻辑）
+                // 建立老兵关系
                 veteranMap = {};
                 becomesVeteranMap = {};
                 for (let c of allCards) {
@@ -1040,10 +1040,10 @@
                     }
                 }
 
-                // 初始化筛选器（静态定义）
+                // 初始化筛选器
                 initStaticFilters();
-                initAttrFilter();   // 基于静态 attrTranslation
-                initSetFilter();    // 基于静态 setTranslation
+                initAttrFilter();
+                initSetFilter();
                 applyFilters();
 
             } catch (e) {
@@ -1125,7 +1125,7 @@
                 el.addEventListener('input', () => applyFilters());
             });
 
-            // 事件委托：处理所有 filter-chip 点击（包括动态生成的词条和扩展包）
+            // 事件委托：处理所有 filter-chip 点击
             document.querySelector('.filter-panel').addEventListener('click', function(e) {
                 const chip = e.target.closest('.filter-chip');
                 if (!chip) return;
@@ -1149,19 +1149,19 @@
             });
         }
 
-        // 词条筛选：基于静态 attrTranslation
+        // 词条筛选
         function initAttrFilter() {
             const container = document.getElementById('attrMultiContainer');
-            const attrKeys = Object.keys(attrTranslation).sort();
+            const attrKeys = Object.keys(attrTranslation);
             container.innerHTML = attrKeys.map(a =>
                 `<div class="filter-chip" data-filter="attribute" data-val="${a}">${attrTranslation[a]}</div>`
             ).join('');
         }
 
-        // 扩展包筛选：基于静态 setTranslation，带图标
+        // 扩展包筛选
         function initSetFilter() {
             const container = document.getElementById('setMultiContainer');
-            const setKeys = Object.keys(setTranslation).sort();
+            const setKeys = Object.keys(setTranslation);
             container.innerHTML = setKeys.map(s => {
                 const icon = setIconMap[s] || '';
                 return `<div class="filter-chip" data-filter="set" data-val="${s}">${icon ? `<img src="${icon}" width="18" height="18" onerror="this.style.display='none'">` : ''} ${setTranslation[s]}</div>`;
@@ -1181,7 +1181,7 @@
                 result = result.filter(c => searchableText(c).includes(search));
             }
 
-            // 词条（AND）
+            // 词条
             if (selectedFilters.attributes.size) {
                 result = result.filter(c => {
                     const attrs = c.attributes || [];
@@ -1266,7 +1266,7 @@
             const pageCards = filteredCards.slice(start, start + PAGE_SIZE);
             const container = document.getElementById('cardContainer');
             if (!pageCards.length) {
-                container.innerHTML = '<div style="color:#e9dbbd;padding:2rem 0;text-align:center;">未找到匹配的卡牌</div>';
+                container.innerHTML = '<div style="color:#e9dbbd;padding:2rem 0;text-align:center;">未找到</div>';
                 return;
             }
             container.innerHTML = pageCards.map((card, idx) => {
@@ -1556,7 +1556,7 @@
             }
         }
 
-        // ==================== 启动 ====================
+        // ==================== 原神启动 ====================
         window.addEventListener('load', () => {
             loadData();
 
