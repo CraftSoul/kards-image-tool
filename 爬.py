@@ -62,7 +62,7 @@ $set: [String], $showSpawnables: Boolean, $showExiles: Boolean, $showReserved: B
 }"""
 
 def fetch_all_cards():
-    all_edges = []
+    all_cards = []
     total_count = 0
     offset = 0
     first = 20  # 每页数量，与查询一致
@@ -105,9 +105,31 @@ def fetch_all_cards():
         if offset == 0:
             total_count = page_info.get("count", 0)
 
-        # 收集该页的 edges
-        all_edges.extend(edges)
-        print(f"  本页获取 {len(edges)} 条，累计 {len(all_edges)} 条")
+        # 提取 node 数据并转换为目标格式
+        for edge in edges:
+            node = edge.get("node", {})
+            # 解析 json 字段
+            json_field = node.get("json")
+            if isinstance(json_field, str):
+                try:
+                    json_field = json.loads(json_field)
+                except json.JSONDecodeError:
+                    json_field = {}
+            
+            # 构建目标格式
+            card = {
+                "id": node.get("id"),
+                "cardId": node.get("cardId"),
+                "importId": node.get("importId"),
+                "json": json_field if json_field else {},
+                "reserved": node.get("reserved", False),
+                "imageUrl": node.get("imageUrl"),
+                "thumbUrl": node.get("thumbUrl"),
+                "__typename": node.get("__typename", "Card")
+            }
+            all_cards.append(card)
+
+        print(f"  本页获取 {len(edges)} 条，累计 {len(all_cards)} 条")
 
         # 检查是否有下一页
         has_next = page_info.get("hasNextPage", False)
@@ -118,19 +140,7 @@ def fetch_all_cards():
         time.sleep(0.5)  # 礼貌性延迟
 
     # 构建最终数据结构
-    result = {
-        "data": {
-            "cards": {
-                "pageInfo": {
-                    "count": total_count,
-                    "hasNextPage": False,   # 已全部获取
-                    "__typename": "PageInfo"
-                },
-                "edges": all_edges,
-                "__typename": "CardConnection"
-            }
-        }
-    }
+    result = {"cards": all_cards}
 
     return result
 
@@ -138,9 +148,9 @@ def main():
     print("开始获取所有卡牌 JSON ...")
     data = fetch_all_cards()
 
-    # 打印结果（格式化）
-    print("\n===== 爬取结果 =====")
-    print(json.dumps(data, indent=2, ensure_ascii=False))
+    # 打印统计信息
+    print(f"\n===== 爬取完成 =====")
+    print(f"共获取 {len(data['cards'])} 张卡牌")
 
     # 保存到文件
     with open("data.json", "w", encoding="utf-8") as f:
