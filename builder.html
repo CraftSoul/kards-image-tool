@@ -825,6 +825,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .filter-group-title .collapse-icon {
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+            margin-left: 8px;
+        }
+        .filter-group-title .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+        .filter-group-body {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            max-height: 600px;
+        }
+        .filter-group-body.collapsed {
+            max-height: 0;
         }
         .multi-select-btns {
             display: flex;
@@ -862,6 +880,7 @@
             padding: 0.2rem 0.8rem;
             border-radius: 40px;
             cursor: pointer;
+            color: #e9dbbd;
         }
         .row-filters {
             display: flex;
@@ -1105,10 +1124,67 @@
                     <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div>
                 </div>
 
-                <div class="filter-group"><div class="filter-group-title">🏳 阵营 <span class="reset-chip" data-filter-type="faction">✖ 清除</span></div><div class="multi-select-btns" id="factionMultiContainer"></div></div>
-                <div class="filter-group"><div class="filter-group-title">♠️ 类型 <span class="reset-chip" data-filter-type="type">✖ 清除</span></div><div class="multi-select-btns" id="typeMultiContainer"></div></div>
-                <div class="filter-group"><div class="filter-group-title">💰 花费 <span class="reset-chip" data-filter-type="cost">✖ 清除</span></div><div class="multi-select-btns" id="costMultiContainer"></div></div>
-                <div class="filter-group"><div class="filter-group-title">🃏 稀有度 <span class="reset-chip" data-filter-type="rarity">✖ 清除</span></div><div class="multi-select-btns" id="rarityMultiContainer"></div></div>
+                <div class="filter-group">
+                    <div class="filter-group-title collapse-toggle" data-target="factionBody">
+                        🏳 阵营 <span class="reset-chip" data-filter-type="faction">✖ 清除</span>
+                        <span class="arrow open">▶</span>
+                    </div>
+                    <div class="filter-group-body" id="factionBody">
+                        <div class="multi-select-btns" id="factionMultiContainer"></div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-group-title collapse-toggle" data-target="typeBody">
+                        ♠️ 类型 <span class="reset-chip" data-filter-type="type">✖ 清除</span>
+                        <span class="arrow open">▶</span>
+                    </div>
+                    <div class="filter-group-body" id="typeBody">
+                        <div class="multi-select-btns" id="typeMultiContainer"></div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-group-title collapse-toggle" data-target="costBody">
+                        💰 花费 <span class="reset-chip" data-filter-type="cost">✖ 清除</span>
+                        <span class="arrow open">▶</span>
+                    </div>
+                    <div class="filter-group-body" id="costBody">
+                        <div class="multi-select-btns" id="costMultiContainer"></div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-group-title collapse-toggle" data-target="rarityBody">
+                        🃏 稀有度 <span class="reset-chip" data-filter-type="rarity">✖ 清除</span>
+                        <span class="arrow open">▶</span>
+                    </div>
+                    <div class="filter-group-body" id="rarityBody">
+                        <div class="multi-select-btns" id="rarityMultiContainer"></div>
+                    </div>
+                </div>
+
+                <!-- 词条 -->
+                <div class="filter-group">
+                    <div class="filter-group-title collapse-toggle" data-target="attrBody">
+                        ✨ 词条 <span class="reset-chip" data-filter-type="attribute">✖ 清除</span>
+                        <span class="arrow open">▶</span>
+                    </div>
+                    <div class="filter-group-body" id="attrBody">
+                        <div class="multi-select-btns" id="attrMultiContainer"></div>
+                    </div>
+                </div>
+
+                <!-- 扩展包（多选） -->
+                <div class="filter-group">
+                    <div class="filter-group-title collapse-toggle" data-target="setBody">
+                        📦 扩展包 <span class="reset-chip" data-filter-type="set">✖ 清除</span>
+                        <span class="arrow open">▶</span>
+                    </div>
+                    <div class="filter-group-body" id="setBody">
+                        <div class="multi-select-btns" id="setMultiContainer"></div>
+                    </div>
+                </div>
 
                 <div id="statsArea" style="display: none;">
                     <div class="stats-group">
@@ -1164,8 +1240,63 @@
 </div>
 
 <script>
-    const attrTranslation = { "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴", "guard": "守护", "heavyarmor1": "重甲1", "heavyarmor2": "重甲2", "heavyarmor3": "重甲3", "alpine": "山地", "mobilize": "动员", "covert": "隐蔽", "shock": "冲击", "bond": "协力", "ambush": "伏击", "intel1": "情报1", "intel2": "情报2", "intel3": "情报3" };
-    function translateAttributesForSearch(attrs) { if (!attrs || !attrs.length) return ""; return attrs.map(a => attrTranslation[a] || a).join(" "); }
+    // ==================== 常量与翻译 ====================
+    // 词条翻译（修正重甲大小写）
+    const attrTranslation = {
+        "blitz": "闪击",
+        "fury": "奋战",
+        "smokescreen": "烟幕",
+        "pincer": "钳击",
+        "salvage": "收缴",
+        "guard": "守护",
+        "heavyArmor1": "重甲 1",
+        "heavyArmor2": "重甲 2",
+        "heavyArmor3": "重甲 3",
+        "alpine": "山地",
+        "mobilize": "动员",
+        "covert": "隐蔽",
+        "shock": "冲击",
+        "bond": "协力",
+        "ambush": "伏击",
+        "intel1": "情报 1",
+        "intel2": "情报 2",
+        "intel3": "情报 3",
+        "exile": "流亡"
+    };
+
+    // 扩展包翻译（按顺序排列，与txt一致）
+    const setTranslation = {
+        "Base": "基础",
+        "Allegiance": "忠诚",
+        "Breakthrough": "突破",
+        "Legions": "军团",
+        "WorldAtWar": "世纪大战",
+        "TheatersOfWar": "战区",
+        "BrothersInArms": "战友",
+        "WinterWar": "冬季战争",
+        "CovertOps": "秘密行动",
+        "BloodAndIron": "铁与血",
+        "NavalWarfare": "海战",
+        "Homefront": "国土阵线",
+        "OceaniaStorm": "澳新风暴"
+    };
+
+    // 扩展包图标映射
+    const setIconMap = {
+        "Base": "https://www.datocms-assets.com/120590/1732572097-set-icon-base.svg",
+        "Allegiance": "https://www.datocms-assets.com/120590/1732572215-set-icon-allegiance.svg",
+        "Breakthrough": "https://www.datocms-assets.com/120590/1732572199-set-icon-breakthrough.svg",
+        "Legions": "https://www.datocms-assets.com/120590/1732572188-set-icon-legions.svg",
+        "WorldAtWar": "https://www.datocms-assets.com/120590/1732572859-set-icon-world.png",
+        "TheatersOfWar": "https://www.datocms-assets.com/120590/1732572178-set-icon-theaters.svg",
+        "BrothersInArms": "https://www.datocms-assets.com/120590/1732573000-set-icon-brothers.png",
+        "WinterWar": "https://www.datocms-assets.com/120590/1732572120-set-icon-winter.svg",
+        "CovertOps": "https://www.datocms-assets.com/120590/1732572110-set-icon-covert.svg",
+        "BloodAndIron": "https://www.datocms-assets.com/120590/1732573199-set-icon-blood.svg",
+        "NavalWarfare": "https://www.datocms-assets.com/120590/1750348798-naval-warfare.svg",
+        "Homefront": "https://www.datocms-assets.com/120590/1763718716-homefront.svg",
+        "OceaniaStorm": "https://www.datocms-assets.com/120590/1780567349-oceania_storm_set-icon.svg"
+    };
 
     const typeNameMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
@@ -1174,11 +1305,29 @@
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国","anzac":"澳新军团" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","anzac":"#9E6F34","neutral":"#6b6e5c" };
     const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland","anzac"];
+    const STATIC_COSTS = ["0","1","2","3","4","5","6","7+"];
+    const STATIC_RARITIES = ["Standard","Limited","Special","Elite"];
+
+    // ==================== 全局状态 ====================
     let allCards = [], filteredCards = [], deckMap = new Map();
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
 
-    let selectedFilters = { factions: new Set(), types: new Set(), costs: new Set(), rarities: new Set() };
+    // 选中的筛选器
+    let selectedFilters = {
+        factions: new Set(),
+        types: new Set(),
+        costs: new Set(),
+        rarities: new Set(),
+        attributes: new Set(),
+        sets: new Set()
+    };
+
+    // 关联关系（用于扩展包有效集）
+    let cardIndex = {};
+    let parentOfMap = {};
+    let veteranMap = {};       // 原版 -> 老兵版
+    let becomesVeteranMap = {}; // 老兵版 -> 原版
 
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -1189,188 +1338,554 @@
         { code: 'ko-KR', label: '한국어', flag: '🇰🇷' }, { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
     ];
 
-    function getCardImageUrl(imgName, lang, quality=20) { return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v51/${lang}/${imgName}&q=${quality}` : ""; }
-    function getSearchableText(card) { const attrsTrans = translateAttributesForSearch(card.attributes || []); return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase(); }
+    function getCardImageUrl(imgName, lang, quality=20) {
+        return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v51/${lang}/${imgName}&q=${quality}` : "";
+    }
 
+    function getSearchableText(card) {
+        const attrsTrans = (card.attributes || []).map(a => attrTranslation[a] || a).join(" ");
+        return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase();
+    }
+
+    // 获取卡牌的有效扩展包（用于筛选）
+    function getEffectiveSet(card, visited) {
+        visited = visited || new Set();
+        if (visited.has(card.cardId)) return card.setName;
+        visited.add(card.cardId);
+
+        if (card.setName === "OnlySpawnable") {
+            const parents = parentOfMap[card.cardId] || [];
+            for (let pid of parents) {
+                const p = cardIndex[pid];
+                if (p) {
+                    const es = getEffectiveSet(p, visited);
+                    if (es && es !== "OnlySpawnable" && es !== "Special") return es;
+                }
+            }
+            return "OnlySpawnable";
+        }
+
+        if (card.setName === "Special") {
+            const originalId = becomesVeteranMap[card.cardId];
+            if (originalId) {
+                const original = cardIndex[originalId];
+                if (original) {
+                    const es = getEffectiveSet(original, visited);
+                    if (es && es !== "Special") return es;
+                }
+            }
+            return "Special";
+        }
+        return card.setName;
+    }
+
+    // ==================== 数据加载 ====================
     async function loadData() {
         try {
             const res = await fetch('data.json');
             const data = await res.json();
-            allCards = (data.cards || []).map((card, idx) => {
-                let rawFaction = (card.json?.faction || card.faction || "").toLowerCase();
-                return { id: card.id ?? idx, ...card, type: card.json?.type || card.type, faction: rawFaction, rarity: card.json?.rarity || card.rarity, setName: card.json?.set || card.set || "基础", cost: card.json?.kredits ?? (card.json?.cost ?? card.cost ?? 0), text_zh: card.json?.text?.["zh-Hans"] || "无描述", titleZh: card.json?.title?.["zh-Hans"] || card.title?.["zh-Hans"] || "无名", image: card.json?.image || card.image, reserved: !!card.reserved, isSpawn: card.json?.set === "OnlySpawnable", attributes: card.json?.attributes || [], attack: card.json?.attack ?? card.attack, defense: card.json?.defense ?? card.defense, operationCost: card.json?.operationCost ?? card.operationCost, importId: card.importId || (card.json?.importId) || "" };
+            const rawCards = data.cards || [];
+
+            allCards = rawCards.map((raw, idx) => {
+                const j = raw.json || {};
+                const factionRaw = (j.faction || "").toLowerCase();
+                return {
+                    id: raw.id ?? idx,
+                    cardId: j.id || raw.cardId || "",
+                    importId: raw.importId || j.import_id || "",
+                    titleZh: j.title?.["zh-Hans"] || j.title?.en || "未找到",
+                    titleEn: j.title?.["en-EN"] || "",
+                    text_zh: j.text?.["zh-Hans"] || "",
+                    textMap: j.text || {},
+                    titleMap: j.title || {},
+                    faction: factionRaw,
+                    type: j.type || "",
+                    rarity: j.rarity || "Standard",
+                    cost: j.kredits ?? 0,
+                    attack: j.attack,
+                    defense: j.defense,
+                    operationCost: j.operationCost,
+                    attributes: j.attributes || [],
+                    setName: j.set || "基础",
+                    image: j.image || "",
+                    reserved: raw.reserved === true,
+                    isSpawn: j.set === "OnlySpawnable",
+                    isVeteranSet: j.set === "Special",
+                    canCreate: j.can_create || [],
+                    rawJson: j
+                };
             });
-            initMultiFilters();
+
+            // 建立索引和关系
+            cardIndex = {};
+            for (let c of allCards) if (c.cardId) cardIndex[c.cardId] = c;
+
+            parentOfMap = {};
+            veteranMap = {};
+            becomesVeteranMap = {};
+
+            // can_create 关系
+            for (let c of allCards) {
+                if (c.canCreate && c.canCreate.length) {
+                    for (let childId of c.canCreate) {
+                        if (!parentOfMap[childId]) parentOfMap[childId] = [];
+                        parentOfMap[childId].push(c.cardId);
+                    }
+                }
+            }
+
+            // 老兵关系
+            for (let c of allCards) {
+                const attrs = c.attributes || [];
+                for (let a of attrs) {
+                    if (a.startsWith("BecomesVeteran:")) {
+                        const veteranId = a.replace("BecomesVeteran:", "");
+                        veteranMap[c.cardId] = veteranId;
+                        becomesVeteranMap[veteranId] = c.cardId;
+                    }
+                    if (a.startsWith("VeteranOf:")) {
+                        const originalId = a.replace("VeteranOf:", "");
+                        veteranMap[originalId] = c.cardId;
+                        becomesVeteranMap[c.cardId] = originalId;
+                    }
+                }
+            }
+
+            // 初始化筛选器
             initStaticFilters();
+            initMultiFilters();
+            initAttrFilter();
+            initSetFilter();
             applyFilters();
             updateFactionStats();
-        } catch(e) { document.getElementById('cardContainer').innerHTML = '<div>数据加载失败</div>'; }
+        } catch(e) {
+            console.error(e);
+            document.getElementById('cardContainer').innerHTML = '<div>数据加载失败</div>';
+        }
     }
 
-    function initMultiFilters() {
-        const factions = [...new Set(allCards.map(c=>c.faction))];
-        const types = [...new Set(allCards.map(c=>c.type))];
-        const costOptions = ["0","1","2","3","4","5","6","7+"];
-        const rarityOptions = ["Standard","Limited","Special","Elite"];
-        
-        const factionContainer = document.getElementById('factionMultiContainer');
-        factionContainer.innerHTML = factions.map(f => `<div class="filter-chip" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]||f}</div>`).join('');
-        document.getElementById('typeMultiContainer').innerHTML = types.map(t => `<div class="filter-chip" data-filter="type" data-val="${t}">${typeNameMap[t]||t}</div>`).join('');
-        document.getElementById('costMultiContainer').innerHTML = costOptions.map(c => `<div class="filter-chip" data-filter="cost" data-val="${c}">${c==='7+'?'7K+':c+'K'}</div>`).join('');
-        document.getElementById('rarityMultiContainer').innerHTML = rarityOptions.map(r => `<div class="filter-chip" data-filter="rarity" data-val="${r}">${rarityDisplayMap[r]||r}</div>`).join('');
-        
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const type = chip.dataset.filter, val = chip.dataset.val;
-                if(type === 'faction') toggleSet(selectedFilters.factions, val, chip);
-                else if(type === 'type') toggleSet(selectedFilters.types, val, chip);
-                else if(type === 'cost') toggleSet(selectedFilters.costs, val, chip);
-                else if(type === 'rarity') toggleSet(selectedFilters.rarities, val, chip);
-                applyFilters();
-            });
-        });
-        document.querySelectorAll('.reset-chip').forEach(reset => {
-            reset.addEventListener('click', (e) => {
-                const filterType = reset.dataset.filterType;
-                if(filterType === 'faction') { selectedFilters.factions.clear(); updateChipsActive('faction'); }
-                if(filterType === 'type') { selectedFilters.types.clear(); updateChipsActive('type'); }
-                if(filterType === 'cost') { selectedFilters.costs.clear(); updateChipsActive('cost'); }
-                if(filterType === 'rarity') { selectedFilters.rarities.clear(); updateChipsActive('rarity'); }
-                applyFilters();
-            });
-        });
-    }
-    function toggleSet(set, val, chip) { if(set.has(val)) set.delete(val); else set.add(val); updateChipActive(chip, set.has(val)); }
-    function updateChipActive(chip, active) { if(active) chip.classList.add('active'); else chip.classList.remove('active'); }
-    function updateChipsActive(type) { document.querySelectorAll(`.filter-chip[data-filter="${type}"]`).forEach(chip => { const val = chip.dataset.val; const set = (type==='faction'?selectedFilters.factions:type==='type'?selectedFilters.types:type==='cost'?selectedFilters.costs:selectedFilters.rarities); updateChipActive(chip, set.has(val)); }); }
-
+    // ==================== 初始化筛选器 ====================
     function initStaticFilters() {
+        // 扩展包下拉（单选）可以从数据动态生成，保留
         const sets = [...new Set(allCards.map(c=>c.setName))];
         const setSelect = document.getElementById('setSelect');
-        setSelect.innerHTML = '<option value="all">全部扩展</option>'+sets.map(s=>`<option value="${s}">${s}</option>`).join('');
-        ['setSelect','statusSelect','searchInput'].forEach(id => document.getElementById(id).addEventListener('change',()=>applyFilters()));
-        document.getElementById('searchInput').addEventListener('input',()=>applyFilters());
-        ['attackExact','defenseExact','opExact'].forEach(id => document.getElementById(id).addEventListener('input',()=>applyFilters()));
+        setSelect.innerHTML = '<option value="all">全部扩展</option>'+sets.map(s=>`<option value="${s}">${setTranslation[s] || s}</option>`).join('');
+        ['setSelect','statusSelect','searchInput'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.addEventListener('change', applyFilters); el.addEventListener('input', applyFilters); }
+        });
+        ['attackExact','defenseExact','opExact'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', applyFilters);
+        });
 
+        // 国家选择
         const optionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
-        ['mainNationSelect', 'mobileMainNation'].forEach(id => { document.getElementById(id).innerHTML = optionsHtml; });
-        ['allyNationSelect', 'mobileAllyNation'].forEach(id => { document.getElementById(id).innerHTML = optionsHtml; });
+        ['mainNationSelect', 'mobileMainNation'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = optionsHtml;
+        });
+        ['allyNationSelect', 'mobileAllyNation'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = optionsHtml;
+        });
         document.getElementById('mainNationSelect').value = mainNation;
         document.getElementById('allyNationSelect').value = allyNation;
         document.getElementById('mobileMainNation').value = mainNation;
         document.getElementById('mobileAllyNation').value = allyNation;
-        
+
+        // 语言选择
         const langSelect = document.getElementById('imgLang');
-        langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
-        langSelect.value = 'zh-Hans';
-        
-        const updateNation = () => { mainNation = document.getElementById('mainNationSelect').value; allyNation = document.getElementById('allyNationSelect').value; document.getElementById('mobileMainNation').value = mainNation; document.getElementById('mobileAllyNation').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
-        const updateMobile = () => { mainNation = document.getElementById('mobileMainNation').value; allyNation = document.getElementById('mobileAllyNation').value; document.getElementById('mainNationSelect').value = mainNation; document.getElementById('allyNationSelect').value = allyNation; updateAllDecksUI(); updateFactionStats(); };
+        if (langSelect) {
+            langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
+            langSelect.value = 'zh-Hans';
+        }
+
+        // 背景色切换
+        const bgSelect = document.getElementById('bgColorSelect');
+        const customDiv = document.getElementById('customColorDiv');
+        if (bgSelect) {
+            bgSelect.addEventListener('change', () => {
+                if (customDiv) customDiv.style.display = bgSelect.value === 'custom' ? 'flex' : 'none';
+            });
+        }
+
+        // 国家变更事件
+        const updateNation = () => {
+            mainNation = document.getElementById('mainNationSelect').value;
+            allyNation = document.getElementById('allyNationSelect').value;
+            document.getElementById('mobileMainNation').value = mainNation;
+            document.getElementById('mobileAllyNation').value = allyNation;
+            updateAllDecksUI();
+            updateFactionStats();
+        };
+        const updateMobile = () => {
+            mainNation = document.getElementById('mobileMainNation').value;
+            allyNation = document.getElementById('mobileAllyNation').value;
+            document.getElementById('mainNationSelect').value = mainNation;
+            document.getElementById('allyNationSelect').value = allyNation;
+            updateAllDecksUI();
+            updateFactionStats();
+        };
         document.getElementById('mainNationSelect').addEventListener('change', updateNation);
         document.getElementById('allyNationSelect').addEventListener('change', updateNation);
         document.getElementById('mobileMainNation').addEventListener('change', updateMobile);
         document.getElementById('mobileAllyNation').addEventListener('change', updateMobile);
-        
-        const bgSelect = document.getElementById('bgColorSelect');
-        const customDiv = document.getElementById('customColorDiv');
-        bgSelect.addEventListener('change', () => { customDiv.style.display = bgSelect.value === 'custom' ? 'flex' : 'none'; });
+
+        // 折叠切换
+        document.querySelectorAll('.collapse-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                if (e.target.classList.contains('reset-chip')) return;
+                const targetId = this.dataset.target;
+                const body = document.getElementById(targetId);
+                const arrow = this.querySelector('.arrow');
+                if (body) {
+                    body.classList.toggle('collapsed');
+                    if (arrow) arrow.classList.toggle('open');
+                }
+            });
+        });
+
+        // 重置按钮（使用事件委托）
+        document.querySelector('.filter-panel').addEventListener('click', function(e) {
+            const reset = e.target.closest('.reset-chip');
+            if (!reset) return;
+            const filterType = reset.dataset.filterType;
+            const map = {
+                'faction': selectedFilters.factions,
+                'type': selectedFilters.types,
+                'cost': selectedFilters.costs,
+                'rarity': selectedFilters.rarities,
+                'attribute': selectedFilters.attributes,
+                'set': selectedFilters.sets
+            };
+            const set = map[filterType];
+            if (set) {
+                set.clear();
+                document.querySelectorAll(`.filter-chip[data-filter="${filterType}"]`).forEach(ch => ch.classList.remove('active'));
+                applyFilters();
+            }
+        });
+
+        // 事件委托：所有 filter-chip 点击
+        document.querySelector('.filter-panel').addEventListener('click', function(e) {
+            const chip = e.target.closest('.filter-chip');
+            if (!chip) return;
+            const type = chip.dataset.filter;
+            const val = chip.dataset.val;
+            if (!type || !val) return;
+            const setMap = {
+                'faction': selectedFilters.factions,
+                'type': selectedFilters.types,
+                'cost': selectedFilters.costs,
+                'rarity': selectedFilters.rarities,
+                'attribute': selectedFilters.attributes,
+                'set': selectedFilters.sets
+            };
+            const set = setMap[type];
+            if (!set) return;
+            if (set.has(val)) set.delete(val);
+            else set.add(val);
+            chip.classList.toggle('active');
+            applyFilters();
+        });
     }
 
-    function filterCardsLogic() { 
-        let res = [...allCards]; 
-        const search = document.getElementById('searchInput').value.trim().toLowerCase(); 
-        if(search) res = res.filter(c => getSearchableText(c).includes(search));
-        if(selectedFilters.factions.size) res = res.filter(c => selectedFilters.factions.has(c.faction));
-        if(selectedFilters.types.size) res = res.filter(c => selectedFilters.types.has(c.type));
-        if(selectedFilters.costs.size) {
-            res = res.filter(c => {
-                for(let costVal of selectedFilters.costs) {
-                    if(costVal === '7+' && c.cost >= 7) return true;
-                    if(costVal !== '7+' && c.cost === parseInt(costVal)) return true;
-                } return false;
-            });
-        }
-        if(selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
-        
-        const setVal = document.getElementById('setSelect').value;
-        if(setVal !== 'all') res = res.filter(c => c.setName === setVal);
-        const status = document.getElementById('statusSelect').value;
-        if(status === 'active') res = res.filter(c => !c.reserved && !c.isSpawn);
-        else if(status === 'reserve') res = res.filter(c => c.reserved);
-        else if(status === 'spawn') res = res.filter(c => c.isSpawn);
+    function initMultiFilters() {
+        // 阵营（使用 allNationOptions）
+        const fc = document.getElementById('factionMultiContainer');
+        fc.innerHTML = allNationOptions.map(f =>
+            `<div class="filter-chip" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</div>`
+        ).join('');
 
-        const activeTypesSet = selectedFilters.types;
-        const onlyUnits = activeTypesSet.size > 0 && [...activeTypesSet].every(t => unitTypes.includes(t));
-        const statsArea = document.getElementById('statsArea');
-        if(onlyUnits) statsArea.style.display = 'block';
-        else statsArea.style.display = 'none';
-        
-        if(onlyUnits) {
-            let attExact = parseInt(document.getElementById('attackExact').value);
-            let defExact = parseInt(document.getElementById('defenseExact').value);
-            let opExact = parseInt(document.getElementById('opExact').value);
+        // 类型（使用 typeNameMap 的键）
+        const typeKeys = Object.keys(typeNameMap);
+        const tc = document.getElementById('typeMultiContainer');
+        tc.innerHTML = typeKeys.map(t =>
+            `<div class="filter-chip" data-filter="type" data-val="${t}">${typeNameMap[t]}</div>`
+        ).join('');
+
+        // 花费
+        const cc = document.getElementById('costMultiContainer');
+        cc.innerHTML = STATIC_COSTS.map(c =>
+            `<div class="filter-chip" data-filter="cost" data-val="${c}">${c==='7+'?'7K+':c+'K'}</div>`
+        ).join('');
+
+        // 稀有度
+        const rc = document.getElementById('rarityMultiContainer');
+        rc.innerHTML = STATIC_RARITIES.map(r =>
+            `<div class="filter-chip" data-filter="rarity" data-val="${r}">${rarityDisplayMap[r]}</div>`
+        ).join('');
+    }
+
+    function initAttrFilter() {
+        const container = document.getElementById('attrMultiContainer');
+        const attrKeys = Object.keys(attrTranslation);
+        container.innerHTML = attrKeys.map(a =>
+            `<div class="filter-chip" data-filter="attribute" data-val="${a}">${attrTranslation[a]}</div>`
+        ).join('');
+    }
+
+    function initSetFilter() {
+        const container = document.getElementById('setMultiContainer');
+        const setKeys = Object.keys(setTranslation); // 保持定义顺序
+        container.innerHTML = setKeys.map(s => {
+            const icon = setIconMap[s] || '';
+            return `<div class="filter-chip" data-filter="set" data-val="${s}">${icon ? `<img src="${icon}" width="18" height="18" onerror="this.style.display='none'">` : ''} ${setTranslation[s]}</div>`;
+        }).join('');
+    }
+
+    // ==================== 筛选逻辑 ====================
+    function filterCardsLogic() {
+        let res = [...allCards];
+        const search = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (search) res = res.filter(c => getSearchableText(c).includes(search));
+
+        // 词条（AND）
+        if (selectedFilters.attributes.size) {
             res = res.filter(c => {
-                if(!unitTypes.includes(c.type)) return false;
-                if(attExact !== -1 && (c.attack ?? -2) !== attExact) return false;
-                if(defExact !== -1 && (c.defense ?? -2) !== defExact) return false;
-                if(opExact !== -1 && (c.operationCost ?? -2) !== opExact) return false;
+                const attrs = c.attributes || [];
+                for (let attr of selectedFilters.attributes) {
+                    if (!attrs.includes(attr)) return false;
+                }
                 return true;
             });
         }
+
+        if (selectedFilters.factions.size) res = res.filter(c => selectedFilters.factions.has(c.faction));
+        if (selectedFilters.types.size) res = res.filter(c => selectedFilters.types.has(c.type));
+        if (selectedFilters.costs.size) {
+            res = res.filter(c => {
+                for (let costVal of selectedFilters.costs) {
+                    if (costVal === '7+' && c.cost >= 7) return true;
+                    if (costVal !== '7+' && c.cost === parseInt(costVal)) return true;
+                }
+                return false;
+            });
+        }
+        if (selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
+
+        // 多选扩展包（使用有效扩展包）
+        if (selectedFilters.sets.size) {
+            res = res.filter(c => {
+                const effSet = getEffectiveSet(c);
+                return selectedFilters.sets.has(effSet);
+            });
+        }
+
+        // 扩展包下拉（单选）
+        const setVal = document.getElementById('setSelect').value;
+        if (setVal !== 'all') res = res.filter(c => c.setName === setVal);
+
+        // 卡池
+        const status = document.getElementById('statusSelect').value;
+        if (status === 'active') res = res.filter(c => !c.reserved && !c.isSpawn && !c.isVeteranSet);
+        else if (status === 'reserve') res = res.filter(c => c.reserved);
+        else if (status === 'spawn') res = res.filter(c => c.isSpawn);
+
+        // 数值
+        const activeTypesSet = selectedFilters.types;
+        const onlyUnits = activeTypesSet.size > 0 && [...activeTypesSet].every(t => unitTypes.includes(t));
+        const statsArea = document.getElementById('statsArea');
+        if (onlyUnits) statsArea.style.display = 'block';
+        else statsArea.style.display = 'none';
+
+        if (onlyUnits) {
+            let attExact = parseInt(document.getElementById('attackExact').value);
+            let defExact = parseInt(document.getElementById('defenseExact').value);
+            let opExact = parseInt(document.getElementById('opExact').value);
+            if (!isNaN(attExact) && attExact !== -1) {
+                res = res.filter(c => (c.attack ?? -2) === attExact);
+            }
+            if (!isNaN(defExact) && defExact !== -1) {
+                res = res.filter(c => (c.defense ?? -2) === defExact);
+            }
+            if (!isNaN(opExact) && opExact !== -1) {
+                res = res.filter(c => (c.operationCost ?? -2) === opExact);
+            }
+        }
         return res;
     }
-    
-    function applyFilters() { filteredCards = filterCardsLogic(); currentPage = 1; renderCards(); renderPagination(); }
-    
-    function renderCards() { 
-        const start = (currentPage-1)*PAGE_SIZE; const pageCards = filteredCards.slice(start, start+PAGE_SIZE); 
-        const container = document.getElementById('cardContainer'); 
-        if(!pageCards.length) { container.innerHTML = '<div>未找到卡牌</div>'; return; } 
-        container.innerHTML = pageCards.map(card => { 
-            const qty = deckMap.get(card.id)?.count || 0; 
-            const borderCol = factionColor[card.faction] || '#6b6e5c'; 
+
+    function applyFilters() {
+        filteredCards = filterCardsLogic();
+        currentPage = 1;
+        renderCards();
+        renderPagination();
+    }
+
+    // ==================== 渲染 ====================
+    function renderCards() {
+        const start = (currentPage-1)*PAGE_SIZE;
+        const pageCards = filteredCards.slice(start, start+PAGE_SIZE);
+        const container = document.getElementById('cardContainer');
+        if (!pageCards.length) {
+            container.innerHTML = '<div style="color:#e9dbbd;padding:2rem 0;text-align:center;">未找到卡牌</div>';
+            return;
+        }
+        container.innerHTML = pageCards.map(card => {
+            const qty = deckMap.get(card.id)?.count || 0;
+            const borderCol = factionColor[card.faction] || '#6b6e5c';
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
             const showBadge = qty > 0;
-            return `<div class="card-item" data-card-id="${card.id}" style="border-color:${borderCol};"><div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image, 'zh-Hans', 20)}" alt="${card.titleZh}"></div><div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div><div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}"><span class="card-deck-count">${qty}</span><button class="card-remove-icon" data-remove="${card.id}">−</button></div><div class="card-mobile-actions ${!showBadge ? 'hide-badge' : ''}"><span class="mobile-count-badge">${qty}</span><button class="mobile-remove-btn" data-remove="${card.id}">-</button></div></div>`; 
-        }).join(''); 
-        document.querySelectorAll('.card-item').forEach(el=>{ el.addEventListener('click',(e)=>{ if(e.target.classList.contains('card-remove-icon') || e.target.classList.contains('mobile-remove-btn')) return; const id = parseInt(el.dataset.cardId); const card = allCards.find(c=>c.id===id); if(card) addToDeck(card); }); }); 
-        document.querySelectorAll('.card-remove-icon, .mobile-remove-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); removeFromDeck(parseInt(btn.dataset.remove)); })); 
+            return `<div class="card-item" data-card-id="${card.id}" style="border-color:${borderCol};">
+                        <div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image, 'zh-Hans', 20)}" alt="${card.titleZh}"></div>
+                        <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
+                        <div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}">
+                            <span class="card-deck-count">${qty}</span>
+                            <button class="card-remove-icon" data-remove="${card.id}">−</button>
+                        </div>
+                        <div class="card-mobile-actions ${!showBadge ? 'hide-badge' : ''}">
+                            <span class="mobile-count-badge">${qty}</span>
+                            <button class="mobile-remove-btn" data-remove="${card.id}">-</button>
+                        </div>
+                    </div>`;
+        }).join('');
+
+        document.querySelectorAll('.card-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.classList.contains('card-remove-icon') || e.target.classList.contains('mobile-remove-btn')) return;
+                const id = parseInt(el.dataset.cardId);
+                const card = allCards.find(c => c.id === id);
+                if (card) addToDeck(card);
+            });
+        });
+        document.querySelectorAll('.card-remove-icon, .mobile-remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFromDeck(parseInt(btn.dataset.remove));
+            });
+        });
     }
-    
-    function renderPagination() { 
-        const total = filteredCards.length, pages = Math.ceil(total/PAGE_SIZE); 
-        const pagDiv = document.getElementById('pagination'); 
-        if(pages<=1) { pagDiv.innerHTML=''; return; } 
-        let html = `<button class="page-btn" data-page="prev" ${currentPage===1?'disabled':''}>◀</button>`; for(let i=1;i<=pages;i++) html += `<button class="page-btn ${i===currentPage?'active-page':''}" data-page="${i}">${i}</button>`; html += `<button class="page-btn" data-page="next" ${currentPage===pages?'disabled':''}>▶</button>`; pagDiv.innerHTML = html; pagDiv.querySelectorAll('.page-btn').forEach(btn=>btn.addEventListener('click',()=>{ let p = btn.dataset.page; if(p==='prev') currentPage = Math.max(1, currentPage-1); else if(p==='next') currentPage = Math.min(pages, currentPage+1); else currentPage = parseInt(p); renderCards(); renderPagination(); })); 
+
+    function renderPagination() {
+        const total = filteredCards.length, pages = Math.ceil(total / PAGE_SIZE);
+        const pagDiv = document.getElementById('pagination');
+        if (pages <= 1) { pagDiv.innerHTML = ''; return; }
+        let html = `<button class="page-btn" data-page="prev" ${currentPage===1?'disabled':''}>◀</button>`;
+        for (let i = 1; i <= pages; i++) html += `<button class="page-btn ${i===currentPage?'active-page':''}" data-page="${i}">${i}</button>`;
+        html += `<button class="page-btn" data-page="next" ${currentPage===pages?'disabled':''}>▶</button>`;
+        pagDiv.innerHTML = html;
+        pagDiv.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                let p = btn.dataset.page;
+                if (p === 'prev') currentPage = Math.max(1, currentPage-1);
+                else if (p === 'next') currentPage = Math.min(pages, currentPage+1);
+                else currentPage = parseInt(p);
+                renderCards();
+                renderPagination();
+            });
+        });
     }
-    
-    function addToDeck(card) { let entry = deckMap.get(card.id); if(entry) entry.count++; else deckMap.set(card.id, { card, count: 1 }); updateAllDecksUI(); renderCards(); updateFactionStats(); }
-    function removeFromDeck(cardId) { let entry = deckMap.get(cardId); if(entry) { if(entry.count>1) entry.count--; else deckMap.delete(cardId); updateAllDecksUI(); renderCards(); updateFactionStats(); } }
-    function clearDeck() { deckMap.clear(); updateAllDecksUI(); renderCards(); updateFactionStats(); }
+
+    // ==================== 卡组操作 ====================
+    function addToDeck(card) {
+        let entry = deckMap.get(card.id);
+        if (entry) entry.count++;
+        else deckMap.set(card.id, { card, count: 1 });
+        updateAllDecksUI();
+        renderCards();
+        updateFactionStats();
+    }
+
+    function removeFromDeck(cardId) {
+        let entry = deckMap.get(cardId);
+        if (entry) {
+            if (entry.count > 1) entry.count--;
+            else deckMap.delete(cardId);
+            updateAllDecksUI();
+            renderCards();
+            updateFactionStats();
+        }
+    }
+
+    function clearDeck() {
+        deckMap.clear();
+        updateAllDecksUI();
+        renderCards();
+        updateFactionStats();
+    }
 
     function updateFactionStats() {
         let mainCount = 0, allyCount = 0, otherCount = 0;
-        for(let {card, count} of deckMap.values()) {
-            if(card.faction === mainNation) mainCount += count;
-            else if(card.faction === allyNation) allyCount += count;
+        for (let {card, count} of deckMap.values()) {
+            if (card.faction === mainNation) mainCount += count;
+            else if (card.faction === allyNation) allyCount += count;
             else otherCount += count;
         }
         let otherHtml = otherCount > 0 ? `<div class="faction-stat"><span>其他:</span> ${otherCount}</div>` : '';
-        const html = `<div class="faction-stat"><span>主国 ${factionNames[mainNation]}:</span> ${mainCount}</div><div class="faction-stat"><span>盟国 ${factionNames[allyNation]}:</span> ${allyCount}</div>${otherHtml}`;
+        const html = `<div class="faction-stat"><span>主国 ${factionNames[mainNation]}:</span> ${mainCount}</div>
+                      <div class="faction-stat"><span>盟国 ${factionNames[allyNation]}:</span> ${allyCount}</div>${otherHtml}`;
         const desktopDiv = document.getElementById('desktopFactionStats');
         const mobileDiv = document.getElementById('mobileFactionStats');
-        if(desktopDiv) desktopDiv.innerHTML = html;
-        if(mobileDiv) mobileDiv.innerHTML = html;
+        if (desktopDiv) desktopDiv.innerHTML = html;
+        if (mobileDiv) mobileDiv.innerHTML = html;
     }
 
+    function updateAllDecksUI() {
+        renderDeckList('deckListContainer');
+        renderDeckList('mobileDeckList');
+        const total = Array.from(deckMap.values()).reduce((s,e) => s + e.count, 0);
+        const toggleCount = document.getElementById('mobileToggleCount');
+        if (toggleCount) toggleCount.innerText = total;
+    }
+
+    function renderDeckList(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        let html = `<div class="deck-card-row headquarters-row" style="border-left-color: #b8860b;">
+                        <div class="deck-card-icon">🏛️</div>
+                        <div class="deck-card-details"><div class="deck-card-name">总部</div><div class="deck-card-stats"></div></div>
+                        <span class="deck-card-qty"></span><button class="deck-remove-btn" style="visibility: hidden;">−</button>
+                    </div>`;
+        if (deckMap.size === 0) {
+            container.innerHTML = html + '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>';
+            return;
+        }
+        const entries = Array.from(deckMap.values()).sort((a, b) => {
+            const idxA = allCards.findIndex(c => c.id === a.card.id);
+            const idxB = allCards.findIndex(c => c.id === b.card.id);
+            return idxA - idxB;
+        });
+        entries.forEach(entry => {
+            const c = entry.card;
+            const borderColor = factionColor[c.faction] || "#6b6e5c";
+            const typeDisplay = typeNameMap[c.type] || c.type;
+            const rarityClass = rarityClassMap[c.rarity] || "rarity-standard";
+            const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity;
+            const reserveIcon = c.reserved ? '<i class="deck-card-reserve-icon"></i>' : '';
+            html += `<div class="deck-card-row" style="border-left-color: ${borderColor};">
+                        <div class="deck-card-icon" style="background-image: url('${c.faction}.svg'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+                        <div class="deck-card-details">
+                            <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}${reserveIcon}</div>
+                            <div class="deck-card-stats">
+                                <div class="kredits-cost"><span>${c.cost}</span><span>K</span></div>
+                                <div class="card-type-badge">${typeDisplay}</div>
+                                <div class="card-rarity-badge ${rarityClass}">${rarityDisplay}</div>
+                            </div>
+                        </div>
+                        <span class="deck-card-qty">x${entry.count}</span>
+                        <button class="deck-remove-btn" data-id="${c.id}">−</button>
+                    </div>`;
+        });
+        container.innerHTML = html;
+        container.querySelectorAll('.deck-remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.dataset.id);
+                if (!isNaN(id)) removeFromDeck(id);
+            });
+        });
+    }
+
+    // ==================== 导入导出 ====================
     function getNationCode(faction) {
         const idx = allNationOptions.indexOf(faction);
         if (idx === -1) return '1';
         const num = idx + 1;
         return num === 10 ? 'a' : num.toString();
     }
-    
+
     function parseNationCode(codeChar) {
         if (codeChar >= '1' && codeChar <= '9') return parseInt(codeChar, 10);
         if (codeChar === 'a') return 10;
@@ -1380,28 +1895,56 @@
     function exportDeckCode() {
         if (deckMap.size === 0) { alert("卡组为空，无法导出"); return null; }
         const cardCountMap = new Map();
-        for (let { card, count } of deckMap.values()) { if (card.importId) { cardCountMap.set(card.importId, (cardCountMap.get(card.importId) || 0) + count); } }
+        for (let { card, count } of deckMap.values()) {
+            if (card.importId) {
+                cardCountMap.set(card.importId, (cardCountMap.get(card.importId) || 0) + count);
+            }
+        }
         const regions = ["", "", "", ""];
         for (let [importId, totalCount] of cardCountMap.entries()) {
             let remainder = totalCount % 4;
             let quotient = Math.floor(totalCount / 4);
-            if (remainder === 0) { for (let i = 0; i < quotient; i++) regions[3] += importId; }
-            else { regions[remainder - 1] += importId; for (let i = 0; i < quotient; i++) regions[3] += importId; }
+            if (remainder === 0) {
+                for (let i = 0; i < quotient; i++) regions[3] += importId;
+            } else {
+                regions[remainder - 1] += importId;
+                for (let i = 0; i < quotient; i++) regions[3] += importId;
+            }
         }
         return `%%${getNationCode(mainNation)}${getNationCode(allyNation)}|${regions[0]};${regions[1]};${regions[2]};${regions[3]}`;
     }
-    
+
     async function copyToClipboard(text) {
         try { await navigator.clipboard.writeText(text); return true; } catch(e) {
-            try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.top = '-9999px'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); if(ok) return true; throw new Error(); } catch(err) { alert('请手动复制：\n' + text); return false; }
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.top = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (ok) return true;
+                throw new Error();
+            } catch(err) {
+                alert('请手动复制：\n' + text);
+                return false;
+            }
         }
     }
-    async function exportAndCopy() { const code = exportDeckCode(); if(code) { await copyToClipboard(code); alert('卡组代码已复制！\n\n' + code); } }
-    
+
+    async function exportAndCopy() {
+        const code = exportDeckCode();
+        if (code) { await copyToClipboard(code); alert('卡组代码已复制！\n\n' + code); }
+    }
+
     function parseDeckCode(rawCode) {
-        const startIdx = rawCode.indexOf('%%'); if (startIdx === -1) throw new Error('未找到 %%');
+        const startIdx = rawCode.indexOf('%%');
+        if (startIdx === -1) throw new Error('未找到 %%');
         let code = rawCode.substring(startIdx + 2);
-        const pipeIdx = code.indexOf('|'); if (pipeIdx === -1) throw new Error('未找到 |');
+        const pipeIdx = code.indexOf('|');
+        if (pipeIdx === -1) throw new Error('未找到 |');
         const nationPart = code.substring(0, pipeIdx).trim();
         if (nationPart.length < 2) throw new Error('编号无效');
         const mainCode = nationPart[0];
@@ -1413,36 +1956,97 @@
         const mainFaction = allNationOptions[mainIdx - 1];
         const allyFaction = allNationOptions[allyIdx - 1];
         const cardsPart = code.substring(pipeIdx + 1);
-        const regions = cardsPart.split(';'); while (regions.length < 4) regions.push('');
+        const regions = cardsPart.split(';');
+        while (regions.length < 4) regions.push('');
         const multipliers = [1, 2, 3, 4];
         const importIdMap = new Map();
-        for (let i = 0; i < 4; i++) { const region = regions[i]; const mult = multipliers[i]; for (let j = 0; j < region.length; j += 2) { const importId = region.substring(j, j+2); if (importId.length === 2) importIdMap.set(importId, (importIdMap.get(importId) || 0) + mult); } }
+        for (let i = 0; i < 4; i++) {
+            const region = regions[i];
+            const mult = multipliers[i];
+            for (let j = 0; j < region.length; j += 2) {
+                const importId = region.substring(j, j+2);
+                if (importId.length === 2) importIdMap.set(importId, (importIdMap.get(importId) || 0) + mult);
+            }
+        }
         const cardEntries = [];
-        for (let [importId, count] of importIdMap.entries()) { const card = allCards.find(c => c.importId === importId); if (card) cardEntries.push({ card, count }); }
+        for (let [importId, count] of importIdMap.entries()) {
+            const card = allCards.find(c => c.importId === importId);
+            if (card) cardEntries.push({ card, count });
+        }
         return { mainFaction, allyFaction, cardEntries };
     }
-    
+
     function importDeckFromCode(rawCode) {
         try {
             const { mainFaction, allyFaction, cardEntries } = parseDeckCode(rawCode);
             deckMap.clear();
-            mainNation = mainFaction; allyNation = allyFaction;
-            document.getElementById('mainNationSelect').value = mainNation; document.getElementById('allyNationSelect').value = allyNation;
-            document.getElementById('mobileMainNation').value = mainNation; document.getElementById('mobileAllyNation').value = allyNation;
-            updateAllDecksUI(); updateFactionStats();
-            for (let { card, count } of cardEntries) for (let i = 0; i < count; i++) addToDeck(card);
-            alert(`导入成功！共 ${cardEntries.reduce((s,e)=>s+e.count,0)} 张`);
-        } catch(e) { alert(`导入失败: ${e.message}`); }
+            mainNation = mainFaction;
+            allyNation = allyFaction;
+            document.getElementById('mainNationSelect').value = mainNation;
+            document.getElementById('allyNationSelect').value = allyNation;
+            document.getElementById('mobileMainNation').value = mainNation;
+            document.getElementById('mobileAllyNation').value = allyNation;
+            updateAllDecksUI();
+            updateFactionStats();
+            for (let { card, count } of cardEntries) {
+                for (let i = 0; i < count; i++) addToDeck(card);
+            }
+            alert(`导入成功！共 ${cardEntries.reduce((s,e) => s + e.count, 0)} 张`);
+        } catch(e) {
+            alert(`导入失败: ${e.message}`);
+        }
     }
 
-    function drawFactionIcon(ctx, x, y, size, faction) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = () => { ctx.drawImage(img, x, y, size, size); resolve(); };
-            img.onerror = () => resolve();
-            img.src = `${faction}.svg`;
+    // ==================== 统计模态框 ====================
+    function showStatsModal() {
+        const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
+        let unitTotal=0, orderTotal=0, counterTotal=0;
+        let rarityCounts = { "Standard":0, "Limited":0, "Special":0, "Elite":0 };
+        for (let {card, count} of deckMap.values()) {
+            const cat = card.cost >= 7 ? 7 : card.cost;
+            const typeCat = card.type === "order" ? "order" : card.type === "countermeasure" ? "counter" : "unit";
+            if (typeCat === "unit") { costMap[cat].unit += count; unitTotal += count; }
+            else if (typeCat === "order") { costMap[cat].order += count; orderTotal += count; }
+            else { costMap[cat].counter += count; counterTotal += count; }
+            if (rarityCounts.hasOwnProperty(card.rarity)) rarityCounts[card.rarity] += count;
+        }
+        const maxHeight = Math.max(...Object.values(costMap).flatMap(v => [v.unit, v.order, v.counter]), 1);
+        const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
+            const unitH = costMap[cost].unit, orderH = costMap[cost].order, counterH = costMap[cost].counter;
+            const totalH = unitH + orderH + counterH;
+            const unitPercent = (unitH / maxHeight) * 48;
+            const orderPercent = (orderH / maxHeight) * 48;
+            const counterPercent = (counterH / maxHeight) * 48;
+            return `<div class="histogram-bar-wrapper">
+                        <div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px;">
+                            <div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="反制:${counterH}"></div>
+                            <div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="指令:${orderH}"></div>
+                            <div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="单位:${unitH}"></div>
+                        </div>
+                        <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
+                        <div class="cost-total">${totalH}</div>
+                    </div>`;
+        }).join('');
+        document.getElementById('modalHistogramBars').innerHTML = barsHtml;
+        document.getElementById('modalTypeSummary').innerHTML = `<span>单位 <span class="unit-badge">${unitTotal}</span></span><span>指令 <span class="order-badge">${orderTotal}</span></span><span>反制 <span class="counter-badge">${counterTotal}</span></span>`;
+        document.getElementById('modalRarityStats').innerHTML = `<div class="rarity-stat"><span>普通</span> <span style="color:var(--rarity-standard);">${rarityCounts.Standard}</span></div><div class="rarity-stat"><span>限定</span> <span style="color:var(--rarity-limited);">${rarityCounts.Limited}</span></div><div class="rarity-stat"><span>特殊</span> <span style="color:var(--rarity-special);">${rarityCounts.Special}</span></div><div class="rarity-stat"><span>精英</span> <span style="color:var(--rarity-elite);">${rarityCounts.Elite}</span></div>`;
+        document.getElementById('statsModal').style.display = 'flex';
+    }
+
+    function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
+
+    // ==================== 图片生成 ====================
+    function getExpandedCardList() {
+        const entries = Array.from(deckMap.values()).sort((a, b) => {
+            const idxA = allCards.findIndex(c => c.id === a.card.id);
+            const idxB = allCards.findIndex(c => c.id === b.card.id);
+            return idxA - idxB;
         });
+        const result = [];
+        for (const entry of entries) {
+            for (let i = 0; i < entry.count; i++) result.push(entry.card);
+        }
+        return result;
     }
 
     async function drawStatsCard(ctx, x, y, w, h, radius) {
@@ -1463,7 +2067,7 @@
         ctx.strokeStyle = "#c9aa5b";
         ctx.lineWidth = 2;
         ctx.stroke();
-        
+
         let mainCount = 0, allyCount = 0, otherCount = 0;
         let rarityCounts = { Standard: 0, Limited: 0, Special: 0, Elite: 0 };
         for (let { card, count } of deckMap.values()) {
@@ -1473,71 +2077,62 @@
             if (rarityCounts.hasOwnProperty(card.rarity)) rarityCounts[card.rarity] += count;
         }
         const totalCards = Array.from(deckMap.values()).reduce((s, e) => s + e.count, 0);
-        
+
         ctx.fillStyle = "#ffefbf";
         ctx.font = `bold ${Math.floor(h * 0.09)}px "Segoe UI"`;
         ctx.textAlign = "center";
         ctx.fillText("卡组统计", x + w/2, y + h * 0.12);
-        
+
         ctx.font = `${Math.floor(h * 0.055)}px "Segoe UI"`;
         ctx.textAlign = "left";
         const startY = y + h * 0.26;
         const lineH = h * 0.085;
         const iconSize = Math.floor(h * 0.07);
-        
-        const mainIconY = startY - iconSize*0.7;
-        await drawFactionIcon(ctx, x + w * 0.08, mainIconY, iconSize, mainNation);
+
+        // 主国
+        const mainIcon = new Image();
+        mainIcon.crossOrigin = "Anonymous";
+        mainIcon.src = `${mainNation}.svg`;
+        await new Promise(r => { mainIcon.onload = r; mainIcon.onerror = r; });
+        ctx.drawImage(mainIcon, x + w * 0.08, startY - iconSize*0.5, iconSize, iconSize);
         ctx.fillStyle = factionColor[mainNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[mainNation]}: ${mainCount}`, x + w * 0.08 + iconSize + 8, startY);
-        
-        const allyIconY = startY + lineH - iconSize*0.7;
-        await drawFactionIcon(ctx, x + w * 0.08, allyIconY, iconSize, allyNation);
+
+        // 盟国
+        const allyIcon = new Image();
+        allyIcon.crossOrigin = "Anonymous";
+        allyIcon.src = `${allyNation}.svg`;
+        await new Promise(r => { allyIcon.onload = r; allyIcon.onerror = r; });
+        ctx.drawImage(allyIcon, x + w * 0.08, startY + lineH - iconSize*0.5, iconSize, iconSize);
         ctx.fillStyle = factionColor[allyNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[allyNation]}: ${allyCount}`, x + w * 0.08 + iconSize + 8, startY + lineH);
-        
+
         let lineOffset = 2;
         if (otherCount > 0) {
             ctx.fillStyle = "#a0a0a0";
             ctx.fillText(`其他: ${otherCount}`, x + w * 0.08 + iconSize + 8, startY + lineH * 2);
             lineOffset = 3;
         }
-        
         ctx.fillStyle = "#e9dbbd";
         ctx.fillText(`总计: ${totalCards} 张`, x + w * 0.08 + iconSize + 8, startY + lineH * lineOffset);
-        
+
         const rarityY = startY + lineH * (lineOffset + 1.3);
         const col2X = x + w * 0.55;
-        
         ctx.fillStyle = "#9e9e9e";
         ctx.fillText(`普通: ${rarityCounts.Standard}`, x + w * 0.08 + iconSize + 8, rarityY);
         ctx.fillStyle = "#cd7f32";
         ctx.fillText(`限定: ${rarityCounts.Limited}`, col2X, rarityY);
-        
         ctx.fillStyle = "#c0c0c0";
         ctx.fillText(`特殊: ${rarityCounts.Special}`, x + w * 0.08 + iconSize + 8, rarityY + lineH);
         ctx.fillStyle = "#ffd700";
         ctx.fillText(`精英: ${rarityCounts.Elite}`, col2X, rarityY + lineH);
-        
-        ctx.restore();
-    }
 
-    function getExpandedCardList() {
-        const entries = Array.from(deckMap.values()).sort((a, b) => {
-            const idxA = allCards.findIndex(c => c.id === a.card.id);
-            const idxB = allCards.findIndex(c => c.id === b.card.id);
-            return idxA - idxB;
-        });
-        const result = [];
-        for (const entry of entries) {
-            for (let i = 0; i < entry.count; i++) result.push(entry.card);
-        }
-        return result;
+        ctx.restore();
     }
 
     async function generateDeckImage(cols, quality, lang, addStatsCard, bgColor) {
         const cards = getExpandedCardList();
         if (cards.length === 0) throw new Error("卡组为空");
-        
         const cardW = 500, cardH = 702, radius = 12;
         let totalCards = cards.length;
         if (addStatsCard) totalCards += 1;
@@ -1546,7 +2141,7 @@
         canvas.width = cols * cardW;
         canvas.height = rows * cardH;
         const ctx = canvas.getContext('2d');
-        
+
         if (bgColor === 'transparent') {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         } else if (bgColor === 'white') {
@@ -1562,7 +2157,7 @@
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        
+
         let cardIdx = 0;
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -1597,7 +2192,7 @@
         }
         return canvas;
     }
-    
+
     let currentPreviewCanvas = null;
     async function updateImgPreview() {
         const cols = parseInt(document.getElementById('imgCols').value);
@@ -1605,24 +2200,23 @@
         const lang = document.getElementById('imgLang').value;
         const addStatsCard = document.getElementById('statsCardToggle').checked;
         let bgColor = document.getElementById('bgColorSelect').value;
-        if (bgColor === 'custom') {
-            bgColor = document.getElementById('customColor').value;
-        }
+        if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
             currentPreviewCanvas = await generateDeckImage(cols, quality, lang, addStatsCard, bgColor);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
-        } catch(e) { previewDiv.innerHTML = `<div style="color:#ff8888;">生成失败: ${e.message}</div>`; }
+        } catch(e) {
+            previewDiv.innerHTML = `<div style="color:#ff8888;">生成失败: ${e.message}</div>`;
+        }
     }
-    
+
     async function showImgGenModal() {
         if (deckMap.size === 0) { alert("卡组为空，无法生成图片"); return; }
         const modal = document.getElementById('imgGenModal');
         modal.style.display = 'flex';
-        
-        document.getElementById('generatePreviewBtn').onclick = () => updateImgPreview();
+        document.getElementById('generatePreviewBtn').onclick = updateImgPreview;
         document.getElementById('downloadImgBtn').onclick = () => {
             if (currentPreviewCanvas) {
                 const link = document.createElement('a');
@@ -1632,88 +2226,62 @@
             }
         };
         document.getElementById('closeImgModal').onclick = () => { modal.style.display = 'none'; };
-        
         const qualitySlider = document.getElementById('imgQuality');
         const qualityVal = document.getElementById('qualityVal');
         qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
     }
 
-    function getCostCategory(cost) { return cost >= 7 ? 7 : cost; }
-    function getTypeCategory(type) { if(type === "order") return "order"; if(type === "countermeasure") return "countermeasure"; return "unit"; }
-    
-    function showStatsModal() {
-        const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
-        let unitTotal=0, orderTotal=0, counterTotal=0;
-        let rarityCounts = { "Standard":0, "Limited":0, "Special":0, "Elite":0 };
-        for(let {card, count} of deckMap.values()) {
-            const cat = getCostCategory(card.cost);
-            const typeCat = getTypeCategory(card.type);
-            if(typeCat === "unit") { costMap[cat].unit += count; unitTotal += count; }
-            else if(typeCat === "order") { costMap[cat].order += count; orderTotal += count; }
-            else { costMap[cat].counter += count; counterTotal += count; }
-            if(rarityCounts.hasOwnProperty(card.rarity)) rarityCounts[card.rarity] += count;
-        }
-        const maxHeight = Math.max(...Object.values(costMap).flatMap(v=>[v.unit, v.order, v.counter]), 1);
-        const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
-            const unitH = costMap[cost].unit, orderH = costMap[cost].order, counterH = costMap[cost].counter;
-            const totalH = unitH + orderH + counterH;
-            const unitPercent = maxHeight ? (unitH / maxHeight) * 48 : 0;
-            const orderPercent = maxHeight ? (orderH / maxHeight) * 48 : 0;
-            const counterPercent = maxHeight ? (counterH / maxHeight) * 48 : 0;
-            return `<div class="histogram-bar-wrapper"><div class="bar-stack" style="height:${Math.max(unitPercent+orderPercent+counterPercent, 4)}px;"><div class="bar-counter" style="height:${counterPercent}px; background:#5a5a5a;" title="反制:${counterH}"></div><div class="bar-order" style="height:${orderPercent}px; background:#f5c542;" title="指令:${orderH}"></div><div class="bar-unit" style="height:${unitPercent}px; background:#e8e4d0;" title="单位:${unitH}"></div></div><div class="bar-label">${cost===7?'7K+':cost+'K'}</div><div class="cost-total">${totalH}</div></div>`;
-        }).join('');
-        document.getElementById('modalHistogramBars').innerHTML = barsHtml;
-        document.getElementById('modalTypeSummary').innerHTML = `<span>单位 <span class="unit-badge">${unitTotal}</span></span><span>指令 <span class="order-badge">${orderTotal}</span></span><span>反制 <span class="counter-badge">${counterTotal}</span></span>`;
-        document.getElementById('modalRarityStats').innerHTML = `<div class="rarity-stat"><span>普通</span> <span style="color:var(--rarity-standard);">${rarityCounts.Standard}</span></div><div class="rarity-stat"><span>限定</span> <span style="color:var(--rarity-limited);">${rarityCounts.Limited}</span></div><div class="rarity-stat"><span>特殊</span> <span style="color:var(--rarity-special);">${rarityCounts.Special}</span></div><div class="rarity-stat"><span>精英</span> <span style="color:var(--rarity-elite);">${rarityCounts.Elite}</span></div>`;
-        document.getElementById('statsModal').style.display = 'flex';
-    }
-    function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
-
-    function updateAllDecksUI() { 
-        renderDeckList('deckListContainer'); renderDeckList('mobileDeckList'); 
-        const total = Array.from(deckMap.values()).reduce((s,e)=>s+e.count,0); 
-        document.getElementById('mobileToggleCount').innerText = total;
-    }
-    
-    function renderDeckList(containerId) {
-        const container = document.getElementById(containerId); if(!container) return; 
-        let html = `<div class="deck-card-row headquarters-row" style="border-left-color: #b8860b;"><div class="deck-card-icon">🏛️</div><div class="deck-card-details"><div class="deck-card-name">总部</div><div class="deck-card-stats"></div></div><span class="deck-card-qty"></span><button class="deck-remove-btn" style="visibility: hidden;">−</button></div>`;
-        if(deckMap.size===0) { container.innerHTML = html + '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>'; return; }
-        const entries = Array.from(deckMap.values()).sort((a, b) => { const idxA = allCards.findIndex(c => c.id === a.card.id); const idxB = allCards.findIndex(c => c.id === b.card.id); return idxA - idxB; });
-        entries.forEach(entry => { const c = entry.card; const borderColor = factionColor[c.faction] || "#6b6e5c"; const typeDisplay = typeNameMap[c.type] || c.type; const rarityClass = rarityClassMap[c.rarity] || "rarity-standard"; const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity; const reserveIcon = c.reserved ? '<i class="deck-card-reserve-icon"></i>' : ''; html += `<div class="deck-card-row" style="border-left-color: ${borderColor};"><div class="deck-card-icon" style="background-image: url('${c.faction}.svg'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div><div class="deck-card-details"><div class="deck-card-name" title="${c.titleZh}">${c.titleZh}${reserveIcon}</div><div class="deck-card-stats"><div class="kredits-cost"><span>${c.cost}</span><span>K</span></div><div class="card-type-badge">${typeDisplay}</div><div class="card-rarity-badge ${rarityClass}">${rarityDisplay}</div></div></div><span class="deck-card-qty">x${entry.count}</span><button class="deck-remove-btn" data-id="${c.id}">−</button></div>`; });
-        container.innerHTML = html;
-        container.querySelectorAll('.deck-remove-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); if(!isNaN(id)) removeFromDeck(id); }));
-    }
-    
+    // ==================== 启动 ====================
     function initSidebars() {
-        const toggle = document.getElementById('mobileDeckToggle'), panel = document.getElementById('mobileDeckPanel'), overlay = document.getElementById('mobileOverlay'), close = document.getElementById('mobileCloseDeck');
-        toggle?.addEventListener('click',()=>{ panel.classList.add('open'); overlay.classList.add('show'); });
-        close?.addEventListener('click',()=>{ panel.classList.remove('open'); overlay.classList.remove('show'); });
-        overlay?.addEventListener('click',()=>{ panel.classList.remove('open'); overlay.classList.remove('show'); });
-        document.getElementById('mobileClearDeck')?.addEventListener('click',()=>clearDeck());
-        document.getElementById('statsBtn')?.addEventListener('click',showStatsModal);
-        document.getElementById('mobileStatsBtn')?.addEventListener('click',showStatsModal);
-        document.getElementById('statsModalClose')?.addEventListener('click',closeStatsModal);
-        document.getElementById('statsModal')?.addEventListener('click',(e)=>{ if(e.target === document.getElementById('statsModal')) closeStatsModal(); });
+        const toggle = document.getElementById('mobileDeckToggle');
+        const panel = document.getElementById('mobileDeckPanel');
+        const overlay = document.getElementById('mobileOverlay');
+        const close = document.getElementById('mobileCloseDeck');
+        toggle?.addEventListener('click', () => { panel.classList.add('open'); overlay.classList.add('show'); });
+        close?.addEventListener('click', () => { panel.classList.remove('open'); overlay.classList.remove('show'); });
+        overlay?.addEventListener('click', () => { panel.classList.remove('open'); overlay.classList.remove('show'); });
+        document.getElementById('mobileClearDeck')?.addEventListener('click', clearDeck);
+        document.getElementById('statsBtn')?.addEventListener('click', showStatsModal);
+        document.getElementById('mobileStatsBtn')?.addEventListener('click', showStatsModal);
+        document.getElementById('statsModalClose')?.addEventListener('click', closeStatsModal);
+        document.getElementById('statsModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('statsModal')) closeStatsModal();
+        });
         document.getElementById('genImgBtn')?.addEventListener('click', showImgGenModal);
         document.getElementById('mobileGenImgBtn')?.addEventListener('click', showImgGenModal);
     }
-    
-    function initNav() { 
-        const menuBtn = document.getElementById('menuToggleBtn'), menuDiv = document.getElementById('navMenu'); 
-        menuBtn.onclick = (e) => { e.stopPropagation(); menuDiv.classList.toggle('open'); }; 
-        document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !menuDiv.contains(e.target)) menuDiv.classList.remove('open'); }); 
-        document.getElementById('clearDeckBtn')?.addEventListener('click',()=>clearDeck()); 
+
+    function initNav() {
+        const menuBtn = document.getElementById('menuToggleBtn');
+        const menuDiv = document.getElementById('navMenu');
+        menuBtn.onclick = (e) => { e.stopPropagation(); menuDiv.classList.toggle('open'); };
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !menuDiv.contains(e.target)) menuDiv.classList.remove('open');
+        });
+        document.getElementById('clearDeckBtn')?.addEventListener('click', clearDeck);
     }
-    
+
     function bindImportExportEvents() {
-        document.getElementById('importBtn').onclick = () => { const code = document.getElementById('importCode').value.trim(); if(code) importDeckFromCode(code); else alert('请输入卡组代码'); };
-        document.getElementById('mobileImportBtn').onclick = () => { const code = document.getElementById('mobileImportCode').value.trim(); if(code) importDeckFromCode(code); else alert('请输入卡组代码'); };
-        document.getElementById('exportBtn').onclick = () => exportAndCopy();
-        document.getElementById('mobileExportBtn').onclick = () => exportAndCopy();
+        document.getElementById('importBtn').onclick = () => {
+            const code = document.getElementById('importCode').value.trim();
+            if (code) importDeckFromCode(code);
+            else alert('请输入卡组代码');
+        };
+        document.getElementById('mobileImportBtn').onclick = () => {
+            const code = document.getElementById('mobileImportCode').value.trim();
+            if (code) importDeckFromCode(code);
+            else alert('请输入卡组代码');
+        };
+        document.getElementById('exportBtn').onclick = exportAndCopy;
+        document.getElementById('mobileExportBtn').onclick = exportAndCopy;
     }
-    
-    window.addEventListener('load', () => { loadData(); initNav(); initSidebars(); bindImportExportEvents(); });
+
+    window.addEventListener('load', () => {
+        loadData();
+        initNav();
+        initSidebars();
+        bindImportExportEvents();
+    });
 </script>
 </body>
 </html>
