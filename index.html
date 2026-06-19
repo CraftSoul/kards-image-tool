@@ -505,6 +505,10 @@
             margin-top: 8px;
             border-top: 1px solid rgba(170, 142, 78, 0.3);
             padding-top: 12px;
+            display: none; /* 默认隐藏，JS控制显示 */
+        }
+        .related-section.visible {
+            display: block;
         }
         .related-section-title {
             font-size: 0.75rem;
@@ -547,11 +551,6 @@
         }
         .related-card-item .card-name {
             font-size: 0.6rem;
-        }
-        .related-empty {
-            color: #887e66;
-            font-size: 0.85rem;
-            padding: 4px 0;
         }
 
         .pagination {
@@ -711,7 +710,7 @@
                 </div>
             </div>
 
-            <!-- 词条 -->
+            <!-- 词条（静态定义） -->
             <div class="filter-group">
                 <div class="filter-group-title collapse-toggle" data-target="attrBody">
                     ✨ 词条 <span class="reset-chip" data-filter-type="attribute">✖ 清除</span>
@@ -722,7 +721,7 @@
                 </div>
             </div>
 
-            <!-- 扩展包（带图标） -->
+            <!-- 扩展包（静态定义，带图标） -->
             <div class="filter-group">
                 <div class="filter-group-title collapse-toggle" data-target="setBody">
                     📦 扩展包 <span class="reset-chip" data-filter-type="set">✖ 清除</span>
@@ -804,6 +803,7 @@
         const AVAILABLE_VERSIONS = generateVersionList();
         const DEFAULT_VERSION = `v${VERSION}`;
 
+        // 词条翻译（修正重甲大小写）
         const attrTranslation = {
             "blitz": "闪击",
             "fury": "奋战",
@@ -811,9 +811,9 @@
             "pincer": "钳击",
             "salvage": "收缴",
             "guard": "守护",
-            "heavyarmor1": "重甲 1",
-            "heavyarmor2": "重甲 2",
-            "heavyarmor3": "重甲 3",
+            "heavyArmor1": "重甲 1",
+            "heavyArmor2": "重甲 2",
+            "heavyArmor3": "重甲 3",
             "alpine": "山地",
             "mobilize": "动员",
             "covert": "隐蔽",
@@ -870,7 +870,7 @@
             "order": "指令", "countermeasure": "反制" };
         const unitTypes = ["infantry", "tank", "fighter", "bomber", "artillery"];
 
-        // 静态定义的筛选选项
+        // 静态定义的筛选选项（阵营、类型、花费、稀有度）
         const STATIC_FACTIONS = ["germany", "britain", "soviet", "usa", "japan", "france", "italy", "poland", "finland",
             "anzac", "neutral"
         ];
@@ -888,11 +888,11 @@
             currentModalVersion = DEFAULT_VERSION;
 
         // 卡牌索引与关联
-        let cardIndex = {}; // cardId -> card
-        let canCreateMap = {}; // parentCardId -> [childCardId, ...]
-        let parentOfMap = {}; // childCardId -> [parentCardId, ...]
-        let veteranMap = {}; // originalCardId -> veteranCardId (原版 -> 老兵版)
-        let becomesVeteranMap = {}; // veteranCardId -> originalCardId (老兵版 -> 原版)
+        let cardIndex = {};
+        let canCreateMap = {};
+        let parentOfMap = {};
+        let veteranMap = {};     // 原版 -> 老兵版
+        let becomesVeteranMap = {}; // 老兵版 -> 原版
 
         // 选中的筛选器
         let selectedFilters = {
@@ -903,9 +903,6 @@
             attributes: new Set(),
             sets: new Set()
         };
-
-        // 所有可用词条
-        let allAttributes = [];
 
         // ==================== 工具函数 ====================
         function getCardImageUrl(imgName, lang, version, quality) {
@@ -1043,21 +1040,10 @@
                     }
                 }
 
-                // 提取所有词条（排除特殊标记）
-                const attrSet = new Set();
-                for (let c of allCards) {
-                    for (let a of c.attributes) {
-                        if (a === "OnlySpawnable") continue;
-                        if (a.startsWith("BecomesVeteran:") || a.startsWith("VeteranOf:")) continue;
-                        attrSet.add(a);
-                    }
-                }
-                allAttributes = [...attrSet].sort();
-
-                // 初始化筛选器
+                // 初始化筛选器（静态定义）
                 initStaticFilters();
-                initAttrFilter();
-                initSetFilter();
+                initAttrFilter();   // 基于静态 attrTranslation
+                initSetFilter();    // 基于静态 setTranslation
                 applyFilters();
 
             } catch (e) {
@@ -1108,7 +1094,6 @@
                     const set = map[filterType];
                     if (set) {
                         set.clear();
-                        // 更新UI
                         document.querySelectorAll(`.filter-chip[data-filter="${filterType}"]`).forEach(ch => ch.classList.remove('active'));
                         applyFilters();
                     }
@@ -1140,7 +1125,7 @@
                 el.addEventListener('input', () => applyFilters());
             });
 
-            // 使用事件委托处理所有 .filter-chip 的点击
+            // 事件委托：处理所有 filter-chip 点击（包括动态生成的词条和扩展包）
             document.querySelector('.filter-panel').addEventListener('click', function(e) {
                 const chip = e.target.closest('.filter-chip');
                 if (!chip) return;
@@ -1164,34 +1149,22 @@
             });
         }
 
+        // 词条筛选：基于静态 attrTranslation
         function initAttrFilter() {
             const container = document.getElementById('attrMultiContainer');
-            if (!allAttributes.length) {
-                container.innerHTML = '<span style="color:#887e66;font-size:0.8rem;">暂无词条</span>';
-                return;
-            }
-            container.innerHTML = allAttributes.map(a =>
-                `<div class="filter-chip" data-filter="attribute" data-val="${a}">${attrTranslation[a]||a}</div>`
+            const attrKeys = Object.keys(attrTranslation).sort();
+            container.innerHTML = attrKeys.map(a =>
+                `<div class="filter-chip" data-filter="attribute" data-val="${a}">${attrTranslation[a]}</div>`
             ).join('');
         }
 
+        // 扩展包筛选：基于静态 setTranslation，带图标
         function initSetFilter() {
-            const setSet = new Set();
-            for (let c of allCards) {
-                const s = c.setName;
-                if (s && s !== "OnlySpawnable" && s !== "Special") {
-                    setSet.add(s);
-                }
-            }
-            const sortedSets = [...setSet].sort();
             const container = document.getElementById('setMultiContainer');
-            if (!sortedSets.length) {
-                container.innerHTML = '<span style="color:#887e66;font-size:0.8rem;">暂无扩展包</span>';
-                return;
-            }
-            container.innerHTML = sortedSets.map(s => {
+            const setKeys = Object.keys(setTranslation).sort();
+            container.innerHTML = setKeys.map(s => {
                 const icon = setIconMap[s] || '';
-                return `<div class="filter-chip" data-filter="set" data-val="${s}">${icon ? `<img src="${icon}" width="18" height="18" onerror="this.style.display='none'">` : ''} ${setTranslation[s]||s}</div>`;
+                return `<div class="filter-chip" data-filter="set" data-val="${s}">${icon ? `<img src="${icon}" width="18" height="18" onerror="this.style.display='none'">` : ''} ${setTranslation[s]}</div>`;
             }).join('');
         }
 
@@ -1208,7 +1181,7 @@
                 result = result.filter(c => searchableText(c).includes(search));
             }
 
-            // 词条
+            // 词条（AND）
             if (selectedFilters.attributes.size) {
                 result = result.filter(c => {
                     const attrs = c.attributes || [];
@@ -1391,7 +1364,8 @@
             document.getElementById('modalCostDefense').style.borderLeftColor = themeColor;
 
             document.getElementById('modalAttributes').textContent = translateAttributes(c.attributes);
-            document.getElementById('modalSet').textContent = c.setName;
+            // 扩展包翻译
+            document.getElementById('modalSet').textContent = setTranslation[c.setName] || c.setName;
             document.getElementById('modalEnName').textContent = c.titleEn || '---';
             document.getElementById('modalImportId').textContent = c.importId || '---';
 
@@ -1436,9 +1410,11 @@
 
         // ==================== 相关卡牌 ====================
         function buildRelatedCards() {
+            const section = document.getElementById('relatedSection');
             const container = document.getElementById('relatedContainer');
             if (!currentModalCard) {
-                container.innerHTML = '<div class="related-empty">无关联卡牌</div>';
+                section.classList.remove('visible');
+                container.innerHTML = '';
                 return;
             }
 
@@ -1462,13 +1438,11 @@
             }
 
             // 老兵关系
-            // 如果当前卡是原版，找出老兵版
             if (veteranMap[cardId]) {
                 const vetId = veteranMap[cardId];
                 const vetCard = cardIndex[vetId];
                 if (vetCard) related.push({ card: vetCard, relation: '老兵版' });
             }
-            // 如果当前卡是老兵版，找出原版
             if (becomesVeteranMap[cardId]) {
                 const origId = becomesVeteranMap[cardId];
                 const origCard = cardIndex[origId];
@@ -1485,11 +1459,13 @@
                 }
             }
 
-            if (!uniqueRelated.length) {
-                container.innerHTML = '<div class="related-empty">无关联卡牌</div>';
+            if (uniqueRelated.length === 0) {
+                section.classList.remove('visible');
+                container.innerHTML = '';
                 return;
             }
 
+            section.classList.add('visible');
             container.innerHTML = `<div class="related-grid">${uniqueRelated.map(item => {
                 const c = item.card;
                 const imgUrl = getCardImageUrl(c.image, currentModalLang, currentModalVersion, 20);
