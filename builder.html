@@ -616,8 +616,8 @@
             background: transparent;
             border-radius: 4px 4px 0 0;
             overflow: hidden;
-            height: 48px;
-            max-height: 48px;
+            height: 128px;
+            max-height: 128px;
             min-height: 0;
             cursor: pointer;
             transition: transform 0.1s;
@@ -1273,8 +1273,7 @@
         "ambush": "伏击",
         "intel1": "情报 1",
         "intel2": "情报 2",
-        "intel3": "情报 3",
-        "exile": "流亡"
+        "intel3": "情报 3"
     };
 
     const setTranslation = {
@@ -2020,7 +2019,7 @@
             
             // 归一化高度
             const ratio = total / maxTotal;
-            const totalH = Math.max(4, ratio * 44);
+            const totalH = Math.max(4, ratio * 124);
             
             // 各段高度按比例分配
             const unitRatio = unit / total;
@@ -2032,7 +2031,7 @@
             const counterH = counterRatio * totalH;
             
             return `<div class="histogram-bar-wrapper">
-                        <div class="bar-stack" style="height:48px;background:transparent;">
+                        <div class="bar-stack" style="height:128px;background:transparent;">
                             <div class="bar-unit" style="height:${unitH}px; background:#e8e4d0;" title="单位:${unit}"></div>
                             <div class="bar-order" style="height:${orderH}px; background:#f5c542;" title="指令:${order}"></div>
                             <div class="bar-counter" style="height:${counterH}px; background:#5a5a5a;" title="反制:${counter}"></div>
