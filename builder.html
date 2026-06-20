@@ -596,7 +596,7 @@
             justify-content: center;
             gap: 4px;
             margin: 6px 0 4px;
-            height: 62px;
+            height: 142px;
             padding: 0 8px;
         }
         .histogram-bar-wrapper {
@@ -1135,7 +1135,7 @@
         <div class="cards-section">
             <div class="filter-panel">
                 <div class="row-filters">
-                    <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本/词条"></div>
+                    <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本"></div>
                     <div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"><option value="all">全部扩展</option></select></div>
                     <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div>
                 </div>
@@ -2176,15 +2176,13 @@
             const total = unit + order + counter;
             
             if (total === 0) {
-                // 数量为0时不显示条形
-                // 只显示标签和总数
                 ctx.fillStyle = "#f5eaca";
                 ctx.font = `${Math.floor(h * 0.035)}px "Segoe UI"`;
                 ctx.textAlign = "center";
                 ctx.fillText(i === 7 ? "7K+" : `${i}K`, bx + (barWidth - barGap)/2, barAreaY + barMaxHeight + h * 0.045);
-                ctx.fillStyle = "#887e66";
+                ctx.fillStyle = "#ffefb9";
                 ctx.font = `${Math.floor(h * 0.03)}px "Segoe UI"`;
-                ctx.fillText("0", bx + (barWidth - barGap)/2, barAreaY + barMaxHeight + h * 0.07);
+                ctx.fillText("0", bx + (barWidth - barGap)/2, barAreaY + barMaxHeight - h * 0.025);
                 continue;
             }
             
