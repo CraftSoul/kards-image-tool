@@ -1481,14 +1481,16 @@
             if (el) el.addEventListener('input', applyFilters);
         });
 
-        const optionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
+        const mainNationOptions = ["germany", "britain", "japan", "soviet", "usa"];
+        const mainOptionsHtml = mainNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
+        const allyOptionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         ['mainNationSelect', 'mobileMainNation'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = optionsHtml;
+            if (el) el.innerHTML = mainOptionsHtml;
         });
         ['allyNationSelect', 'mobileAllyNation'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = optionsHtml;
+            if (el) el.innerHTML = allyOptionsHtml;
         });
         document.getElementById('mainNationSelect').value = mainNation;
         document.getElementById('allyNationSelect').value = allyNation;
