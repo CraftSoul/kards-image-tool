@@ -435,7 +435,7 @@
         <div class="input-row">
             <div class="input-group">
                 <label>英文卡名</label>
-                <input type="text" id="cardNameInput" placeholder="例: RESISTANCE" value="RESISTANCE">
+                <input type="text" id="cardNameInput" placeholder="例: RESISTANCE" value="STALINGRAD">
             </div>
             <div class="lang-group">
                 <label>语言</label>
@@ -864,7 +864,7 @@
         langSelect.addEventListener('change', () => { if(currentBaseClean) performSearch(true, activeVariantKey); else if(cardNameInput.value.trim()) performSearch(false, null); });
         versionSelect.addEventListener('change', () => { if(currentBaseClean) performSearch(true, activeVariantKey); else if(cardNameInput.value.trim()) performSearch(false, null); });
         
-        setTimeout(() => { if(cardNameInput.value.trim() === "RESISTANCE") performSearch(false, null); }, 120);
+        setTimeout(() => { if(cardNameInput.value.trim() === "STALINGRAD") performSearch(false, null); }, 120);
     })();
 </script>
 </body>

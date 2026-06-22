@@ -1136,8 +1136,7 @@
             <div class="filter-panel">
                 <div class="row-filters">
                     <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本"></div>
-                    <div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"><option value="all">全部扩展</option></select></div>
-                    <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option></select></div>
+                    <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option><option value="veteran">老兵</option></select></div>
                 </div>
 
                 <div class="filter-group">
@@ -1469,10 +1468,7 @@
 
     // ==================== 初始化筛选器 ====================
     function initStaticFilters() {
-        const sets = [...new Set(allCards.map(c=>c.setName))];
-        const setSelect = document.getElementById('setSelect');
-        setSelect.innerHTML = '<option value="all">全部扩展</option>'+sets.map(s=>`<option value="${s}">${setTranslation[s] || s}</option>`).join('');
-        ['setSelect','statusSelect','searchInput'].forEach(id => {
+        ['statusSelect','searchInput'].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.addEventListener('change', applyFilters); el.addEventListener('input', applyFilters); }
         });
@@ -1664,13 +1660,11 @@
             });
         }
 
-        const setVal = document.getElementById('setSelect').value;
-        if (setVal !== 'all') res = res.filter(c => c.setName === setVal);
-
         const status = document.getElementById('statusSelect').value;
         if (status === 'active') res = res.filter(c => !c.reserved && !c.isSpawn && !c.isVeteranSet);
         else if (status === 'reserve') res = res.filter(c => c.reserved);
         else if (status === 'spawn') res = res.filter(c => c.isSpawn);
+        else if (status === 'veteran') res = res.filter(c => c.isVeteranSet);
 
         const activeTypesSet = selectedFilters.types;
         const onlyUnits = activeTypesSet.size > 0 && [...activeTypesSet].every(t => unitTypes.includes(t));
