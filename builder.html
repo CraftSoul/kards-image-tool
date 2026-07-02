@@ -959,7 +959,7 @@
         }
         .card-item {
             background: #111812;
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid;
@@ -1346,7 +1346,7 @@
     ];
 
     function getCardImageUrl(imgName, lang, quality=20) {
-        return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v51/${lang}/${imgName}&q=${quality}` : "";
+        return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/${lang}/${imgName}&q=${quality}` : "";
     }
 
     function getSearchableText(card) {
@@ -2219,7 +2219,7 @@
     async function generateDeckImage(cols, quality, lang, addStatsCard, bgColor) {
         const cards = getExpandedCardList();
         if (cards.length === 0) throw new Error("卡组为空");
-        const cardW = 500, cardH = 702, radius = 12;
+        const cardW = 500, cardH = 702, radius = 15;
         let totalCards = cards.length;
         if (addStatsCard) totalCards += 1;
         const rows = Math.ceil(totalCards / cols);

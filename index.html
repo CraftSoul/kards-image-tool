@@ -283,7 +283,7 @@
         }
         .card-item {
             background: #111812;
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
             transition: transform 0.15s, box-shadow 0.2s;
             cursor: pointer;
@@ -414,7 +414,7 @@
             position: relative;
             width: 100%;
             max-width: 280px;
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 8px 18px black;
         }
@@ -518,6 +518,16 @@
             margin-bottom: 8px;
             font-weight: 600;
         }
+        .related-group {
+            margin-bottom: 12px;
+        }
+        .related-group-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #c9b06b;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
         .related-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -525,7 +535,7 @@
         }
         .related-card-item {
             background: #1a1f1a;
-            border-radius: 8px;
+            border-radius: 15px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid #3a3f3a;
@@ -551,6 +561,21 @@
         }
         .related-card-item .card-name {
             font-size: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2px;
+            color: #faf0cf;
+        }
+        .related-card-item .card-name span:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .related-card-item .reserve-icon-sm {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
         }
 
         .pagination {
@@ -791,11 +816,11 @@
 
     <script>
         // ==================== 常量与翻译 ====================
-        const VERSION = 51;
+        const VERSION = 52;
 
         function generateVersionList() {
             let versions = [];
-            for (let i = 0; i <= 10; i++) {
+            for (let i = 0; i <= 9+VERSION%10; i++) {
                 versions.push(`v${VERSION - i}`);
             }
             return versions;
@@ -1464,17 +1489,35 @@
                 return;
             }
 
-            section.classList.add('visible');
-            container.innerHTML = `<div class="related-grid">${uniqueRelated.map(item => {
-                const c = item.card;
-                const imgUrl = getCardImageUrl(c.image, currentModalLang, currentModalVersion, 20);
-                const borderColor = factionColor[c.faction] || '#6b6e5c';
-                return `<div class="related-card-item" data-cardid="${c.cardId}" style="border-color: ${borderColor};">
-                            <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${c.titleZh}"></div>
-                            <div class="card-info"><div class="card-name"><span>${c.titleZh}</span><span style="font-size:0.5rem;color:#c9b06b;">${item.relation}</span></div></div>
-                        </div>`;
-            }).join('')}</div>`;
+            // 按 relation 分组
+            const groups = {};
+            for (let item of uniqueRelated) {
+                if (!groups[item.relation]) groups[item.relation] = [];
+                groups[item.relation].push(item.card);
+            }
 
+            const order = ['原版', '老兵版', '上级', '生成'];
+            let html = '';
+            for (let rel of order) {
+                if (groups[rel] && groups[rel].length) {
+                    html += `<div class="related-group"><div class="related-group-title">${rel}</div><div class="related-grid">`;
+                    for (let c of groups[rel]) {
+                        const imgUrl = getCardImageUrl(c.image, currentModalLang, currentModalVersion, 20);
+                        const borderColor = factionColor[c.faction] || '#6b6e5c';
+                        const reserveMark = c.reserved ? '<i class="reserve-icon-sm"></i>' : '';
+                        html += `<div class="related-card-item" data-cardid="${c.cardId}" style="border-color: ${borderColor};">
+                                    <div class="card-img"><img loading="lazy" src="${imgUrl}" alt="${c.titleZh}"></div>
+                                    <div class="card-info"><div class="card-name"><span>${c.titleZh}</span>${reserveMark}</div></div>
+                                </div>`;
+                    }
+                    html += `</div></div>`;
+                }
+            }
+
+            section.classList.add('visible');
+            container.innerHTML = html;
+
+            // 事件绑定
             container.querySelectorAll('.related-card-item').forEach(el => {
                 el.addEventListener('click', () => {
                     const cid = el.dataset.cardid;
@@ -1512,7 +1555,7 @@
             canvas.width = w;
             canvas.height = h;
             const ctx = canvas.getContext('2d');
-            const rad = 12;
+            const rad = 15;
             ctx.beginPath();
             ctx.moveTo(rad, 0);
             ctx.lineTo(w - rad, 0);
