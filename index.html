@@ -927,6 +927,9 @@
             attributes: new Set(),
             sets: new Set()
         };
+        
+        // "白板"标志（无词条）
+        let whiteboardMode = false;
 
         // ==================== 工具函数 ====================
         function getCardImageUrl(imgName, lang, version, quality) {
@@ -1119,6 +1122,11 @@
                     if (set) {
                         set.clear();
                         document.querySelectorAll(`.filter-chip[data-filter="${filterType}"]`).forEach(ch => ch.classList.remove('active'));
+                        // 如果重置的是词条，同时关闭白板模式
+                        if (filterType === 'attribute') {
+                            whiteboardMode = false;
+                            document.querySelector('.filter-chip[data-filter="whiteboard"]')?.classList.remove('active');
+                        }
                         applyFilters();
                     }
                 });
@@ -1156,6 +1164,24 @@
                 const type = chip.dataset.filter;
                 const val = chip.dataset.val;
                 if (!type || !val) return;
+                
+                // 处理白板特殊逻辑
+                if (type === 'whiteboard') {
+                    whiteboardMode = !whiteboardMode;
+                    chip.classList.toggle('active');
+                    if (whiteboardMode) {
+                        selectedFilters.attributes.clear();
+                        document.querySelectorAll('.filter-chip[data-filter="attribute"]').forEach(ch => ch.classList.remove('active'));
+                    }
+                    applyFilters();
+                    return;
+                }
+                
+                if (type === 'attribute' && whiteboardMode) {
+                    whiteboardMode = false;
+                    document.querySelector('.filter-chip[data-filter="whiteboard"]')?.classList.remove('active');
+                }
+                
                 const setMap = {
                     'faction': selectedFilters.factions,
                     'type': selectedFilters.types,
@@ -1177,9 +1203,11 @@
         function initAttrFilter() {
             const container = document.getElementById('attrMultiContainer');
             const attrKeys = Object.keys(attrTranslation);
-            container.innerHTML = attrKeys.map(a =>
+            let html = `<div class="filter-chip" data-filter="whiteboard" data-val="whiteboard">白板</div>`;
+            html += attrKeys.map(a =>
                 `<div class="filter-chip" data-filter="attribute" data-val="${a}">${attrTranslation[a]}</div>`
             ).join('');
+            container.innerHTML = html;
         }
 
         // 扩展包筛选
@@ -1206,7 +1234,14 @@
             }
 
             // 词条
-            if (selectedFilters.attributes.size) {
+            if (whiteboardMode) {
+                // 白板：只保留无词条的卡牌（排除特殊标记）
+                result = result.filter(c => {
+                    const attrs = c.attributes || [];
+                    const filtered = attrs.filter(a => a !== "OnlySpawnable" && !a.startsWith("BecomesVeteran:") && !a.startsWith("VeteranOf:"));
+                    return filtered.length === 0;
+                });
+            } else if (selectedFilters.attributes.size) {
                 result = result.filter(c => {
                     const attrs = c.attributes || [];
                     for (let attr of selectedFilters.attributes) {
@@ -1541,37 +1576,106 @@
         }
 
         // ==================== 保存图片 ====================
-        async function saveCardAsRoundedPng() {
+        function isDarkPixel(data, x, y, width, threshold) {
+            const idx = (y * width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            return Math.max(r, g, b) <= threshold;
+        }
+
+        async function saveCardAsTransparent() {
             const imgEl = document.getElementById('modalImg');
-            if (!imgEl?.complete || imgEl.naturalWidth === 0) { alert("图片未加载完成"); return; }
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.src = imgEl.src;
-            await new Promise((r, j) => { img.onload = r;
-                img.onerror = j; });
-            const w = img.width,
-                h = img.height,
-                canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            const rad = 15;
-            ctx.beginPath();
-            ctx.moveTo(rad, 0);
-            ctx.lineTo(w - rad, 0);
-            ctx.quadraticCurveTo(w, 0, w, rad);
-            ctx.lineTo(w, h - rad);
-            ctx.quadraticCurveTo(w, h, w - rad, h);
-            ctx.lineTo(rad, h);
-            ctx.quadraticCurveTo(0, h, 0, h - rad);
-            ctx.lineTo(0, rad);
-            ctx.quadraticCurveTo(0, 0, rad, 0);
-            ctx.clip();
-            ctx.drawImage(img, 0, 0, w, h);
-            const a = document.createElement('a');
-            a.href = canvas.toDataURL('image/png');
-            a.download = `${currentModalCard?.titleZh||'card'}_${currentModalLang}.png`;
-            a.click();
+            if (!imgEl?.complete || imgEl.naturalWidth === 0) {
+                alert("图片未加载完成");
+                return;
+            }
+            
+            saveImgBtn.disabled = true;
+            const originalText = saveImgBtn.innerText;
+            saveImgBtn.innerText = "💾 处理中...";
+            
+            try {
+                const src = imgEl.src;
+                const resp = await fetch(src);
+                if (!resp.ok) throw new Error("fetch failed");
+                const blob = await resp.blob();
+                const bitmap = await createImageBitmap(blob);
+                const w = bitmap.width, h = bitmap.height;
+                
+                // 获取图片数据
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = w;
+                tempCanvas.height = h;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(bitmap, 0, 0);
+                const imgData = tempCtx.getImageData(0, 0, w, h);
+                const data = imgData.data;
+                
+                // BFS标记所有四角相连的暗色像素，将其alpha设为0
+                const visited = new Uint8Array(w * h);
+                const queue = [];
+                const threshold = 50;
+                
+                // 四角起始点
+                const corners = [
+                    [0, 0],
+                    [w - 1, 0],
+                    [0, h - 1],
+                    [w - 1, h - 1]
+                ];
+                
+                for (const [cx, cy] of corners) {
+                    const idx = cy * w + cx;
+                    if (!visited[idx] && isDarkPixel(data, cx, cy, w, threshold)) {
+                        visited[idx] = 1;
+                        queue.push([cx, cy]);
+                    }
+                }
+                
+                const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+                let transparentCount = 0;
+                while (queue.length > 0) {
+                    const [x, y] = queue.shift();
+                    // 将该像素设为透明
+                    const idx = (y * w + x) * 4;
+                    data[idx + 3] = 0;
+                    transparentCount++;
+                    
+                    for (const [dx, dy] of dirs) {
+                        const nx = x + dx;
+                        const ny = y + dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                            const nidx = ny * w + nx;
+                            if (!visited[nidx] && isDarkPixel(data, nx, ny, w, threshold)) {
+                                visited[nidx] = 1;
+                                queue.push([nx, ny]);
+                            }
+                        }
+                    }
+                }
+                
+                // 将处理后的图像放回canvas
+                tempCtx.putImageData(imgData, 0, 0);
+                
+                // 导出为PNG
+                const pngBlob = await new Promise(r => tempCanvas.toBlob(r, 'image/png'));
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(pngBlob);
+                a.download = `${currentModalCard?.titleZh || 'card'}_${currentModalLang}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+                
+                alert(`✅ 保存成功！透明边缘 ${transparentCount} 像素`);
+            } catch(e) {
+                alert(`❌ 保存失败: ${e.message}`);
+                console.error(e);
+            } finally {
+                saveImgBtn.disabled = false;
+                saveImgBtn.innerText = originalText;
+            }
         }
 
         async function copyLink() {
@@ -1606,7 +1710,9 @@
             document.getElementById('cardModal').addEventListener('click', (e) => {
                 if (e.target === document.getElementById('cardModal')) closeModal();
             });
-            document.getElementById('saveImgBtn').addEventListener('click', saveCardAsRoundedPng);
+            
+            const saveImgBtn = document.getElementById('saveImgBtn');
+            saveImgBtn.addEventListener('click', saveCardAsTransparent);
             document.getElementById('copyLinkBtn').addEventListener('click', copyLink);
 
             const menuBtn = document.getElementById('menuToggleBtn'),

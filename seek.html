@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>KARDS 军械库 | 英文直检</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             min-height: 100vh;
             background: #2b2b1f;
@@ -23,13 +18,7 @@
             background-blend-mode: overlay, normal;
             font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
         }
-
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 16px 16px 32px;
-        }
-
+        .app-container { max-width: 1400px; margin: 0 auto; padding: 16px 16px 32px; }
         .nav-bar {
             background: rgba(20, 20, 15, 0.96);
             backdrop-filter: blur(16px);
@@ -39,7 +28,6 @@
             overflow: hidden;
             box-shadow: 0 6px 14px rgba(0,0,0,0.3);
         }
-
         .nav-header-row {
             display: flex;
             align-items: center;
@@ -48,7 +36,6 @@
             background: rgba(0,0,0,0.2);
             border-bottom: 1px solid rgba(170, 142, 78, 0.3);
         }
-
         .nav-brand {
             font-size: 1.45rem;
             font-weight: 800;
@@ -59,7 +46,6 @@
             color: transparent;
             white-space: nowrap;
         }
-
         .menu-btn {
             background: rgba(210, 210, 225, 0.12);
             border: 1px solid #aa8e4e;
@@ -73,26 +59,10 @@
             gap: 5px;
             cursor: pointer;
         }
-        .menu-btn span {
-            display: block;
-            width: 22px;
-            height: 2.5px;
-            background-color: #f2e2b0;
-            border-radius: 2px;
-        }
-        .nav-menu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-            background: rgba(10, 10, 8, 0.98);
-        }
+        .menu-btn span { display: block; width: 22px; height: 2.5px; background-color: #f2e2b0; border-radius: 2px; }
+        .nav-menu { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: rgba(10, 10, 8, 0.98); }
         .nav-menu.open { max-height: 400px; }
-        .menu-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 16px 20px 20px;
-        }
+        .menu-links { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px 20px; }
         .menu-link {
             display: block;
             text-decoration: none;
@@ -107,36 +77,12 @@
             border: 1px solid transparent;
         }
         .menu-link:hover { background: rgba(235, 235, 245, 0.2); border-color: #c9a53b; }
-        .menu-link.active {
-            background: #c9a53b;
-            color: #1e1c10;
-            font-weight: 700;
-        }
+        .menu-link.active { background: #c9a53b; color: #1e1c10; font-weight: 700; }
 
-        .search-panel {
-            background: transparent;
-            backdrop-filter: none;
-            border-radius: 0;
-            padding: 0 0 1rem 0;
-            margin-bottom: 1.8rem;
-            border: none;
-        }
-
-        .input-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.2rem;
-            align-items: flex-end;
-            margin-bottom: 1.2rem;
-        }
-        .input-group, .lang-group, .version-group {
-            flex: 2;
-            min-width: 180px;
-        }
-        .lang-group, .version-group {
-            flex: 1.5;
-            min-width: 160px;
-        }
+        .search-panel { background: transparent; padding: 0 0 1rem 0; margin-bottom: 1.8rem; border: none; }
+        .input-row { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-end; margin-bottom: 1.2rem; }
+        .input-group, .lang-group, .version-group { flex: 2; min-width: 180px; }
+        .lang-group, .version-group { flex: 1.5; min-width: 160px; }
         .input-group label, .lang-group label, .version-group label {
             display: block;
             font-size: 0.8rem;
@@ -171,7 +117,6 @@
             border-color: #e6bc6a;
             box-shadow: 0 0 0 2px rgba(220, 180, 80, 0.3);
         }
-
         .toggle-row {
             display: flex;
             align-items: center;
@@ -193,22 +138,9 @@
             border: 1px solid #ab8e4e;
             margin-left: auto;
         }
-        .toggle-switch span {
-            color: #ffeaae;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 26px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .toggle-switch span { color: #ffeaae; font-weight: 600; font-size: 0.85rem; }
+        .switch { position: relative; display: inline-block; width: 52px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
             cursor: pointer;
@@ -232,19 +164,9 @@
             transition: 0.2s;
             border-radius: 50%;
         }
-        input:checked + .slider {
-            background-color: #7a6233;
-        }
-        input:checked + .slider:before {
-            transform: translateX(24px);
-            background-color: #fef0b6;
-        }
-
-        .search-btn-wrap {
-            display: flex;
-            justify-content: center;
-            margin: 1.5rem 0 0.5rem;
-        }
+        input:checked + .slider { background-color: #7a6233; }
+        input:checked + .slider:before { transform: translateX(24px); background-color: #fef0b6; }
+        .search-btn-wrap { display: flex; justify-content: center; margin: 1.5rem 0 0.5rem; }
         .search-btn {
             background: #6b5a39;
             border: none;
@@ -258,11 +180,7 @@
             letter-spacing: 1px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
-        .search-btn:hover {
-            background: #8f774b;
-            transform: scale(0.97);
-        }
-
+        .search-btn:hover { background: #8f774b; transform: scale(0.97); }
         .variants-panel {
             margin: 1.2rem 0 1rem;
             background: rgba(38, 34, 22, 0.8);
@@ -281,18 +199,8 @@
             font-weight: bold;
             flex-wrap: wrap;
         }
-        .variants-badge {
-            background: #5b4b2b;
-            border-radius: 30px;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.7rem;
-            color: #ffefbf;
-        }
-        .variant-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.7rem;
-        }
+        .variants-badge { background: #5b4b2b; border-radius: 30px; padding: 0.2rem 0.8rem; font-size: 0.7rem; color: #ffefbf; }
+        .variant-list { display: flex; flex-wrap: wrap; gap: 0.7rem; }
         .variant-chip {
             background: #312b1c;
             border: 1px solid #ad924d;
@@ -304,25 +212,9 @@
             cursor: pointer;
             transition: 0.1s;
         }
-        .variant-chip:hover {
-            background: #7e643a;
-            color: white;
-            transform: translateY(-1px);
-        }
-        .variant-chip.active {
-            background: #c7a252;
-            color: #1f1c0f;
-            border-color: #fbdd8b;
-        }
-
-        .image-showcase {
-            margin: 1rem 0 1rem;
-            background: transparent;
-            border-radius: 15px;
-            padding: 0;
-            text-align: center;
-            border: none;
-        }
+        .variant-chip:hover { background: #7e643a; color: white; transform: translateY(-1px); }
+        .variant-chip.active { background: #c7a252; color: #1f1c0f; border-color: #fbdd8b; }
+        .image-showcase { margin: 1rem 0 1rem; background: transparent; border-radius: 15px; padding: 0; text-align: center; border: none; }
         #cardImage {
             max-width: 100%;
             max-height: 460px;
@@ -342,14 +234,7 @@
             margin-top: 16px;
             backdrop-filter: blur(8px);
         }
-
-        .action-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.2rem;
-            margin: 1.5rem 0 1rem;
-        }
+        .action-bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; margin: 1.5rem 0 1rem; }
         .action-btn {
             background: #2a2a1c;
             border: 1px solid #aa8e4e;
@@ -362,7 +247,6 @@
             transition: 0.1s;
         }
         .action-btn:hover { background: #c9a63b; color: #1e1c0b; border-color: #eecb77; }
-
         .footer-simple {
             margin-top: 2.5rem;
             padding-top: 1rem;
@@ -386,7 +270,6 @@
         }
         .footer-simple a:hover { background: #b48b3f; color: #181d0e; }
         .footer-simple img { width: 18px; height: 18px; filter: invert(0.95); }
-
         .loader {
             display: inline-block;
             width: 24px;
@@ -399,7 +282,6 @@
             margin-right: 8px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-
         @media (max-width: 680px) {
             .app-container { padding: 12px 12px 24px; }
             .input-row { flex-direction: column; gap: 0.9rem; }
@@ -460,7 +342,6 @@
         </div>
     </div>
 
-    <!-- 变体面板 -->
     <div id="variantsContainer" class="variants-panel" style="display: none;">
         <div class="variants-header">
             <span>📜 同名衍生版本</span>
@@ -766,16 +647,16 @@
             return found ? found.label : code;
         }
 
-        // ==================== 智能裁剪核心算法 ====================
-        function isDarkPixel(data, x, y, width, threshold = 15) {
+        // ==================== 裁剪卡图 ====================
+        function isDarkPixel(data, x, y, width, threshold) {
             const idx = (y * width + x) * 4;
             const r = data[idx];
             const g = data[idx + 1];
             const b = data[idx + 2];
-            return r <= threshold && g <= threshold && b <= threshold;
+            return Math.max(r,g,b) <= threshold;
         }
 
-        function buildCropTemplate(imgData, width, height, threshold = 15) {
+        function buildCropTemplate(imgData, width, height, threshold) {
             const visited = new Uint8Array(width * height);
             const queue = [];
             
@@ -871,7 +752,7 @@
             return { top, bottom, left, right, width: right - left + 1, height: bottom - top + 1 };
         }
 
-        // ==================== 统一模板裁剪保存 ====================
+        // ==================== 统一模板 ====================
         async function saveCroppedImage() {
             const src = cardImage.src;
             if (!src || src.includes("data:image/svg+xml") && (src.includes("等待") || src.includes("不存在") || src.includes("不可用"))) {
@@ -885,7 +766,7 @@
             
             saveBtn.disabled = true;
             const originalText = saveBtn.innerText;
-            saveBtn.innerText = "💾 裁剪中...";
+            saveBtn.innerText = "💾 处理中...";
             
             try {
                 const resp = await fetch(src);
@@ -894,33 +775,67 @@
                 const bitmap = await createImageBitmap(blob);
                 const w = bitmap.width, h = bitmap.height;
                 
-                // 获取图片数据用于分析
+                // 获取图片数据
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = w;
                 tempCanvas.height = h;
                 const tempCtx = tempCanvas.getContext('2d');
                 tempCtx.drawImage(bitmap, 0, 0);
                 const imgData = tempCtx.getImageData(0, 0, w, h);
+                const data = imgData.data;
                 
-                // 使用统一模板：如果模板不存在则生成，否则直接复用
+                // 如果统一模板不存在，先构建模板
                 if (!unifiedCropTemplate) {
-                    unifiedCropTemplate = buildCropTemplate(imgData, w, h, 15);
-                    imageStatus.innerHTML = `✂️ 统一裁剪模板已生成 (${unifiedCropTemplate.width}x${unifiedCropTemplate.height})`;
+                    unifiedCropTemplate = buildCropTemplate(imgData, w, h, 50);
+                    imageStatus.innerHTML = `✂️ 统一模板已生成 (有效区域: ${unifiedCropTemplate.width}x${unifiedCropTemplate.height})`;
                 }
                 
-                const { left, top, width: cropW, height: cropH } = unifiedCropTemplate;
+                // BFS标记所有四角相连的暗色像素，将其alpha设为0
+                const visited = new Uint8Array(w * h);
+                const queue = [];
+                const threshold = 50;
                 
-                if (cropW <= 0 || cropH <= 0 || cropW > w || cropH > h) {
-                    throw new Error("裁剪区域无效或超出图片范围");
+                // 四角起始点
+                const corners = [
+                    [0, 0],
+                    [w - 1, 0],
+                    [0, h - 1],
+                    [w - 1, h - 1]
+                ];
+                
+                for (const [cx, cy] of corners) {
+                    const idx = cy * w + cx;
+                    if (!visited[idx] && isDarkPixel(data, cx, cy, w, threshold)) {
+                        visited[idx] = 1;
+                        queue.push([cx, cy]);
+                    }
                 }
                 
-                const resultCanvas = document.createElement('canvas');
-                resultCanvas.width = cropW;
-                resultCanvas.height = cropH;
-                const resultCtx = resultCanvas.getContext('2d');
-                resultCtx.drawImage(bitmap, left, top, cropW, cropH, 0, 0, cropW, cropH);
+                const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+                while (queue.length > 0) {
+                    const [x, y] = queue.shift();
+                    // 将该像素设为透明
+                    const idx = (y * w + x) * 4;
+                    data[idx + 3] = 0; // alpha = 0
+                    
+                    for (const [dx, dy] of dirs) {
+                        const nx = x + dx;
+                        const ny = y + dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                            const nidx = ny * w + nx;
+                            if (!visited[nidx] && isDarkPixel(data, nx, ny, w, threshold)) {
+                                visited[nidx] = 1;
+                                queue.push([nx, ny]);
+                            }
+                        }
+                    }
+                }
                 
-                const pngBlob = await new Promise(r => resultCanvas.toBlob(r, 'image/png'));
+                // 将处理后的图像放回canvas
+                tempCtx.putImageData(imgData, 0, 0);
+                
+                // 导出为PNG（支持透明）
+                const pngBlob = await new Promise(r => tempCanvas.toBlob(r, 'image/png'));
                 const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
                 const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
                 const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
@@ -936,7 +851,8 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                imageStatus.innerHTML = `📦 保存成功: ${fileName} (${cropW}x${cropH}) [统一模板]`;
+                const transparentCount = queue.length;
+                imageStatus.innerHTML = `📦 保存成功: ${fileName} (透明边缘 ${transparentCount} 像素)`;
             } catch(e) {
                 imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
                 console.error(e);
@@ -978,7 +894,6 @@
         copyUrlBtn.onclick = (e) => { e.preventDefault(); copyHighUrl(); };
         cardNameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(false, null); });
         variantToggle.addEventListener('change', () => { if(currentBaseClean) performSearch(false, null); else if(cardNameInput.value.trim()) performSearch(false, null); });
-        
         langSelect.addEventListener('change', () => { 
             if(currentBaseClean) performSearch(true, activeVariantKey);
             else if(cardNameInput.value.trim()) performSearch(false, null);
@@ -987,10 +902,7 @@
             if(currentBaseClean) performSearch(true, activeVariantKey);
             else if(cardNameInput.value.trim()) performSearch(false, null);
         });
-        
-        // 加载新卡片时不清除统一模板（所有卡共用同一个模板）
-        // 不需要重写 loadCardVariant
-        
+
         setTimeout(() => { if(cardNameInput.value.trim() === "STALINGRAD") performSearch(false, null); }, 120);
     })();
 </script>
