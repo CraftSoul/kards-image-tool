@@ -1136,7 +1136,6 @@
             <div class="filter-panel">
                 <div class="row-filters">
                     <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本"></div>
-                    <div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"><option value="all">全部扩展</option></select></div>
                     <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option><option value="veteran">老兵</option></select></div>
                 </div>
 
@@ -1379,7 +1378,7 @@
         return `${card.titleZh || ''} ${card.text_zh || ''} ${attrsTrans}`.toLowerCase();
     }
 
-    // 获取卡牌的有效扩展包（用于筛选）
+    // 获取卡牌的有效扩展包
     function getEffectiveSet(card, visited) {
         visited = visited || new Set();
         if (visited.has(card.cardId)) return card.setName;
@@ -1499,14 +1498,6 @@
 
     // ==================== 初始化筛选器 ====================
     function initStaticFilters() {
-        // 扩展包下拉
-        const sets = [...new Set(allCards.map(c=>c.setName))];
-        const setSelect = document.getElementById('setSelect');
-        if (setSelect) {
-            setSelect.innerHTML = '<option value="all">全部扩展</option>'+sets.map(s=>`<option value="${s}">${setTranslation[s] || s}</option>`).join('');
-            setSelect.addEventListener('change', applyFilters);
-        }
-        
         ['statusSelect','searchInput'].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.addEventListener('change', applyFilters); el.addEventListener('input', applyFilters); }
@@ -1733,17 +1724,13 @@
         }
         if (selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
 
-        // 多选扩展包
+        // 扩展包
         if (selectedFilters.sets.size) {
             res = res.filter(c => {
                 const effSet = getEffectiveSet(c);
                 return selectedFilters.sets.has(effSet);
             });
         }
-
-        // 扩展包下拉（单选）
-        const setVal = document.getElementById('setSelect').value;
-        if (setVal && setVal !== 'all') res = res.filter(c => c.setName === setVal);
 
         // 卡池
         const status = document.getElementById('statusSelect').value;
