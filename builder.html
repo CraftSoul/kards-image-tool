@@ -1246,6 +1246,7 @@
             <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label></div>
             <div class="switch-item"><span>🎨 背景色</span><select id="bgColorSelect"><option value="white">白色</option><option value="black">黑色</option><option value="transparent">透明</option><option value="custom">自定义</option></select></div>
             <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
+            <div class="switch-item"><span>✂️ 裁剪边缘</span><label class="switch"><input type="checkbox" id="cropToggle" checked><span class="slider"></span></label></div>
         </div>
         <div class="img-gen-preview" id="imgGenPreview"></div>
         <div class="img-gen-actions"><button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button><button id="downloadImgBtn" class="export-btn">💾 下载图片</button><button id="closeImgModal" class="import-btn">关闭</button></div>
@@ -1254,6 +1255,7 @@
 
 <script>
     // ==================== 常量与翻译 ====================
+    // 词条翻译（修正重甲大小写）
     const attrTranslation = {
         "blitz": "闪击",
         "fury": "奋战",
@@ -1314,6 +1316,7 @@
     const factionNames = { "soviet":"苏联","usa":"美国","poland":"波兰","neutral":"中立","japan":"日本","italy":"意大利","france":"法国","britain":"英国","finland":"芬兰","germany":"德国","anzac":"澳新军团" };
     const factionColor = { "germany":"#5A5F55","britain":"#857A60","soviet":"#4F3826","usa":"#434B32","japan":"#90723C","france":"#283454","italy":"#555248","poland":"#645633","finland":"#C9C8BC","anzac":"#9E6F34","neutral":"#6b6e5c" };
     const allNationOptions = ["germany","britain","japan","soviet","usa","france","italy","poland","finland","anzac"];
+    const mainNationOptions = ["germany","britain","japan","soviet","usa"];
     const STATIC_COSTS = ["0","1","2","3","4","5","6","7+"];
     const STATIC_RARITIES = ["Standard","Limited","Special","Elite"];
 
@@ -1322,6 +1325,7 @@
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
 
+    // 选中的筛选器
     let selectedFilters = {
         factions: new Set(),
         types: new Set(),
@@ -1330,11 +1334,15 @@
         attributes: new Set(),
         sets: new Set()
     };
+    
+    // 白板
+    let whiteboardMode = false;
 
+    // 关联关系
     let cardIndex = {};
     let parentOfMap = {};
-    let veteranMap = {};
-    let becomesVeteranMap = {};
+    let veteranMap = {};       // 原版 -> 老兵版
+    let becomesVeteranMap = {}; // 老兵版 -> 原版
 
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -1354,6 +1362,7 @@
         return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase();
     }
 
+    // 获取卡牌的有效扩展包（用于筛选）
     function getEffectiveSet(card, visited) {
         visited = visited || new Set();
         if (visited.has(card.cardId)) return card.setName;
@@ -1422,6 +1431,7 @@
                 };
             });
 
+            // 建立索引和关系
             cardIndex = {};
             for (let c of allCards) if (c.cardId) cardIndex[c.cardId] = c;
 
@@ -1429,6 +1439,7 @@
             veteranMap = {};
             becomesVeteranMap = {};
 
+            // can_create 关系
             for (let c of allCards) {
                 if (c.canCreate && c.canCreate.length) {
                     for (let childId of c.canCreate) {
@@ -1438,6 +1449,7 @@
                 }
             }
 
+            // 老兵关系
             for (let c of allCards) {
                 const attrs = c.attributes || [];
                 for (let a of attrs) {
@@ -1454,6 +1466,7 @@
                 }
             }
 
+            // 初始化筛选器
             initStaticFilters();
             initMultiFilters();
             initAttrFilter();
@@ -1468,6 +1481,14 @@
 
     // ==================== 初始化筛选器 ====================
     function initStaticFilters() {
+        // 扩展包下拉（保留原有单选）
+        const sets = [...new Set(allCards.map(c=>c.setName))];
+        const setSelect = document.getElementById('setSelect');
+        if (setSelect) {
+            setSelect.innerHTML = '<option value="all">全部扩展</option>'+sets.map(s=>`<option value="${s}">${setTranslation[s] || s}</option>`).join('');
+            setSelect.addEventListener('change', applyFilters);
+        }
+        
         ['statusSelect','searchInput'].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.addEventListener('change', applyFilters); el.addEventListener('input', applyFilters); }
@@ -1477,7 +1498,7 @@
             if (el) el.addEventListener('input', applyFilters);
         });
 
-        const mainNationOptions = ["germany", "britain", "japan", "soviet", "usa"];
+        // 国家选择
         const mainOptionsHtml = mainNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         const allyOptionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         ['mainNationSelect', 'mobileMainNation'].forEach(id => {
@@ -1493,12 +1514,14 @@
         document.getElementById('mobileMainNation').value = mainNation;
         document.getElementById('mobileAllyNation').value = allyNation;
 
+        // 语言选择
         const langSelect = document.getElementById('imgLang');
         if (langSelect) {
             langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
             langSelect.value = 'zh-Hans';
         }
 
+        // 背景色切换
         const bgSelect = document.getElementById('bgColorSelect');
         const customDiv = document.getElementById('customColorDiv');
         if (bgSelect) {
@@ -1507,6 +1530,7 @@
             });
         }
 
+        // 国家变更事件
         const updateNation = () => {
             mainNation = document.getElementById('mainNationSelect').value;
             allyNation = document.getElementById('allyNationSelect').value;
@@ -1528,6 +1552,7 @@
         document.getElementById('mobileMainNation').addEventListener('change', updateMobile);
         document.getElementById('mobileAllyNation').addEventListener('change', updateMobile);
 
+        // 折叠切换
         document.querySelectorAll('.collapse-toggle').forEach(toggle => {
             toggle.addEventListener('click', function(e) {
                 if (e.target.classList.contains('reset-chip')) return;
@@ -1541,6 +1566,7 @@
             });
         });
 
+        // 重置按钮
         document.querySelector('.filter-panel').addEventListener('click', function(e) {
             const reset = e.target.closest('.reset-chip');
             if (!reset) return;
@@ -1557,16 +1583,39 @@
             if (set) {
                 set.clear();
                 document.querySelectorAll(`.filter-chip[data-filter="${filterType}"]`).forEach(ch => ch.classList.remove('active'));
+                if (filterType === 'attribute') {
+                    whiteboardMode = false;
+                    document.querySelector('.filter-chip[data-filter="whiteboard"]')?.classList.remove('active');
+                }
                 applyFilters();
             }
         });
 
+        // 事件委托：所有 filter-chip 点击
         document.querySelector('.filter-panel').addEventListener('click', function(e) {
             const chip = e.target.closest('.filter-chip');
             if (!chip) return;
             const type = chip.dataset.filter;
             const val = chip.dataset.val;
             if (!type || !val) return;
+            
+            // 白板
+            if (type === 'whiteboard') {
+                whiteboardMode = !whiteboardMode;
+                chip.classList.toggle('active');
+                if (whiteboardMode) {
+                    selectedFilters.attributes.clear();
+                    document.querySelectorAll('.filter-chip[data-filter="attribute"]').forEach(ch => ch.classList.remove('active'));
+                }
+                applyFilters();
+                return;
+            }
+            
+            if (type === 'attribute' && whiteboardMode) {
+                whiteboardMode = false;
+                document.querySelector('.filter-chip[data-filter="whiteboard"]')?.classList.remove('active');
+            }
+            
             const setMap = {
                 'faction': selectedFilters.factions,
                 'type': selectedFilters.types,
@@ -1585,22 +1634,26 @@
     }
 
     function initMultiFilters() {
+        // 阵营（使用 allNationOptions）
         const fc = document.getElementById('factionMultiContainer');
         fc.innerHTML = allNationOptions.map(f =>
             `<div class="filter-chip" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</div>`
         ).join('');
 
+        // 类型（使用 typeNameMap 的键）
         const typeKeys = Object.keys(typeNameMap);
         const tc = document.getElementById('typeMultiContainer');
         tc.innerHTML = typeKeys.map(t =>
             `<div class="filter-chip" data-filter="type" data-val="${t}">${typeNameMap[t]}</div>`
         ).join('');
 
+        // 花费
         const cc = document.getElementById('costMultiContainer');
         cc.innerHTML = STATIC_COSTS.map(c =>
             `<div class="filter-chip" data-filter="cost" data-val="${c}">${c==='7+'?'7K+':c+'K'}</div>`
         ).join('');
 
+        // 稀有度
         const rc = document.getElementById('rarityMultiContainer');
         rc.innerHTML = STATIC_RARITIES.map(r =>
             `<div class="filter-chip" data-filter="rarity" data-val="${r}">${rarityDisplayMap[r]}</div>`
@@ -1610,9 +1663,11 @@
     function initAttrFilter() {
         const container = document.getElementById('attrMultiContainer');
         const attrKeys = Object.keys(attrTranslation);
-        container.innerHTML = attrKeys.map(a =>
+        let html = `<div class="filter-chip" data-filter="whiteboard" data-val="whiteboard">白板</div>`;
+        html += attrKeys.map(a =>
             `<div class="filter-chip" data-filter="attribute" data-val="${a}">${attrTranslation[a]}</div>`
         ).join('');
+        container.innerHTML = html;
     }
 
     function initSetFilter() {
@@ -1630,7 +1685,14 @@
         const search = document.getElementById('searchInput').value.trim().toLowerCase();
         if (search) res = res.filter(c => getSearchableText(c).includes(search));
 
-        if (selectedFilters.attributes.size) {
+        // 词条
+        if (whiteboardMode) {
+            res = res.filter(c => {
+                const attrs = c.attributes || [];
+                const filtered = attrs.filter(a => a !== "OnlySpawnable" && !a.startsWith("BecomesVeteran:") && !a.startsWith("VeteranOf:"));
+                return filtered.length === 0;
+            });
+        } else if (selectedFilters.attributes.size) {
             res = res.filter(c => {
                 const attrs = c.attributes || [];
                 for (let attr of selectedFilters.attributes) {
@@ -1653,6 +1715,7 @@
         }
         if (selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
 
+        // 扩展包
         if (selectedFilters.sets.size) {
             res = res.filter(c => {
                 const effSet = getEffectiveSet(c);
@@ -1660,12 +1723,17 @@
             });
         }
 
+        const setVal = document.getElementById('setSelect').value;
+        if (setVal && setVal !== 'all') res = res.filter(c => c.setName === setVal);
+
+        // 卡池
         const status = document.getElementById('statusSelect').value;
         if (status === 'active') res = res.filter(c => !c.reserved && !c.isSpawn && !c.isVeteranSet);
         else if (status === 'reserve') res = res.filter(c => c.reserved);
         else if (status === 'spawn') res = res.filter(c => c.isSpawn);
         else if (status === 'veteran') res = res.filter(c => c.isVeteranSet);
 
+        // 数值
         const activeTypesSet = selectedFilters.types;
         const onlyUnits = activeTypesSet.size > 0 && [...activeTypesSet].every(t => unitTypes.includes(t));
         const statsArea = document.getElementById('statsArea');
@@ -1702,7 +1770,7 @@
         const pageCards = filteredCards.slice(start, start+PAGE_SIZE);
         const container = document.getElementById('cardContainer');
         if (!pageCards.length) {
-            container.innerHTML = '<div style="color:#e9dbbd;padding:2rem 0;text-align:center;">未找到</div>';
+            container.innerHTML = '<div style="color:#e9dbbd;padding:2rem 0;text-align:center;">未找到卡牌</div>';
             return;
         }
         container.innerHTML = pageCards.map(card => {
@@ -1979,7 +2047,7 @@
         }
     }
 
-    // ==================== 统计 ====================
+    // ==================== 统计模态框 ====================
     function showStatsModal() {
         const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
@@ -1992,7 +2060,6 @@
             else { costMap[cat].counter += count; counterTotal += count; }
             if (rarityCounts.hasOwnProperty(card.rarity)) rarityCounts[card.rarity] += count;
         }
-        // 找出所有cost中的最大值用于归一化
         let maxTotal = 1;
         for (let i = 0; i <= 7; i++) {
             const total = costMap[i].unit + costMap[i].order + costMap[i].counter;
@@ -2013,15 +2080,11 @@
                         </div>`;
             }
             
-            // 归一化高度
             const ratio = total / maxTotal;
             const totalH = Math.max(4, ratio * 124);
-            
-            // 各段高度按比例分配
             const unitRatio = unit / total;
             const orderRatio = order / total;
             const counterRatio = counter / total;
-            
             const unitH = unitRatio * totalH;
             const orderH = orderRatio * totalH;
             const counterH = counterRatio * totalH;
@@ -2058,6 +2121,82 @@
         return result;
     }
 
+    // ===== 智能裁剪：检测暗色像素 =====
+    function isDarkPixelForCanvas(ctx, x, y, threshold = 50) {
+        try {
+            const pixel = ctx.getImageData(x, y, 1, 1);
+            const data = pixel.data;
+            const r = data[0], g = data[1], b = data[2];
+            return Math.max(r, g, b) <= threshold;
+        } catch(e) { return false; }
+    }
+
+    function getCanvasCropRegion(ctx, width, height, threshold = 50) {
+        const visited = new Uint8Array(width * height);
+        const queue = [];
+        const corners = [
+            [0, 0],
+            [width - 1, 0],
+            [0, height - 1],
+            [width - 1, height - 1]
+        ];
+        
+        for (const [cx, cy] of corners) {
+            const idx = cy * width + cx;
+            if (!visited[idx] && isDarkPixelForCanvas(ctx, cx, cy, threshold)) {
+                visited[idx] = 1;
+                queue.push([cx, cy]);
+            }
+        }
+        
+        const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        while (queue.length > 0) {
+            const [x, y] = queue.shift();
+            for (const [dx, dy] of dirs) {
+                const nx = x + dx, ny = y + dy;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    const nidx = ny * width + nx;
+                    if (!visited[nidx] && isDarkPixelForCanvas(ctx, nx, ny, threshold)) {
+                        visited[nidx] = 1;
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+        }
+        
+        let top = 0, bottom = height - 1, left = 0, right = width - 1;
+        for (let y = 0; y < height; y++) {
+            let hasLight = false;
+            for (let x = 0; x < width; x++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { top = y; break; }
+        }
+        for (let y = height - 1; y >= 0; y--) {
+            let hasLight = false;
+            for (let x = 0; x < width; x++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { bottom = y; break; }
+        }
+        for (let x = 0; x < width; x++) {
+            let hasLight = false;
+            for (let y = 0; y < height; y++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { left = x; break; }
+        }
+        for (let x = width - 1; x >= 0; x--) {
+            let hasLight = false;
+            for (let y = 0; y < height; y++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { right = x; break; }
+        }
+        return { left, top, width: right - left + 1, height: bottom - top + 1 };
+    }
+
+    // ===== 绘制统计卡 =====
     async function drawStatsCard(ctx, x, y, w, h, radius) {
         ctx.save();
         ctx.beginPath();
@@ -2157,7 +2296,6 @@
         const barMaxHeight = barAreaH * 0.75;
         const barGap = 2;
 
-        // 找出所有cost中的最大值用于归一化
         let maxCount = 1;
         for (let i = 0; i <= 7; i++) {
             const total = costMap[i].unit + costMap[i].order + costMap[i].counter;
@@ -2186,24 +2324,19 @@
             const orderH = maxCount > 0 ? (order / maxCount) * barMaxHeight : 0;
             const counterH = maxCount > 0 ? (counter / maxCount) * barMaxHeight : 0;
             
-            // 自下至上：单位（底部）→ 指令（中部）→ 反制（顶部）
-            // 底部：单位（浅色）
             if (unit > 0) {
                 ctx.fillStyle = "#e8e4d0";
                 ctx.fillRect(bx, barAreaY + barMaxHeight - unitH, barWidth - barGap, unitH);
             }
-            // 中部：指令（金色）
             if (order > 0) {
                 ctx.fillStyle = "#f5c542";
                 ctx.fillRect(bx, barAreaY + barMaxHeight - unitH - orderH, barWidth - barGap, orderH);
             }
-            // 顶部：反制（灰色）
             if (counter > 0) {
                 ctx.fillStyle = "#5a5a5a";
                 ctx.fillRect(bx, barAreaY + barMaxHeight - unitH - orderH - counterH, barWidth - barGap, counterH);
             }
             
-            // 标签
             ctx.fillStyle = "#f5eaca";
             ctx.font = `${Math.floor(h * 0.035)}px "Segoe UI"`;
             ctx.textAlign = "center";
@@ -2216,7 +2349,8 @@
         ctx.restore();
     }
 
-    async function generateDeckImage(cols, quality, lang, addStatsCard, bgColor) {
+    // ===== 生成卡组图片 =====
+    async function generateDeckImage(cols, quality, lang, addStatsCard, bgColor, cropEnabled) {
         const cards = getExpandedCardList();
         if (cards.length === 0) throw new Error("卡组为空");
         const cardW = 500, cardH = 702, radius = 15;
@@ -2276,6 +2410,24 @@
                 }
             }
         }
+
+        // ===== 智能裁剪 =====
+        if (cropEnabled !== false) {
+            try {
+                const region = getCanvasCropRegion(ctx, canvas.width, canvas.height, 50);
+                if (region.width > 0 && region.height > 0 && 
+                    (region.left > 0 || region.top > 0 || region.width < canvas.width || region.height < canvas.height)) {
+                    const croppedCanvas = document.createElement('canvas');
+                    croppedCanvas.width = region.width;
+                    croppedCanvas.height = region.height;
+                    const croppedCtx = croppedCanvas.getContext('2d');
+                    croppedCtx.drawImage(canvas, region.left, region.top, region.width, region.height, 0, 0, region.width, region.height);
+                    return croppedCanvas;
+                }
+            } catch(e) {
+                console.warn('裁剪失败，使用原图:', e);
+            }
+        }
         return canvas;
     }
 
@@ -2285,12 +2437,13 @@
         const quality = parseInt(document.getElementById('imgQuality').value);
         const lang = document.getElementById('imgLang').value;
         const addStatsCard = document.getElementById('statsCardToggle').checked;
+        const cropEnabled = document.getElementById('cropToggle').checked;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            currentPreviewCanvas = await generateDeckImage(cols, quality, lang, addStatsCard, bgColor);
+            currentPreviewCanvas = await generateDeckImage(cols, quality, lang, addStatsCard, bgColor, cropEnabled);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
         } catch(e) {
@@ -2315,9 +2468,11 @@
         const qualitySlider = document.getElementById('imgQuality');
         const qualityVal = document.getElementById('qualityVal');
         qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
+        // 自动生成预览
+        setTimeout(updateImgPreview, 300);
     }
 
-    // ==================== 原神启动 ====================
+    // ==================== 启动 ====================
     function initSidebars() {
         const toggle = document.getElementById('mobileDeckToggle');
         const panel = document.getElementById('mobileDeckPanel');
