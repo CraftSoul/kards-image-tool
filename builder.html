@@ -1136,6 +1136,7 @@
             <div class="filter-panel">
                 <div class="row-filters">
                     <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本"></div>
+                    <div class="filter-item"><div class="filter-label">📦 扩展包</div><select id="setSelect"><option value="all">全部扩展</option></select></div>
                     <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option><option value="veteran">老兵</option></select></div>
                 </div>
 
@@ -1222,7 +1223,7 @@
             <div class="deck-list" id="deckListContainer"></div>
         </div>
     </div>
-    <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a><a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a></div>
+    <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a><a href="https://space.bilibili.com/3546776475505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a></div>
 </div>
 
 <div id="statsModal" class="modal-stats">
@@ -1254,8 +1255,20 @@
 </div>
 
 <script>
+    // ==================== 版本定义 ====================
+    const VERSION = 52;
+
+    function generateVersionList() {
+        let versions = [];
+        for (let i = 0; i <= 9 + VERSION % 10; i++) {
+            versions.push(`v${VERSION - i}`);
+        }
+        return versions;
+    }
+    const AVAILABLE_VERSIONS = generateVersionList();
+    const DEFAULT_VERSION = `v${VERSION}`;
+
     // ==================== 常量与翻译 ====================
-    // 词条翻译（修正重甲大小写）
     const attrTranslation = {
         "blitz": "闪击",
         "fury": "奋战",
@@ -1353,13 +1366,17 @@
         { code: 'ko-KR', label: '한국어', flag: '🇰🇷' }, { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
     ];
 
-    function getCardImageUrl(imgName, lang, quality=20) {
-        return imgName ? `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/${lang}/${imgName}&q=${quality}` : "";
+    // ==================== 工具函数 ====================
+    function getCardImageUrl(imgName, lang, quality) {
+        if (!imgName) return "";
+        const ver = DEFAULT_VERSION;
+        const q = quality || 20;
+        return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${imgName}&q=${q}`;
     }
 
     function getSearchableText(card) {
         const attrsTrans = (card.attributes || []).map(a => attrTranslation[a] || a).join(" ");
-        return `${card.titleZh} ${card.text_zh} ${attrsTrans}`.toLowerCase();
+        return `${card.titleZh || ''} ${card.text_zh || ''} ${attrsTrans}`.toLowerCase();
     }
 
     // 获取卡牌的有效扩展包（用于筛选）
@@ -1398,6 +1415,7 @@
     async function loadData() {
         try {
             const res = await fetch('data.json');
+            if (!res.ok) throw new Error("data.json failed");
             const data = await res.json();
             const rawCards = data.cards || [];
 
@@ -1475,13 +1493,13 @@
             updateFactionStats();
         } catch(e) {
             console.error(e);
-            document.getElementById('cardContainer').innerHTML = '<div>数据加载失败</div>';
+            document.getElementById('cardContainer').innerHTML = '<div>❌ 数据加载失败</div>';
         }
     }
 
     // ==================== 初始化筛选器 ====================
     function initStaticFilters() {
-        // 扩展包下拉（保留原有单选）
+        // 扩展包下拉
         const sets = [...new Set(allCards.map(c=>c.setName))];
         const setSelect = document.getElementById('setSelect');
         if (setSelect) {
@@ -1566,7 +1584,7 @@
             });
         });
 
-        // 重置按钮
+        // 重置按钮（使用事件委托）
         document.querySelector('.filter-panel').addEventListener('click', function(e) {
             const reset = e.target.closest('.reset-chip');
             if (!reset) return;
@@ -1591,7 +1609,7 @@
             }
         });
 
-        // 事件委托：所有 filter-chip 点击
+        // 事件委托
         document.querySelector('.filter-panel').addEventListener('click', function(e) {
             const chip = e.target.closest('.filter-chip');
             if (!chip) return;
@@ -1599,7 +1617,7 @@
             const val = chip.dataset.val;
             if (!type || !val) return;
             
-            // 白板
+            // 处理白板特殊逻辑
             if (type === 'whiteboard') {
                 whiteboardMode = !whiteboardMode;
                 chip.classList.toggle('active');
@@ -1634,13 +1652,13 @@
     }
 
     function initMultiFilters() {
-        // 阵营（使用 allNationOptions）
+        // 阵营
         const fc = document.getElementById('factionMultiContainer');
         fc.innerHTML = allNationOptions.map(f =>
             `<div class="filter-chip" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</div>`
         ).join('');
 
-        // 类型（使用 typeNameMap 的键）
+        // 类型
         const typeKeys = Object.keys(typeNameMap);
         const tc = document.getElementById('typeMultiContainer');
         tc.innerHTML = typeKeys.map(t =>
@@ -1715,7 +1733,7 @@
         }
         if (selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
 
-        // 扩展包
+        // 多选扩展包
         if (selectedFilters.sets.size) {
             res = res.filter(c => {
                 const effSet = getEffectiveSet(c);
@@ -1723,6 +1741,7 @@
             });
         }
 
+        // 扩展包下拉（单选）
         const setVal = document.getElementById('setSelect').value;
         if (setVal && setVal !== 'all') res = res.filter(c => c.setName === setVal);
 
@@ -2121,7 +2140,6 @@
         return result;
     }
 
-    // ===== 智能裁剪：检测暗色像素 =====
     function isDarkPixelForCanvas(ctx, x, y, threshold = 50) {
         try {
             const pixel = ctx.getImageData(x, y, 1, 1);
@@ -2196,7 +2214,6 @@
         return { left, top, width: right - left + 1, height: bottom - top + 1 };
     }
 
-    // ===== 绘制统计卡 =====
     async function drawStatsCard(ctx, x, y, w, h, radius) {
         ctx.save();
         ctx.beginPath();
@@ -2216,7 +2233,6 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // 计算统计数据
         let mainCount = 0, allyCount = 0, otherCount = 0;
         let rarityCounts = { Standard: 0, Limited: 0, Special: 0, Elite: 0 };
         let costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
@@ -2235,20 +2251,17 @@
         }
         const totalCards = Array.from(deckMap.values()).reduce((s, e) => s + e.count, 0);
 
-        // 标题
         ctx.fillStyle = "#ffefbf";
         ctx.font = `bold ${Math.floor(h * 0.08)}px "Segoe UI"`;
         ctx.textAlign = "center";
         ctx.fillText("卡组统计", x + w/2, y + h * 0.10);
 
-        // 统计信息 - 左列
         ctx.font = `${Math.floor(h * 0.05)}px "Segoe UI"`;
         ctx.textAlign = "left";
         const startY = y + h * 0.22;
         const lineH = h * 0.075;
         const iconSize = Math.floor(h * 0.06);
 
-        // 主国
         const mainIcon = new Image();
         mainIcon.crossOrigin = "Anonymous";
         mainIcon.src = `${mainNation}.svg`;
@@ -2257,7 +2270,6 @@
         ctx.fillStyle = factionColor[mainNation] || "#c9aa5b";
         ctx.fillText(`${factionNames[mainNation]}: ${mainCount}`, x + w * 0.05 + iconSize + 5, startY + 2);
 
-        // 盟国
         const allyIcon = new Image();
         allyIcon.crossOrigin = "Anonymous";
         allyIcon.src = `${allyNation}.svg`;
@@ -2275,7 +2287,6 @@
         ctx.fillStyle = "#e9dbbd";
         ctx.fillText(`总计: ${totalCards}`, x + w * 0.05 + iconSize + 5, startY + lineH * lineOffset + 2);
 
-        // 稀有度 - 右列
         const rarityY = startY;
         const col2X = x + w * 0.52;
         ctx.textAlign = "left";
@@ -2288,7 +2299,6 @@
         ctx.fillStyle = "#ffd700";
         ctx.fillText(`精英: ${rarityCounts.Elite}`, col2X, rarityY + lineH * 3 + 2);
 
-        // 条形图区域
         const barAreaY = y + h * 0.68;
         const barAreaH = h * 0.28;
         const barStartX = x + w * 0.06;
@@ -2349,7 +2359,6 @@
         ctx.restore();
     }
 
-    // ===== 生成卡组图片 =====
     async function generateDeckImage(cols, quality, lang, addStatsCard, bgColor, cropEnabled) {
         const cards = getExpandedCardList();
         if (cards.length === 0) throw new Error("卡组为空");
@@ -2411,7 +2420,6 @@
             }
         }
 
-        // ===== 智能裁剪 =====
         if (cropEnabled !== false) {
             try {
                 const region = getCanvasCropRegion(ctx, canvas.width, canvas.height, 50);
@@ -2468,7 +2476,6 @@
         const qualitySlider = document.getElementById('imgQuality');
         const qualityVal = document.getElementById('qualityVal');
         qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
-        // 自动生成预览
         setTimeout(updateImgPreview, 300);
     }
 
