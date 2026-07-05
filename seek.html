@@ -499,7 +499,6 @@
         const AVAILABLE_VERSIONS = generateVersionList();
         const DEFAULT_VERSION = `v${LATEST_VERSION_NUM}`;
 
-        // 语言列表
         const languages = [
             { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' },
             { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -515,7 +514,6 @@
             { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
         ];
 
-        // DOM 元素
         const langSelect = document.getElementById('langSelect');
         const versionSelect = document.getElementById('versionSelect');
         const cardNameInput = document.getElementById('cardNameInput');
@@ -529,7 +527,9 @@
         const variantCountBadge = document.getElementById('variantCountBadge');
         const variantToggle = document.getElementById('variantToggle');
 
-        // 填充语言下拉
+        // ==================== 统一裁剪模板（所有卡共用） ====================
+        let unifiedCropTemplate = null;
+
         languages.forEach(lang => {
             const option = document.createElement('option');
             option.value = lang.code;
@@ -538,7 +538,6 @@
         });
         langSelect.value = 'zh-Hans';
 
-        // 填充版本下拉
         AVAILABLE_VERSIONS.forEach(ver => {
             const option = document.createElement('option');
             option.value = ver;
@@ -569,7 +568,7 @@
         let currentBaseClean = '';
         let currentRawCardName = '';
         let currentLang = 'zh-Hans';
-        let currentVersion = DEFAULT_VERSION;      // 当前检索使用的版本
+        let currentVersion = DEFAULT_VERSION;
         let currentHighResUrl = '';
         let isDiscovering = false;
 
@@ -767,7 +766,113 @@
             return found ? found.label : code;
         }
 
-        async function saveRoundedImage() {
+        // ==================== 智能裁剪核心算法 ====================
+        function isDarkPixel(data, x, y, width, threshold = 15) {
+            const idx = (y * width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            return r <= threshold && g <= threshold && b <= threshold;
+        }
+
+        function buildCropTemplate(imgData, width, height, threshold = 15) {
+            const visited = new Uint8Array(width * height);
+            const queue = [];
+            
+            const corners = [
+                [0, 0],
+                [width - 1, 0],
+                [0, height - 1],
+                [width - 1, height - 1]
+            ];
+            
+            for (const [cx, cy] of corners) {
+                const idx = cy * width + cx;
+                if (!visited[idx] && isDarkPixel(imgData.data, cx, cy, width, threshold)) {
+                    visited[idx] = 1;
+                    queue.push([cx, cy]);
+                }
+            }
+            
+            const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            while (queue.length > 0) {
+                const [x, y] = queue.shift();
+                for (const [dx, dy] of dirs) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                        const nidx = ny * width + nx;
+                        if (!visited[nidx] && isDarkPixel(imgData.data, nx, ny, width, threshold)) {
+                            visited[nidx] = 1;
+                            queue.push([nx, ny]);
+                        }
+                    }
+                }
+            }
+            
+            let top = 0, bottom = height - 1, left = 0, right = width - 1;
+            
+            for (let y = 0; y < height; y++) {
+                let hasLight = false;
+                for (let x = 0; x < width; x++) {
+                    if (!visited[y * width + x]) {
+                        hasLight = true;
+                        break;
+                    }
+                }
+                if (hasLight) {
+                    top = y;
+                    break;
+                }
+            }
+            
+            for (let y = height - 1; y >= 0; y--) {
+                let hasLight = false;
+                for (let x = 0; x < width; x++) {
+                    if (!visited[y * width + x]) {
+                        hasLight = true;
+                        break;
+                    }
+                }
+                if (hasLight) {
+                    bottom = y;
+                    break;
+                }
+            }
+            
+            for (let x = 0; x < width; x++) {
+                let hasLight = false;
+                for (let y = 0; y < height; y++) {
+                    if (!visited[y * width + x]) {
+                        hasLight = true;
+                        break;
+                    }
+                }
+                if (hasLight) {
+                    left = x;
+                    break;
+                }
+            }
+            
+            for (let x = width - 1; x >= 0; x--) {
+                let hasLight = false;
+                for (let y = 0; y < height; y++) {
+                    if (!visited[y * width + x]) {
+                        hasLight = true;
+                        break;
+                    }
+                }
+                if (hasLight) {
+                    right = x;
+                    break;
+                }
+            }
+            
+            return { top, bottom, left, right, width: right - left + 1, height: bottom - top + 1 };
+        }
+
+        // ==================== 统一模板裁剪保存 ====================
+        async function saveCroppedImage() {
             const src = cardImage.src;
             if (!src || src.includes("data:image/svg+xml") && (src.includes("等待") || src.includes("不存在") || src.includes("不可用"))) {
                 imageStatus.innerHTML = "⚠️ 无有效卡图";
@@ -777,41 +882,51 @@
                 imageStatus.innerHTML = "⏳ 图片未完全加载，稍后重试";
                 return;
             }
+            
             saveBtn.disabled = true;
             const originalText = saveBtn.innerText;
-            saveBtn.innerText = "💾 生成中...";
+            saveBtn.innerText = "💾 裁剪中...";
+            
             try {
                 const resp = await fetch(src);
                 if (!resp.ok) throw new Error("fetch failed");
                 const blob = await resp.blob();
                 const bitmap = await createImageBitmap(blob);
                 const w = bitmap.width, h = bitmap.height;
-                const canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.save();
-                const radius = 15;
-                ctx.beginPath();
-                ctx.moveTo(radius, 0);
-                ctx.lineTo(w - radius, 0);
-                ctx.quadraticCurveTo(w, 0, w, radius);
-                ctx.lineTo(w, h - radius);
-                ctx.quadraticCurveTo(w, h, w - radius, h);
-                ctx.lineTo(radius, h);
-                ctx.quadraticCurveTo(0, h, 0, h - radius);
-                ctx.lineTo(0, radius);
-                ctx.quadraticCurveTo(0, 0, radius, 0);
-                ctx.closePath();
-                ctx.clip();
-                ctx.drawImage(bitmap, 0, 0);
-                ctx.restore();
-                const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                
+                // 获取图片数据用于分析
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = w;
+                tempCanvas.height = h;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(bitmap, 0, 0);
+                const imgData = tempCtx.getImageData(0, 0, w, h);
+                
+                // 使用统一模板：如果模板不存在则生成，否则直接复用
+                if (!unifiedCropTemplate) {
+                    unifiedCropTemplate = buildCropTemplate(imgData, w, h, 15);
+                    imageStatus.innerHTML = `✂️ 统一裁剪模板已生成 (${unifiedCropTemplate.width}x${unifiedCropTemplate.height})`;
+                }
+                
+                const { left, top, width: cropW, height: cropH } = unifiedCropTemplate;
+                
+                if (cropW <= 0 || cropH <= 0 || cropW > w || cropH > h) {
+                    throw new Error("裁剪区域无效或超出图片范围");
+                }
+                
+                const resultCanvas = document.createElement('canvas');
+                resultCanvas.width = cropW;
+                resultCanvas.height = cropH;
+                const resultCtx = resultCanvas.getContext('2d');
+                resultCtx.drawImage(bitmap, left, top, cropW, cropH, 0, 0, cropW, cropH);
+                
+                const pngBlob = await new Promise(r => resultCanvas.toBlob(r, 'image/png'));
                 const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
                 const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
                 const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
                 const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
                 const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
+                
                 const url = URL.createObjectURL(pngBlob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -820,9 +935,11 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                imageStatus.innerHTML = `📦 保存成功: ${fileName}`;
+                
+                imageStatus.innerHTML = `📦 保存成功: ${fileName} (${cropW}x${cropH}) [统一模板]`;
             } catch(e) {
-                imageStatus.innerHTML = `保存失败: ${e.message}`;
+                imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
+                console.error(e);
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerText = originalText;
@@ -857,12 +974,22 @@
         }
 
         fetchBtn.onclick = (e) => { e.preventDefault(); performSearch(false, null); };
-        saveBtn.onclick = (e) => { e.preventDefault(); saveRoundedImage(); };
+        saveBtn.onclick = (e) => { e.preventDefault(); saveCroppedImage(); };
         copyUrlBtn.onclick = (e) => { e.preventDefault(); copyHighUrl(); };
         cardNameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(false, null); });
         variantToggle.addEventListener('change', () => { if(currentBaseClean) performSearch(false, null); else if(cardNameInput.value.trim()) performSearch(false, null); });
-        langSelect.addEventListener('change', () => { if(currentBaseClean) performSearch(true, activeVariantKey); else if(cardNameInput.value.trim()) performSearch(false, null); });
-        versionSelect.addEventListener('change', () => { if(currentBaseClean) performSearch(true, activeVariantKey); else if(cardNameInput.value.trim()) performSearch(false, null); });
+        
+        langSelect.addEventListener('change', () => { 
+            if(currentBaseClean) performSearch(true, activeVariantKey);
+            else if(cardNameInput.value.trim()) performSearch(false, null);
+        });
+        versionSelect.addEventListener('change', () => { 
+            if(currentBaseClean) performSearch(true, activeVariantKey);
+            else if(cardNameInput.value.trim()) performSearch(false, null);
+        });
+        
+        // 加载新卡片时不清除统一模板（所有卡共用同一个模板）
+        // 不需要重写 loadCardVariant
         
         setTimeout(() => { if(cardNameInput.value.trim() === "STALINGRAD") performSearch(false, null); }, 120);
     })();
