@@ -823,6 +823,110 @@
             outline: none;
         }
 
+        /* 排序列表样式 */
+        .sortable-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #aa8e4e;
+        }
+        .sortable-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e9dbbd;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sortable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .sortable-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sortable-list::-webkit-scrollbar-track {
+            background: #2a2a1c;
+            border-radius: 4px;
+        }
+        .sortable-list::-webkit-scrollbar-thumb {
+            background: #c9aa5b;
+            border-radius: 4px;
+        }
+        .sortable-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #1a1c14;
+            border: 1px solid #3a3f3a;
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: grab;
+            transition: 0.1s;
+        }
+        .sortable-item.drag-over {
+            border-color: #c9a53b;
+            background: #2a2c1c;
+        }
+        .sortable-item:active {
+            cursor: grabbing;
+        }
+        .sortable-handle {
+            cursor: grab;
+            color: #6b6e5c;
+            font-size: 1.2rem;
+            line-height: 1;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .sortable-handle:active {
+            cursor: grabbing;
+        }
+        .sortable-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .sortable-name {
+            flex: 1;
+            font-size: 0.8rem;
+            color: #faf0cf;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sortable-qty {
+            font-size: 0.7rem;
+            color: #c9b06b;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-right: 4px;
+        }
+        .sortable-version {
+            flex-shrink: 0;
+            width: 80px;
+        }
+        .sortable-version select {
+            width: 100%;
+            background: #1e1c16;
+            border: 1px solid #6b6e5c;
+            border-radius: 20px;
+            padding: 2px 6px;
+            color: #f5efdb;
+            font-size: 0.65rem;
+            outline: none;
+            cursor: pointer;
+        }
+
         .img-gen-preview {
             text-align: center;
             margin-bottom: 16px;
@@ -1158,6 +1262,7 @@
             <div class="filter-panel">
                 <div class="row-filters">
                     <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本"></div>
+                    <!-- 移除了扩展包下拉框 -->
                     <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option><option value="veteran">老兵</option></select></div>
                 </div>
 
@@ -1274,8 +1379,18 @@
         <!-- 总部输入框 -->
         <div id="headquarterInputDiv">
             <label for="headquarterNameInput">总部英文名</label>
-            <input type="text" id="headquarterNameInput" placeholder="例: HEADQUARTERS">
+            <input type="text" id="headquarterNameInput" placeholder="例: MOSCOW">
         </div>
+
+        <!-- 拖拽排序区域 -->
+        <div class="sortable-section">
+            <div class="sortable-section-title">
+                <span>🔄 卡牌顺序（拖拽调整）</span>
+                <span style="font-size:0.6rem; color:#6b6e5c;">拖动 ☰ 调整顺序</span>
+            </div>
+            <div class="sortable-list" id="sortableListContainer"></div>
+        </div>
+
         <div class="img-gen-preview" id="imgGenPreview"></div>
         <div class="img-gen-actions">
             <button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button>
@@ -1385,6 +1500,11 @@
     let veteranMap = {};
     let becomesVeteranMap = {};
 
+    // 排序与版本相关
+    let sortableCards = [];
+    let dragSrcIndex = null;
+    let dragOverIndex = null;
+
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
         { code: 'en-EN', label: 'English', flag: '🇺🇸' }, { code: 'fr-FR', label: 'Français', flag: '🇫🇷' },
@@ -1400,6 +1520,31 @@
         const ver = version || DEFAULT_VERSION;
         const q = quality || 20;
         return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${imgName}&q=${q}`;
+    }
+
+    // 探针检测
+    function probeImage(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = url;
+        });
+    }
+
+    // 获取卡图
+    async function fetchCardImageWithFallback(card, lang, preferredVersion, quality) {
+        if (!card.image) return null;
+        // 总部强制使用最新版本
+        if (card.isHeadquarter) {
+            const url = getCardImageUrl(card.image, lang, DEFAULT_VERSION, quality);
+            return url;
+        }
+        // 尝试首选版本
+        const probeUrl = getCardImageUrl(card.image, lang, preferredVersion, 1);
+        const exists = await probeImage(probeUrl);
+        const finalVersion = exists ? preferredVersion : DEFAULT_VERSION;
+        return getCardImageUrl(card.image, lang, finalVersion, quality);
     }
 
     function getSearchableText(card) {
@@ -1568,6 +1713,7 @@
             document.getElementById('mobileAllyNation').value = allyNation;
             updateAllDecksUI();
             updateFactionStats();
+            buildSortableCards();
         };
         const updateMobile = () => {
             mainNation = document.getElementById('mobileMainNation').value;
@@ -1576,6 +1722,7 @@
             document.getElementById('allyNationSelect').value = allyNation;
             updateAllDecksUI();
             updateFactionStats();
+            buildSortableCards();
         };
         document.getElementById('mainNationSelect').addEventListener('change', updateNation);
         document.getElementById('allyNationSelect').addEventListener('change', updateNation);
@@ -1713,6 +1860,7 @@
             if (ver === DEFAULT_VERSION) opt.selected = true;
             select.appendChild(opt);
         });
+        // 监听变化：控制统计卡可用性
         select.addEventListener('change', function() {
             const isLatest = this.value === DEFAULT_VERSION;
             const statsToggle = document.getElementById('statsCardToggle');
@@ -1728,13 +1876,16 @@
                 statsItem.style.opacity = '0.5';
                 statsItem.title = '非最新版本，统计卡不可用';
             }
+            // 刷新排序列表，更新版本选项
+            buildSortableCards();
         });
+        // 触发一次初始状态
         select.dispatchEvent(new Event('change'));
     }
 
     // ==================== 总部功能 ====================
     async function checkHeadquarterImage(name, lang) {
-        const ver = DEFAULT_VERSION; // 固定使用最新版本
+        const ver = DEFAULT_VERSION;
         const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(/^_+|_+$/g, '');
         if (!formatted) return false;
         const url = `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${formatted}.avif&q=1&w=1&h=1`;
@@ -1775,22 +1926,184 @@
         };
     }
 
-    function getExpandedCardListWithHeadquarter(headquarterCard) {
+    // ==================== 拖拽排序 ====================
+    function buildSortableCards() {
+        const hqToggle = document.getElementById('headquarterToggle');
+        const hqName = document.getElementById('headquarterNameInput').value.trim();
+        const globalVersion = document.getElementById('imgVersionSelect').value;
+
+        // 从 deckMap 构建基础列表
         const entries = Array.from(deckMap.values()).sort((a, b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
             const idxB = allCards.findIndex(c => c.id === b.card.id);
             return idxA - idxB;
         });
-        const result = [];
-        if (headquarterCard) {
-            result.push(headquarterCard);
+
+        let newList = [];
+        // 如果总部启用，添加到开头
+        if (hqToggle.checked && hqName) {
+            const hqPlaceholder = {
+                id: -1,
+                cardId: 'headquarter',
+                titleZh: '总部',
+                faction: 'neutral',
+                image: 'headquarter',
+                isHeadquarter: true,
+                count: 1
+            };
+            newList.push(hqPlaceholder);
         }
+
         for (const entry of entries) {
-            for (let i = 0; i < entry.count; i++) {
-                result.push(entry.card);
+            newList.push({
+                ...entry.card,
+                count: entry.count
+            });
+        }
+
+        // 保留已有的版本设置（如果有）
+        const oldMap = {};
+        for (const item of sortableCards) {
+            if (item.cardId) {
+                oldMap[item.cardId] = item._version || globalVersion;
             }
         }
-        return result;
+
+        sortableCards = newList.map((card, index) => {
+            const ver = oldMap[card.cardId] || globalVersion;
+            return {
+                ...card,
+                _version: ver,
+                _index: index
+            };
+        });
+
+        renderSortableList();
+    }
+
+    function renderSortableList() {
+        const container = document.getElementById('sortableListContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (sortableCards.length === 0) {
+            container.innerHTML = '<div style="color:#6b6e5c; padding:12px; text-align:center; font-size:0.8rem;">卡组为空，请添加卡牌</div>';
+            return;
+        }
+
+        sortableCards.forEach((card, index) => {
+            const div = document.createElement('div');
+            div.className = 'sortable-item';
+            div.draggable = true;
+            div.dataset.index = index;
+            div.dataset.cardId = card.cardId;
+
+            // 手柄
+            const handle = document.createElement('span');
+            handle.className = 'sortable-handle';
+            handle.textContent = '☰';
+            div.appendChild(handle);
+
+            // 阵营图标
+            const icon = document.createElement('div');
+            icon.className = 'sortable-icon';
+            icon.style.backgroundImage = `url('${card.faction}.svg')`;
+            div.appendChild(icon);
+
+            // 卡名
+            const name = document.createElement('span');
+            name.className = 'sortable-name';
+            name.textContent = card.titleZh || '未知卡牌';
+            if (card.isHeadquarter) name.textContent = '🏛️ 总部';
+            div.appendChild(name);
+
+            // 数量
+            const qty = document.createElement('span');
+            qty.className = 'sortable-qty';
+            qty.textContent = card.isHeadquarter ? '' : `x${card.count || 1}`;
+            div.appendChild(qty);
+
+            // 版本选择
+            const versionDiv = document.createElement('div');
+            versionDiv.className = 'sortable-version';
+            const select = document.createElement('select');
+            AVAILABLE_VERSIONS.forEach(ver => {
+                const opt = document.createElement('option');
+                opt.value = ver;
+                opt.textContent = ver.toUpperCase();
+                if (ver === card._version || (ver === DEFAULT_VERSION && !card._version)) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+            // 总部固定最新版本
+            if (card.isHeadquarter) {
+                select.disabled = true;
+                select.value = DEFAULT_VERSION;
+            }
+            select.addEventListener('change', function(e) {
+                e.stopPropagation();
+                const idx = parseInt(div.dataset.index);
+                if (!isNaN(idx) && sortableCards[idx]) {
+                    sortableCards[idx]._version = this.value;
+                }
+            });
+            versionDiv.appendChild(select);
+            div.appendChild(versionDiv);
+
+            // 拖拽事件
+            div.addEventListener('dragstart', onDragStart);
+            div.addEventListener('dragend', onDragEnd);
+            div.addEventListener('dragover', onDragOver);
+            div.addEventListener('dragenter', onDragEnter);
+            div.addEventListener('dragleave', onDragLeave);
+            div.addEventListener('drop', onDrop);
+
+            container.appendChild(div);
+        });
+    }
+
+    let dragSrcIndex = null;
+    function onDragStart(e) {
+        dragSrcIndex = parseInt(this.dataset.index);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', this.dataset.index);
+        this.style.opacity = '0.5';
+    }
+
+    function onDragEnd(e) {
+        this.style.opacity = '1';
+        document.querySelectorAll('.sortable-item').forEach(el => el.classList.remove('drag-over'));
+    }
+
+    function onDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    function onDragEnter(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    }
+
+    function onDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    function onDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        const srcIndex = parseInt(e.dataTransfer.getData('text/plain'));
+        const targetIndex = parseInt(this.dataset.index);
+        if (isNaN(srcIndex) || isNaN(targetIndex) || srcIndex === targetIndex) return;
+
+        // 重新排序
+        const [movedItem] = sortableCards.splice(srcIndex, 1);
+        sortableCards.splice(targetIndex, 0, movedItem);
+        
+        // 更新索引
+        sortableCards.forEach((item, idx) => item._index = idx);
+        renderSortableList();
     }
 
     // ==================== 筛选逻辑 ====================
@@ -1943,6 +2256,7 @@
         updateAllDecksUI();
         renderCards();
         updateFactionStats();
+        buildSortableCards();
     }
 
     function removeFromDeck(cardId) {
@@ -1953,6 +2267,7 @@
             updateAllDecksUI();
             renderCards();
             updateFactionStats();
+            buildSortableCards();
         }
     }
 
@@ -1961,6 +2276,7 @@
         updateAllDecksUI();
         renderCards();
         updateFactionStats();
+        buildSortableCards();
     }
 
     function updateFactionStats() {
@@ -2216,6 +2532,7 @@
 
     // ==================== 图片生成 ====================
     function getExpandedCardList() {
+        // 仅用于兼容，实际使用 sortableCards
         const entries = Array.from(deckMap.values()).sort((a, b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
             const idxB = allCards.findIndex(c => c.id === b.card.id);
@@ -2451,7 +2768,7 @@
     }
 
     // 生成卡组图片
-    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cards, version) {
+    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cards, globalVersion) {
         if (cards.length === 0) throw new Error("卡组为空");
         const cardW = 500, cardH = 702, radius = 15;
         let totalCards = cards.length;
@@ -2484,8 +2801,19 @@
                 const x = col * cardW, y = row * cardH;
                 if (cardIdx < cards.length) {
                     const card = cards[cardIdx];
-                    const ver = card.isHeadquarter ? DEFAULT_VERSION : (version || DEFAULT_VERSION);
-                    const imgUrl = getCardImageUrl(card.image, lang, ver, quality);
+                    // 确定版本：总部用最新，其他用自定义或全局
+                    let preferredVersion = globalVersion;
+                    if (card.isHeadquarter) {
+                        preferredVersion = DEFAULT_VERSION;
+                    } else if (card._version) {
+                        preferredVersion = card._version;
+                    }
+                    // 使用探针获取有效图片URL
+                    const imgUrl = await fetchCardImageWithFallback(card, lang, preferredVersion, quality);
+                    if (!imgUrl) {
+                        cardIdx++;
+                        continue;
+                    }
                     const img = new Image();
                     img.crossOrigin = "Anonymous";
                     await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = imgUrl; });
@@ -2512,6 +2840,7 @@
             }
         }
 
+        // 始终裁剪
         try {
             const region = getCanvasCropRegion(ctx, canvas.width, canvas.height, 50);
             if (region.width > 0 && region.height > 0 && 
@@ -2534,33 +2863,45 @@
         const cols = parseInt(document.getElementById('imgCols').value);
         const quality = parseInt(document.getElementById('imgQuality').value);
         const lang = document.getElementById('imgLang').value;
+        const globalVersion = document.getElementById('imgVersionSelect').value;
         const addStatsCard = document.getElementById('statsCardToggle').checked && !document.getElementById('statsCardToggle').disabled;
-        const version = document.getElementById('imgVersionSelect').value;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
 
-        // 处理总部
+        // 使用排序列表中的卡片
+        if (sortableCards.length === 0) {
+            alert("卡组为空，请添加卡牌");
+            return;
+        }
+
+        // 检查总部是否存在
         const hqToggle = document.getElementById('headquarterToggle');
         const hqName = document.getElementById('headquarterNameInput').value.trim();
-        let hqCard = null;
         if (hqToggle.checked && hqName) {
-            hqCard = await fetchHeadquarterCard(hqName, lang);
-            if (!hqCard) {
-                alert(`总部图片 "${hqName}" 不存在，请检查输入`);
+            const exists = await checkHeadquarterImage(hqName, lang);
+            if (!exists) {
+                alert(`总部图片 "${hqName}" 不存在，请检查名称`);
                 return;
             }
         }
 
-        const cards = getExpandedCardListWithHeadquarter(hqCard);
-        if (cards.length === 0) {
-            alert("卡组为空");
+        // 准备最终卡牌列表
+        const finalCards = sortableCards.filter(card => {
+            if (card.isHeadquarter) {
+                return hqToggle.checked && hqName;
+            }
+            return true;
+        });
+
+        if (finalCards.length === 0) {
+            alert("没有有效的卡牌可生成");
             return;
         }
 
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cards, version);
+            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, finalCards, globalVersion);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
         } catch(e) {
@@ -2569,18 +2910,18 @@
     }
 
     async function showImgGenModal() {
+        // 检查卡组是否为空
         if (deckMap.size === 0) {
             const hqToggle = document.getElementById('headquarterToggle');
-            if (!hqToggle.checked) {
+            const hqName = document.getElementById('headquarterNameInput').value.trim();
+            if (!hqToggle.checked || !hqName) {
                 alert("卡组为空，请添加卡牌或启用总部");
                 return;
             }
-            const hqName = document.getElementById('headquarterNameInput').value.trim();
-            if (!hqName) {
-                alert("请输入总部英文名");
-                return;
-            }
         }
+        // 构建排序列表
+        await buildSortableCards();
+        
         const modal = document.getElementById('imgGenModal');
         modal.style.display = 'flex';
         document.getElementById('generatePreviewBtn').onclick = updateImgPreview;
@@ -2605,9 +2946,16 @@
         if (hqToggle && hqInputDiv) {
             hqToggle.addEventListener('change', function() {
                 hqInputDiv.style.display = this.checked ? 'block' : 'none';
+                // 重新构建排序列表
+                buildSortableCards();
             });
             // 初始隐藏
             hqInputDiv.style.display = 'none';
+        }
+        // 总部名称输入变化时重建列表
+        const hqNameInput = document.getElementById('headquarterNameInput');
+        if (hqNameInput) {
+            hqNameInput.addEventListener('input', buildSortableCards);
         }
     });
 
