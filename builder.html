@@ -702,6 +702,7 @@
             outline: none;
         }
 
+        /* 卡牌版本列表 - 可折叠 */
         #cardVersionList {
             margin-top: 16px;
             border-top: 1px solid #aa8e4e;
@@ -1141,7 +1142,6 @@
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
             <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width:100%;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 卡图语言</label><select id="imgLang"></select></div>
-            <div class="img-gen-control"><label>📌 全部设为</label><select id="imgVersionSelect"></select></div>
         </div>
         <div class="switch-row">
             <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label></div>
@@ -1149,8 +1149,9 @@
             <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
             <div class="switch-item"><span>🏛️ 总部</span><label class="switch"><input type="checkbox" id="headquarterToggle"><span class="slider"></span></label></div>
         </div>
-        <div id="headquarterInputDiv"><label for="headquarterNameInput">总部英文名</label><input type="text" id="headquarterNameInput" placeholder="例: MOSCOW"></div>
+        <div id="headquarterInputDiv"><label for="headquarterNameInput">总部英文名</label><input type="text" id="headquarterNameInput" placeholder="例: LONDON"></div>
 
+        <!-- 卡牌版本列表 -->
         <div id="cardVersionList">
             <div class="version-list-header" id="versionListToggle">
                 <span style="color:#e9dbbd; font-size:0.85rem; font-weight:600;">📋 卡牌版本</span>
@@ -1369,7 +1370,6 @@
             initMultiFilters();
             initAttrFilter();
             initSetFilter();
-            initImgVersionSelect();
             initCardVersionList();
             applyFilters();
             updateFactionStats();
@@ -1550,52 +1550,7 @@
         }).join('');
     }
 
-    // ==================== 版本选择 ====================
-    function initImgVersionSelect() {
-        const select = document.getElementById('imgVersionSelect');
-        if (!select) return;
-        select.innerHTML = '';
-        AVAILABLE_VERSIONS.forEach(ver => {
-            const opt = document.createElement('option');
-            opt.value = ver;
-            opt.textContent = ver.toUpperCase();
-            if (ver === DEFAULT_VERSION) opt.selected = true;
-            select.appendChild(opt);
-        });
-        select.addEventListener('change', function() {
-            const isLatest = this.value === DEFAULT_VERSION;
-            const statsToggle = document.getElementById('statsCardToggle');
-            const statsItem = statsToggle.closest('.switch-item');
-            if (isLatest) {
-                statsToggle.disabled = false;
-                statsItem.style.opacity = '1';
-                statsItem.title = '';
-                statsToggle.checked = true;
-            } else {
-                statsToggle.disabled = true;
-                statsToggle.checked = false;
-                statsItem.style.opacity = '0.5';
-                statsItem.title = '非最新版本，统计卡不可用';
-            }
-            // 同步到“全部设为”下拉
-            document.getElementById('setAllVersionSelect').value = this.value;
-        });
-        // 填充“全部设为”下拉
-        const setAllSelect = document.getElementById('setAllVersionSelect');
-        if (setAllSelect) {
-            setAllSelect.innerHTML = '';
-            AVAILABLE_VERSIONS.forEach(ver => {
-                const opt = document.createElement('option');
-                opt.value = ver;
-                opt.textContent = ver.toUpperCase();
-                if (ver === DEFAULT_VERSION) opt.selected = true;
-                setAllSelect.appendChild(opt);
-            });
-        }
-        select.dispatchEvent(new Event('change'));
-    }
-
-    // ==================== 卡牌版本列表（可折叠） ====================
+    // ==================== 卡牌版本列表 ====================
     function initCardVersionList() {
         // 折叠切换
         const toggle = document.getElementById('versionListToggle');
@@ -1611,7 +1566,6 @@
                     arrow.textContent = '▶';
                 }
             });
-            // 默认收起
             content.style.display = 'none';
             arrow.textContent = '▶';
         }
@@ -1625,6 +1579,19 @@
             updateCardVersionList();
         });
 
+        // 填充“全部设为”下拉
+        const setAllSelect = document.getElementById('setAllVersionSelect');
+        if (setAllSelect) {
+            setAllSelect.innerHTML = '';
+            AVAILABLE_VERSIONS.forEach(ver => {
+                const opt = document.createElement('option');
+                opt.value = ver;
+                opt.textContent = ver.toUpperCase();
+                if (ver === DEFAULT_VERSION) opt.selected = true;
+                setAllSelect.appendChild(opt);
+            });
+        }
+
         // 在打开模态框时更新
         document.getElementById('genImgBtn')?.addEventListener('click', () => updateCardVersionList());
         document.getElementById('mobileGenImgBtn')?.addEventListener('click', () => updateCardVersionList());
@@ -1635,15 +1602,10 @@
         if (!container) return;
         // 保留 .set-all-wrapper
         const wrapper = container.querySelector('.set-all-wrapper');
-        // 移除其他子元素
         while (container.children.length > 1) {
             container.removeChild(container.lastChild);
         }
-        const entries = Array.from(deckMap.entries()).sort((a, b) => {
-            const idxA = allCards.findIndex(c => c.id === a[0]);
-            const idxB = allCards.findIndex(c => c.id === b[0]);
-            return idxA - idxB;
-        });
+        const entries = Array.from(deckMap.entries());
         if (entries.length === 0) {
             const emptyMsg = document.createElement('div');
             emptyMsg.style.cssText = 'color:#887e66; font-size:0.8rem; padding:8px 0; text-align:center;';
@@ -1892,11 +1854,7 @@
             container.innerHTML = html + '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>';
             return;
         }
-        const entries = Array.from(deckMap.values()).sort((a, b) => {
-            const idxA = allCards.findIndex(c => c.id === a.card.id);
-            const idxB = allCards.findIndex(c => c.id === b.card.id);
-            return idxA - idxB;
-        });
+        const entries = Array.from(deckMap.values());
         entries.forEach(entry => {
             const c = entry.card;
             const borderColor = factionColor[c.faction] || "#6b6e5c";
@@ -2125,11 +2083,7 @@
     }
 
     function getExpandedCardListWithHeadquarter(headquarterCard) {
-        const entries = Array.from(deckMap.values()).sort((a, b) => {
-            const idxA = allCards.findIndex(c => c.id === a.card.id);
-            const idxB = allCards.findIndex(c => c.id === b.card.id);
-            return idxA - idxB;
-        });
+        const entries = Array.from(deckMap.values());
         const result = [];
         if (headquarterCard) {
             result.push(headquarterCard);
@@ -2344,6 +2298,7 @@
         ctx.restore();
     }
 
+    // 生成卡组图片：每张卡探针检测，失败回退最新版
     async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion) {
         if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
         const cardW = 500, cardH = 702, radius = 15;
@@ -2379,6 +2334,7 @@
                     const item = cardsWithVersion[cardIdx];
                     const card = item.card;
                     let ver = item.version || DEFAULT_VERSION;
+                    // 探针检测：如果指定版本不存在，回退最新版
                     if (!await probeImageExists(card.image, lang, ver)) {
                         ver = DEFAULT_VERSION;
                     }
@@ -2433,10 +2389,10 @@
         const quality = parseInt(document.getElementById('imgQuality').value);
         const lang = document.getElementById('imgLang').value;
         const addStatsCard = document.getElementById('statsCardToggle').checked && !document.getElementById('statsCardToggle').disabled;
-        const version = document.getElementById('imgVersionSelect').value;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
 
+        // 总部
         const hqToggle = document.getElementById('headquarterToggle');
         const hqName = document.getElementById('headquarterNameInput').value.trim();
         let hqCard = null;
@@ -2448,6 +2404,7 @@
             }
         }
 
+        // 按卡组顺序构建卡牌列表
         const entries = Array.from(deckMap.entries());
         const cardsWithVersion = [];
         if (hqCard) {
@@ -2455,7 +2412,7 @@
         }
         for (let [cardId, entry] of entries) {
             const card = entry.card;
-            let ver = cardVersionMap.get(card.cardId) || version || DEFAULT_VERSION;
+            let ver = cardVersionMap.get(card.cardId) || DEFAULT_VERSION;
             for (let i = 0; i < entry.count; i++) {
                 cardsWithVersion.push({ card, version: ver });
             }
@@ -2481,7 +2438,7 @@
         if (deckMap.size === 0) {
             const hqToggle = document.getElementById('headquarterToggle');
             if (!hqToggle.checked) {
-                alert("卡组为空，请添加卡牌或启用总部");
+                alert("卡组为空");
                 return;
             }
             const hqName = document.getElementById('headquarterNameInput').value.trim();
@@ -2506,8 +2463,10 @@
         const qualitySlider = document.getElementById('imgQuality');
         const qualityVal = document.getElementById('qualityVal');
         qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
+        // 不自动触发预览
     }
 
+    // 总部开关显示输入框
     document.addEventListener('DOMContentLoaded', function() {
         const hqToggle = document.getElementById('headquarterToggle');
         const hqInputDiv = document.getElementById('headquarterInputDiv');
@@ -2519,7 +2478,7 @@
         }
     });
 
-    // ==================== 原神启动 ====================
+    // ==================== 启动 ====================
     function initSidebars() {
         const toggle = document.getElementById('mobileDeckToggle');
         const panel = document.getElementById('mobileDeckPanel');
