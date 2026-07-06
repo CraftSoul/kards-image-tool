@@ -801,6 +801,28 @@
         input:checked + .slider { background-color: #7a6233; }
         input:checked + .slider:before { transform: translateX(20px); background-color: #fef0b6; }
         
+        /* 总部输入框样式 */
+        #headquarterInputDiv {
+            margin-top: 8px;
+            display: none;
+        }
+        #headquarterInputDiv label {
+            display: block;
+            font-size: 0.75rem;
+            color: #e9dbbd;
+            margin-bottom: 4px;
+        }
+        #headquarterInputDiv input {
+            width: 100%;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.6rem 1rem;
+            color: #f5efdb;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
         .img-gen-preview {
             text-align: center;
             margin-bottom: 16px;
@@ -1241,15 +1263,25 @@
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
             <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width: 100%; margin: 0;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 卡图语言</label><select id="imgLang"></select></div>
+            <div class="img-gen-control"><label>📌 游戏版本</label><select id="imgVersionSelect"></select></div>
         </div>
         <div class="switch-row">
             <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label></div>
             <div class="switch-item"><span>🎨 背景色</span><select id="bgColorSelect"><option value="white">白色</option><option value="black">黑色</option><option value="transparent">透明</option><option value="custom">自定义</option></select></div>
             <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
-            <div class="switch-item"><span>✂️ 裁剪边缘</span><label class="switch"><input type="checkbox" id="cropToggle" checked><span class="slider"></span></label></div>
+            <div class="switch-item"><span>🏛️ 总部</span><label class="switch"><input type="checkbox" id="headquarterToggle"><span class="slider"></span></label></div>
+        </div>
+        <!-- 总部输入框 -->
+        <div id="headquarterInputDiv">
+            <label for="headquarterNameInput">总部英文名</label>
+            <input type="text" id="headquarterNameInput" placeholder="例: HEADQUARTERS">
         </div>
         <div class="img-gen-preview" id="imgGenPreview"></div>
-        <div class="img-gen-actions"><button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button><button id="downloadImgBtn" class="export-btn">💾 下载图片</button><button id="closeImgModal" class="import-btn">关闭</button></div>
+        <div class="img-gen-actions">
+            <button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button>
+            <button id="downloadImgBtn" class="export-btn">💾 下载图片</button>
+            <button id="closeImgModal" class="import-btn">关闭</button>
+        </div>
     </div>
 </div>
 
@@ -1337,7 +1369,6 @@
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
 
-    // 选中的筛选器
     let selectedFilters = {
         factions: new Set(),
         types: new Set(),
@@ -1347,14 +1378,12 @@
         sets: new Set()
     };
     
-    // 白板
     let whiteboardMode = false;
 
-    // 关联关系
     let cardIndex = {};
     let parentOfMap = {};
-    let veteranMap = {};       // 原版 -> 老兵版
-    let becomesVeteranMap = {}; // 老兵版 -> 原版
+    let veteranMap = {};
+    let becomesVeteranMap = {};
 
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -1366,9 +1395,9 @@
     ];
 
     // ==================== 工具函数 ====================
-    function getCardImageUrl(imgName, lang, quality) {
+    function getCardImageUrl(imgName, lang, version, quality) {
         if (!imgName) return "";
-        const ver = DEFAULT_VERSION;
+        const ver = version || DEFAULT_VERSION;
         const q = quality || 20;
         return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${imgName}&q=${q}`;
     }
@@ -1378,7 +1407,6 @@
         return `${card.titleZh || ''} ${card.text_zh || ''} ${attrsTrans}`.toLowerCase();
     }
 
-    // 获取卡牌的有效扩展包
     function getEffectiveSet(card, visited) {
         visited = visited || new Set();
         if (visited.has(card.cardId)) return card.setName;
@@ -1448,7 +1476,6 @@
                 };
             });
 
-            // 建立索引和关系
             cardIndex = {};
             for (let c of allCards) if (c.cardId) cardIndex[c.cardId] = c;
 
@@ -1456,7 +1483,6 @@
             veteranMap = {};
             becomesVeteranMap = {};
 
-            // can_create 关系
             for (let c of allCards) {
                 if (c.canCreate && c.canCreate.length) {
                     for (let childId of c.canCreate) {
@@ -1466,7 +1492,6 @@
                 }
             }
 
-            // 老兵关系
             for (let c of allCards) {
                 const attrs = c.attributes || [];
                 for (let a of attrs) {
@@ -1483,11 +1508,11 @@
                 }
             }
 
-            // 初始化筛选器
             initStaticFilters();
             initMultiFilters();
             initAttrFilter();
             initSetFilter();
+            initImgVersionSelect();
             applyFilters();
             updateFactionStats();
         } catch(e) {
@@ -1507,7 +1532,6 @@
             if (el) el.addEventListener('input', applyFilters);
         });
 
-        // 国家选择
         const mainOptionsHtml = mainNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         const allyOptionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         ['mainNationSelect', 'mobileMainNation'].forEach(id => {
@@ -1523,14 +1547,12 @@
         document.getElementById('mobileMainNation').value = mainNation;
         document.getElementById('mobileAllyNation').value = allyNation;
 
-        // 语言选择
         const langSelect = document.getElementById('imgLang');
         if (langSelect) {
             langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
             langSelect.value = 'zh-Hans';
         }
 
-        // 背景色切换
         const bgSelect = document.getElementById('bgColorSelect');
         const customDiv = document.getElementById('customColorDiv');
         if (bgSelect) {
@@ -1539,7 +1561,6 @@
             });
         }
 
-        // 国家变更事件
         const updateNation = () => {
             mainNation = document.getElementById('mainNationSelect').value;
             allyNation = document.getElementById('allyNationSelect').value;
@@ -1561,7 +1582,6 @@
         document.getElementById('mobileMainNation').addEventListener('change', updateMobile);
         document.getElementById('mobileAllyNation').addEventListener('change', updateMobile);
 
-        // 折叠切换
         document.querySelectorAll('.collapse-toggle').forEach(toggle => {
             toggle.addEventListener('click', function(e) {
                 if (e.target.classList.contains('reset-chip')) return;
@@ -1575,7 +1595,6 @@
             });
         });
 
-        // 重置按钮（使用事件委托）
         document.querySelector('.filter-panel').addEventListener('click', function(e) {
             const reset = e.target.closest('.reset-chip');
             if (!reset) return;
@@ -1600,7 +1619,6 @@
             }
         });
 
-        // 事件委托
         document.querySelector('.filter-panel').addEventListener('click', function(e) {
             const chip = e.target.closest('.filter-chip');
             if (!chip) return;
@@ -1608,7 +1626,6 @@
             const val = chip.dataset.val;
             if (!type || !val) return;
             
-            // 处理白板特殊逻辑
             if (type === 'whiteboard') {
                 whiteboardMode = !whiteboardMode;
                 chip.classList.toggle('active');
@@ -1643,26 +1660,22 @@
     }
 
     function initMultiFilters() {
-        // 阵营
         const fc = document.getElementById('factionMultiContainer');
         fc.innerHTML = allNationOptions.map(f =>
             `<div class="filter-chip" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</div>`
         ).join('');
 
-        // 类型
         const typeKeys = Object.keys(typeNameMap);
         const tc = document.getElementById('typeMultiContainer');
         tc.innerHTML = typeKeys.map(t =>
             `<div class="filter-chip" data-filter="type" data-val="${t}">${typeNameMap[t]}</div>`
         ).join('');
 
-        // 花费
         const cc = document.getElementById('costMultiContainer');
         cc.innerHTML = STATIC_COSTS.map(c =>
             `<div class="filter-chip" data-filter="cost" data-val="${c}">${c==='7+'?'7K+':c+'K'}</div>`
         ).join('');
 
-        // 稀有度
         const rc = document.getElementById('rarityMultiContainer');
         rc.innerHTML = STATIC_RARITIES.map(r =>
             `<div class="filter-chip" data-filter="rarity" data-val="${r}">${rarityDisplayMap[r]}</div>`
@@ -1688,13 +1701,104 @@
         }).join('');
     }
 
+    // ==================== 图片生成版本选择 ====================
+    function initImgVersionSelect() {
+        const select = document.getElementById('imgVersionSelect');
+        if (!select) return;
+        select.innerHTML = '';
+        AVAILABLE_VERSIONS.forEach(ver => {
+            const opt = document.createElement('option');
+            opt.value = ver;
+            opt.textContent = ver.toUpperCase();
+            if (ver === DEFAULT_VERSION) opt.selected = true;
+            select.appendChild(opt);
+        });
+        select.addEventListener('change', function() {
+            const isLatest = this.value === DEFAULT_VERSION;
+            const statsToggle = document.getElementById('statsCardToggle');
+            const statsItem = statsToggle.closest('.switch-item');
+            if (isLatest) {
+                statsToggle.disabled = false;
+                statsItem.style.opacity = '1';
+                statsItem.title = '';
+                statsToggle.checked = true;
+            } else {
+                statsToggle.disabled = true;
+                statsToggle.checked = false;
+                statsItem.style.opacity = '0.5';
+                statsItem.title = '非最新版本，统计卡不可用';
+            }
+        });
+        select.dispatchEvent(new Event('change'));
+    }
+
+    // ==================== 总部功能 ====================
+    async function checkHeadquarterImage(name, lang) {
+        const ver = DEFAULT_VERSION; // 固定使用最新版本
+        const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(/^_+|_+$/g, '');
+        if (!formatted) return false;
+        const url = `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${formatted}.avif&q=1&w=1&h=1`;
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = url;
+        });
+    }
+
+    async function fetchHeadquarterCard(name, lang) {
+        if (!name || name.trim() === '') return null;
+        const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(/^_+|_+$/g, '');
+        if (!formatted) return null;
+        const exists = await checkHeadquarterImage(formatted, lang);
+        if (!exists) return null;
+        return {
+            id: -1,
+            cardId: 'headquarter',
+            titleZh: '总部',
+            titleEn: 'Headquarters',
+            image: `${formatted}.avif`,
+            faction: 'neutral',
+            type: 'order',
+            rarity: 'Standard',
+            cost: 0,
+            attack: undefined,
+            defense: undefined,
+            operationCost: undefined,
+            attributes: [],
+            setName: 'Base',
+            reserved: false,
+            isSpawn: false,
+            isVeteranSet: false,
+            canCreate: [],
+            isHeadquarter: true
+        };
+    }
+
+    function getExpandedCardListWithHeadquarter(headquarterCard) {
+        const entries = Array.from(deckMap.values()).sort((a, b) => {
+            const idxA = allCards.findIndex(c => c.id === a.card.id);
+            const idxB = allCards.findIndex(c => c.id === b.card.id);
+            return idxA - idxB;
+        });
+        const result = [];
+        if (headquarterCard) {
+            result.push(headquarterCard);
+        }
+        for (const entry of entries) {
+            for (let i = 0; i < entry.count; i++) {
+                result.push(entry.card);
+            }
+        }
+        return result;
+    }
+
     // ==================== 筛选逻辑 ====================
     function filterCardsLogic() {
         let res = [...allCards];
         const search = document.getElementById('searchInput').value.trim().toLowerCase();
         if (search) res = res.filter(c => getSearchableText(c).includes(search));
 
-        // 词条
         if (whiteboardMode) {
             res = res.filter(c => {
                 const attrs = c.attributes || [];
@@ -1724,7 +1828,6 @@
         }
         if (selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
 
-        // 扩展包
         if (selectedFilters.sets.size) {
             res = res.filter(c => {
                 const effSet = getEffectiveSet(c);
@@ -1732,14 +1835,12 @@
             });
         }
 
-        // 卡池
         const status = document.getElementById('statusSelect').value;
         if (status === 'active') res = res.filter(c => !c.reserved && !c.isSpawn && !c.isVeteranSet);
         else if (status === 'reserve') res = res.filter(c => c.reserved);
         else if (status === 'spawn') res = res.filter(c => c.isSpawn);
         else if (status === 'veteran') res = res.filter(c => c.isVeteranSet);
 
-        // 数值
         const activeTypesSet = selectedFilters.types;
         const onlyUnits = activeTypesSet.size > 0 && [...activeTypesSet].every(t => unitTypes.includes(t));
         const statsArea = document.getElementById('statsArea');
@@ -1785,7 +1886,7 @@
             const reserveMark = card.reserved ? '<i class="reserve-icon-sm"></i>' : '';
             const showBadge = qty > 0;
             return `<div class="card-item" data-card-id="${card.id}" style="border-color:${borderCol};">
-                        <div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image, 'zh-Hans', 20)}" alt="${card.titleZh}"></div>
+                        <div class="card-img"><img loading="lazy" src="${getCardImageUrl(card.image, 'zh-Hans', DEFAULT_VERSION, 20)}" alt="${card.titleZh}"></div>
                         <div class="card-info"><div class="card-name"><span>${card.titleZh}</span>${reserveMark}</div></div>
                         <div class="card-badge-desktop ${!showBadge ? 'hide-badge' : ''}">
                             <span class="card-deck-count">${qty}</span>
@@ -2122,11 +2223,14 @@
         });
         const result = [];
         for (const entry of entries) {
-            for (let i = 0; i < entry.count; i++) result.push(entry.card);
+            for (let i = 0; i < entry.count; i++) {
+                result.push(entry.card);
+            }
         }
         return result;
     }
 
+    // 裁剪辅助
     function isDarkPixelForCanvas(ctx, x, y, threshold = 50) {
         try {
             const pixel = ctx.getImageData(x, y, 1, 1);
@@ -2346,8 +2450,8 @@
         ctx.restore();
     }
 
-    async function generateDeckImage(cols, quality, lang, addStatsCard, bgColor, cropEnabled) {
-        const cards = getExpandedCardList();
+    // 生成卡组图片
+    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cards, version) {
         if (cards.length === 0) throw new Error("卡组为空");
         const cardW = 500, cardH = 702, radius = 15;
         let totalCards = cards.length;
@@ -2380,7 +2484,8 @@
                 const x = col * cardW, y = row * cardH;
                 if (cardIdx < cards.length) {
                     const card = cards[cardIdx];
-                    const imgUrl = getCardImageUrl(card.image, lang, quality);
+                    const ver = card.isHeadquarter ? DEFAULT_VERSION : (version || DEFAULT_VERSION);
+                    const imgUrl = getCardImageUrl(card.image, lang, ver, quality);
                     const img = new Image();
                     img.crossOrigin = "Anonymous";
                     await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = imgUrl; });
@@ -2407,21 +2512,19 @@
             }
         }
 
-        if (cropEnabled !== false) {
-            try {
-                const region = getCanvasCropRegion(ctx, canvas.width, canvas.height, 50);
-                if (region.width > 0 && region.height > 0 && 
-                    (region.left > 0 || region.top > 0 || region.width < canvas.width || region.height < canvas.height)) {
-                    const croppedCanvas = document.createElement('canvas');
-                    croppedCanvas.width = region.width;
-                    croppedCanvas.height = region.height;
-                    const croppedCtx = croppedCanvas.getContext('2d');
-                    croppedCtx.drawImage(canvas, region.left, region.top, region.width, region.height, 0, 0, region.width, region.height);
-                    return croppedCanvas;
-                }
-            } catch(e) {
-                console.warn('裁剪失败，使用原图:', e);
+        try {
+            const region = getCanvasCropRegion(ctx, canvas.width, canvas.height, 50);
+            if (region.width > 0 && region.height > 0 && 
+                (region.left > 0 || region.top > 0 || region.width < canvas.width || region.height < canvas.height)) {
+                const croppedCanvas = document.createElement('canvas');
+                croppedCanvas.width = region.width;
+                croppedCanvas.height = region.height;
+                const croppedCtx = croppedCanvas.getContext('2d');
+                croppedCtx.drawImage(canvas, region.left, region.top, region.width, region.height, 0, 0, region.width, region.height);
+                return croppedCanvas;
             }
+        } catch(e) {
+            console.warn('裁剪失败，使用原图:', e);
         }
         return canvas;
     }
@@ -2431,14 +2534,33 @@
         const cols = parseInt(document.getElementById('imgCols').value);
         const quality = parseInt(document.getElementById('imgQuality').value);
         const lang = document.getElementById('imgLang').value;
-        const addStatsCard = document.getElementById('statsCardToggle').checked;
-        const cropEnabled = document.getElementById('cropToggle').checked;
+        const addStatsCard = document.getElementById('statsCardToggle').checked && !document.getElementById('statsCardToggle').disabled;
+        const version = document.getElementById('imgVersionSelect').value;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
+
+        // 处理总部
+        const hqToggle = document.getElementById('headquarterToggle');
+        const hqName = document.getElementById('headquarterNameInput').value.trim();
+        let hqCard = null;
+        if (hqToggle.checked && hqName) {
+            hqCard = await fetchHeadquarterCard(hqName, lang);
+            if (!hqCard) {
+                alert(`总部图片 "${hqName}" 不存在，请检查输入`);
+                return;
+            }
+        }
+
+        const cards = getExpandedCardListWithHeadquarter(hqCard);
+        if (cards.length === 0) {
+            alert("卡组为空");
+            return;
+        }
+
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            currentPreviewCanvas = await generateDeckImage(cols, quality, lang, addStatsCard, bgColor, cropEnabled);
+            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cards, version);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
         } catch(e) {
@@ -2447,7 +2569,18 @@
     }
 
     async function showImgGenModal() {
-        if (deckMap.size === 0) { alert("卡组为空，无法生成图片"); return; }
+        if (deckMap.size === 0) {
+            const hqToggle = document.getElementById('headquarterToggle');
+            if (!hqToggle.checked) {
+                alert("卡组为空，请添加卡牌或启用总部");
+                return;
+            }
+            const hqName = document.getElementById('headquarterNameInput').value.trim();
+            if (!hqName) {
+                alert("请输入总部英文名");
+                return;
+            }
+        }
         const modal = document.getElementById('imgGenModal');
         modal.style.display = 'flex';
         document.getElementById('generatePreviewBtn').onclick = updateImgPreview;
@@ -2463,10 +2596,22 @@
         const qualitySlider = document.getElementById('imgQuality');
         const qualityVal = document.getElementById('qualityVal');
         qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
-        setTimeout(updateImgPreview, 300);
     }
 
-    // ==================== 启动 ====================
+    // 总部开关显示输入框
+    document.addEventListener('DOMContentLoaded', function() {
+        const hqToggle = document.getElementById('headquarterToggle');
+        const hqInputDiv = document.getElementById('headquarterInputDiv');
+        if (hqToggle && hqInputDiv) {
+            hqToggle.addEventListener('change', function() {
+                hqInputDiv.style.display = this.checked ? 'block' : 'none';
+            });
+            // 初始隐藏
+            hqInputDiv.style.display = 'none';
+        }
+    });
+
+    // ==================== 原神启动 ====================
     function initSidebars() {
         const toggle = document.getElementById('mobileDeckToggle');
         const panel = document.getElementById('mobileDeckPanel');
