@@ -5,53 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>KARDS 军械库 | 卡组构筑</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             min-height: 100vh;
             background: #2b2b1f;
             background-image: 
-                radial-gradient(circle at 20% 40%, rgba(80, 70, 40, 0.4) 2%, transparent 2.5%),
-                radial-gradient(circle at 70% 85%, rgba(60, 50, 30, 0.5) 1.8%, transparent 2.2%),
-                radial-gradient(circle at 45% 20%, rgba(110, 90, 50, 0.3) 3%, transparent 3.5%),
+                radial-gradient(circle at 20% 40%, rgba(80,70,40,0.4) 2%, transparent 2.5%),
+                radial-gradient(circle at 70% 85%, rgba(60,50,30,0.5) 1.8%, transparent 2.2%),
+                radial-gradient(circle at 45% 20%, rgba(110,90,50,0.3) 3%, transparent 3.5%),
                 repeating-linear-gradient(45deg, #5e5536 0px, #5e5536 2px, #7e6e48 2px, #7e6e48 8px),
                 repeating-linear-gradient(135deg, #3e3a2a 0px, #3e3a2a 3px, #5a4e32 3px, #5a4e32 10px);
             background-blend-mode: overlay, normal;
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            color: #f5efdb;
+            padding: 16px;
         }
-
-        :root {
-            --germany: #5A5F55;
-            --britain: #857A60;
-            --soviet: #4F3826;
-            --usa: #434B32;
-            --japan: #90723C;
-            --france: #283454;
-            --italy: #555248;
-            --poland: #645633;
-            --finland: #C9C8BC;
-            --anzac: #9E6F34;
-            --neutral: #6b6e5c;
-            --rarity-standard: #9e9e9e;
-            --rarity-limited: #cd7f32;
-            --rarity-special: #c0c0c0;
-            --rarity-elite: #ffd700;
-        }
-
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 16px 16px 32px;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .app-container { max-width: 1400px; margin: 0 auto; }
         .nav-bar {
-            background: rgba(20, 20, 15, 0.96);
+            background: rgba(20,20,15,0.96);
             backdrop-filter: blur(16px);
             border: 1px solid #aa8e4e;
             border-radius: 20px;
@@ -65,7 +36,7 @@
             justify-content: space-between;
             padding: 12px 18px;
             background: rgba(0,0,0,0.2);
-            border-bottom: 1px solid rgba(170, 142, 78, 0.3);
+            border-bottom: 1px solid rgba(170,142,78,0.3);
         }
         .nav-brand {
             font-size: 1.45rem;
@@ -78,7 +49,7 @@
             white-space: nowrap;
         }
         .menu-btn {
-            background: rgba(210, 210, 225, 0.12);
+            background: rgba(210,210,225,0.12);
             border: 1px solid #aa8e4e;
             width: 44px;
             height: 44px;
@@ -90,26 +61,10 @@
             gap: 5px;
             cursor: pointer;
         }
-        .menu-btn span {
-            display: block;
-            width: 22px;
-            height: 2.5px;
-            background-color: #f2e2b0;
-            border-radius: 2px;
-        }
-        .nav-menu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s ease-out;
-            background: rgba(10, 10, 8, 0.98);
-        }
+        .menu-btn span { display: block; width: 22px; height: 2.5px; background-color: #f2e2b0; border-radius: 2px; }
+        .nav-menu { max-height: 0; overflow: hidden; transition: max-height 0.35s ease-out; background: rgba(10,10,8,0.98); }
         .nav-menu.open { max-height: 400px; }
-        .menu-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 16px 20px 20px;
-        }
+        .menu-links { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px 20px; }
         .menu-link {
             display: block;
             text-decoration: none;
@@ -117,33 +72,21 @@
             font-size: 1rem;
             padding: 12px 20px;
             border-radius: 60px;
-            background: rgba(210, 210, 225, 0.08);
+            background: rgba(210,210,225,0.08);
             color: #eef0ff;
             text-align: center;
             transition: 0.2s;
             border: 1px solid transparent;
         }
-        .menu-link:hover { background: rgba(235, 235, 245, 0.2); border-color: #c9a53b; }
-        .menu-link.active {
-            background: #c9a53b;
-            color: #1e1c10;
-            font-weight: 700;
-        }
+        .menu-link:hover { background: rgba(235,235,245,0.2); border-color: #c9a53b; }
+        .menu-link.active { background: #c9a53b; color: #1e1c10; font-weight: 700; }
 
-        .builder-main {
-            display: flex;
-            gap: 24px;
-            position: relative;
-        }
-        .cards-section {
-            flex: 3;
-            min-width: 0;
-        }
-
+        .builder-main { display: flex; gap: 24px; position: relative; }
+        .cards-section { flex: 3; min-width: 0; }
         .deck-panel {
             width: 380px;
             flex-shrink: 0;
-            background: rgba(10, 12, 8, 0.94);
+            background: rgba(10,12,8,0.94);
             backdrop-filter: blur(12px);
             border-radius: 28px;
             border: 1px solid #c9aa5b;
@@ -166,12 +109,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        .deck-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #ffefbf;
-            letter-spacing: 1px;
-        }
+        .deck-title { font-size: 1.3rem; font-weight: bold; color: #ffefbf; letter-spacing: 1px; }
         .clear-deck {
             background: #4a3720;
             border: none;
@@ -183,7 +121,6 @@
             transition: 0.2s;
         }
         .clear-deck:hover { background: #aa6f3c; color: white; }
-        
         .nation-selector {
             background: rgba(0,0,0,0.5);
             border-radius: 20px;
@@ -192,7 +129,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            border: 1px solid rgba(170, 142, 78, 0.5);
+            border: 1px solid rgba(170,142,78,0.5);
         }
         .nation-row {
             display: flex;
@@ -200,12 +137,7 @@
             justify-content: space-between;
             gap: 10px;
         }
-        .nation-label {
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #f3eaca;
-            min-width: 40px;
-        }
+        .nation-label { font-size: 0.8rem; font-weight: bold; color: #f3eaca; min-width: 40px; }
         .nation-select {
             flex: 1;
             background: #1e1c16;
@@ -217,7 +149,6 @@
             cursor: pointer;
             outline: none;
         }
-
         .faction-stats {
             background: rgba(0,0,0,0.4);
             border-radius: 20px;
@@ -227,13 +158,9 @@
             gap: 16px;
             justify-content: space-around;
             flex-wrap: wrap;
-            border: 1px solid rgba(170, 142, 78, 0.5);
+            border: 1px solid rgba(170,142,78,0.5);
         }
-        .faction-stat {
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: #f5efdb;
-        }
+        .faction-stat { font-size: 0.75rem; font-weight: bold; color: #f5efdb; }
         .faction-stat span:first-child { color: #dbba6c; margin-right: 6px; }
 
         .import-area, .export-area {
@@ -241,7 +168,7 @@
             border-radius: 20px;
             padding: 10px 12px;
             margin-bottom: 16px;
-            border: 1px solid rgba(170, 142, 78, 0.5);
+            border: 1px solid rgba(170,142,78,0.5);
         }
         .import-row, .export-row {
             display: flex;
@@ -320,7 +247,7 @@
         }
         .headquarters-row {
             border-left-color: #b8860b;
-            background: linear-gradient(135deg, #1e1c14, #14120c);
+            background: linear-gradient(135deg,#1e1c14,#14120c);
         }
         .deck-card-icon {
             width: 30px;
@@ -334,13 +261,7 @@
             align-items: center;
             justify-content: center;
         }
-        .deck-card-details {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 0;
-        }
+        .deck-card-details { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
         .deck-card-name {
             font-size: 0.8rem;
             font-weight: 600;
@@ -370,17 +291,9 @@
             scrollbar-width: thin;
             padding-bottom: 2px;
         }
-        .deck-card-stats::-webkit-scrollbar {
-            height: 3px;
-        }
-        .deck-card-stats::-webkit-scrollbar-track {
-            background: #2a2a1c;
-            border-radius: 4px;
-        }
-        .deck-card-stats::-webkit-scrollbar-thumb {
-            background: #c9aa5b;
-            border-radius: 4px;
-        }
+        .deck-card-stats::-webkit-scrollbar { height: 3px; }
+        .deck-card-stats::-webkit-scrollbar-track { background: #2a2a1c; border-radius: 4px; }
+        .deck-card-stats::-webkit-scrollbar-thumb { background: #c9aa5b; border-radius: 4px; }
         .kredits-cost {
             background: #000000cc;
             border-radius: 10px;
@@ -420,7 +333,6 @@
         .rarity-limited { color: var(--rarity-limited); border-left: 2px solid var(--rarity-limited); }
         .rarity-special { color: var(--rarity-special); border-left: 2px solid var(--rarity-special); }
         .rarity-elite { color: var(--rarity-elite); border-left: 2px solid var(--rarity-elite); }
-        
         .deck-card-qty {
             background: rgba(0,0,0,0.7);
             border-radius: 30px;
@@ -486,7 +398,6 @@
             font-size: 0.7rem;
             font-weight: bold;
         }
-        
         .mobile-deck-panel {
             position: fixed;
             top: 0;
@@ -494,7 +405,7 @@
             width: 80%;
             max-width: 360px;
             height: 100vh;
-            background: rgba(10, 12, 8, 0.98);
+            background: rgba(10,12,8,0.98);
             backdrop-filter: blur(16px);
             border-left: 2px solid #c9aa5b;
             z-index: 1001;
@@ -518,13 +429,7 @@
             font-size: 1.6rem;
             cursor: pointer;
         }
-        .mobile-deck-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        .mobile-deck-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .mobile-overlay {
             position: fixed;
             top: 0;
@@ -536,13 +441,13 @@
             display: none;
         }
         .mobile-overlay.show { display: block; }
-        
         @media (max-width: 860px) {
             .builder-main { flex-direction: column; }
             .deck-panel { display: none; }
             .mobile-deck-toggle { display: flex; }
         }
 
+        /* 统计模态框 */
         .modal-stats {
             display: none;
             position: fixed;
@@ -623,32 +528,10 @@
             transition: transform 0.1s;
         }
         .bar-stack:hover { transform: scaleX(1.05); }
-        .bar-unit {
-            background-color: #e8e4d0;
-            transition: height 0.2s;
-            flex-shrink: 0;
-            width: 100%;
-            min-height: 0;
-        }
-        .bar-order {
-            background-color: #f5c542;
-            flex-shrink: 0;
-            width: 100%;
-            min-height: 0;
-        }
-        .bar-counter {
-            background-color: #5a5a5a;
-            flex-shrink: 0;
-            width: 100%;
-            min-height: 0;
-        }
-        .bar-label {
-            font-size: 0.65rem;
-            color: #f5eaca;
-            text-align: center;
-            margin-top: 4px;
-            font-weight: bold;
-        }
+        .bar-unit { background-color: #e8e4d0; transition: height 0.2s; flex-shrink: 0; width: 100%; min-height: 0; }
+        .bar-order { background-color: #f5c542; flex-shrink: 0; width: 100%; min-height: 0; }
+        .bar-counter { background-color: #5a5a5a; flex-shrink: 0; width: 100%; min-height: 0; }
+        .bar-label { font-size: 0.65rem; color: #f5eaca; text-align: center; margin-top: 4px; font-weight: bold; }
         .cost-total {
             font-size: 0.6rem;
             color: #ffefb9;
@@ -668,12 +551,7 @@
             flex-wrap: wrap;
             border-bottom: 1px solid #aa8e4e;
         }
-        .type-summary-modal span {
-            font-weight: bold;
-            font-size: 1rem;
-            color: #ffefb9;
-            margin-left: 6px;
-        }
+        .type-summary-modal span { font-weight: bold; font-size: 1rem; color: #ffefb9; margin-left: 6px; }
         .unit-badge { color: #e8e4d0; }
         .order-badge { color: #f5c542; }
         .counter-badge { color: #a0a0a0; }
@@ -693,9 +571,8 @@
             font-weight: bold;
             color: #ffefb9;
         }
-        .legend {
-            display: none;
-        }
+        .legend { display: none; }
+
         .img-gen-modal {
             display: none;
             position: fixed;
@@ -734,12 +611,7 @@
             flex: 1;
             min-width: 100px;
         }
-        .img-gen-control label {
-            font-size: 0.7rem;
-            color: #e9dbbd;
-            display: block;
-            margin-bottom: 4px;
-        }
+        .img-gen-control label { font-size: 0.7rem; color: #e9dbbd; display: block; margin-bottom: 4px; }
         .img-gen-control input, .img-gen-control select {
             width: 100%;
             background: #1e1c16;
@@ -759,7 +631,6 @@
             border-radius: 2px;
             outline: none;
         }
-
         .img-gen-control input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 14px;
@@ -769,7 +640,6 @@
             cursor: pointer;
             border: none;
         }
-
         .img-gen-control input[type="range"]::-moz-range-thumb {
             width: 14px;
             height: 14px;
@@ -778,6 +648,7 @@
             cursor: pointer;
             border: none;
         }
+
         .switch-row {
             display: flex;
             gap: 16px;
@@ -796,22 +667,31 @@
         .switch-item span { color: #e9dbbd; font-size: 0.75rem; }
         .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3222; transition: 0.2s; border-radius: 34px; border: 1px solid #b19458; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 2px; background-color: #e9cf95; transition: 0.2s; border-radius: 50%; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #3a3222;
+            transition: 0.2s;
+            border-radius: 34px;
+            border: 1px solid #b19458;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 2px;
+            background-color: #e9cf95;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
         input:checked + .slider { background-color: #7a6233; }
         input:checked + .slider:before { transform: translateX(20px); background-color: #fef0b6; }
-        
-        /* 总部输入框样式 */
-        #headquarterInputDiv {
-            margin-top: 8px;
-            display: none;
-        }
-        #headquarterInputDiv label {
-            display: block;
-            font-size: 0.75rem;
-            color: #e9dbbd;
-            margin-bottom: 4px;
-        }
+
+        #headquarterInputDiv { margin-top: 8px; display: none; }
+        #headquarterInputDiv label { display: block; font-size: 0.75rem; color: #e9dbbd; margin-bottom: 4px; }
         #headquarterInputDiv input {
             width: 100%;
             background: #1e1c16;
@@ -823,108 +703,69 @@
             outline: none;
         }
 
-        /* 排序列表样式 */
-        .sortable-section {
+        #cardVersionList {
             margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #aa8e4e;
-        }
-        .sortable-section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #e9dbbd;
-            margin-bottom: 8px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .sortable-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            max-height: 240px;
+            max-height: 200px;
             overflow-y: auto;
-            padding-right: 4px;
+            border-top: 1px solid #aa8e4e;
+            padding-top: 12px;
         }
-        .sortable-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sortable-list::-webkit-scrollbar-track {
-            background: #2a2a1c;
-            border-radius: 4px;
-        }
-        .sortable-list::-webkit-scrollbar-thumb {
-            background: #c9aa5b;
-            border-radius: 4px;
-        }
-        .sortable-item {
+        #cardVersionList .version-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: #1a1c14;
-            border: 1px solid #3a3f3a;
-            border-radius: 8px;
-            padding: 6px 10px;
-            cursor: grab;
-            transition: 0.1s;
+            gap: 10px;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(170,142,78,0.2);
         }
-        .sortable-item.drag-over {
-            border-color: #c9a53b;
-            background: #2a2c1c;
-        }
-        .sortable-item:active {
-            cursor: grabbing;
-        }
-        .sortable-handle {
-            cursor: grab;
-            color: #6b6e5c;
-            font-size: 1.2rem;
-            line-height: 1;
-            user-select: none;
-            flex-shrink: 0;
-        }
-        .sortable-handle:active {
-            cursor: grabbing;
-        }
-        .sortable-icon {
+        #cardVersionList .version-row .v-icon {
             width: 24px;
             height: 24px;
             flex-shrink: 0;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
         }
-        .sortable-name {
+        #cardVersionList .version-row .v-name {
             flex: 1;
             font-size: 0.8rem;
-            color: #faf0cf;
+            color: #f5efdb;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .sortable-qty {
+        #cardVersionList .version-row .v-qty {
             font-size: 0.7rem;
             color: #c9b06b;
-            font-weight: 600;
-            flex-shrink: 0;
             margin-right: 4px;
         }
-        .sortable-version {
-            flex-shrink: 0;
+        #cardVersionList .version-row select {
             width: 80px;
-        }
-        .sortable-version select {
-            width: 100%;
             background: #1e1c16;
-            border: 1px solid #6b6e5c;
-            border-radius: 20px;
-            padding: 2px 6px;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 2px 8px;
             color: #f5efdb;
-            font-size: 0.65rem;
-            outline: none;
+            font-size: 0.7rem;
             cursor: pointer;
+            outline: none;
+        }
+        .set-all-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0 4px;
+        }
+        .set-all-wrapper label {
+            font-size: 0.75rem;
+            color: #e9dbbd;
+        }
+        .set-all-wrapper select {
+            width: 100px;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 4px 8px;
+            color: #f5efdb;
+            font-size: 0.7rem;
+            cursor: pointer;
+            outline: none;
         }
 
         .img-gen-preview {
@@ -945,12 +786,12 @@
         }
 
         .filter-panel {
-            background: rgba(0, 0, 0, 0.65);
+            background: rgba(0,0,0,0.65);
             backdrop-filter: blur(8px);
             border-radius: 24px;
             padding: 1.2rem;
             margin-bottom: 1.5rem;
-            border: 1px solid rgba(170, 142, 78, 0.6);
+            border: 1px solid rgba(170,142,78,0.6);
         }
         .filter-group {
             margin-bottom: 1rem;
@@ -970,27 +811,15 @@
             cursor: pointer;
             user-select: none;
         }
-        .filter-group-title .collapse-icon {
-            font-size: 0.8rem;
-            transition: transform 0.2s;
-            margin-left: 8px;
-        }
-        .filter-group-title .collapse-icon.collapsed {
-            transform: rotate(-90deg);
-        }
+        .filter-group-title .collapse-icon { font-size: 0.8rem; transition: transform 0.2s; margin-left: 8px; }
+        .filter-group-title .collapse-icon.collapsed { transform: rotate(-90deg); }
         .filter-group-body {
             overflow: hidden;
             transition: max-height 0.3s ease-out;
             max-height: 600px;
         }
-        .filter-group-body.collapsed {
-            max-height: 0;
-        }
-        .multi-select-btns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
+        .filter-group-body.collapsed { max-height: 0; }
+        .multi-select-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
         .filter-chip {
             background: #1e1c16;
             border: 1px solid #aa8e4e;
@@ -1010,11 +839,7 @@
             border-color: #c9a53b;
             font-weight: 600;
         }
-        .filter-chip img {
-            width: 18px;
-            height: 18px;
-            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
-        }
+        .filter-chip img { width: 18px; height: 18px; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3)); }
         .reset-chip {
             background: #2a2618;
             border-color: #b69654;
@@ -1031,10 +856,7 @@
             align-items: flex-end;
             margin-bottom: 1rem;
         }
-        .filter-item {
-            flex: 1;
-            min-width: 130px;
-        }
+        .filter-item { flex: 1; min-width: 130px; }
         .filter-label {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -1057,7 +879,7 @@
         .stats-group {
             margin-top: 0.8rem;
             padding-top: 0.5rem;
-            border-top: 1px dashed rgba(170, 142, 78, 0.4);
+            border-top: 1px dashed rgba(170,142,78,0.4);
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
@@ -1080,9 +902,7 @@
             gap: 1rem;
             margin-top: 1rem;
         }
-        @media (max-width: 680px) {
-            .card-grid { grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
-        }
+        @media (max-width: 680px) { .card-grid { grid-template-columns: repeat(4,1fr); gap: 0.7rem; } }
         .card-item {
             background: #111812;
             border-radius: 15px;
@@ -1093,7 +913,7 @@
         }
         .card-img {
             width: 100%;
-            aspect-ratio: 500 / 702;
+            aspect-ratio: 500/702;
             background: #0a0f0c;
         }
         .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -1107,11 +927,7 @@
             gap: 4px;
             color: #faf0cf;
         }
-        .card-name span:first-child {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .card-name span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .reserve-icon-sm {
             width: 14px;
             height: 14px;
@@ -1160,7 +976,6 @@
             justify-content: center;
         }
         .card-remove-icon:hover { background: #b6521a; color: white; }
-        
         .card-mobile-actions {
             display: none;
             background: rgba(0,0,0,0.85);
@@ -1189,7 +1004,6 @@
             cursor: pointer;
         }
         .mobile-remove-btn:hover { background: #b6521a; color: white; }
-        
         @media (max-width: 680px) {
             .card-badge-desktop { display: none; }
             .card-mobile-actions { display: flex; }
@@ -1241,9 +1055,11 @@
 </head>
 <body>
 <div class="app-container">
+    <!-- 导航栏 -->
     <div class="nav-bar"><div class="nav-header-row"><div class="nav-brand">KARDS 军械库</div><div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div></div>
-    <div class="nav-menu" id="navMenu"><div class="menu-links"><a class="menu-link" href="index.html">卡牌收藏</a><a class="menu-link active" href="#">卡组构筑</a><a class="menu-link" href="seek.html">英文直检</a><a class="menu-link" href="duel.html" data-target="duel">击剑大厅</a><a class="menu-link" href="pack.html" data-target="pack">模拟开包</a><a class="menu-link" href="about.html">关于军械库</a></div></div></div>
+    <div class="nav-menu" id="navMenu"><div class="menu-links"><a class="menu-link" href="index.html">卡牌收藏</a><a class="menu-link active" href="#">卡组构筑</a><a class="menu-link" href="seek.html">英文直检</a><a class="menu-link" href="duel.html">击剑大厅</a><a class="menu-link" href="pack.html">模拟开包</a><a class="menu-link" href="about.html">关于军械库</a></div></div></div>
 
+    <!-- 移动端卡组面板 -->
     <div class="mobile-deck-toggle" id="mobileDeckToggle"><span class="toggle-text">卡组</span><span class="mobile-count-badge-toggle" id="mobileToggleCount">0</span><span>◀</span></div>
     <div class="mobile-overlay" id="mobileOverlay"></div>
     <div class="mobile-deck-panel" id="mobileDeckPanel">
@@ -1257,88 +1073,28 @@
         <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空</button>
     </div>
 
+    <!-- 主区域 -->
     <div class="builder-main">
         <div class="cards-section">
+            <!-- 筛选面板 -->
             <div class="filter-panel">
                 <div class="row-filters">
                     <div class="filter-item"><div class="filter-label">🔍 搜索</div><input type="text" id="searchInput" class="search-input" placeholder="卡名/文本"></div>
-                    <!-- 移除了扩展包下拉框 -->
                     <div class="filter-item"><div class="filter-label">⚙️ 卡池</div><select id="statusSelect"><option value="all">全部</option><option value="active">活跃</option><option value="reserve">预备</option><option value="spawn">衍生</option><option value="veteran">老兵</option></select></div>
                 </div>
-
-                <div class="filter-group">
-                    <div class="filter-group-title collapse-toggle" data-target="factionBody">
-                        🏳 阵营 <span class="reset-chip" data-filter-type="faction">✖ 清除</span>
-                        <span class="arrow open">▶</span>
-                    </div>
-                    <div class="filter-group-body" id="factionBody">
-                        <div class="multi-select-btns" id="factionMultiContainer"></div>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <div class="filter-group-title collapse-toggle" data-target="typeBody">
-                        ♠️ 类型 <span class="reset-chip" data-filter-type="type">✖ 清除</span>
-                        <span class="arrow open">▶</span>
-                    </div>
-                    <div class="filter-group-body" id="typeBody">
-                        <div class="multi-select-btns" id="typeMultiContainer"></div>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <div class="filter-group-title collapse-toggle" data-target="costBody">
-                        💰 花费 <span class="reset-chip" data-filter-type="cost">✖ 清除</span>
-                        <span class="arrow open">▶</span>
-                    </div>
-                    <div class="filter-group-body" id="costBody">
-                        <div class="multi-select-btns" id="costMultiContainer"></div>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <div class="filter-group-title collapse-toggle" data-target="rarityBody">
-                        🃏 稀有度 <span class="reset-chip" data-filter-type="rarity">✖ 清除</span>
-                        <span class="arrow open">▶</span>
-                    </div>
-                    <div class="filter-group-body" id="rarityBody">
-                        <div class="multi-select-btns" id="rarityMultiContainer"></div>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <div class="filter-group-title collapse-toggle" data-target="attrBody">
-                        ✨ 词条 <span class="reset-chip" data-filter-type="attribute">✖ 清除</span>
-                        <span class="arrow open">▶</span>
-                    </div>
-                    <div class="filter-group-body" id="attrBody">
-                        <div class="multi-select-btns" id="attrMultiContainer"></div>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <div class="filter-group-title collapse-toggle" data-target="setBody">
-                        📦 扩展包 <span class="reset-chip" data-filter-type="set">✖ 清除</span>
-                        <span class="arrow open">▶</span>
-                    </div>
-                    <div class="filter-group-body" id="setBody">
-                        <div class="multi-select-btns" id="setMultiContainer"></div>
-                    </div>
-                </div>
-
-                <div id="statsArea" style="display: none;">
-                    <div class="stats-group">
-                        <div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><input type="number" id="attackExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div>
-                        <div class="stats-item"><div class="filter-label">🛡️ 防御力</div><input type="number" id="defenseExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div>
-                        <div class="stats-item"><div class="filter-label">⚙️ 行动花费</div><input type="number" id="opExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="6"></div>
-                    </div>
-                    <div class="stats-note">※ 仅筛选单位时生效，-1 = 不筛选</div>
-                </div>
+                <div class="filter-group"><div class="filter-group-title collapse-toggle" data-target="factionBody">🏳 阵营 <span class="reset-chip" data-filter-type="faction">✖ 清除</span><span class="arrow open">▶</span></div><div class="filter-group-body" id="factionBody"><div class="multi-select-btns" id="factionMultiContainer"></div></div></div>
+                <div class="filter-group"><div class="filter-group-title collapse-toggle" data-target="typeBody">♠️ 类型 <span class="reset-chip" data-filter-type="type">✖ 清除</span><span class="arrow open">▶</span></div><div class="filter-group-body" id="typeBody"><div class="multi-select-btns" id="typeMultiContainer"></div></div></div>
+                <div class="filter-group"><div class="filter-group-title collapse-toggle" data-target="costBody">💰 花费 <span class="reset-chip" data-filter-type="cost">✖ 清除</span><span class="arrow open">▶</span></div><div class="filter-group-body" id="costBody"><div class="multi-select-btns" id="costMultiContainer"></div></div></div>
+                <div class="filter-group"><div class="filter-group-title collapse-toggle" data-target="rarityBody">🃏 稀有度 <span class="reset-chip" data-filter-type="rarity">✖ 清除</span><span class="arrow open">▶</span></div><div class="filter-group-body" id="rarityBody"><div class="multi-select-btns" id="rarityMultiContainer"></div></div></div>
+                <div class="filter-group"><div class="filter-group-title collapse-toggle" data-target="attrBody">✨ 词条 <span class="reset-chip" data-filter-type="attribute">✖ 清除</span><span class="arrow open">▶</span></div><div class="filter-group-body" id="attrBody"><div class="multi-select-btns" id="attrMultiContainer"></div></div></div>
+                <div class="filter-group"><div class="filter-group-title collapse-toggle" data-target="setBody">📦 扩展包 <span class="reset-chip" data-filter-type="set">✖ 清除</span><span class="arrow open">▶</span></div><div class="filter-group-body" id="setBody"><div class="multi-select-btns" id="setMultiContainer"></div></div></div>
+                <div id="statsArea" style="display:none;"><div class="stats-group"><div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><input type="number" id="attackExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div><div class="stats-item"><div class="filter-label">🛡️ 防御力</div><input type="number" id="defenseExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div><div class="stats-item"><div class="filter-label">⚙️ 行动花费</div><input type="number" id="opExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="6"></div></div><div class="stats-note">※ 仅筛选单位时生效，-1 = 不筛选</div></div>
             </div>
-
+            <!-- 卡牌网格 -->
             <div id="cardContainer" class="card-grid">正在寻找敌人...</div>
             <div class="pagination" id="pagination"></div>
         </div>
+        <!-- 桌面端卡组面板 -->
         <div class="deck-panel" id="deckPanel">
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
@@ -1349,24 +1105,19 @@
             <div class="deck-list" id="deckListContainer"></div>
         </div>
     </div>
+
     <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a><a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a></div>
 </div>
 
-<div id="statsModal" class="modal-stats">
-    <div class="modal-stats-content">
-        <div class="modal-stats-close" id="statsModalClose">&times;</div>
-        <div class="modal-stats-title">📊 卡组统计</div>
-        <div id="modalHistogramBars" class="histogram-bars"></div>
-        <div id="modalTypeSummary" class="type-summary-modal"></div>
-        <div id="modalRarityStats" class="rarity-stats-row"></div>
-    </div>
-</div>
+<!-- 统计模态框 -->
+<div id="statsModal" class="modal-stats"><div class="modal-stats-content"><div class="modal-stats-close" id="statsModalClose">&times;</div><div class="modal-stats-title">📊 卡组统计</div><div id="modalHistogramBars" class="histogram-bars"></div><div id="modalTypeSummary" class="type-summary-modal"></div><div id="modalRarityStats" class="rarity-stats-row"></div></div></div>
 
+<!-- 图片生成模态框 -->
 <div id="imgGenModal" class="img-gen-modal">
     <div class="img-gen-content">
         <div class="img-gen-controls">
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
-            <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width: 100%; margin: 0;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
+            <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width:100%;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 卡图语言</label><select id="imgLang"></select></div>
             <div class="img-gen-control"><label>📌 游戏版本</label><select id="imgVersionSelect"></select></div>
         </div>
@@ -1376,19 +1127,14 @@
             <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
             <div class="switch-item"><span>🏛️ 总部</span><label class="switch"><input type="checkbox" id="headquarterToggle"><span class="slider"></span></label></div>
         </div>
-        <!-- 总部输入框 -->
-        <div id="headquarterInputDiv">
-            <label for="headquarterNameInput">总部英文名</label>
-            <input type="text" id="headquarterNameInput" placeholder="例: MOSCOW">
-        </div>
+        <div id="headquarterInputDiv"><label for="headquarterNameInput">总部英文名</label><input type="text" id="headquarterNameInput" placeholder="例:MOSCOW"></div>
 
-        <!-- 拖拽排序区域 -->
-        <div class="sortable-section">
-            <div class="sortable-section-title">
-                <span>🔄 卡牌顺序（拖拽调整）</span>
-                <span style="font-size:0.6rem; color:#6b6e5c;">拖动 ☰ 调整顺序</span>
+        <div id="cardVersionList">
+            <div class="set-all-wrapper">
+                <label>全部设为</label>
+                <select id="setAllVersionSelect"></select>
+                <button id="applySetAllBtn" class="gen-img-btn" style="padding:2px 12px; font-size:0.7rem;">应用</button>
             </div>
-            <div class="sortable-list" id="sortableListContainer"></div>
         </div>
 
         <div class="img-gen-preview" id="imgGenPreview"></div>
@@ -1416,42 +1162,17 @@
 
     // ==================== 常量与翻译 ====================
     const attrTranslation = {
-        "blitz": "闪击",
-        "fury": "奋战",
-        "smokescreen": "烟幕",
-        "pincer": "钳击",
-        "salvage": "收缴",
-        "guard": "守护",
-        "heavyArmor1": "重甲 1",
-        "heavyArmor2": "重甲 2",
-        "heavyArmor3": "重甲 3",
-        "alpine": "山地",
-        "mobilize": "动员",
-        "covert": "隐蔽",
-        "shock": "冲击",
-        "bond": "协力",
-        "ambush": "伏击",
-        "intel1": "情报 1",
-        "intel2": "情报 2",
-        "intel3": "情报 3"
+        "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴",
+        "guard": "守护", "heavyArmor1": "重甲 1", "heavyArmor2": "重甲 2", "heavyArmor3": "重甲 3",
+        "alpine": "山地", "mobilize": "动员", "covert": "隐蔽", "shock": "冲击", "bond": "协力",
+        "ambush": "伏击", "intel1": "情报 1", "intel2": "情报 2", "intel3": "情报 3"
     };
-
     const setTranslation = {
-        "Base": "基础",
-        "Allegiance": "忠诚",
-        "Breakthrough": "突破",
-        "Legions": "军团",
-        "WorldAtWar": "世纪大战",
-        "TheatersOfWar": "战区",
-        "BrothersInArms": "战友",
-        "WinterWar": "冬季战争",
-        "CovertOps": "秘密行动",
-        "BloodAndIron": "铁与血",
-        "NavalWarfare": "海战",
-        "Homefront": "国土阵线",
-        "OceaniaStorm": "澳新风暴"
+        "Base": "基础", "Allegiance": "忠诚", "Breakthrough": "突破", "Legions": "军团",
+        "WorldAtWar": "世纪大战", "TheatersOfWar": "战区", "BrothersInArms": "战友",
+        "WinterWar": "冬季战争", "CovertOps": "秘密行动", "BloodAndIron": "铁与血",
+        "NavalWarfare": "海战", "Homefront": "国土阵线", "OceaniaStorm": "澳新风暴"
     };
-
     const setIconMap = {
         "Base": "https://www.datocms-assets.com/120590/1732572097-set-icon-base.svg",
         "Allegiance": "https://www.datocms-assets.com/120590/1732572215-set-icon-allegiance.svg",
@@ -1467,7 +1188,6 @@
         "Homefront": "https://www.datocms-assets.com/120590/1763718716-homefront.svg",
         "OceaniaStorm": "https://www.datocms-assets.com/120590/1780567349-oceania_storm_set-icon.svg"
     };
-
     const typeNameMap = { "infantry":"步兵","tank":"坦克","fighter":"战斗机","bomber":"轰炸机","artillery":"炮兵","order":"指令","countermeasure":"反制" };
     const unitTypes = ["infantry","tank","fighter","bomber","artillery"];
     const rarityClassMap = { "Standard":"rarity-standard","Limited":"rarity-limited","Special":"rarity-special","Elite":"rarity-elite" };
@@ -1483,27 +1203,13 @@
     let allCards = [], filteredCards = [], deckMap = new Map();
     let currentPage = 1, PAGE_SIZE = 20;
     let mainNation = "usa", allyNation = "finland";
-
     let selectedFilters = {
-        factions: new Set(),
-        types: new Set(),
-        costs: new Set(),
-        rarities: new Set(),
-        attributes: new Set(),
-        sets: new Set()
+        factions: new Set(), types: new Set(), costs: new Set(),
+        rarities: new Set(), attributes: new Set(), sets: new Set()
     };
-    
     let whiteboardMode = false;
-
-    let cardIndex = {};
-    let parentOfMap = {};
-    let veteranMap = {};
-    let becomesVeteranMap = {};
-
-    // 排序与版本相关
-    let sortableCards = [];
-    let dragSrcIndex = null;
-    let dragOverIndex = null;
+    let cardIndex = {}, parentOfMap = {}, veteranMap = {}, becomesVeteranMap = {};
+    let cardVersionMap = new Map();
 
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -1523,28 +1229,15 @@
     }
 
     // 探针检测
-    function probeImage(url) {
+    function probeImageExists(imgName, lang, version) {
+        if (!imgName) return Promise.resolve(false);
+        const url = getCardImageUrl(imgName, lang, version, 1);
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => resolve(true);
             img.onerror = () => resolve(false);
             img.src = url;
         });
-    }
-
-    // 获取卡图
-    async function fetchCardImageWithFallback(card, lang, preferredVersion, quality) {
-        if (!card.image) return null;
-        // 总部强制使用最新版本
-        if (card.isHeadquarter) {
-            const url = getCardImageUrl(card.image, lang, DEFAULT_VERSION, quality);
-            return url;
-        }
-        // 尝试首选版本
-        const probeUrl = getCardImageUrl(card.image, lang, preferredVersion, 1);
-        const exists = await probeImage(probeUrl);
-        const finalVersion = exists ? preferredVersion : DEFAULT_VERSION;
-        return getCardImageUrl(card.image, lang, finalVersion, quality);
     }
 
     function getSearchableText(card) {
@@ -1556,7 +1249,6 @@
         visited = visited || new Set();
         if (visited.has(card.cardId)) return card.setName;
         visited.add(card.cardId);
-
         if (card.setName === "OnlySpawnable") {
             const parents = parentOfMap[card.cardId] || [];
             for (let pid of parents) {
@@ -1568,7 +1260,6 @@
             }
             return "OnlySpawnable";
         }
-
         if (card.setName === "Special") {
             const originalId = becomesVeteranMap[card.cardId];
             if (originalId) {
@@ -1590,7 +1281,6 @@
             if (!res.ok) throw new Error("data.json failed");
             const data = await res.json();
             const rawCards = data.cards || [];
-
             allCards = rawCards.map((raw, idx) => {
                 const j = raw.json || {};
                 const factionRaw = (j.faction || "").toLowerCase();
@@ -1620,14 +1310,11 @@
                     rawJson: j
                 };
             });
-
             cardIndex = {};
             for (let c of allCards) if (c.cardId) cardIndex[c.cardId] = c;
-
             parentOfMap = {};
             veteranMap = {};
             becomesVeteranMap = {};
-
             for (let c of allCards) {
                 if (c.canCreate && c.canCreate.length) {
                     for (let childId of c.canCreate) {
@@ -1636,7 +1323,6 @@
                     }
                 }
             }
-
             for (let c of allCards) {
                 const attrs = c.attributes || [];
                 for (let a of attrs) {
@@ -1652,12 +1338,12 @@
                     }
                 }
             }
-
             initStaticFilters();
             initMultiFilters();
             initAttrFilter();
             initSetFilter();
             initImgVersionSelect();
+            initCardVersionList();
             applyFilters();
             updateFactionStats();
         } catch(e) {
@@ -1676,7 +1362,6 @@
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', applyFilters);
         });
-
         const mainOptionsHtml = mainNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         const allyOptionsHtml = allNationOptions.map(f => `<option value="${f}">${factionNames[f]}</option>`).join('');
         ['mainNationSelect', 'mobileMainNation'].forEach(id => {
@@ -1697,7 +1382,6 @@
             langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
             langSelect.value = 'zh-Hans';
         }
-
         const bgSelect = document.getElementById('bgColorSelect');
         const customDiv = document.getElementById('customColorDiv');
         if (bgSelect) {
@@ -1705,7 +1389,6 @@
                 if (customDiv) customDiv.style.display = bgSelect.value === 'custom' ? 'flex' : 'none';
             });
         }
-
         const updateNation = () => {
             mainNation = document.getElementById('mainNationSelect').value;
             allyNation = document.getElementById('allyNationSelect').value;
@@ -1713,7 +1396,6 @@
             document.getElementById('mobileAllyNation').value = allyNation;
             updateAllDecksUI();
             updateFactionStats();
-            buildSortableCards();
         };
         const updateMobile = () => {
             mainNation = document.getElementById('mobileMainNation').value;
@@ -1722,7 +1404,6 @@
             document.getElementById('allyNationSelect').value = allyNation;
             updateAllDecksUI();
             updateFactionStats();
-            buildSortableCards();
         };
         document.getElementById('mainNationSelect').addEventListener('change', updateNation);
         document.getElementById('allyNationSelect').addEventListener('change', updateNation);
@@ -1772,7 +1453,6 @@
             const type = chip.dataset.filter;
             const val = chip.dataset.val;
             if (!type || !val) return;
-            
             if (type === 'whiteboard') {
                 whiteboardMode = !whiteboardMode;
                 chip.classList.toggle('active');
@@ -1783,12 +1463,10 @@
                 applyFilters();
                 return;
             }
-            
             if (type === 'attribute' && whiteboardMode) {
                 whiteboardMode = false;
                 document.querySelector('.filter-chip[data-filter="whiteboard"]')?.classList.remove('active');
             }
-            
             const setMap = {
                 'faction': selectedFilters.factions,
                 'type': selectedFilters.types,
@@ -1811,18 +1489,15 @@
         fc.innerHTML = allNationOptions.map(f =>
             `<div class="filter-chip" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</div>`
         ).join('');
-
         const typeKeys = Object.keys(typeNameMap);
         const tc = document.getElementById('typeMultiContainer');
         tc.innerHTML = typeKeys.map(t =>
             `<div class="filter-chip" data-filter="type" data-val="${t}">${typeNameMap[t]}</div>`
         ).join('');
-
         const cc = document.getElementById('costMultiContainer');
         cc.innerHTML = STATIC_COSTS.map(c =>
             `<div class="filter-chip" data-filter="cost" data-val="${c}">${c==='7+'?'7K+':c+'K'}</div>`
         ).join('');
-
         const rc = document.getElementById('rarityMultiContainer');
         rc.innerHTML = STATIC_RARITIES.map(r =>
             `<div class="filter-chip" data-filter="rarity" data-val="${r}">${rarityDisplayMap[r]}</div>`
@@ -1848,7 +1523,7 @@
         }).join('');
     }
 
-    // ==================== 图片生成版本选择 ====================
+    // ==================== 版本选择 ====================
     function initImgVersionSelect() {
         const select = document.getElementById('imgVersionSelect');
         if (!select) return;
@@ -1860,7 +1535,6 @@
             if (ver === DEFAULT_VERSION) opt.selected = true;
             select.appendChild(opt);
         });
-        // 监听变化：控制统计卡可用性
         select.addEventListener('change', function() {
             const isLatest = this.value === DEFAULT_VERSION;
             const statsToggle = document.getElementById('statsCardToggle');
@@ -1876,234 +1550,103 @@
                 statsItem.style.opacity = '0.5';
                 statsItem.title = '非最新版本，统计卡不可用';
             }
-            // 刷新排序列表，更新版本选项
-            buildSortableCards();
+            // 同步到“全部设为”下拉
+            document.getElementById('setAllVersionSelect').value = this.value;
         });
-        // 触发一次初始状态
-        select.dispatchEvent(new Event('change'));
-    }
-
-    // ==================== 总部功能 ====================
-    async function checkHeadquarterImage(name, lang) {
-        const ver = DEFAULT_VERSION;
-        const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(/^_+|_+$/g, '');
-        if (!formatted) return false;
-        const url = `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${formatted}.avif&q=1&w=1&h=1`;
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(true);
-            img.onerror = () => resolve(false);
-            img.src = url;
-        });
-    }
-
-    async function fetchHeadquarterCard(name, lang) {
-        if (!name || name.trim() === '') return null;
-        const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(/^_+|_+$/g, '');
-        if (!formatted) return null;
-        const exists = await checkHeadquarterImage(formatted, lang);
-        if (!exists) return null;
-        return {
-            id: -1,
-            cardId: 'headquarter',
-            titleZh: '总部',
-            titleEn: 'Headquarters',
-            image: `${formatted}.avif`,
-            faction: 'neutral',
-            type: 'order',
-            rarity: 'Standard',
-            cost: 0,
-            attack: undefined,
-            defense: undefined,
-            operationCost: undefined,
-            attributes: [],
-            setName: 'Base',
-            reserved: false,
-            isSpawn: false,
-            isVeteranSet: false,
-            canCreate: [],
-            isHeadquarter: true
-        };
-    }
-
-    // ==================== 拖拽排序 ====================
-    function buildSortableCards() {
-        const hqToggle = document.getElementById('headquarterToggle');
-        const hqName = document.getElementById('headquarterNameInput').value.trim();
-        const globalVersion = document.getElementById('imgVersionSelect').value;
-
-        // 从 deckMap 构建基础列表
-        const entries = Array.from(deckMap.values()).sort((a, b) => {
-            const idxA = allCards.findIndex(c => c.id === a.card.id);
-            const idxB = allCards.findIndex(c => c.id === b.card.id);
-            return idxA - idxB;
-        });
-
-        let newList = [];
-        // 如果总部启用，添加到开头
-        if (hqToggle.checked && hqName) {
-            const hqPlaceholder = {
-                id: -1,
-                cardId: 'headquarter',
-                titleZh: '总部',
-                faction: 'neutral',
-                image: 'headquarter',
-                isHeadquarter: true,
-                count: 1
-            };
-            newList.push(hqPlaceholder);
-        }
-
-        for (const entry of entries) {
-            newList.push({
-                ...entry.card,
-                count: entry.count
-            });
-        }
-
-        // 保留已有的版本设置（如果有）
-        const oldMap = {};
-        for (const item of sortableCards) {
-            if (item.cardId) {
-                oldMap[item.cardId] = item._version || globalVersion;
-            }
-        }
-
-        sortableCards = newList.map((card, index) => {
-            const ver = oldMap[card.cardId] || globalVersion;
-            return {
-                ...card,
-                _version: ver,
-                _index: index
-            };
-        });
-
-        renderSortableList();
-    }
-
-    function renderSortableList() {
-        const container = document.getElementById('sortableListContainer');
-        if (!container) return;
-        container.innerHTML = '';
-
-        if (sortableCards.length === 0) {
-            container.innerHTML = '<div style="color:#6b6e5c; padding:12px; text-align:center; font-size:0.8rem;">卡组为空，请添加卡牌</div>';
-            return;
-        }
-
-        sortableCards.forEach((card, index) => {
-            const div = document.createElement('div');
-            div.className = 'sortable-item';
-            div.draggable = true;
-            div.dataset.index = index;
-            div.dataset.cardId = card.cardId;
-
-            // 手柄
-            const handle = document.createElement('span');
-            handle.className = 'sortable-handle';
-            handle.textContent = '☰';
-            div.appendChild(handle);
-
-            // 阵营图标
-            const icon = document.createElement('div');
-            icon.className = 'sortable-icon';
-            icon.style.backgroundImage = `url('${card.faction}.svg')`;
-            div.appendChild(icon);
-
-            // 卡名
-            const name = document.createElement('span');
-            name.className = 'sortable-name';
-            name.textContent = card.titleZh || '未知卡牌';
-            if (card.isHeadquarter) name.textContent = '🏛️ 总部';
-            div.appendChild(name);
-
-            // 数量
-            const qty = document.createElement('span');
-            qty.className = 'sortable-qty';
-            qty.textContent = card.isHeadquarter ? '' : `x${card.count || 1}`;
-            div.appendChild(qty);
-
-            // 版本选择
-            const versionDiv = document.createElement('div');
-            versionDiv.className = 'sortable-version';
-            const select = document.createElement('select');
+        // 填充“全部设为”下拉
+        const setAllSelect = document.getElementById('setAllVersionSelect');
+        if (setAllSelect) {
+            setAllSelect.innerHTML = '';
             AVAILABLE_VERSIONS.forEach(ver => {
                 const opt = document.createElement('option');
                 opt.value = ver;
                 opt.textContent = ver.toUpperCase();
-                if (ver === card._version || (ver === DEFAULT_VERSION && !card._version)) {
-                    opt.selected = true;
-                }
-                select.appendChild(opt);
+                if (ver === DEFAULT_VERSION) opt.selected = true;
+                setAllSelect.appendChild(opt);
             });
-            // 总部固定最新版本
-            if (card.isHeadquarter) {
-                select.disabled = true;
-                select.value = DEFAULT_VERSION;
+        }
+        select.dispatchEvent(new Event('change'));
+    }
+
+    // ==================== 卡牌版本列表 ====================
+    function initCardVersionList() {
+        // 在打开模态框时更新
+        document.getElementById('genImgBtn')?.addEventListener('click', () => {
+            // 更新版本列表
+            updateCardVersionList();
+        });
+        document.getElementById('mobileGenImgBtn')?.addEventListener('click', () => {
+            updateCardVersionList();
+        });
+        // 监听“全部设为”应用按钮
+        document.getElementById('applySetAllBtn')?.addEventListener('click', function() {
+            const ver = document.getElementById('setAllVersionSelect').value;
+            // 遍历所有卡牌设置版本
+            for (let [cardId, _] of cardVersionMap) {
+                cardVersionMap.set(cardId, ver);
             }
-            select.addEventListener('change', function(e) {
-                e.stopPropagation();
-                const idx = parseInt(div.dataset.index);
-                if (!isNaN(idx) && sortableCards[idx]) {
-                    sortableCards[idx]._version = this.value;
-                }
-            });
-            versionDiv.appendChild(select);
-            div.appendChild(versionDiv);
-
-            // 拖拽事件
-            div.addEventListener('dragstart', onDragStart);
-            div.addEventListener('dragend', onDragEnd);
-            div.addEventListener('dragover', onDragOver);
-            div.addEventListener('dragenter', onDragEnter);
-            div.addEventListener('dragleave', onDragLeave);
-            div.addEventListener('drop', onDrop);
-
-            container.appendChild(div);
+            updateCardVersionList();
         });
     }
 
-    let dragSrcIndex = null;
-    function onDragStart(e) {
-        dragSrcIndex = parseInt(this.dataset.index);
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', this.dataset.index);
-        this.style.opacity = '0.5';
-    }
-
-    function onDragEnd(e) {
-        this.style.opacity = '1';
-        document.querySelectorAll('.sortable-item').forEach(el => el.classList.remove('drag-over'));
-    }
-
-    function onDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    }
-
-    function onDragEnter(e) {
-        e.preventDefault();
-        this.classList.add('drag-over');
-    }
-
-    function onDragLeave(e) {
-        this.classList.remove('drag-over');
-    }
-
-    function onDrop(e) {
-        e.preventDefault();
-        this.classList.remove('drag-over');
-        const srcIndex = parseInt(e.dataTransfer.getData('text/plain'));
-        const targetIndex = parseInt(this.dataset.index);
-        if (isNaN(srcIndex) || isNaN(targetIndex) || srcIndex === targetIndex) return;
-
-        // 重新排序
-        const [movedItem] = sortableCards.splice(srcIndex, 1);
-        sortableCards.splice(targetIndex, 0, movedItem);
-        
-        // 更新索引
-        sortableCards.forEach((item, idx) => item._index = idx);
-        renderSortableList();
+    function updateCardVersionList() {
+        const container = document.getElementById('cardVersionList');
+        if (!container) return;
+        // 保留 .set-all-wrapper
+        const wrapper = container.querySelector('.set-all-wrapper');
+        // 移除其他子元素
+        while (container.children.length > 1) {
+            container.removeChild(container.lastChild);
+        }
+        const entries = Array.from(deckMap.entries()).sort((a, b) => {
+            const idxA = allCards.findIndex(c => c.id === a[0]);
+            const idxB = allCards.findIndex(c => c.id === b[0]);
+            return idxA - idxB;
+        });
+        if (entries.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.cssText = 'color:#887e66; font-size:0.8rem; padding:8px 0; text-align:center;';
+            emptyMsg.textContent = '卡组为空';
+            container.appendChild(emptyMsg);
+            return;
+        }
+        for (let [cardId, entry] of entries) {
+            const card = entry.card;
+            if (!card) continue;
+            const row = document.createElement('div');
+            row.className = 'version-row';
+            // 阵营图标
+            const icon = document.createElement('img');
+            icon.className = 'v-icon';
+            icon.src = `${card.faction}.svg`;
+            icon.onerror = () => icon.style.display = 'none';
+            row.appendChild(icon);
+            // 名称
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'v-name';
+            nameSpan.textContent = card.titleZh;
+            row.appendChild(nameSpan);
+            // 数量
+            const qtySpan = document.createElement('span');
+            qtySpan.className = 'v-qty';
+            qtySpan.textContent = `x${entry.count}`;
+            row.appendChild(qtySpan);
+            // 版本下拉
+            const select = document.createElement('select');
+            const currentVer = cardVersionMap.get(card.cardId) || DEFAULT_VERSION;
+            AVAILABLE_VERSIONS.forEach(ver => {
+                const opt = document.createElement('option');
+                opt.value = ver;
+                opt.textContent = ver.toUpperCase();
+                if (ver === currentVer) opt.selected = true;
+                select.appendChild(opt);
+            });
+            select.addEventListener('change', function() {
+                cardVersionMap.set(card.cardId, this.value);
+            });
+            row.appendChild(select);
+            container.appendChild(row);
+        }
     }
 
     // ==================== 筛选逻辑 ====================
@@ -2111,7 +1654,6 @@
         let res = [...allCards];
         const search = document.getElementById('searchInput').value.trim().toLowerCase();
         if (search) res = res.filter(c => getSearchableText(c).includes(search));
-
         if (whiteboardMode) {
             res = res.filter(c => {
                 const attrs = c.attributes || [];
@@ -2127,7 +1669,6 @@
                 return true;
             });
         }
-
         if (selectedFilters.factions.size) res = res.filter(c => selectedFilters.factions.has(c.faction));
         if (selectedFilters.types.size) res = res.filter(c => selectedFilters.types.has(c.type));
         if (selectedFilters.costs.size) {
@@ -2140,26 +1681,22 @@
             });
         }
         if (selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
-
         if (selectedFilters.sets.size) {
             res = res.filter(c => {
                 const effSet = getEffectiveSet(c);
                 return selectedFilters.sets.has(effSet);
             });
         }
-
         const status = document.getElementById('statusSelect').value;
         if (status === 'active') res = res.filter(c => !c.reserved && !c.isSpawn && !c.isVeteranSet);
         else if (status === 'reserve') res = res.filter(c => c.reserved);
         else if (status === 'spawn') res = res.filter(c => c.isSpawn);
         else if (status === 'veteran') res = res.filter(c => c.isVeteranSet);
-
         const activeTypesSet = selectedFilters.types;
         const onlyUnits = activeTypesSet.size > 0 && [...activeTypesSet].every(t => unitTypes.includes(t));
         const statsArea = document.getElementById('statsArea');
         if (onlyUnits) statsArea.style.display = 'block';
         else statsArea.style.display = 'none';
-
         if (onlyUnits) {
             let attExact = parseInt(document.getElementById('attackExact').value);
             let defExact = parseInt(document.getElementById('defenseExact').value);
@@ -2211,7 +1748,6 @@
                         </div>
                     </div>`;
         }).join('');
-
         document.querySelectorAll('.card-item').forEach(el => {
             el.addEventListener('click', (e) => {
                 if (e.target.classList.contains('card-remove-icon') || e.target.classList.contains('mobile-remove-btn')) return;
@@ -2253,30 +1789,35 @@
         let entry = deckMap.get(card.id);
         if (entry) entry.count++;
         else deckMap.set(card.id, { card, count: 1 });
+        // 设置默认版本
+        if (!cardVersionMap.has(card.cardId)) {
+            cardVersionMap.set(card.cardId, DEFAULT_VERSION);
+        }
         updateAllDecksUI();
         renderCards();
         updateFactionStats();
-        buildSortableCards();
     }
 
     function removeFromDeck(cardId) {
         let entry = deckMap.get(cardId);
         if (entry) {
             if (entry.count > 1) entry.count--;
-            else deckMap.delete(cardId);
+            else {
+                deckMap.delete(cardId);
+                cardVersionMap.delete(entry.card.cardId);
+            }
             updateAllDecksUI();
             renderCards();
             updateFactionStats();
-            buildSortableCards();
         }
     }
 
     function clearDeck() {
         deckMap.clear();
+        cardVersionMap.clear();
         updateAllDecksUI();
         renderCards();
         updateFactionStats();
-        buildSortableCards();
     }
 
     function updateFactionStats() {
@@ -2358,13 +1899,11 @@
         const num = idx + 1;
         return num === 10 ? 'a' : num.toString();
     }
-
     function parseNationCode(codeChar) {
         if (codeChar >= '1' && codeChar <= '9') return parseInt(codeChar, 10);
         if (codeChar === 'a') return 10;
         return 1;
     }
-
     function exportDeckCode() {
         if (deckMap.size === 0) { alert("卡组为空，无法导出"); return null; }
         const cardCountMap = new Map();
@@ -2386,7 +1925,6 @@
         }
         return `%%${getNationCode(mainNation)}${getNationCode(allyNation)}|${regions[0]};${regions[1]};${regions[2]};${regions[3]}`;
     }
-
     async function copyToClipboard(text) {
         try { await navigator.clipboard.writeText(text); return true; } catch(e) {
             try {
@@ -2406,12 +1944,10 @@
             }
         }
     }
-
     async function exportAndCopy() {
         const code = exportDeckCode();
         if (code) { await copyToClipboard(code); alert('卡组代码已复制！\n\n' + code); }
     }
-
     function parseDeckCode(rawCode) {
         const startIdx = rawCode.indexOf('%%');
         if (startIdx === -1) throw new Error('未找到 %%');
@@ -2448,11 +1984,11 @@
         }
         return { mainFaction, allyFaction, cardEntries };
     }
-
     function importDeckFromCode(rawCode) {
         try {
             const { mainFaction, allyFaction, cardEntries } = parseDeckCode(rawCode);
             deckMap.clear();
+            cardVersionMap.clear();
             mainNation = mainFaction;
             allyNation = allyFaction;
             document.getElementById('mainNationSelect').value = mainNation;
@@ -2488,21 +2024,14 @@
             const total = costMap[i].unit + costMap[i].order + costMap[i].counter;
             if (total > maxTotal) maxTotal = total;
         }
-
         const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
             const unit = costMap[cost].unit;
             const order = costMap[cost].order;
             const counter = costMap[cost].counter;
             const total = unit + order + counter;
-            
             if (total === 0) {
-                return `<div class="histogram-bar-wrapper">
-                            <div class="bar-stack" style="height:0;background:transparent;"></div>
-                            <div class="bar-label">${cost===7?'7K+':cost+'K'}</div>
-                            <div class="cost-total">0</div>
-                        </div>`;
+                return `<div class="histogram-bar-wrapper"><div class="bar-stack" style="height:0;background:transparent;"></div><div class="bar-label">${cost===7?'7K+':cost+'K'}</div><div class="cost-total">0</div></div>`;
             }
-            
             const ratio = total / maxTotal;
             const totalH = Math.max(4, ratio * 124);
             const unitRatio = unit / total;
@@ -2511,7 +2040,6 @@
             const unitH = unitRatio * totalH;
             const orderH = orderRatio * totalH;
             const counterH = counterRatio * totalH;
-            
             return `<div class="histogram-bar-wrapper">
                         <div class="bar-stack" style="height:128px;background:transparent;">
                             <div class="bar-unit" style="height:${unitH}px; background:#e8e4d0;" title="单位:${unit}"></div>
@@ -2531,14 +2059,45 @@
     function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
     // ==================== 图片生成 ====================
-    function getExpandedCardList() {
-        // 仅用于兼容，实际使用 sortableCards
+    async function fetchHeadquarterCard(name, lang) {
+        if (!name || name.trim() === '') return null;
+        const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(/^_+|_+$/g, '');
+        if (!formatted) return null;
+        const exists = await probeImageExists(`${formatted}.avif`, lang, DEFAULT_VERSION);
+        if (!exists) return null;
+        return {
+            id: -1,
+            cardId: 'headquarter',
+            titleZh: '总部',
+            titleEn: 'Headquarters',
+            image: `${formatted}.avif`,
+            faction: 'neutral',
+            type: 'order',
+            rarity: 'Standard',
+            cost: 0,
+            attack: undefined,
+            defense: undefined,
+            operationCost: undefined,
+            attributes: [],
+            setName: 'Base',
+            reserved: false,
+            isSpawn: false,
+            isVeteranSet: false,
+            canCreate: [],
+            isHeadquarter: true
+        };
+    }
+
+    function getExpandedCardListWithHeadquarter(headquarterCard) {
         const entries = Array.from(deckMap.values()).sort((a, b) => {
             const idxA = allCards.findIndex(c => c.id === a.card.id);
             const idxB = allCards.findIndex(c => c.id === b.card.id);
             return idxA - idxB;
         });
         const result = [];
+        if (headquarterCard) {
+            result.push(headquarterCard);
+        }
         for (const entry of entries) {
             for (let i = 0; i < entry.count; i++) {
                 result.push(entry.card);
@@ -2556,17 +2115,10 @@
             return Math.max(r, g, b) <= threshold;
         } catch(e) { return false; }
     }
-
     function getCanvasCropRegion(ctx, width, height, threshold = 50) {
         const visited = new Uint8Array(width * height);
         const queue = [];
-        const corners = [
-            [0, 0],
-            [width - 1, 0],
-            [0, height - 1],
-            [width - 1, height - 1]
-        ];
-        
+        const corners = [[0,0],[width-1,0],[0,height-1],[width-1,height-1]];
         for (const [cx, cy] of corners) {
             const idx = cy * width + cx;
             if (!visited[idx] && isDarkPixelForCanvas(ctx, cx, cy, threshold)) {
@@ -2574,8 +2126,7 @@
                 queue.push([cx, cy]);
             }
         }
-        
-        const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
         while (queue.length > 0) {
             const [x, y] = queue.shift();
             for (const [dx, dy] of dirs) {
@@ -2589,7 +2140,6 @@
                 }
             }
         }
-        
         let top = 0, bottom = height - 1, left = 0, right = width - 1;
         for (let y = 0; y < height; y++) {
             let hasLight = false;
@@ -2622,6 +2172,7 @@
         return { left, top, width: right - left + 1, height: bottom - top + 1 };
     }
 
+    // 绘制统计卡
     async function drawStatsCard(ctx, x, y, w, h, radius) {
         ctx.save();
         ctx.beginPath();
@@ -2645,7 +2196,6 @@
         let rarityCounts = { Standard: 0, Limited: 0, Special: 0, Elite: 0 };
         let costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
-        
         for (let { card, count } of deckMap.values()) {
             if (card.faction === mainNation) mainCount += count;
             else if (card.faction === allyNation) allyCount += count;
@@ -2713,20 +2263,17 @@
         const barWidth = (w * 0.88) / 8;
         const barMaxHeight = barAreaH * 0.75;
         const barGap = 2;
-
         let maxCount = 1;
         for (let i = 0; i <= 7; i++) {
             const total = costMap[i].unit + costMap[i].order + costMap[i].counter;
             if (total > maxCount) maxCount = total;
         }
-
         for (let i = 0; i <= 7; i++) {
             const bx = barStartX + i * barWidth;
             const unit = costMap[i].unit;
             const order = costMap[i].order;
             const counter = costMap[i].counter;
             const total = unit + order + counter;
-            
             if (total === 0) {
                 ctx.fillStyle = "#f5eaca";
                 ctx.font = `${Math.floor(h * 0.035)}px "Segoe UI"`;
@@ -2737,11 +2284,9 @@
                 ctx.fillText("0", bx + (barWidth - barGap)/2, barAreaY + barMaxHeight - h * 0.025);
                 continue;
             }
-            
             const unitH = maxCount > 0 ? (unit / maxCount) * barMaxHeight : 0;
             const orderH = maxCount > 0 ? (order / maxCount) * barMaxHeight : 0;
             const counterH = maxCount > 0 ? (counter / maxCount) * barMaxHeight : 0;
-            
             if (unit > 0) {
                 ctx.fillStyle = "#e8e4d0";
                 ctx.fillRect(bx, barAreaY + barMaxHeight - unitH, barWidth - barGap, unitH);
@@ -2754,7 +2299,6 @@
                 ctx.fillStyle = "#5a5a5a";
                 ctx.fillRect(bx, barAreaY + barMaxHeight - unitH - orderH - counterH, barWidth - barGap, counterH);
             }
-            
             ctx.fillStyle = "#f5eaca";
             ctx.font = `${Math.floor(h * 0.035)}px "Segoe UI"`;
             ctx.textAlign = "center";
@@ -2763,15 +2307,14 @@
             ctx.font = `${Math.floor(h * 0.03)}px "Segoe UI"`;
             ctx.fillText(total, bx + (barWidth - barGap)/2, barAreaY + barMaxHeight - unitH - orderH - counterH - h * 0.025);
         }
-
         ctx.restore();
     }
 
-    // 生成卡组图片
-    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cards, globalVersion) {
-        if (cards.length === 0) throw new Error("卡组为空");
+    // 主生成函数：接收卡牌数组
+    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion) {
+        if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
         const cardW = 500, cardH = 702, radius = 15;
-        let totalCards = cards.length;
+        let totalCards = cardsWithVersion.length;
         if (addStatsCard) totalCards += 1;
         const rows = Math.ceil(totalCards / cols);
         const canvas = document.createElement('canvas');
@@ -2799,21 +2342,15 @@
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * cardW, y = row * cardH;
-                if (cardIdx < cards.length) {
-                    const card = cards[cardIdx];
-                    // 确定版本：总部用最新，其他用自定义或全局
-                    let preferredVersion = globalVersion;
-                    if (card.isHeadquarter) {
-                        preferredVersion = DEFAULT_VERSION;
-                    } else if (card._version) {
-                        preferredVersion = card._version;
+                if (cardIdx < cardsWithVersion.length) {
+                    const item = cardsWithVersion[cardIdx];
+                    const card = item.card;
+                    let ver = item.version || DEFAULT_VERSION;
+                    // 探针检测：如果指定版本不存在，回退最新版
+                    if (!await probeImageExists(card.image, lang, ver)) {
+                        ver = DEFAULT_VERSION;
                     }
-                    // 使用探针获取有效图片URL
-                    const imgUrl = await fetchCardImageWithFallback(card, lang, preferredVersion, quality);
-                    if (!imgUrl) {
-                        cardIdx++;
-                        continue;
-                    }
+                    const imgUrl = getCardImageUrl(card.image, lang, ver, quality);
                     const img = new Image();
                     img.crossOrigin = "Anonymous";
                     await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = imgUrl; });
@@ -2833,7 +2370,7 @@
                     ctx.drawImage(img, x, y, cardW, cardH);
                     ctx.restore();
                     cardIdx++;
-                } else if (addStatsCard && cardIdx === cards.length) {
+                } else if (addStatsCard && cardIdx === cardsWithVersion.length) {
                     await drawStatsCard(ctx, x, y, cardW, cardH, radius);
                     cardIdx++;
                 }
@@ -2863,45 +2400,47 @@
         const cols = parseInt(document.getElementById('imgCols').value);
         const quality = parseInt(document.getElementById('imgQuality').value);
         const lang = document.getElementById('imgLang').value;
-        const globalVersion = document.getElementById('imgVersionSelect').value;
         const addStatsCard = document.getElementById('statsCardToggle').checked && !document.getElementById('statsCardToggle').disabled;
+        const version = document.getElementById('imgVersionSelect').value;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
 
-        // 使用排序列表中的卡片
-        if (sortableCards.length === 0) {
-            alert("卡组为空，请添加卡牌");
-            return;
-        }
-
-        // 检查总部是否存在
+        // 处理总部
         const hqToggle = document.getElementById('headquarterToggle');
         const hqName = document.getElementById('headquarterNameInput').value.trim();
+        let hqCard = null;
         if (hqToggle.checked && hqName) {
-            const exists = await checkHeadquarterImage(hqName, lang);
-            if (!exists) {
+            hqCard = await fetchHeadquarterCard(hqName, lang);
+            if (!hqCard) {
                 alert(`总部图片 "${hqName}" 不存在，请检查名称`);
                 return;
             }
         }
 
-        // 准备最终卡牌列表
-        const finalCards = sortableCards.filter(card => {
-            if (card.isHeadquarter) {
-                return hqToggle.checked && hqName;
+        // 构建卡牌列表
+        const entries = Array.from(deckMap.entries());
+        const cardsWithVersion = [];
+        if (hqCard) {
+            cardsWithVersion.push({ card: hqCard, version: DEFAULT_VERSION });
+        }
+        for (let [cardId, entry] of entries) {
+            const card = entry.card;
+            let ver = cardVersionMap.get(card.cardId) || version || DEFAULT_VERSION;
+            // 对每张卡进行探针检测将在生成函数中异步执行
+            for (let i = 0; i < entry.count; i++) {
+                cardsWithVersion.push({ card, version: ver });
             }
-            return true;
-        });
+        }
 
-        if (finalCards.length === 0) {
-            alert("没有有效的卡牌可生成");
+        if (cardsWithVersion.length === 0) {
+            alert("卡组为空");
             return;
         }
 
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, finalCards, globalVersion);
+            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
         } catch(e) {
@@ -2910,20 +2449,22 @@
     }
 
     async function showImgGenModal() {
-        // 检查卡组是否为空
         if (deckMap.size === 0) {
             const hqToggle = document.getElementById('headquarterToggle');
-            const hqName = document.getElementById('headquarterNameInput').value.trim();
-            if (!hqToggle.checked || !hqName) {
+            if (!hqToggle.checked) {
                 alert("卡组为空，请添加卡牌或启用总部");
                 return;
             }
+            const hqName = document.getElementById('headquarterNameInput').value.trim();
+            if (!hqName) {
+                alert("请输入总部名称");
+                return;
+            }
         }
-        // 构建排序列表
-        await buildSortableCards();
-        
         const modal = document.getElementById('imgGenModal');
         modal.style.display = 'flex';
+        // 更新卡牌版本列表
+        updateCardVersionList();
         document.getElementById('generatePreviewBtn').onclick = updateImgPreview;
         document.getElementById('downloadImgBtn').onclick = () => {
             if (currentPreviewCanvas) {
@@ -2937,6 +2478,7 @@
         const qualitySlider = document.getElementById('imgQuality');
         const qualityVal = document.getElementById('qualityVal');
         qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
+        // 不自动触发预览
     }
 
     // 总部开关显示输入框
@@ -2946,20 +2488,12 @@
         if (hqToggle && hqInputDiv) {
             hqToggle.addEventListener('change', function() {
                 hqInputDiv.style.display = this.checked ? 'block' : 'none';
-                // 重新构建排序列表
-                buildSortableCards();
             });
-            // 初始隐藏
             hqInputDiv.style.display = 'none';
-        }
-        // 总部名称输入变化时重建列表
-        const hqNameInput = document.getElementById('headquarterNameInput');
-        if (hqNameInput) {
-            hqNameInput.addEventListener('input', buildSortableCards);
         }
     });
 
-    // ==================== 原神启动 ====================
+    // ==================== 启动 ====================
     function initSidebars() {
         const toggle = document.getElementById('mobileDeckToggle');
         const panel = document.getElementById('mobileDeckPanel');
