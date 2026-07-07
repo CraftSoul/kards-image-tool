@@ -569,11 +569,14 @@
             font-size: 0.9rem;
             font-weight: bold;
         }
-        .rarity-stat .rarity-standard { color: #9e9e9e; }
-        .rarity-stat .rarity-limited { color: #cd7f32; }
-        .rarity-stat .rarity-special { color: #c0c0c0; }
-        .rarity-stat .rarity-elite { color: #ffd700; }
-
+        .rarity-stat.rarity-standard,
+        .rarity-stat.rarity-standard span { color: #9e9e9e; }
+        .rarity-stat.rarity-limited,
+        .rarity-stat.rarity-limited span { color: #cd7f32; }
+        .rarity-stat.rarity-special,
+        .rarity-stat.rarity-special span { color: #c0c0c0; }
+        .rarity-stat.rarity-elite,
+        .rarity-stat.rarity-elite span { color: #ffd700; }
         .legend { display: none; }
 
         .img-gen-modal {
@@ -824,6 +827,10 @@
             transition: 0.2s;
         }
         .set-all-wrapper button:hover { background: #7e9e4a; }
+        .set-all-wrapper button.reset-cost-btn {
+            background: #6a4a3c;
+        }
+        .set-all-wrapper button.reset-cost-btn:hover { background: #8a5a4a; }
 
         .img-gen-preview {
             text-align: center;
@@ -1183,6 +1190,7 @@
         </div>
         <div id="headquarterInputDiv"><label for="headquarterNameInput">总部英文名</label><input type="text" id="headquarterNameInput" placeholder="例: MOSCOW"></div>
 
+        <!-- 卡牌版本列表 -->
         <div id="cardVersionList">
             <div class="version-list-header" id="versionListToggle">
                 <span style="color:#e9dbbd; font-size:0.85rem; font-weight:600;">📋 卡牌版本</span>
@@ -1193,7 +1201,7 @@
                     <label>全部设为</label>
                     <select id="setAllVersionSelect"></select>
                     <button id="applySetAllBtn" class="gen-img-btn" style="padding:2px 12px; font-size:0.7rem;">应用</button>
-                    <button id="resetCostBtn" class="gen-img-btn" style="padding:2px 12px; font-size:0.7rem; background:#6a4a3c;">重置</button>
+                    <button id="resetCostBtn" class="gen-img-btn reset-cost-btn" style="padding:2px 12px; font-size:0.7rem;">重置最新</button>
                 </div>
             </div>
         </div>
@@ -1607,7 +1615,6 @@
             arrow.textContent = '▶';
         }
 
-        // 重置费用按钮 - 重置为数据中的原始值（最新版）
         document.getElementById('resetCostBtn')?.addEventListener('click', function() {
             for (let [cardId, entry] of deckMap) {
                 const card = entry.card;
@@ -1697,7 +1704,8 @@
             costInput.className = 'v-cost-input';
             costInput.min = 0;
             costInput.max = 24;
-            costInput.value = cardCostMap.get(card.cardId) ?? card.cost;
+            const costVal = cardCostMap.get(card.cardId) ?? card.cost;
+            costInput.value = costVal;
             costInput.addEventListener('change', function() {
                 let val = parseInt(this.value);
                 if (isNaN(val) || val < 0) val = 0;
@@ -2126,12 +2134,11 @@
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `<span>单位 <span class="unit-badge">${unitTotal}</span></span><span>指令 <span class="order-badge">${orderTotal}</span></span><span>反制 <span class="counter-badge">${counterTotal}</span></span>`;
 
-        // 稀有度统计
-        const rarityHtml = `<div class="rarity-stat"><span>普通</span> <span class="rarity-standard">${rarityCounts.Standard}</span></div>
-                            <div class="rarity-stat"><span>限定</span> <span class="rarity-limited">${rarityCounts.Limited}</span></div>
-                            <div class="rarity-stat"><span>特殊</span> <span class="rarity-special">${rarityCounts.Special}</span></div>
-                            <div class="rarity-stat"><span>精英</span> <span class="rarity-elite">${rarityCounts.Elite}</span></div>`;
-        document.getElementById('modalRarityStats').innerHTML = rarityHtml + `<div class="rarity-stat" style="margin-left:16px;"><span>平均费用</span> <span style="color:#ffefb9;">${avgCost.toFixed(2)}</span></div>`;
+        const rarityHtml = `<div class="rarity-stat rarity-standard"><span>普通</span> <span>${rarityCounts.Standard}</span></div>
+                            <div class="rarity-stat rarity-limited"><span>限定</span> <span>${rarityCounts.Limited}</span></div>
+                            <div class="rarity-stat rarity-special"><span>特殊</span> <span>${rarityCounts.Special}</span></div>
+                            <div class="rarity-stat rarity-elite"><span>精英</span> <span>${rarityCounts.Elite}</span></div>`;
+        document.getElementById('modalRarityStats').innerHTML = rarityHtml + `<div class="rarity-stat" style="margin-left:16px; color:#ffefb9;"><span>平均费用</span> <span>${avgCost.toFixed(2)}</span></div>`;
         document.getElementById('statsModal').style.display = 'flex';
     }
 
@@ -2272,6 +2279,8 @@
         let rarityCounts = { Standard: 0, Limited: 0, Special: 0, Elite: 0 };
         let costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
+        let totalCostSum = 0;
+        let totalCardsCount = 0;
         for (let { card, count } of deckMap.values()) {
             if (card.faction === mainNation) mainCount += count;
             else if (card.faction === allyNation) allyCount += count;
@@ -2283,7 +2292,10 @@
             if (typeCat === "unit") { costMap[cat].unit += count; unitTotal += count; }
             else if (typeCat === "order") { costMap[cat].order += count; orderTotal += count; }
             else { costMap[cat].counter += count; counterTotal += count; }
+            totalCostSum += effectiveCost * count;
+            totalCardsCount += count;
         }
+        const avgCost = totalCardsCount > 0 ? (totalCostSum / totalCardsCount) : 0;
         const totalCards = Array.from(deckMap.values()).reduce((s, e) => s + e.count, 0);
 
         ctx.fillStyle = "#ffefbf";
@@ -2333,6 +2345,11 @@
         ctx.fillText(`特殊: ${rarityCounts.Special}`, col2X, rarityY + lineH * 2 + 2);
         ctx.fillStyle = "#ffd700";
         ctx.fillText(`精英: ${rarityCounts.Elite}`, col2X, rarityY + lineH * 3 + 2);
+
+        ctx.fillStyle = "#ffefb9";
+        ctx.font = `${Math.floor(h * 0.045)}px "Segoe UI"`;
+        ctx.textAlign = "center";
+        ctx.fillText(`平均费用: ${avgCost.toFixed(2)}`, x + w/2, rarityY + lineH * 4 + 10);
 
         const barAreaY = y + h * 0.68;
         const barAreaH = h * 0.28;
@@ -2387,9 +2404,11 @@
         ctx.restore();
     }
 
+    // 生成卡组图片
     async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled) {
         if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
-        // 按费用→cardId排序
+
+        // 费用→cardId排序
         cardsWithVersion.sort((a, b) => {
             if (a.card.isHeadquarter) return -1;
             if (b.card.isHeadquarter) return 1;
@@ -2406,8 +2425,36 @@
             cardCountMap[key] = (cardCountMap[key] || 0) + 1;
         }
 
+        // 折叠处理
+        let displayCards = cardsWithVersion;
+        if (foldEnabled) {
+            const uniqueMap = new Map();
+            for (const item of cardsWithVersion) {
+                const key = item.card.cardId;
+                if (!uniqueMap.has(key)) {
+                    uniqueMap.set(key, { card: item.card, version: item.version, count: 1 });
+                } else {
+                    uniqueMap.get(key).count++;
+                }
+            }
+            displayCards = Array.from(uniqueMap.values()).map(item => ({
+                card: item.card,
+                version: item.version,
+                count: item.count
+            }));
+            // 重新排序
+            displayCards.sort((a, b) => {
+                if (a.card.isHeadquarter) return -1;
+                if (b.card.isHeadquarter) return 1;
+                const costA = cardCostMap.get(a.card.cardId) ?? a.card.cost;
+                const costB = cardCostMap.get(b.card.cardId) ?? b.card.cost;
+                if (costA !== costB) return costA - costB;
+                return a.card.cardId.localeCompare(b.card.cardId, undefined, { numeric: true, sensitivity: 'base' });
+            });
+        }
+
         const cardW = 500, cardH = 702, radius = 15;
-        let totalCards = cardsWithVersion.length;
+        let totalCards = displayCards.length;
         if (addStatsCard) totalCards += 1;
         const rows = Math.ceil(totalCards / cols);
         const canvas = document.createElement('canvas');
@@ -2431,7 +2478,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        // 如果折叠开启，绘制数量标记
+        // 绘制折叠数量标记
         const drawFoldMark = (cardId, x, y) => {
             const count = cardCountMap[cardId] || 0;
             if (count <= 1) return;
@@ -2440,21 +2487,18 @@
             ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.shadowBlur = 4;
             ctx.fillStyle = 'rgba(0,0,0,0.85)';
-            const textWidth = ctx.measureText(label).width;
-            const pad = 8;
-            const rectW = textWidth + pad * 2;
-            const rectH = 24;
+            const rectW = cardW;
+            const rectH = 60;
             const posX = x;
-            const posY = y + 199;
+            const posY = y + 99;
             ctx.beginPath();
-            ctx.roundRect(posX, posY, rectW, rectH, 4);
-            ctx.fill();
+            ctx.fillRect(posX, posY, rectW, rectH);
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 14px "Segoe UI"';
+            ctx.font = 'bold 28px "Segoe UI"';
             ctx.textAlign = 'left';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(label, posX + pad, posY + rectH - 4);
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, posX + 20, posY + rectH / 2);
             ctx.restore();
         };
 
@@ -2462,8 +2506,8 @@
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * cardW, y = row * cardH;
-                if (cardIdx < cardsWithVersion.length) {
-                    const item = cardsWithVersion[cardIdx];
+                if (cardIdx < displayCards.length) {
+                    const item = displayCards[cardIdx];
                     const card = item.card;
                     let ver = item.version || DEFAULT_VERSION;
                     if (!await probeImageExists(card.image, lang, ver)) {
@@ -2493,7 +2537,7 @@
                         drawFoldMark(card.cardId, x, y);
                     }
                     cardIdx++;
-                } else if (addStatsCard && cardIdx === cardsWithVersion.length) {
+                } else if (addStatsCard && cardIdx === displayCards.length) {
                     await drawStatsCard(ctx, x, y, cardW, cardH, radius);
                     cardIdx++;
                 }
