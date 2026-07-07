@@ -827,10 +827,6 @@
             transition: 0.2s;
         }
         .set-all-wrapper button:hover { background: #7e9e4a; }
-        .set-all-wrapper button.reset-cost-btn {
-            background: #6a4a3c;
-        }
-        .set-all-wrapper button.reset-cost-btn:hover { background: #8a5a4a; }
 
         .img-gen-preview {
             text-align: center;
@@ -1202,14 +1198,13 @@
                     <label>全部设为</label>
                     <select id="setAllVersionSelect"></select>
                     <button id="applySetAllBtn" class="gen-img-btn" style="padding:2px 12px; font-size:0.7rem;">应用</button>
-                    <button id="resetCostBtn" class="gen-img-btn reset-cost-btn" style="padding:2px 12px; font-size:0.7rem;">重置花费</button>
                 </div>
             </div>
         </div>
 
         <div class="img-gen-preview" id="imgGenPreview"></div>
         <div class="img-gen-actions">
-            <button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button>
+            <button id="generatePreviewBtn" class="gen-img-btn">🔎 生成预览</button>
             <button id="downloadImgBtn" class="export-btn">💾 下载图片</button>
             <button id="closeImgModal" class="import-btn">关闭</button>
         </div>
@@ -1417,6 +1412,7 @@
             initCardVersionList();
             applyFilters();
             updateFactionStats();
+            // 刷新卡组列表显示总部
             renderDeckList('deckListContainer');
             renderDeckList('mobileDeckList');
         } catch(e) {
@@ -1615,14 +1611,6 @@
             content.style.display = 'none';
             arrow.textContent = '▶';
         }
-
-        document.getElementById('resetCostBtn')?.addEventListener('click', function() {
-            for (let [cardId, entry] of deckMap) {
-                const card = entry.card;
-                cardCostMap.set(cardId, card.cost);
-            }
-            updateCardVersionList();
-        });
 
         document.getElementById('applySetAllBtn')?.addEventListener('click', function() {
             const ver = document.getElementById('setAllVersionSelect').value;
@@ -1921,6 +1909,7 @@
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
+        // 总部行始终显示
         let html = `<div class="deck-card-row headquarters-row" style="border-left-color: #b8860b;">
                         <div class="deck-card-icon">🏛️</div>
                         <div class="deck-card-details"><div class="deck-card-name">总部</div><div class="deck-card-stats"></div></div>
@@ -2135,7 +2124,6 @@
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `<span>单位 <span class="unit-badge">${unitTotal}</span></span><span>指令 <span class="order-badge">${orderTotal}</span></span><span>反制 <span class="counter-badge">${counterTotal}</span></span>`;
 
-        // 稀有度统计
         const rarityHtml = `<div class="rarity-stat rarity-standard"><span>普通</span> <span>${rarityCounts.Standard}</span></div>
                             <div class="rarity-stat rarity-limited"><span>限定</span> <span>${rarityCounts.Limited}</span></div>
                             <div class="rarity-stat rarity-special"><span>特殊</span> <span>${rarityCounts.Special}</span></div>
@@ -2295,10 +2283,29 @@
             img.onerror = reject;
             img.src = qrUrl;
         });
-        // 绘制二维码
+
+        // 绘制二维码并反转颜色
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = img.width;
+        tempCanvas.height = img.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(img, 0, 0);
+        const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
+        const data = imageData.data;
+        // 反转颜色：将每个像素的RGB取反
+        for (let i = 0; i < data.length; i += 4) {
+            // 只反转非透明像素
+            if (data[i + 3] > 128) {
+                data[i] = 255 - data[i];
+                data[i + 1] = 255 - data[i + 1];
+                data[i + 2] = 255 - data[i + 2];
+            }
+        }
+        tempCtx.putImageData(imageData, 0, 0);
+        // 将反转后的二维码绘制到主画布
         const qrX = x + (w - qrSize) / 2;
         const qrY = y + h * 0.18;
-        ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+        ctx.drawImage(tempCanvas, qrX, qrY, qrSize, qrSize);
 
         // 下方显示卡组代码
         const codeText = qrCodeData;
@@ -2481,14 +2488,12 @@
             return a.card.cardId.localeCompare(b.card.cardId, undefined, { numeric: true, sensitivity: 'base' });
         });
 
-        // 统计每张卡的张数
         const cardCountMap = {};
         for (const item of cardsWithVersion) {
             const key = item.card.cardId;
             cardCountMap[key] = (cardCountMap[key] || 0) + 1;
         }
 
-        // 折叠处理
         let displayCards = cardsWithVersion;
         if (foldEnabled) {
             const uniqueMap = new Map();
@@ -2545,7 +2550,6 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        // 绘制折叠数量标记
         const drawFoldMark = (cardId, x, y) => {
             const count = cardCountMap[cardId] || 0;
             if (count <= 1) return;
@@ -2559,7 +2563,7 @@
             const pad = 12;
             const rectW = textWidth + pad * 2;
             const rectH = 60;
-            const posX = x + 16;
+            const posX = x;
             const posY = y + 99;
             ctx.fillStyle = 'rgba(0,0,0,0.85)';
             ctx.beginPath();
