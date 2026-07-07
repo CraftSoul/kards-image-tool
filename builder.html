@@ -1187,6 +1187,7 @@
             <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
             <div class="switch-item"><span>🏛️ 总部</span><label class="switch"><input type="checkbox" id="headquarterToggle"><span class="slider"></span></label></div>
             <div class="switch-item"><span>📦 折叠</span><label class="switch"><input type="checkbox" id="foldToggle"><span class="slider"></span></label></div>
+            <div class="switch-item"><span>📌 二维码</span><label class="switch"><input type="checkbox" id="qrToggle"><span class="slider"></span></label></div>
         </div>
         <div id="headquarterInputDiv"><label for="headquarterNameInput">总部英文名</label><input type="text" id="headquarterNameInput" placeholder="例: MOSCOW"></div>
 
@@ -1201,7 +1202,7 @@
                     <label>全部设为</label>
                     <select id="setAllVersionSelect"></select>
                     <button id="applySetAllBtn" class="gen-img-btn" style="padding:2px 12px; font-size:0.7rem;">应用</button>
-                    <button id="resetCostBtn" class="gen-img-btn reset-cost-btn" style="padding:2px 12px; font-size:0.7rem;">重置最新</button>
+                    <button id="resetCostBtn" class="gen-img-btn reset-cost-btn" style="padding:2px 12px; font-size:0.7rem;">重置花费</button>
                 </div>
             </div>
         </div>
@@ -2134,6 +2135,7 @@
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `<span>单位 <span class="unit-badge">${unitTotal}</span></span><span>指令 <span class="order-badge">${orderTotal}</span></span><span>反制 <span class="counter-badge">${counterTotal}</span></span>`;
 
+        // 稀有度统计
         const rarityHtml = `<div class="rarity-stat rarity-standard"><span>普通</span> <span>${rarityCounts.Standard}</span></div>
                             <div class="rarity-stat rarity-limited"><span>限定</span> <span>${rarityCounts.Limited}</span></div>
                             <div class="rarity-stat rarity-special"><span>特殊</span> <span>${rarityCounts.Special}</span></div>
@@ -2254,6 +2256,67 @@
             if (hasLight) { right = x; break; }
         }
         return { left, top, width: right - left + 1, height: bottom - top + 1 };
+    }
+
+    // 绘制二维码牌
+    async function drawQrCard(ctx, x, y, w, h, radius, qrCodeData) {
+        if (!qrCodeData) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + w - radius, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+        ctx.lineTo(x + w, y + h - radius);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        ctx.lineTo(x + radius, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fillStyle = "#1a1c12";
+        ctx.fill();
+        ctx.strokeStyle = "#c9aa5b";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 标题
+        ctx.fillStyle = "#ffefbf";
+        ctx.font = `bold ${Math.floor(h * 0.08)}px "Segoe UI"`;
+        ctx.textAlign = "center";
+        ctx.fillText("卡组二维码", x + w/2, y + h * 0.10);
+
+        // 生成二维码图片
+        const qrSize = Math.min(w * 0.5, h * 0.35);
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(qrCodeData)}`;
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = qrUrl;
+        });
+        // 绘制二维码
+        const qrX = x + (w - qrSize) / 2;
+        const qrY = y + h * 0.18;
+        ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+
+        // 下方显示卡组代码
+        const codeText = qrCodeData;
+        const maxWidth = w * 0.85;
+        const fontSize = Math.floor(h * 0.035);
+        ctx.font = `${fontSize}px monospace`;
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#c9b06b";
+        // 自动换行
+        const words = codeText.match(/.{1,40}/g) || [codeText];
+        const lineHeight = fontSize * 1.4;
+        const startY = y + h * 0.68;
+        for (let i = 0; i < words.length; i++) {
+            const lineY = startY + i * lineHeight;
+            if (lineY > y + h - 10) break;
+            ctx.fillText(words[i], x + w/2, lineY);
+        }
+        ctx.restore();
     }
 
     async function drawStatsCard(ctx, x, y, w, h, radius) {
@@ -2405,10 +2468,10 @@
     }
 
     // 生成卡组图片
-    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled) {
+    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled) {
         if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
 
-        // 费用→cardId排序
+        // 按费用→cardId排序
         cardsWithVersion.sort((a, b) => {
             if (a.card.isHeadquarter) return -1;
             if (b.card.isHeadquarter) return 1;
@@ -2453,9 +2516,13 @@
             });
         }
 
+        // 计算附加牌
+        let extraCount = 0;
+        if (addStatsCard) extraCount++;
+        if (qrEnabled) extraCount++;
+
         const cardW = 500, cardH = 702, radius = 15;
-        let totalCards = displayCards.length;
-        if (addStatsCard) totalCards += 1;
+        let totalCards = displayCards.length + extraCount;
         const rows = Math.ceil(totalCards / cols);
         const canvas = document.createElement('canvas');
         canvas.width = cols * cardW;
@@ -2482,23 +2549,27 @@
         const drawFoldMark = (cardId, x, y) => {
             const count = cardCountMap[cardId] || 0;
             if (count <= 1) return;
-            const label = count > 99 ? '×99+' : ('×'+String(count));
+            const label = '×' + (count > 99 ? '99+' : count);
             ctx.save();
             ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.shadowBlur = 4;
-            ctx.fillStyle = 'rgba(0,0,0,0.85)';
-            const rectW = cardW;
+            ctx.font = 'bold 28px "Segoe UI"';
+            const metrics = ctx.measureText(label);
+            const textWidth = metrics.width;
+            const pad = 12;
+            const rectW = textWidth + pad * 2;
             const rectH = 60;
-            const posX = x;
+            const posX = x + 16;
             const posY = y + 99;
+            ctx.fillStyle = 'rgba(0,0,0,0.85)';
             ctx.beginPath();
-            ctx.fillRect(posX, posY, rectW, rectH);
+            ctx.roundRect(posX, posY, rectW, rectH, 4);
+            ctx.fill();
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 28px "Segoe UI"';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
-            ctx.fillText(label, posX + 20, posY + rectH / 2);
+            ctx.fillText(label, posX + pad, posY + rectH / 2);
             ctx.restore();
         };
 
@@ -2540,6 +2611,12 @@
                 } else if (addStatsCard && cardIdx === displayCards.length) {
                     await drawStatsCard(ctx, x, y, cardW, cardH, radius);
                     cardIdx++;
+                } else if (qrEnabled && cardIdx === displayCards.length + (addStatsCard ? 1 : 0)) {
+                    const deckCode = exportDeckCode();
+                    if (deckCode) {
+                        await drawQrCard(ctx, x, y, cardW, cardH, radius, deckCode);
+                    }
+                    cardIdx++;
                 }
             }
         }
@@ -2568,6 +2645,7 @@
         const lang = document.getElementById('imgLang').value;
         const addStatsCard = document.getElementById('statsCardToggle').checked && !document.getElementById('statsCardToggle').disabled;
         const foldEnabled = document.getElementById('foldToggle').checked;
+        const qrEnabled = document.getElementById('qrToggle').checked;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
 
@@ -2608,7 +2686,7 @@
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled);
+            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
         } catch(e) {
