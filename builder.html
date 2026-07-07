@@ -1179,23 +1179,21 @@
             <div class="switch-item"><span>🎨 背景色</span><select id="bgColorSelect"><option value="white">白色</option><option value="black">黑色</option><option value="transparent">透明</option><option value="custom">自定义</option></select></div>
             <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
             <div class="switch-item"><span>🏛️ 总部</span><label class="switch"><input type="checkbox" id="headquarterToggle"><span class="slider"></span></label></div>
+            <div class="switch-item"><span>📦 折叠</span><label class="switch"><input type="checkbox" id="foldToggle"><span class="slider"></span></label></div>
         </div>
         <div id="headquarterInputDiv"><label for="headquarterNameInput">总部英文名</label><input type="text" id="headquarterNameInput" placeholder="例: MOSCOW"></div>
 
-        <!-- 卡牌版本列表 -->
         <div id="cardVersionList">
             <div class="version-list-header" id="versionListToggle">
                 <span style="color:#e9dbbd; font-size:0.85rem; font-weight:600;">📋 卡牌版本</span>
-                <div class="header-actions">
-                    <button id="resetCostBtn">重置费用</button>
-                    <span id="versionListArrow" style="color:#c9b06b; font-size:0.8rem;">▶</span>
-                </div>
+                <span id="versionListArrow" style="color:#c9b06b; font-size:0.8rem;">▶</span>
             </div>
             <div id="versionListContent">
                 <div class="set-all-wrapper">
                     <label>全部设为</label>
                     <select id="setAllVersionSelect"></select>
                     <button id="applySetAllBtn" class="gen-img-btn" style="padding:2px 12px; font-size:0.7rem;">应用</button>
+                    <button id="resetCostBtn" class="gen-img-btn" style="padding:2px 12px; font-size:0.7rem; background:#6a4a3c;">重置</button>
                 </div>
             </div>
         </div>
@@ -1410,6 +1408,8 @@
             initCardVersionList();
             applyFilters();
             updateFactionStats();
+            renderDeckList('deckListContainer');
+            renderDeckList('mobileDeckList');
         } catch(e) {
             console.error(e);
             document.getElementById('cardContainer').innerHTML = '<div>❌ 数据加载失败</div>';
@@ -1607,7 +1607,7 @@
             arrow.textContent = '▶';
         }
 
-        // 重置费用按钮
+        // 重置费用按钮 - 重置为数据中的原始值（最新版）
         document.getElementById('resetCostBtn')?.addEventListener('click', function() {
             for (let [cardId, entry] of deckMap) {
                 const card = entry.card;
@@ -1679,7 +1679,6 @@
             qtySpan.className = 'v-qty';
             qtySpan.textContent = `x${entry.count}`;
             row.appendChild(qtySpan);
-            // 版本下拉
             const verSelect = document.createElement('select');
             const currentVer = cardVersionMap.get(card.cardId) || DEFAULT_VERSION;
             AVAILABLE_VERSIONS.forEach(ver => {
@@ -1693,7 +1692,6 @@
                 cardVersionMap.set(card.cardId, this.value);
             });
             row.appendChild(verSelect);
-            // 费用输入框
             const costInput = document.createElement('input');
             costInput.type = 'number';
             costInput.className = 'v-cost-input';
@@ -2082,7 +2080,6 @@
         let totalCostSum = 0;
         let totalCardsCount = 0;
         for (let {card, count} of deckMap.values()) {
-            // 使用用户定义的费用
             const effectiveCost = cardCostMap.get(card.cardId) ?? card.cost;
             const cat = effectiveCost >= 7 ? 7 : effectiveCost;
             const typeCat = card.type === "order" ? "order" : card.type === "countermeasure" ? "counter" : "unit";
@@ -2172,7 +2169,6 @@
 
     function getExpandedCardListWithHeadquarter(headquarterCard) {
         const entries = Array.from(deckMap.values());
-        // 按原始顺序排序
         entries.sort((a, b) => {
             return (a.card._index || 0) - (b.card._index || 0);
         });
@@ -2391,8 +2387,7 @@
         ctx.restore();
     }
 
-    // 生成卡组图片
-    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion) {
+    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled) {
         if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
         // 按费用→cardId排序
         cardsWithVersion.sort((a, b) => {
@@ -2403,6 +2398,13 @@
             if (costA !== costB) return costA - costB;
             return a.card.cardId.localeCompare(b.card.cardId, undefined, { numeric: true, sensitivity: 'base' });
         });
+
+        // 统计每张卡的张数
+        const cardCountMap = {};
+        for (const item of cardsWithVersion) {
+            const key = item.card.cardId;
+            cardCountMap[key] = (cardCountMap[key] || 0) + 1;
+        }
 
         const cardW = 500, cardH = 702, radius = 15;
         let totalCards = cardsWithVersion.length;
@@ -2428,6 +2430,33 @@
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
+
+        // 如果折叠开启，绘制数量标记
+        const drawFoldMark = (cardId, x, y) => {
+            const count = cardCountMap[cardId] || 0;
+            if (count <= 1) return;
+            const label = count > 99 ? '×99+' : ('×'+String(count));
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 4;
+            ctx.fillStyle = 'rgba(0,0,0,0.85)';
+            const textWidth = ctx.measureText(label).width;
+            const pad = 8;
+            const rectW = textWidth + pad * 2;
+            const rectH = 24;
+            const posX = x;
+            const posY = y + 199;
+            ctx.beginPath();
+            ctx.roundRect(posX, posY, rectW, rectH, 4);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 14px "Segoe UI"';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(label, posX + pad, posY + rectH - 4);
+            ctx.restore();
+        };
 
         let cardIdx = 0;
         for (let row = 0; row < rows; row++) {
@@ -2459,6 +2488,10 @@
                     ctx.clip();
                     ctx.drawImage(img, x, y, cardW, cardH);
                     ctx.restore();
+
+                    if (foldEnabled) {
+                        drawFoldMark(card.cardId, x, y);
+                    }
                     cardIdx++;
                 } else if (addStatsCard && cardIdx === cardsWithVersion.length) {
                     await drawStatsCard(ctx, x, y, cardW, cardH, radius);
@@ -2490,6 +2523,7 @@
         const quality = parseInt(document.getElementById('imgQuality').value);
         const lang = document.getElementById('imgLang').value;
         const addStatsCard = document.getElementById('statsCardToggle').checked && !document.getElementById('statsCardToggle').disabled;
+        const foldEnabled = document.getElementById('foldToggle').checked;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
 
@@ -2530,7 +2564,7 @@
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion);
+            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
         } catch(e) {
