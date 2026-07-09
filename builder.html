@@ -174,7 +174,7 @@
             display: flex;
             gap: 8px;
             align-items: center;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
         }
         .import-input {
             flex: 1;
@@ -468,8 +468,11 @@
             .builder-main { flex-direction: column; }
             .deck-panel { display: none; }
             .mobile-deck-toggle { display: flex; }
-            /* 移动端折叠开关偏移修复 */
-            .img-gen-control:last-child { align-self: center; }
+            .mobile-deck-panel .import-row,
+            .mobile-deck-panel .export-row { flex-wrap: wrap; }
+            .mobile-deck-panel .import-row .import-btn,
+            .mobile-deck-panel .export-row .gen-img-btn,
+            .mobile-deck-panel .export-row .export-btn { flex-shrink: 0; }
         }
 
         .modal-stats {
@@ -676,6 +679,17 @@
             cursor: pointer;
             border: none;
         }
+        /* 折叠开关重构 */
+        .fold-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+            min-width: 80px;
+            align-self: center;
+        }
+        .fold-control label { margin: 0; font-size: 0.7rem; color: #e9dbbd; }
+        .fold-control .switch { width: 44px; height: 24px; margin: 0; }
 
         .section-label {
             font-size: 0.75rem;
@@ -1035,7 +1049,7 @@
         <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
         <div id="mobileFactionStats" class="faction-stats"></div>
-        <!-- 移动端导入区（同步） -->
+        <!-- 移动端导入区 -->
         <div class="import-area">
             <div class="import-row">
                 <input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码">
@@ -1044,7 +1058,7 @@
                 <input type="file" id="mobileQrFileInput" accept="image/*" style="display:none;">
             </div>
         </div>
-        <!-- 移动端导出区（同步） -->
+        <!-- 移动端导出区 -->
         <div class="export-area">
             <div class="export-row">
                 <button id="mobileExportBtn" class="export-btn">📤 导出代码</button>
@@ -1116,9 +1130,9 @@
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
             <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width:100%;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 语言</label><select id="imgLang"></select></div>
-            <div class="img-gen-control" style="flex:0.5; min-width:80px; display:flex; align-items:center; gap:8px;">
-                <label style="margin:0;">折叠</label>
-                <label class="switch" style="width:44px; height:24px; margin:0;"><input type="checkbox" id="foldToggle"><span class="slider" style="height:24px;"></span></label>
+            <div class="fold-control">
+                <label>折叠</label>
+                <label class="switch"><input type="checkbox" id="foldToggle"><span class="slider"></span></label>
             </div>
         </div>
 
@@ -1359,7 +1373,7 @@
         return Math.max(r, g, b) <= threshold;
     }
 
-    // 预生成裁剪模板（使用 resistance.avif）
+    // 预生成裁剪模板
     async function generateCropTemplate() {
         if (cropTemplate) return cropTemplate;
         try {
@@ -1492,8 +1506,6 @@
             langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
             langSelect.value = 'zh-Hans';
         }
-        // 移除背景色选择，因为我们不需要在 builder 中改变背景色（保持统一）
-        // 但仍然保留以防意外，但可以从 HTML 中移除控件，这里不处理
 
         const updateNation = () => {
             mainNation = document.getElementById('mainNationSelect').value;
@@ -2295,7 +2307,6 @@
             mobileQrImportBtn.addEventListener('click', () => mobileQrFileInput.click());
             mobileQrFileInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
-                    // 触发桌面端的文件输入 change 事件
                     const dt = new DataTransfer();
                     dt.items.add(this.files[0]);
                     qrFileInput.files = dt.files;
@@ -2358,72 +2369,6 @@
             }
         }
         return result;
-    }
-
-    // 裁剪辅助（用于生成图片后的裁剪）
-    function isDarkPixelForCanvas(ctx, x, y, threshold = 50) {
-        try {
-            const pixel = ctx.getImageData(x, y, 1, 1);
-            const data = pixel.data;
-            const r = data[0], g = data[1], b = data[2];
-            return Math.max(r, g, b) <= threshold;
-        } catch(e) { return false; }
-    }
-    function getCanvasCropRegion(ctx, width, height, threshold = 50) {
-        const visited = new Uint8Array(width * height);
-        const queue = [];
-        const corners = [[0,0],[width-1,0],[0,height-1],[width-1,height-1]];
-        for (const [cx, cy] of corners) {
-            const idx = cy * width + cx;
-            if (!visited[idx] && isDarkPixelForCanvas(ctx, cx, cy, threshold)) {
-                visited[idx] = 1;
-                queue.push([cx, cy]);
-            }
-        }
-        const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-        while (queue.length > 0) {
-            const [x, y] = queue.shift();
-            for (const [dx, dy] of dirs) {
-                const nx = x + dx, ny = y + dy;
-                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                    const nidx = ny * width + nx;
-                    if (!visited[nidx] && isDarkPixelForCanvas(ctx, nx, ny, threshold)) {
-                        visited[nidx] = 1;
-                        queue.push([nx, ny]);
-                    }
-                }
-            }
-        }
-        let top = 0, bottom = height - 1, left = 0, right = width - 1;
-        for (let y = 0; y < height; y++) {
-            let hasLight = false;
-            for (let x = 0; x < width; x++) {
-                if (!visited[y * width + x]) { hasLight = true; break; }
-            }
-            if (hasLight) { top = y; break; }
-        }
-        for (let y = height - 1; y >= 0; y--) {
-            let hasLight = false;
-            for (let x = 0; x < width; x++) {
-                if (!visited[y * width + x]) { hasLight = true; break; }
-            }
-            if (hasLight) { bottom = y; break; }
-        }
-        for (let x = 0; x < width; x++) {
-            let hasLight = false;
-            for (let y = 0; y < height; y++) {
-                if (!visited[y * width + x]) { hasLight = true; break; }
-            }
-            if (hasLight) { left = x; break; }
-        }
-        for (let x = width - 1; x >= 0; x--) {
-            let hasLight = false;
-            for (let y = 0; y < height; y++) {
-                if (!visited[y * width + x]) { hasLight = true; break; }
-            }
-            if (hasLight) { right = x; break; }
-        }
-        return { left, top, width: right - left + 1, height: bottom - top + 1 };
     }
 
     // 绘制统计卡（可自定义标题）
@@ -2683,12 +2628,10 @@
         canvas.height = rows * cardH;
         const ctx = canvas.getContext('2d');
 
-        // 背景色（忽略 bgColor 参数，统一使用白色透明，或由用户选择？但 builder 中我们默认白色）
-        // 但我们仍保留参数，但实际从界面移除，这里默认白色
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = bgColor || '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 画布绘制完成后统一裁剪
+        // 绘制折叠数量标签（左对齐边缘，左侧直角，右侧圆角）
         const drawFoldMark = (cardId, x, y) => {
             const count = cardCountMap[cardId] || 0;
             if (count <= 1) return;
@@ -2702,11 +2645,19 @@
             const pad = 12;
             const rectW = textWidth + pad * 2;
             const rectH = 60;
-            const posX = x + 10;
+            const posX = x; // 左对齐边缘
             const posY = y + 99;
-            ctx.fillStyle = 'rgba(0,0,0,0.85)';
+            // 绘制矩形：左侧直角，右侧圆角
+            const rad = 8;
             ctx.beginPath();
-            ctx.roundRect(posX, posY, rectW, rectH, 4);
+            ctx.moveTo(posX, posY);
+            ctx.lineTo(posX + rectW - rad, posY);
+            ctx.quadraticCurveTo(posX + rectW, posY, posX + rectW, posY + rad);
+            ctx.lineTo(posX + rectW, posY + rectH - rad);
+            ctx.quadraticCurveTo(posX + rectW, posY + rectH, posX + rectW - rad, posY + rectH);
+            ctx.lineTo(posX, posY + rectH);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(0,0,0,0.85)';
             ctx.fill();
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffffff';
@@ -2716,24 +2667,32 @@
             ctx.restore();
         };
 
+        // 绘制星标标签（与数量标签高度一致）
         const drawStarMark = (cardId, x, y) => {
             if (!starredSet.has(cardId)) return;
             const label = '★';
             ctx.save();
             ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.shadowBlur = 4;
-            ctx.font = 'bold 22px "Segoe UI"';
+            ctx.font = 'bold 28px "Segoe UI"';
             const metrics = ctx.measureText(label);
             const textWidth = metrics.width;
-            const pad = 10;
+            const pad = 12;
             const rectW = textWidth + pad * 2;
-            const rectH = 34;
+            const rectH = 60; // 与数量标签高度一致
+            const posX = x; // 左对齐边缘
             const count = cardCountMap[cardId] || 0;
-            const posX = x + 10;
-            const posY = (count > 1) ? y + 99 + 60 : y + 99;
-            ctx.fillStyle = 'rgba(0,0,0,0.85)';
+            const posY = (count > 1) ? y + 99 + 60 : y + 99; // 有数量标签时在下方
+            const rad = 8;
             ctx.beginPath();
-            ctx.roundRect(posX, posY, rectW, rectH, 4);
+            ctx.moveTo(posX, posY);
+            ctx.lineTo(posX + rectW - rad, posY);
+            ctx.quadraticCurveTo(posX + rectW, posY, posX + rectW, posY + rad);
+            ctx.lineTo(posX + rectW, posY + rectH - rad);
+            ctx.quadraticCurveTo(posX + rectW, posY + rectH, posX + rectW - rad, posY + rectH);
+            ctx.lineTo(posX, posY + rectH);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(0,0,0,0.85)';
             ctx.fill();
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffd700';
@@ -2819,7 +2778,6 @@
         const statsTitle = document.getElementById('statsCardTitle').value.trim() || null;
         const qrTitle = document.getElementById('qrCardTitle').value.trim() || null;
 
-        // 预生成裁剪模板（只生成一次）
         if (!cropTemplate) {
             await generateCropTemplate();
         }
@@ -2860,7 +2818,6 @@
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            // 背景色固定为白色
             const bgColor = '#ffffff';
             currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled, statsTitle, qrTitle);
             previewDiv.innerHTML = '';
