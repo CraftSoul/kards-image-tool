@@ -468,6 +468,8 @@
             .builder-main { flex-direction: column; }
             .deck-panel { display: none; }
             .mobile-deck-toggle { display: flex; }
+            /* 移动端折叠开关偏移修复 */
+            .img-gen-control:last-child { align-self: center; }
         }
 
         .modal-stats {
@@ -1033,8 +1035,23 @@
         <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
         <div id="mobileFactionStats" class="faction-stats"></div>
-        <div class="import-area"><div class="import-row"><input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码"><button id="mobileImportBtn" class="import-btn">📥 导入</button></div></div>
-        <div class="export-area"><div class="export-row"><button id="mobileExportBtn" class="export-btn">📤 导出代码</button><button id="mobileGenImgBtn" class="gen-img-btn">🖼️ 生成图片</button></div></div>
+        <!-- 移动端导入区（同步） -->
+        <div class="import-area">
+            <div class="import-row">
+                <input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码">
+                <button id="mobileImportBtn" class="import-btn">📥 导入</button>
+                <button id="mobileQrImportBtn" class="import-btn" style="background:#6a5a3a;">📥 扫描二维码</button>
+                <input type="file" id="mobileQrFileInput" accept="image/*" style="display:none;">
+            </div>
+        </div>
+        <!-- 移动端导出区（同步） -->
+        <div class="export-area">
+            <div class="export-row">
+                <button id="mobileExportBtn" class="export-btn">📤 导出代码</button>
+                <button id="mobileQrExportBtn" class="gen-img-btn" style="background:#6a5a3a;">📤 导出二维码卡</button>
+                <button id="mobileGenImgBtn" class="gen-img-btn">🖼️ 生成图片</button>
+            </div>
+        </div>
         <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
         <div class="mobile-deck-list" id="mobileDeckList"></div>
         <button class="clear-deck" id="mobileClearDeck" style="margin-top:12px;">清空</button>
@@ -1063,6 +1080,7 @@
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
             <div id="desktopFactionStats" class="faction-stats"></div>
+            <!-- 桌面端导入/导出 -->
             <div class="import-area">
                 <div class="import-row">
                     <input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码">
@@ -1098,7 +1116,10 @@
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
             <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width:100%;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 语言</label><select id="imgLang"></select></div>
-            <div class="img-gen-control" style="flex:0.5; min-width:80px;"><label>折叠</label><label class="switch" style="width:44px; height:24px; margin-top:4px;"><input type="checkbox" id="foldToggle"><span class="slider" style="height:24px;"></span></label></div>
+            <div class="img-gen-control" style="flex:0.5; min-width:80px; display:flex; align-items:center; gap:8px;">
+                <label style="margin:0;">折叠</label>
+                <label class="switch" style="width:44px; height:24px; margin:0;"><input type="checkbox" id="foldToggle"><span class="slider" style="height:24px;"></span></label>
+            </div>
         </div>
 
         <!-- 附件栏 -->
@@ -1147,6 +1168,7 @@
 <script>
     // ==================== 版本定义 ====================
     const VERSION = 52;
+    const DEFAULT_VERSION = `v${VERSION}`;
 
     function generateVersionList() {
         let versions = [];
@@ -1156,7 +1178,6 @@
         return versions;
     }
     const AVAILABLE_VERSIONS = generateVersionList();
-    const DEFAULT_VERSION = `v${VERSION}`;
 
     // ==================== 常量与翻译 ====================
     const attrTranslation = {
@@ -1274,13 +1295,7 @@
         return card.setName;
     }
 
-    // ==================== 裁剪模板（与 seek.html 一致） ====================
-    function isDarkPixel(data, x, y, width, threshold) {
-        const idx = (y * width + x) * 4;
-        const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-        return Math.max(r, g, b) <= threshold;
-    }
-
+    // ==================== 裁剪模板（固定使用 resistance.avif） ====================
     function buildCropTemplateFromImageData(imgData, width, height, threshold) {
         const visited = new Uint8Array(width * height);
         const queue = [];
@@ -1338,30 +1353,33 @@
         return { left, top, width: right - left + 1, height: bottom - top + 1 };
     }
 
-    async function getCropTemplateFromCard(card, lang) {
-        const imgUrl = getCardImageUrl(card.image, lang, DEFAULT_VERSION, 100);
-        const resp = await fetch(imgUrl);
-        if (!resp.ok) throw new Error("无法获取卡图用于模板");
-        const blob = await resp.blob();
-        const bitmap = await createImageBitmap(blob);
-        const canvas = document.createElement('canvas');
-        canvas.width = bitmap.width;
-        canvas.height = bitmap.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(bitmap, 0, 0);
-        const imgData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
-        return buildCropTemplateFromImageData(imgData, bitmap.width, bitmap.height, 50);
+    function isDarkPixel(data, x, y, width, threshold) {
+        const idx = (y * width + x) * 4;
+        const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+        return Math.max(r, g, b) <= threshold;
     }
 
-    // 应用裁剪模板到画布
-    function applyCropTemplateToCanvas(sourceCanvas, template) {
-        const { left, top, width, height } = template;
-        const cropped = document.createElement('canvas');
-        cropped.width = width;
-        cropped.height = height;
-        const ctx = cropped.getContext('2d');
-        ctx.drawImage(sourceCanvas, left, top, width, height, 0, 0, width, height);
-        return cropped;
+    // 预生成裁剪模板（使用 resistance.avif）
+    async function generateCropTemplate() {
+        if (cropTemplate) return cropTemplate;
+        try {
+            const imgUrl = getCardImageUrl('resistance.avif', 'zh-Hans', DEFAULT_VERSION, 100);
+            const resp = await fetch(imgUrl);
+            if (!resp.ok) throw new Error('fetch failed');
+            const blob = await resp.blob();
+            const bitmap = await createImageBitmap(blob);
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0);
+            const imgData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+            cropTemplate = buildCropTemplateFromImageData(imgData, bitmap.width, bitmap.height, 50);
+            return cropTemplate;
+        } catch(e) {
+            console.warn('裁剪模板生成失败，将使用备用裁剪:', e);
+            return null;
+        }
     }
 
     // ==================== 数据加载 ====================
@@ -1474,13 +1492,9 @@
             langSelect.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
             langSelect.value = 'zh-Hans';
         }
-        const bgSelect = document.getElementById('bgColorSelect');
-        const customDiv = document.getElementById('customColorDiv');
-        if (bgSelect) {
-            bgSelect.addEventListener('change', () => {
-                if (customDiv) customDiv.style.display = bgSelect.value === 'custom' ? 'flex' : 'none';
-            });
-        }
+        // 移除背景色选择，因为我们不需要在 builder 中改变背景色（保持统一）
+        // 但仍然保留以防意外，但可以从 HTML 中移除控件，这里不处理
+
         const updateNation = () => {
             mainNation = document.getElementById('mainNationSelect').value;
             allyNation = document.getElementById('allyNationSelect').value;
@@ -2177,7 +2191,7 @@
 
     // ==================== QR 导入/导出 ====================
     function setupQRImportExport() {
-        // QR 导入（文件选择 + API 解码）
+        // 桌面端 QR 导入
         const qrImportBtn = document.getElementById('qrImportBtn');
         const qrFileInput = document.getElementById('qrFileInput');
         if (qrImportBtn && qrFileInput) {
@@ -2185,9 +2199,8 @@
             qrFileInput.addEventListener('change', async function() {
                 if (!this.files || !this.files[0]) return;
                 const file = this.files[0];
-                const status = document.getElementById('imageStatus'); // 借用主状态显示（或可添加单独状态）
-                const mainStatus = document.getElementById('imageStatus');
-                if (mainStatus) mainStatus.textContent = '⏳ 解码中...';
+                const status = document.getElementById('imageStatus');
+                if (status) status.textContent = '⏳ 解码中...';
                 try {
                     const formData = new FormData();
                     formData.append('file', file);
@@ -2199,27 +2212,26 @@
                     const result = await response.json();
                     if (result && result.data) {
                         const code = result.data;
-                        if (mainStatus) mainStatus.textContent = '✅ 二维码解码成功！';
+                        if (status) status.textContent = '✅ 二维码解码成功！';
                         importDeckFromCode(code);
                     } else {
                         throw new Error('未识别到二维码数据');
                     }
                 } catch (e) {
-                    if (mainStatus) mainStatus.textContent = '❌ 二维码解码失败: ' + e.message;
+                    if (status) status.textContent = '❌ 二维码解码失败: ' + e.message;
                     alert('二维码解码失败: ' + e.message);
                 }
-                this.value = ''; // 重置输入
+                this.value = '';
             });
         }
 
-        // QR 导出（生成二维码卡）
+        // 桌面端 QR 导出
         const qrExportBtn = document.getElementById('qrExportBtn');
         if (qrExportBtn) {
             qrExportBtn.addEventListener('click', async function() {
                 const code = exportDeckCode();
                 if (!code) { alert('卡组为空'); return; }
-                const title = document.getElementById('qrExportTitle')?.value?.trim() || '卡组二维码';
-                // 生成一张二维码卡图片
+                const title = document.getElementById('qrCardTitle')?.value?.trim() || '卡组二维码';
                 const cardW = 500, cardH = 702;
                 const canvas = document.createElement('canvas');
                 canvas.width = cardW;
@@ -2269,11 +2281,34 @@
                     ctx.fillText(words[i], cardW/2, lineY);
                 }
 
-                // 下载
                 const link = document.createElement('a');
                 link.download = `qr_card_${new Date().toISOString().slice(0,19)}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
+            });
+        }
+
+        // 移动端同步
+        const mobileQrImportBtn = document.getElementById('mobileQrImportBtn');
+        const mobileQrFileInput = document.getElementById('mobileQrFileInput');
+        if (mobileQrImportBtn && mobileQrFileInput) {
+            mobileQrImportBtn.addEventListener('click', () => mobileQrFileInput.click());
+            mobileQrFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    // 触发桌面端的文件输入 change 事件
+                    const dt = new DataTransfer();
+                    dt.items.add(this.files[0]);
+                    qrFileInput.files = dt.files;
+                    qrFileInput.dispatchEvent(new Event('change'));
+                    this.value = '';
+                }
+            });
+        }
+
+        const mobileQrExportBtn = document.getElementById('mobileQrExportBtn');
+        if (mobileQrExportBtn) {
+            mobileQrExportBtn.addEventListener('click', function() {
+                qrExportBtn.click();
             });
         }
     }
@@ -2648,21 +2683,10 @@
         canvas.height = rows * cardH;
         const ctx = canvas.getContext('2d');
 
-        if (bgColor === 'transparent') {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        } else if (bgColor === 'white') {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        } else if (bgColor === 'black') {
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        } else if (bgColor.startsWith('#')) {
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        } else {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+        // 背景色（忽略 bgColor 参数，统一使用白色透明，或由用户选择？但 builder 中我们默认白色）
+        // 但我们仍保留参数，但实际从界面移除，这里默认白色
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // 画布绘制完成后统一裁剪
         const drawFoldMark = (cardId, x, y) => {
@@ -2704,7 +2728,6 @@
             const pad = 10;
             const rectW = textWidth + pad * 2;
             const rectH = 34;
-            // 如果有数量标签，放在数量标签下方；否则放在相同位置
             const count = cardCountMap[cardId] || 0;
             const posX = x + 10;
             const posY = (count > 1) ? y + 99 + 60 : y + 99;
@@ -2769,7 +2792,7 @@
             }
         }
 
-        // 应用统一裁剪模板（如已有）
+        // 应用统一裁剪模板
         if (cropTemplate) {
             try {
                 const croppedCanvas = document.createElement('canvas');
@@ -2795,8 +2818,11 @@
         const qrEnabled = document.getElementById('qrToggle').checked;
         const statsTitle = document.getElementById('statsCardTitle').value.trim() || null;
         const qrTitle = document.getElementById('qrCardTitle').value.trim() || null;
-        let bgColor = document.getElementById('bgColorSelect').value;
-        if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
+
+        // 预生成裁剪模板（只生成一次）
+        if (!cropTemplate) {
+            await generateCropTemplate();
+        }
 
         const hqToggle = document.getElementById('headquarterToggle');
         const hqName = document.getElementById('headquarterNameInput').value.trim();
@@ -2806,17 +2832,6 @@
             if (!hqCard) {
                 alert(`总部图片 "${hqName}" 不存在，请检查名称`);
                 return;
-            }
-        }
-
-        // 构建裁剪模板（使用第一张卡）
-        if (!cropTemplate && allCards.length > 0) {
-            try {
-                const templateCard = allCards.find(c => c.image && c.image.endsWith('.avif')) || allCards[0];
-                cropTemplate = await getCropTemplateFromCard(templateCard, lang);
-                console.log('裁剪模板已生成:', cropTemplate);
-            } catch(e) {
-                console.warn('模板生成失败，将使用备用裁剪:', e);
             }
         }
 
@@ -2845,6 +2860,8 @@
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
+            // 背景色固定为白色
+            const bgColor = '#ffffff';
             currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled, statsTitle, qrTitle);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
