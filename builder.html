@@ -178,6 +178,7 @@
         }
         .import-input {
             flex: 1;
+            min-width: 120px;
             background: #1e1c16;
             border: 1px solid #aa8e4e;
             border-radius: 40px;
@@ -186,7 +187,6 @@
             font-size: 0.75rem;
             outline: none;
             font-family: monospace;
-            min-width: 0;
         }
         .import-btn, .export-btn, .gen-img-btn {
             background: #5a6b3c;
@@ -468,11 +468,6 @@
             .builder-main { flex-direction: column; }
             .deck-panel { display: none; }
             .mobile-deck-toggle { display: flex; }
-            .mobile-deck-panel .import-row,
-            .mobile-deck-panel .export-row { flex-wrap: wrap; }
-            .mobile-deck-panel .import-row .import-btn,
-            .mobile-deck-panel .export-row .gen-img-btn,
-            .mobile-deck-panel .export-row .export-btn { flex-shrink: 0; }
         }
 
         .modal-stats {
@@ -679,17 +674,6 @@
             cursor: pointer;
             border: none;
         }
-        /* 折叠开关重构 */
-        .fold-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 0 0 auto;
-            min-width: 80px;
-            align-self: center;
-        }
-        .fold-control label { margin: 0; font-size: 0.7rem; color: #e9dbbd; }
-        .fold-control .switch { width: 44px; height: 24px; margin: 0; }
 
         .section-label {
             font-size: 0.75rem;
@@ -718,30 +702,40 @@
             border-radius: 40px;
         }
         .switch-item span { color: #e9dbbd; font-size: 0.75rem; }
-        .switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background-color: #3a3222;
             transition: 0.2s;
             border-radius: 34px;
             border: 1px solid #b19458;
+            height: 100%;
         }
         .slider:before {
             position: absolute;
             content: "";
-            height: 14px;
-            width: 14px;
-            left: 2px;
+            height: 18px;
+            width: 18px;
+            left: 3px;
             bottom: 2px;
             background-color: #e9cf95;
             transition: 0.2s;
             border-radius: 50%;
         }
         input:checked + .slider { background-color: #7a6233; }
-        input:checked + .slider:before { transform: translateX(18px); background-color: #fef0b6; }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #fef0b6; }
 
         #headquarterInputDiv { margin-top: 6px; display: none; }
         #headquarterInputDiv label { display: block; font-size: 0.7rem; color: #e9dbbd; margin-bottom: 2px; }
@@ -1049,7 +1043,6 @@
         <div class="mobile-deck-header"><span class="deck-title">📋 卡组</span><button class="mobile-close-deck" id="mobileCloseDeck">✕</button></div>
         <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mobileMainNation"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="mobileAllyNation"></select></div></div>
         <div id="mobileFactionStats" class="faction-stats"></div>
-        <!-- 移动端导入区 -->
         <div class="import-area">
             <div class="import-row">
                 <input type="text" id="mobileImportCode" class="import-input" placeholder="粘贴卡组代码">
@@ -1058,7 +1051,6 @@
                 <input type="file" id="mobileQrFileInput" accept="image/*" style="display:none;">
             </div>
         </div>
-        <!-- 移动端导出区 -->
         <div class="export-area">
             <div class="export-row">
                 <button id="mobileExportBtn" class="export-btn">📤 导出代码</button>
@@ -1094,7 +1086,6 @@
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
             <div id="desktopFactionStats" class="faction-stats"></div>
-            <!-- 桌面端导入/导出 -->
             <div class="import-area">
                 <div class="import-row">
                     <input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码">
@@ -1130,9 +1121,9 @@
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
             <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width:100%;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
             <div class="img-gen-control"><label>🌐 语言</label><select id="imgLang"></select></div>
-            <div class="fold-control">
-                <label>折叠</label>
-                <label class="switch"><input type="checkbox" id="foldToggle"><span class="slider"></span></label>
+            <div class="img-gen-control" style="flex:0.5; min-width:80px; display:flex; align-items:center; gap:8px;">
+                <label style="margin:0;">折叠</label>
+                <label class="switch" style="width:44px; height:24px; margin:0;"><input type="checkbox" id="foldToggle"><span class="slider" style="height:24px;"></span></label>
             </div>
         </div>
 
@@ -1245,7 +1236,7 @@
     let cardVersionMap = new Map(); // cardId -> version
     let cardCostMap = new Map();   // cardId -> user-defined cost (number)
     let cardStarMap = new Map();   // cardId -> boolean (starred)
-    let cropTemplate = null;       // 统一裁剪模板
+    let cropTemplate = null;       // 统一裁剪模板（单卡）
 
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -1373,7 +1364,7 @@
         return Math.max(r, g, b) <= threshold;
     }
 
-    // 预生成裁剪模板
+    // 预生成裁剪模板（使用 resistance.avif）
     async function generateCropTemplate() {
         if (cropTemplate) return cropTemplate;
         try {
@@ -1751,7 +1742,6 @@
                 cardCostMap.set(card.cardId, val);
             });
             row.appendChild(costInput);
-            // 星标按钮
             const starBtn = document.createElement('button');
             starBtn.className = 'star-btn' + (cardStarMap.get(card.cardId) ? ' active' : '');
             starBtn.textContent = '★';
@@ -2221,13 +2211,43 @@
                         body: formData
                     });
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const result = await response.json();
-                    if (result && result.data) {
-                        const code = result.data;
-                        if (status) status.textContent = '✅ 二维码解码成功！';
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (e) {
+                        // 可能返回的是纯文本
+                        const text = await response.text();
+                        if (text.startsWith('%%')) {
+                            // 直接是卡组代码
+                            importDeckFromCode(text);
+                            if (status) status.textContent = '✅ 二维码解码成功！';
+                            this.value = '';
+                            return;
+                        }
+                        throw new Error('无法解析响应');
+                    }
+                    // 尝试多种数据格式
+                    let code = null;
+                    if (result && typeof result === 'object') {
+                        if (result.data) code = result.data;
+                        else if (result.code) code = result.code;
+                        else if (result.result) code = result.result;
+                        else if (result.text) code = result.text;
+                        else if (result.message && result.message.startsWith('%%')) code = result.message;
+                        else if (Array.isArray(result) && result.length > 0 && result[0].data) code = result[0].data;
+                        // 如果是字符串
+                        for (let key of Object.keys(result)) {
+                            if (typeof result[key] === 'string' && result[key].startsWith('%%')) {
+                                code = result[key];
+                                break;
+                            }
+                        }
+                    }
+                    if (code && code.startsWith('%%')) {
                         importDeckFromCode(code);
+                        if (status) status.textContent = '✅ 二维码解码成功！';
                     } else {
-                        throw new Error('未识别到二维码数据');
+                        throw new Error('未识别到卡组代码');
                     }
                 } catch (e) {
                     if (status) status.textContent = '❌ 二维码解码失败: ' + e.message;
@@ -2371,6 +2391,9 @@
         return result;
     }
 
+    // 裁剪辅助（用于生成图片后的裁剪 - 不再使用整体裁剪）
+    // 保留但不使用，因为我们现在每张卡单独裁剪
+
     // 绘制统计卡（可自定义标题）
     async function drawStatsCard(ctx, x, y, w, h, radius, customTitle) {
         ctx.save();
@@ -2508,7 +2531,7 @@
         ctx.restore();
     }
 
-    // 绘制二维码卡（使用API参数，暗色风格）
+    // 绘制二维码卡
     async function drawQrCard(ctx, x, y, w, h, radius, qrCodeData, customTitle) {
         if (!qrCodeData) return;
         ctx.save();
@@ -2564,7 +2587,7 @@
         ctx.restore();
     }
 
-    // 生成卡组图片
+    // 生成卡组图片：每张卡单独裁剪并绘制
     async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled, statsTitle, qrTitle) {
         if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
 
@@ -2628,10 +2651,11 @@
         canvas.height = rows * cardH;
         const ctx = canvas.getContext('2d');
 
-        ctx.fillStyle = bgColor || '#ffffff';
+        // 背景白色
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 绘制折叠数量标签（左对齐边缘，左侧直角，右侧圆角）
+        // 绘制折叠数量标签（横坐标0，左两角无圆角）
         const drawFoldMark = (cardId, x, y) => {
             const count = cardCountMap[cardId] || 0;
             if (count <= 1) return;
@@ -2645,19 +2669,12 @@
             const pad = 12;
             const rectW = textWidth + pad * 2;
             const rectH = 60;
-            const posX = x; // 左对齐边缘
+            const posX = 0; // 横坐标0
             const posY = y + 99;
-            // 绘制矩形：左侧直角，右侧圆角
-            const rad = 8;
-            ctx.beginPath();
-            ctx.moveTo(posX, posY);
-            ctx.lineTo(posX + rectW - rad, posY);
-            ctx.quadraticCurveTo(posX + rectW, posY, posX + rectW, posY + rad);
-            ctx.lineTo(posX + rectW, posY + rectH - rad);
-            ctx.quadraticCurveTo(posX + rectW, posY + rectH, posX + rectW - rad, posY + rectH);
-            ctx.lineTo(posX, posY + rectH);
-            ctx.closePath();
+            // 左侧两角无圆角（使用rect）
             ctx.fillStyle = 'rgba(0,0,0,0.85)';
+            ctx.beginPath();
+            ctx.rect(posX, posY, rectW, rectH);
             ctx.fill();
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffffff';
@@ -2667,32 +2684,25 @@
             ctx.restore();
         };
 
-        // 绘制星标标签（与数量标签高度一致）
+        // 绘制星标标签（横坐标0，左两角无圆角，高度与数量标签一致60px，星形增大）
         const drawStarMark = (cardId, x, y) => {
             if (!starredSet.has(cardId)) return;
             const label = '★';
             ctx.save();
             ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.shadowBlur = 4;
-            ctx.font = 'bold 28px "Segoe UI"';
+            ctx.font = 'bold 32px "Segoe UI"'; // 增大星形
             const metrics = ctx.measureText(label);
             const textWidth = metrics.width;
-            const pad = 12;
+            const pad = 10;
             const rectW = textWidth + pad * 2;
-            const rectH = 60; // 与数量标签高度一致
-            const posX = x; // 左对齐边缘
+            const rectH = 60; // 与数量标签一致
+            const posX = 0; // 横坐标0
             const count = cardCountMap[cardId] || 0;
-            const posY = (count > 1) ? y + 99 + 60 : y + 99; // 有数量标签时在下方
-            const rad = 8;
-            ctx.beginPath();
-            ctx.moveTo(posX, posY);
-            ctx.lineTo(posX + rectW - rad, posY);
-            ctx.quadraticCurveTo(posX + rectW, posY, posX + rectW, posY + rad);
-            ctx.lineTo(posX + rectW, posY + rectH - rad);
-            ctx.quadraticCurveTo(posX + rectW, posY + rectH, posX + rectW - rad, posY + rectH);
-            ctx.lineTo(posX, posY + rectH);
-            ctx.closePath();
+            const posY = (count > 1) ? y + 99 + 60 + 4 : y + 99; // 标签间隔4px
             ctx.fillStyle = 'rgba(0,0,0,0.85)';
+            ctx.beginPath();
+            ctx.rect(posX, posY, rectW, rectH);
             ctx.fill();
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffd700';
@@ -2717,7 +2727,10 @@
                     const img = new Image();
                     img.crossOrigin = "Anonymous";
                     await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = imgUrl; });
+
+                    // 使用裁剪模板裁剪该卡图
                     ctx.save();
+                    // 圆角路径
                     ctx.beginPath();
                     ctx.moveTo(x + radius, y);
                     ctx.lineTo(x + cardW - radius, y);
@@ -2730,9 +2743,20 @@
                     ctx.quadraticCurveTo(x, y, x + radius, y);
                     ctx.closePath();
                     ctx.clip();
-                    ctx.drawImage(img, x, y, cardW, cardH);
+
+                    // 绘制裁剪后的图片
+                    if (cropTemplate) {
+                        ctx.drawImage(img,
+                            cropTemplate.left, cropTemplate.top, cropTemplate.width, cropTemplate.height,
+                            x, y, cardW, cardH
+                        );
+                    } else {
+                        // 无模板时直接绘制（备用）
+                        ctx.drawImage(img, x, y, cardW, cardH);
+                    }
                     ctx.restore();
 
+                    // 绘制标签（在圆角之上，但不受裁剪影响）
                     if (foldEnabled) {
                         drawFoldMark(card.cardId, x, y);
                     }
@@ -2751,19 +2775,6 @@
             }
         }
 
-        // 应用统一裁剪模板
-        if (cropTemplate) {
-            try {
-                const croppedCanvas = document.createElement('canvas');
-                croppedCanvas.width = cropTemplate.width;
-                croppedCanvas.height = cropTemplate.height;
-                const croppedCtx = croppedCanvas.getContext('2d');
-                croppedCtx.drawImage(canvas, cropTemplate.left, cropTemplate.top, cropTemplate.width, cropTemplate.height, 0, 0, cropTemplate.width, cropTemplate.height);
-                return croppedCanvas;
-            } catch(e) {
-                console.warn('裁剪失败，使用原图:', e);
-            }
-        }
         return canvas;
     }
 
@@ -2778,6 +2789,7 @@
         const statsTitle = document.getElementById('statsCardTitle').value.trim() || null;
         const qrTitle = document.getElementById('qrCardTitle').value.trim() || null;
 
+        // 预生成裁剪模板
         if (!cropTemplate) {
             await generateCropTemplate();
         }
