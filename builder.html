@@ -740,70 +740,6 @@
             outline: none;
         }
 
-        /* QR Import/Export */
-        .qr-import-area, .qr-export-area {
-            margin-top: 8px;
-            padding: 8px 12px;
-            background: rgba(0,0,0,0.25);
-            border-radius: 16px;
-            border: 1px solid rgba(170,142,78,0.3);
-        }
-        .qr-import-area .qr-import-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
-        }
-        .qr-import-area .qr-import-row input[type="file"] {
-            display: none;
-        }
-        .qr-import-area .qr-import-row button {
-            background: #3a4a3a;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 40px;
-            color: #f5efdb;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .qr-import-area .qr-import-row button:hover { background: #5a6a5a; }
-        .qr-import-area .qr-import-row .qr-status {
-            font-size: 0.65rem;
-            color: #c9b06b;
-        }
-        .qr-export-area {
-            margin-top: 8px;
-        }
-        .qr-export-area .qr-export-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
-        }
-        .qr-export-area .qr-export-row input {
-            flex: 1;
-            min-width: 80px;
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 4px 10px;
-            color: #f5efdb;
-            font-size: 0.7rem;
-            outline: none;
-        }
-        .qr-export-area .qr-export-row button {
-            background: #4a5a3a;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 40px;
-            color: #f5efdb;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .qr-export-area .qr-export-row button:hover { background: #6a7a4a; }
-
         #cardVersionList {
             margin-top: 12px;
             border-top: 1px solid #aa8e4e;
@@ -1127,8 +1063,21 @@
             <div class="deck-header"><span class="deck-title">📋 卡组</span><button class="clear-deck" id="clearDeckBtn">清空</button></div>
             <div class="nation-selector"><div class="nation-row"><span class="nation-label">主国</span><select id="mainNationSelect"></select></div><div class="nation-row"><span class="nation-label">盟国</span><select id="allyNationSelect"></select></div></div>
             <div id="desktopFactionStats" class="faction-stats"></div>
-            <div class="import-area"><div class="import-row"><input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码"><button id="importBtn" class="import-btn">📥 导入</button></div></div>
-            <div class="export-area"><div class="export-row"><button id="exportBtn" class="export-btn">📤 导出代码</button><button id="genImgBtn" class="gen-img-btn">🖼️ 生成图片</button></div></div>
+            <div class="import-area">
+                <div class="import-row">
+                    <input type="text" id="importCode" class="import-input" placeholder="粘贴卡组代码">
+                    <button id="importBtn" class="import-btn">📥 导入</button>
+                    <button id="qrImportBtn" class="import-btn" style="background:#6a5a3a;">📥 扫描二维码</button>
+                    <input type="file" id="qrFileInput" accept="image/*" style="display:none;">
+                </div>
+            </div>
+            <div class="export-area">
+                <div class="export-row">
+                    <button id="exportBtn" class="export-btn">📤 导出代码</button>
+                    <button id="qrExportBtn" class="gen-img-btn" style="background:#6a5a3a;">📤 导出二维码卡</button>
+                    <button id="genImgBtn" class="gen-img-btn">🖼️ 生成图片</button>
+                </div>
+            </div>
             <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
             <div class="deck-list" id="deckListContainer"></div>
         </div>
@@ -1144,7 +1093,7 @@
 <div id="imgGenModal" class="img-gen-modal">
     <div class="img-gen-content">
         <!-- 基础栏 -->
-        <div class="section-label">基础</div>
+        <div class="section-label">📐 基础</div>
         <div class="img-gen-controls">
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
             <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width:100%;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
@@ -1153,7 +1102,7 @@
         </div>
 
         <!-- 附件栏 -->
-        <div class="section-label" style="margin-top:12px;">附件</div>
+        <div class="section-label" style="margin-top:12px;">📎 附件</div>
         <div class="switch-row">
             <div class="switch-item"><span>🏛️ 总部</span><label class="switch"><input type="checkbox" id="headquarterToggle"><span class="slider"></span></label></div>
             <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label></div>
@@ -1169,24 +1118,6 @@
         <div style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">
             <span style="font-size:0.7rem; color:#e9dbbd;">二维码标题</span>
             <input type="text" id="qrCardTitle" placeholder="📱 卡组二维码" style="flex:1; min-width:100px; background:#1e1c16; border:1px solid #aa8e4e; border-radius:40px; padding:4px 12px; color:#f5efdb; font-size:0.75rem; outline:none;">
-        </div>
-
-        <!-- QR 导入/导出 -->
-        <div class="qr-import-area">
-            <div class="qr-import-row">
-                <span style="font-size:0.7rem; color:#e9dbbd;">📥 导入二维码</span>
-                <button id="qrFileBtn">📁 选择图片</button>
-                <button id="qrCameraBtn">📷 摄像头</button>
-                <input type="file" id="qrFileInput" accept="image/*">
-                <span id="qrImportStatus" class="qr-status">就绪</span>
-            </div>
-        </div>
-        <div class="qr-export-area">
-            <div class="qr-export-row">
-                <span style="font-size:0.7rem; color:#e9dbbd;">📤 导出二维码</span>
-                <input type="text" id="qrExportTitle" placeholder="标题" value="卡组二维码">
-                <button id="qrExportBtn">生成</button>
-            </div>
         </div>
 
         <!-- 卡牌版本列表 -->
@@ -1212,10 +1143,6 @@
         </div>
     </div>
 </div>
-
-<!-- 隐藏的video用于摄像头 -->
-<video id="qrVideo" style="display:none;"></video>
-<canvas id="qrCanvas" style="display:none;"></canvas>
 
 <script>
     // ==================== 版本定义 ====================
@@ -2248,6 +2175,109 @@
 
     function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
+    // ==================== QR 导入/导出 ====================
+    function setupQRImportExport() {
+        // QR 导入（文件选择 + API 解码）
+        const qrImportBtn = document.getElementById('qrImportBtn');
+        const qrFileInput = document.getElementById('qrFileInput');
+        if (qrImportBtn && qrFileInput) {
+            qrImportBtn.addEventListener('click', () => qrFileInput.click());
+            qrFileInput.addEventListener('change', async function() {
+                if (!this.files || !this.files[0]) return;
+                const file = this.files[0];
+                const status = document.getElementById('imageStatus'); // 借用主状态显示（或可添加单独状态）
+                const mainStatus = document.getElementById('imageStatus');
+                if (mainStatus) mainStatus.textContent = '⏳ 解码中...';
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const response = await fetch('https://api.2dcode.biz/v1/read-qr-code', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const result = await response.json();
+                    if (result && result.data) {
+                        const code = result.data;
+                        if (mainStatus) mainStatus.textContent = '✅ 二维码解码成功！';
+                        importDeckFromCode(code);
+                    } else {
+                        throw new Error('未识别到二维码数据');
+                    }
+                } catch (e) {
+                    if (mainStatus) mainStatus.textContent = '❌ 二维码解码失败: ' + e.message;
+                    alert('二维码解码失败: ' + e.message);
+                }
+                this.value = ''; // 重置输入
+            });
+        }
+
+        // QR 导出（生成二维码卡）
+        const qrExportBtn = document.getElementById('qrExportBtn');
+        if (qrExportBtn) {
+            qrExportBtn.addEventListener('click', async function() {
+                const code = exportDeckCode();
+                if (!code) { alert('卡组为空'); return; }
+                const title = document.getElementById('qrExportTitle')?.value?.trim() || '卡组二维码';
+                // 生成一张二维码卡图片
+                const cardW = 500, cardH = 702;
+                const canvas = document.createElement('canvas');
+                canvas.width = cardW;
+                canvas.height = cardH;
+                const ctx = canvas.getContext('2d');
+                const radius = 15;
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(cardW - radius, 0);
+                ctx.quadraticCurveTo(cardW, 0, cardW, radius);
+                ctx.lineTo(cardW, cardH - radius);
+                ctx.quadraticCurveTo(cardW, cardH, cardW - radius, cardH);
+                ctx.lineTo(radius, cardH);
+                ctx.quadraticCurveTo(0, cardH, 0, cardH - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.fillStyle = '#1a1c12';
+                ctx.fill();
+                ctx.strokeStyle = '#c9aa5b';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffefbf';
+                ctx.font = 'bold 36px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.fillText(title, cardW/2, 60);
+
+                const qrSize = Math.min(cardW * 0.6, cardH * 0.4);
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(code)}&bgcolor=1a1c12&color=f5c542&format=png`;
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                await new Promise((r) => { img.onload = r; img.onerror = r; img.src = qrUrl; });
+                const qrX = (cardW - qrSize) / 2;
+                const qrY = 90;
+                ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+
+                const fontSize = 16;
+                ctx.font = `${fontSize}px monospace`;
+                ctx.fillStyle = '#c9b06b';
+                const words = code.match(/.{1,35}/g) || [code];
+                const lineHeight = fontSize * 1.6;
+                const startY = qrY + qrSize + 30;
+                for (let i = 0; i < words.length; i++) {
+                    const lineY = startY + i * lineHeight;
+                    if (lineY > cardH - 10) break;
+                    ctx.fillText(words[i], cardW/2, lineY);
+                }
+
+                // 下载
+                const link = document.createElement('a');
+                link.download = `qr_card_${new Date().toISOString().slice(0,19)}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    }
+
     // ==================== 图片生成 ====================
     async function fetchHeadquarterCard(name, lang) {
         if (!name || name.trim() === '') return null;
@@ -2526,7 +2556,6 @@
         ctx.fillText(title, x + w/2, y + h * 0.10);
 
         const qrSize = Math.min(w * 0.5, h * 0.35);
-        // 使用API参数生成二维码：暗色背景，金色点
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(qrCodeData)}&bgcolor=1a1c12&color=f5c542&format=png`;
         const img = new Image();
         img.crossOrigin = "Anonymous";
@@ -2865,156 +2894,6 @@
             hqInputDiv.style.display = 'none';
         }
     });
-
-    // ==================== QR 导入/导出 ====================
-    function setupQRImportExport() {
-        // 导入 - 文件
-        const fileBtn = document.getElementById('qrFileBtn');
-        const fileInput = document.getElementById('qrFileInput');
-        const status = document.getElementById('qrImportStatus');
-        if (fileBtn && fileInput) {
-            fileBtn.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', async function() {
-                if (this.files && this.files[0]) {
-                    status.textContent = '读取中...';
-                    try {
-                        const file = this.files[0];
-                        const img = new Image();
-                        const url = URL.createObjectURL(file);
-                        img.src = url;
-                        await new Promise((r) => { img.onload = r; });
-                        // 使用 jsQR 解码（需要引入库）
-                        // 简化版本：使用画布提取数据
-                        const canvas = document.getElementById('qrCanvas');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0);
-                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
-                        // 使用 jsQR 解码
-                        if (typeof jsQR !== 'undefined') {
-                            const code = jsQR(imageData.data, img.width, img.height);
-                            if (code && code.data) {
-                                status.textContent = '✅ 解码成功！';
-                                // 导入卡组
-                                importDeckFromCode(code.data);
-                            } else {
-                                status.textContent = '❌ 未识别到二维码';
-                            }
-                        } else {
-                            status.textContent = '⚠️ 未加载解码库，请引入 jsQR';
-                            // 简单提示
-                            alert('请确保 jsQR 库已加载 (https://cdn.jsdelivr.net/npm/jsqr)');
-                        }
-                        URL.revokeObjectURL(url);
-                    } catch(e) {
-                        status.textContent = '❌ 读取失败';
-                        console.error(e);
-                    }
-                }
-            });
-        }
-
-        // 导入 - 摄像头
-        const cameraBtn = document.getElementById('qrCameraBtn');
-        if (cameraBtn) {
-            cameraBtn.addEventListener('click', async function() {
-                status.textContent = '📷 启动摄像头...';
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    const video = document.getElementById('qrVideo');
-                    video.srcObject = stream;
-                    await video.play();
-                    // 简单捕获一帧
-                    const canvas = document.getElementById('qrCanvas');
-                    canvas.width = video.videoWidth || 640;
-                    canvas.height = video.videoHeight || 480;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(video, 0, 0);
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    stream.getTracks().forEach(t => t.stop());
-                    if (typeof jsQR !== 'undefined') {
-                        const code = jsQR(imageData.data, canvas.width, canvas.height);
-                        if (code && code.data) {
-                            status.textContent = '✅ 解码成功！';
-                            importDeckFromCode(code.data);
-                        } else {
-                            status.textContent = '❌ 未识别到二维码';
-                        }
-                    } else {
-                        status.textContent = '⚠️ 请引入 jsQR 库';
-                    }
-                } catch(e) {
-                    status.textContent = '❌ 摄像头错误: ' + e.message;
-                }
-            });
-        }
-
-        // 导出 - 生成二维码卡
-        const exportBtn = document.getElementById('qrExportBtn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', async function() {
-                const title = document.getElementById('qrExportTitle').value.trim() || '卡组二维码';
-                const code = exportDeckCode();
-                if (!code) { alert('卡组为空'); return; }
-                // 生成一张二维码卡图片
-                const cardW = 500, cardH = 702;
-                const canvas = document.createElement('canvas');
-                canvas.width = cardW;
-                canvas.height = cardH;
-                const ctx = canvas.getContext('2d');
-                const radius = 15;
-                ctx.beginPath();
-                ctx.moveTo(radius, 0);
-                ctx.lineTo(cardW - radius, 0);
-                ctx.quadraticCurveTo(cardW, 0, cardW, radius);
-                ctx.lineTo(cardW, cardH - radius);
-                ctx.quadraticCurveTo(cardW, cardH, cardW - radius, cardH);
-                ctx.lineTo(radius, cardH);
-                ctx.quadraticCurveTo(0, cardH, 0, cardH - radius);
-                ctx.lineTo(0, radius);
-                ctx.quadraticCurveTo(0, 0, radius, 0);
-                ctx.closePath();
-                ctx.fillStyle = '#1a1c12';
-                ctx.fill();
-                ctx.strokeStyle = '#c9aa5b';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                ctx.fillStyle = '#ffefbf';
-                ctx.font = 'bold 36px "Segoe UI"';
-                ctx.textAlign = 'center';
-                ctx.fillText(title, cardW/2, 60);
-
-                const qrSize = Math.min(cardW * 0.6, cardH * 0.4);
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(code)}&bgcolor=1a1c12&color=f5c542&format=png`;
-                const img = new Image();
-                img.crossOrigin = 'Anonymous';
-                await new Promise((r) => { img.onload = r; img.onerror = r; img.src = qrUrl; });
-                const qrX = (cardW - qrSize) / 2;
-                const qrY = 90;
-                ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
-
-                const fontSize = 16;
-                ctx.font = `${fontSize}px monospace`;
-                ctx.fillStyle = '#c9b06b';
-                const words = code.match(/.{1,35}/g) || [code];
-                const lineHeight = fontSize * 1.6;
-                const startY = qrY + qrSize + 30;
-                for (let i = 0; i < words.length; i++) {
-                    const lineY = startY + i * lineHeight;
-                    if (lineY > cardH - 10) break;
-                    ctx.fillText(words[i], cardW/2, lineY);
-                }
-
-                // 下载
-                const link = document.createElement('a');
-                link.download = `qr_card_${new Date().toISOString().slice(0,19)}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        }
-    }
 
     // ==================== 启动 ====================
     function initSidebars() {
