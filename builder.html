@@ -244,11 +244,13 @@
             border-left: 5px solid;
             transition: 0.1s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            position: relative;
         }
         .headquarters-row {
             border-left-color: #b8860b;
             background: linear-gradient(135deg,#1e1c14,#14120c);
         }
+        .headquarters-row .deck-add-btn { display: none; }
         .deck-card-icon {
             width: 30px;
             height: 30px;
@@ -340,7 +342,6 @@
             font-size: 0.65rem;
             font-weight: bold;
             color: #ffe0a3;
-            margin-left: auto;
             min-width: 36px;
             text-align: center;
             flex-shrink: 0;
@@ -361,8 +362,30 @@
             justify-content: center;
         }
         .deck-remove-btn:hover { background: #b6521a; color: white; }
+        .deck-add-btn {
+            background: #2a4a2a;
+            border: none;
+            color: #8fdf8f;
+            border-radius: 30px;
+            width: 24px;
+            height: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .deck-add-btn:hover { background: #3a6a3a; color: #afffaf; }
         .headquarters-row .deck-remove-btn { display: none; }
         .headquarters-row .deck-card-qty { visibility: hidden; }
+        .qty-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
 
         .mobile-deck-toggle {
             display: none;
@@ -613,10 +636,7 @@
             border-bottom: 1px solid #aa8e4e;
             align-items: flex-end;
         }
-        .img-gen-control {
-            flex: 1;
-            min-width: 100px;
-        }
+        .img-gen-control { flex: 1; min-width: 100px; }
         .img-gen-control label { font-size: 0.7rem; color: #e9dbbd; display: block; margin-bottom: 4px; }
         .img-gen-control input, .img-gen-control select {
             width: 100%;
@@ -655,23 +675,34 @@
             border: none;
         }
 
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #c9b06b;
+            letter-spacing: 0.5px;
+            padding: 4px 0 2px;
+            border-bottom: 1px solid rgba(170,142,78,0.3);
+            margin-bottom: 8px;
+            width: 100%;
+        }
+
         .switch-row {
             display: flex;
-            gap: 16px;
-            align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 16px;
+            gap: 12px 16px;
+            align-items: center;
+            margin-bottom: 12px;
         }
         .switch-item {
             display: flex;
             align-items: center;
             gap: 8px;
             background: rgba(0,0,0,0.3);
-            padding: 6px 12px;
+            padding: 4px 12px;
             border-radius: 40px;
         }
         .switch-item span { color: #e9dbbd; font-size: 0.75rem; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
@@ -685,32 +716,96 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 16px;
-            width: 16px;
-            left: 3px;
+            height: 14px;
+            width: 14px;
+            left: 2px;
             bottom: 2px;
             background-color: #e9cf95;
             transition: 0.2s;
             border-radius: 50%;
         }
         input:checked + .slider { background-color: #7a6233; }
-        input:checked + .slider:before { transform: translateX(20px); background-color: #fef0b6; }
+        input:checked + .slider:before { transform: translateX(18px); background-color: #fef0b6; }
 
-        #headquarterInputDiv { margin-top: 8px; display: none; }
-        #headquarterInputDiv label { display: block; font-size: 0.75rem; color: #e9dbbd; margin-bottom: 4px; }
+        #headquarterInputDiv { margin-top: 6px; display: none; }
+        #headquarterInputDiv label { display: block; font-size: 0.7rem; color: #e9dbbd; margin-bottom: 2px; }
         #headquarterInputDiv input {
             width: 100%;
             background: #1e1c16;
             border: 1px solid #aa8e4e;
             border-radius: 40px;
-            padding: 0.6rem 1rem;
+            padding: 0.4rem 0.8rem;
             color: #f5efdb;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             outline: none;
         }
 
+        /* QR Import/Export */
+        .qr-import-area, .qr-export-area {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 16px;
+            border: 1px solid rgba(170,142,78,0.3);
+        }
+        .qr-import-area .qr-import-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+        .qr-import-area .qr-import-row input[type="file"] {
+            display: none;
+        }
+        .qr-import-area .qr-import-row button {
+            background: #3a4a3a;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: #f5efdb;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .qr-import-area .qr-import-row button:hover { background: #5a6a5a; }
+        .qr-import-area .qr-import-row .qr-status {
+            font-size: 0.65rem;
+            color: #c9b06b;
+        }
+        .qr-export-area {
+            margin-top: 8px;
+        }
+        .qr-export-area .qr-export-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+        .qr-export-area .qr-export-row input {
+            flex: 1;
+            min-width: 80px;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 4px 10px;
+            color: #f5efdb;
+            font-size: 0.7rem;
+            outline: none;
+        }
+        .qr-export-area .qr-export-row button {
+            background: #4a5a3a;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: #f5efdb;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .qr-export-area .qr-export-row button:hover { background: #6a7a4a; }
+
         #cardVersionList {
-            margin-top: 16px;
+            margin-top: 12px;
             border-top: 1px solid #aa8e4e;
             padding-top: 6px;
         }
@@ -719,15 +814,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 0;
+            padding: 4px 0;
             user-select: none;
         }
         .version-list-header:hover { color: #dbba6c; }
-        .version-list-header .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .version-list-header .header-actions { display: flex; align-items: center; gap: 8px; }
         .version-list-header .header-actions button {
             background: #4a3720;
             border: none;
@@ -754,78 +845,25 @@
             padding: 4px 0;
             border-bottom: 1px solid rgba(170,142,78,0.2);
         }
-        #versionListContent .version-row .v-icon {
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
+        #versionListContent .version-row .v-icon { width: 24px; height: 24px; flex-shrink: 0; }
+        #versionListContent .version-row .v-name { flex: 1; font-size: 0.8rem; color: #f5efdb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #versionListContent .version-row .v-qty { font-size: 0.7rem; color: #c9b06b; margin-right: 4px; }
+        #versionListContent .version-row select { width: 70px; background: #1e1c16; border: 1px solid #aa8e4e; border-radius: 40px; padding: 2px 6px; color: #f5efdb; font-size: 0.7rem; cursor: pointer; outline: none; }
+        #versionListContent .version-row .v-cost-input { width: 55px; background: #1e1c16; border: 1px solid #aa8e4e; border-radius: 40px; padding: 2px 6px; color: #f5efdb; font-size: 0.7rem; text-align: center; outline: none; }
+        #versionListContent .version-row .star-btn {
+            width: 28px; height: 28px; border-radius: 50%; border: 2px solid #6a6a6a; background: transparent; color: #6a6a6a; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.15s; flex-shrink: 0;
         }
-        #versionListContent .version-row .v-name {
-            flex: 1;
-            font-size: 0.8rem;
-            color: #f5efdb;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        #versionListContent .version-row .v-qty {
-            font-size: 0.7rem;
-            color: #c9b06b;
-            margin-right: 4px;
-        }
-        #versionListContent .version-row select {
-            width: 70px;
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 2px 6px;
-            color: #f5efdb;
-            font-size: 0.7rem;
-            cursor: pointer;
-            outline: none;
-        }
-        #versionListContent .version-row .v-cost-input {
-            width: 55px;
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 2px 6px;
-            color: #f5efdb;
-            font-size: 0.7rem;
-            text-align: center;
-            outline: none;
-        }
+        #versionListContent .version-row .star-btn.active { border-color: #ffd700; background: #ffd700; color: #1a1c12; }
+
         .set-all-wrapper {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 8px 0 4px;
+            margin: 6px 0 4px;
         }
-        .set-all-wrapper label {
-            font-size: 0.75rem;
-            color: #e9dbbd;
-        }
-        .set-all-wrapper select {
-            width: 100px;
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 4px 8px;
-            color: #f5efdb;
-            font-size: 0.7rem;
-            cursor: pointer;
-            outline: none;
-        }
-        .set-all-wrapper button {
-            background: #5a6b3c;
-            border: none;
-            padding: 2px 12px;
-            border-radius: 40px;
-            color: #f5efdb;
-            font-weight: bold;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .set-all-wrapper label { font-size: 0.75rem; color: #e9dbbd; }
+        .set-all-wrapper select { width: 100px; background: #1e1c16; border: 1px solid #aa8e4e; border-radius: 40px; padding: 4px 8px; color: #f5efdb; font-size: 0.7rem; cursor: pointer; outline: none; }
+        .set-all-wrapper button { background: #5a6b3c; border: none; padding: 2px 12px; border-radius: 40px; color: #f5efdb; font-weight: bold; font-size: 0.7rem; cursor: pointer; transition: 0.2s; }
         .set-all-wrapper button:hover { background: #7e9e4a; }
 
         .img-gen-preview {
@@ -834,16 +872,8 @@
             max-height: 50vh;
             overflow: auto;
         }
-        .img-gen-preview canvas {
-            max-width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-        .img-gen-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
+        .img-gen-preview canvas { max-width: 100%; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .img-gen-actions { display: flex; gap: 12px; justify-content: center; }
 
         .filter-panel {
             background: rgba(0,0,0,0.65);
@@ -853,11 +883,7 @@
             margin-bottom: 1.5rem;
             border: 1px solid rgba(170,142,78,0.6);
         }
-        .filter-group {
-            margin-bottom: 1rem;
-            border-bottom: 1px dashed rgba(170,142,78,0.3);
-            padding-bottom: 0.6rem;
-        }
+        .filter-group { margin-bottom: 1rem; border-bottom: 1px dashed rgba(170,142,78,0.3); padding-bottom: 0.6rem; }
         .filter-group-title {
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -873,11 +899,7 @@
         }
         .filter-group-title .collapse-icon { font-size: 0.8rem; transition: transform 0.2s; margin-left: 8px; }
         .filter-group-title .collapse-icon.collapsed { transform: rotate(-90deg); }
-        .filter-group-body {
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            max-height: 600px;
-        }
+        .filter-group-body { overflow: hidden; transition: max-height 0.3s ease-out; max-height: 600px; }
         .filter-group-body.collapsed { max-height: 0; }
         .multi-select-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
         .filter-chip {
@@ -893,38 +915,12 @@
             align-items: center;
             gap: 6px;
         }
-        .filter-chip.active {
-            background: #c9a53b;
-            color: #1e1c10;
-            border-color: #c9a53b;
-            font-weight: 600;
-        }
+        .filter-chip.active { background: #c9a53b; color: #1e1c10; border-color: #c9a53b; font-weight: 600; }
         .filter-chip img { width: 18px; height: 18px; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3)); }
-        .reset-chip {
-            background: #2a2618;
-            border-color: #b69654;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.8rem;
-            border-radius: 40px;
-            cursor: pointer;
-            color: #e9dbbd;
-        }
-        .row-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: flex-end;
-            margin-bottom: 1rem;
-        }
+        .reset-chip { background: #2a2618; border-color: #b69654; font-size: 0.7rem; padding: 0.2rem 0.8rem; border-radius: 40px; cursor: pointer; color: #e9dbbd; }
+        .row-filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; margin-bottom: 1rem; }
         .filter-item { flex: 1; min-width: 130px; }
-        .filter-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #e9dbbd;
-            margin-bottom: 0.3rem;
-            font-weight: 600;
-        }
+        .filter-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #e9dbbd; margin-bottom: 0.3rem; font-weight: 600; }
         select, .search-input {
             width: 100%;
             background: #1e1c16;
@@ -945,15 +941,7 @@
             gap: 1rem;
         }
         .stats-item { flex: 1; min-width: 100px; }
-        .exact-input {
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 0.4rem 0.8rem;
-            width: 100%;
-            color: #f5efdb;
-            text-align: center;
-        }
+        .exact-input { background: #1e1c16; border: 1px solid #aa8e4e; border-radius: 40px; padding: 0.4rem 0.8rem; width: 100%; color: #f5efdb; text-align: center; }
         .stats-note { font-size: 0.7rem; color: #c9b06b; margin-top: 6px; }
 
         .card-grid {
@@ -971,11 +959,7 @@
             border: 2px solid;
             position: relative;
         }
-        .card-img {
-            width: 100%;
-            aspect-ratio: 500/702;
-            background: #0a0f0c;
-        }
+        .card-img { width: 100%; aspect-ratio: 500/702; background: #0a0f0c; }
         .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .card-info { padding: 0.5rem 0.6rem 0.7rem; background: rgba(0,0,0,0.75); }
         .card-name {
@@ -988,14 +972,7 @@
             color: #faf0cf;
         }
         .card-name span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .reserve-icon-sm {
-            width: 14px;
-            height: 14px;
-            background: url('reserve.png') no-repeat center;
-            background-size: contain;
-            display: inline-block;
-            flex-shrink: 0;
-        }
+        .reserve-icon-sm { width: 14px; height: 14px; background: url('reserve.png') no-repeat center; background-size: contain; display: inline-block; flex-shrink: 0; }
         .card-badge-desktop {
             position: absolute;
             top: 6px;
@@ -1070,13 +1047,7 @@
             .card-name span:first-child { font-size: 0.7rem; }
         }
 
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 1.5rem;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+        .pagination { display: flex; justify-content: center; margin-top: 1.5rem; gap: 6px; flex-wrap: wrap; }
         .page-btn {
             background: #2d2a1d;
             border: 1px solid #a3874b;
@@ -1172,20 +1143,51 @@
 <!-- 图片生成模态框 -->
 <div id="imgGenModal" class="img-gen-modal">
     <div class="img-gen-content">
+        <!-- 基础栏 -->
+        <div class="section-label">基础</div>
         <div class="img-gen-controls">
             <div class="img-gen-control"><label>每行数量</label><input type="number" id="imgCols" value="10" min="1" max="40"></div>
             <div class="img-gen-control"><label>画质</label><input type="range" id="imgQuality" min="1" max="100" value="20" style="width:100%;"><span id="qualityVal" style="color:#e9dbbd; margin-left:8px;">20</span></div>
-            <div class="img-gen-control"><label>🌐 卡图语言</label><select id="imgLang"></select></div>
+            <div class="img-gen-control"><label>🌐 语言</label><select id="imgLang"></select></div>
+            <div class="img-gen-control" style="flex:0.5; min-width:80px;"><label>折叠</label><label class="switch" style="width:44px; height:24px; margin-top:4px;"><input type="checkbox" id="foldToggle"><span class="slider" style="height:24px;"></span></label></div>
         </div>
+
+        <!-- 附件栏 -->
+        <div class="section-label" style="margin-top:12px;">附件</div>
         <div class="switch-row">
-            <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label></div>
-            <div class="switch-item"><span>🎨 背景色</span><select id="bgColorSelect"><option value="white">白色</option><option value="black">黑色</option><option value="transparent">透明</option><option value="custom">自定义</option></select></div>
-            <div class="switch-item" id="customColorDiv" style="display:none;"><span>自定义颜色</span><input type="color" id="customColor" value="#ffffff"></div>
             <div class="switch-item"><span>🏛️ 总部</span><label class="switch"><input type="checkbox" id="headquarterToggle"><span class="slider"></span></label></div>
-            <div class="switch-item"><span>📦 折叠</span><label class="switch"><input type="checkbox" id="foldToggle"><span class="slider"></span></label></div>
-            <div class="switch-item"><span>📌 二维码</span><label class="switch"><input type="checkbox" id="qrToggle"><span class="slider"></span></label></div>
+            <div class="switch-item"><span>📊 统计卡</span><label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label></div>
+            <div class="switch-item"><span>📱 二维码</span><label class="switch"><input type="checkbox" id="qrToggle"><span class="slider"></span></label></div>
         </div>
         <div id="headquarterInputDiv"><label for="headquarterNameInput">总部英文名</label><input type="text" id="headquarterNameInput" placeholder="例: MOSCOW"></div>
+
+        <!-- 统计卡标题 -->
+        <div style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">
+            <span style="font-size:0.7rem; color:#e9dbbd;">统计卡标题</span>
+            <input type="text" id="statsCardTitle" placeholder="卡组统计" style="flex:1; min-width:100px; background:#1e1c16; border:1px solid #aa8e4e; border-radius:40px; padding:4px 12px; color:#f5efdb; font-size:0.75rem; outline:none;">
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap;">
+            <span style="font-size:0.7rem; color:#e9dbbd;">二维码标题</span>
+            <input type="text" id="qrCardTitle" placeholder="📱 卡组二维码" style="flex:1; min-width:100px; background:#1e1c16; border:1px solid #aa8e4e; border-radius:40px; padding:4px 12px; color:#f5efdb; font-size:0.75rem; outline:none;">
+        </div>
+
+        <!-- QR 导入/导出 -->
+        <div class="qr-import-area">
+            <div class="qr-import-row">
+                <span style="font-size:0.7rem; color:#e9dbbd;">📥 导入二维码</span>
+                <button id="qrFileBtn">📁 选择图片</button>
+                <button id="qrCameraBtn">📷 摄像头</button>
+                <input type="file" id="qrFileInput" accept="image/*">
+                <span id="qrImportStatus" class="qr-status">就绪</span>
+            </div>
+        </div>
+        <div class="qr-export-area">
+            <div class="qr-export-row">
+                <span style="font-size:0.7rem; color:#e9dbbd;">📤 导出二维码</span>
+                <input type="text" id="qrExportTitle" placeholder="标题" value="卡组二维码">
+                <button id="qrExportBtn">生成</button>
+            </div>
+        </div>
 
         <!-- 卡牌版本列表 -->
         <div id="cardVersionList">
@@ -1204,12 +1206,16 @@
 
         <div class="img-gen-preview" id="imgGenPreview"></div>
         <div class="img-gen-actions">
-            <button id="generatePreviewBtn" class="gen-img-btn">🔎 生成预览</button>
+            <button id="generatePreviewBtn" class="gen-img-btn">✨ 生成预览</button>
             <button id="downloadImgBtn" class="export-btn">💾 下载图片</button>
             <button id="closeImgModal" class="import-btn">关闭</button>
         </div>
     </div>
 </div>
+
+<!-- 隐藏的video用于摄像头 -->
+<video id="qrVideo" style="display:none;"></video>
+<canvas id="qrCanvas" style="display:none;"></canvas>
 
 <script>
     // ==================== 版本定义 ====================
@@ -1276,6 +1282,8 @@
     let cardIndex = {}, parentOfMap = {}, veteranMap = {}, becomesVeteranMap = {};
     let cardVersionMap = new Map(); // cardId -> version
     let cardCostMap = new Map();   // cardId -> user-defined cost (number)
+    let cardStarMap = new Map();   // cardId -> boolean (starred)
+    let cropTemplate = null;       // 统一裁剪模板
 
     const languages = [
         { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' }, { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
@@ -1339,6 +1347,96 @@
         return card.setName;
     }
 
+    // ==================== 裁剪模板（与 seek.html 一致） ====================
+    function isDarkPixel(data, x, y, width, threshold) {
+        const idx = (y * width + x) * 4;
+        const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+        return Math.max(r, g, b) <= threshold;
+    }
+
+    function buildCropTemplateFromImageData(imgData, width, height, threshold) {
+        const visited = new Uint8Array(width * height);
+        const queue = [];
+        const corners = [[0,0],[width-1,0],[0,height-1],[width-1,height-1]];
+        for (const [cx, cy] of corners) {
+            const idx = cy * width + cx;
+            if (!visited[idx] && isDarkPixel(imgData.data, cx, cy, width, threshold)) {
+                visited[idx] = 1;
+                queue.push([cx, cy]);
+            }
+        }
+        const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+        while (queue.length > 0) {
+            const [x, y] = queue.shift();
+            for (const [dx, dy] of dirs) {
+                const nx = x + dx, ny = y + dy;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    const nidx = ny * width + nx;
+                    if (!visited[nidx] && isDarkPixel(imgData.data, nx, ny, width, threshold)) {
+                        visited[nidx] = 1;
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+        }
+        let top = 0, bottom = height - 1, left = 0, right = width - 1;
+        for (let y = 0; y < height; y++) {
+            let hasLight = false;
+            for (let x = 0; x < width; x++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { top = y; break; }
+        }
+        for (let y = height - 1; y >= 0; y--) {
+            let hasLight = false;
+            for (let x = 0; x < width; x++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { bottom = y; break; }
+        }
+        for (let x = 0; x < width; x++) {
+            let hasLight = false;
+            for (let y = 0; y < height; y++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { left = x; break; }
+        }
+        for (let x = width - 1; x >= 0; x--) {
+            let hasLight = false;
+            for (let y = 0; y < height; y++) {
+                if (!visited[y * width + x]) { hasLight = true; break; }
+            }
+            if (hasLight) { right = x; break; }
+        }
+        return { left, top, width: right - left + 1, height: bottom - top + 1 };
+    }
+
+    async function getCropTemplateFromCard(card, lang) {
+        const imgUrl = getCardImageUrl(card.image, lang, DEFAULT_VERSION, 100);
+        const resp = await fetch(imgUrl);
+        if (!resp.ok) throw new Error("无法获取卡图用于模板");
+        const blob = await resp.blob();
+        const bitmap = await createImageBitmap(blob);
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap, 0, 0);
+        const imgData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+        return buildCropTemplateFromImageData(imgData, bitmap.width, bitmap.height, 50);
+    }
+
+    // 应用裁剪模板到画布
+    function applyCropTemplateToCanvas(sourceCanvas, template) {
+        const { left, top, width, height } = template;
+        const cropped = document.createElement('canvas');
+        cropped.width = width;
+        cropped.height = height;
+        const ctx = cropped.getContext('2d');
+        ctx.drawImage(sourceCanvas, left, top, width, height, 0, 0, width, height);
+        return cropped;
+    }
+
     // ==================== 数据加载 ====================
     async function loadData() {
         try {
@@ -1375,7 +1473,6 @@
                     rawJson: j
                 };
             });
-            // 为每张卡添加索引位置
             allCards.forEach((c, i) => c._index = i);
             cardIndex = {};
             for (let c of allCards) if (c.cardId) cardIndex[c.cardId] = c;
@@ -1412,7 +1509,6 @@
             initCardVersionList();
             applyFilters();
             updateFactionStats();
-            // 刷新卡组列表显示总部
             renderDeckList('deckListContainer');
             renderDeckList('mobileDeckList');
         } catch(e) {
@@ -1643,7 +1739,6 @@
         while (container.children.length > 1) {
             container.removeChild(container.lastChild);
         }
-        // 按 allCards 原始顺序排列
         const entries = Array.from(deckMap.entries());
         entries.sort((a, b) => {
             const cardA = a[1].card;
@@ -1703,6 +1798,17 @@
                 cardCostMap.set(card.cardId, val);
             });
             row.appendChild(costInput);
+            // 星标按钮
+            const starBtn = document.createElement('button');
+            starBtn.className = 'star-btn' + (cardStarMap.get(card.cardId) ? ' active' : '');
+            starBtn.textContent = '★';
+            starBtn.title = '标记/取消标记';
+            starBtn.addEventListener('click', function() {
+                const current = cardStarMap.get(card.cardId) || false;
+                cardStarMap.set(card.cardId, !current);
+                this.classList.toggle('active');
+            });
+            row.appendChild(starBtn);
             container.appendChild(row);
         }
     }
@@ -1853,6 +1959,9 @@
         if (!cardCostMap.has(card.cardId)) {
             cardCostMap.set(card.cardId, card.cost);
         }
+        if (!cardStarMap.has(card.cardId)) {
+            cardStarMap.set(card.cardId, false);
+        }
         updateAllDecksUI();
         renderCards();
         updateFactionStats();
@@ -1866,6 +1975,7 @@
                 deckMap.delete(cardId);
                 cardVersionMap.delete(entry.card.cardId);
                 cardCostMap.delete(entry.card.cardId);
+                cardStarMap.delete(entry.card.cardId);
             }
             updateAllDecksUI();
             renderCards();
@@ -1877,6 +1987,7 @@
         deckMap.clear();
         cardVersionMap.clear();
         cardCostMap.clear();
+        cardStarMap.clear();
         updateAllDecksUI();
         renderCards();
         updateFactionStats();
@@ -1909,7 +2020,6 @@
     function renderDeckList(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        // 总部行始终显示
         let html = `<div class="deck-card-row headquarters-row" style="border-left-color: #b8860b;">
                         <div class="deck-card-icon">🏛️</div>
                         <div class="deck-card-details"><div class="deck-card-name">总部</div><div class="deck-card-stats"></div></div>
@@ -1919,7 +2029,6 @@
             container.innerHTML = html + '<div style="color:#ab9f7c;text-align:center;padding:12px;">暂无卡牌，点击左侧卡片加入</div>';
             return;
         }
-        // 按 allCards 原始顺序排序
         const entries = Array.from(deckMap.values());
         entries.sort((a, b) => {
             return (a.card._index || 0) - (b.card._index || 0);
@@ -1941,8 +2050,11 @@
                                 <div class="card-rarity-badge ${rarityClass}">${rarityDisplay}</div>
                             </div>
                         </div>
-                        <span class="deck-card-qty">x${entry.count}</span>
-                        <button class="deck-remove-btn" data-id="${c.id}">−</button>
+                        <div class="qty-group">
+                            <button class="deck-remove-btn" data-id="${c.id}">−</button>
+                            <span class="deck-card-qty">x${entry.count}</span>
+                            <button class="deck-add-btn" data-id="${c.id}">+</button>
+                        </div>
                     </div>`;
         });
         container.innerHTML = html;
@@ -1951,6 +2063,16 @@
                 e.stopPropagation();
                 const id = parseInt(btn.dataset.id);
                 if (!isNaN(id)) removeFromDeck(id);
+            });
+        });
+        container.querySelectorAll('.deck-add-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.dataset.id);
+                if (!isNaN(id)) {
+                    const card = allCards.find(c => c.id === id);
+                    if (card) addToDeck(card);
+                }
             });
         });
     }
@@ -2053,6 +2175,7 @@
             deckMap.clear();
             cardVersionMap.clear();
             cardCostMap.clear();
+            cardStarMap.clear();
             mainNation = mainFaction;
             allyNation = allyFaction;
             document.getElementById('mainNationSelect').value = mainNation;
@@ -2075,8 +2198,7 @@
         const costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
         let unitTotal=0, orderTotal=0, counterTotal=0;
         let rarityCounts = { "Standard":0, "Limited":0, "Special":0, "Elite":0 };
-        let totalCostSum = 0;
-        let totalCardsCount = 0;
+        let totalCostSum = 0, totalCardsCount = 0;
         for (let {card, count} of deckMap.values()) {
             const effectiveCost = cardCostMap.get(card.cardId) ?? card.cost;
             const cat = effectiveCost >= 7 ? 7 : effectiveCost;
@@ -2089,28 +2211,21 @@
             totalCardsCount += count;
         }
         const avgCost = totalCardsCount > 0 ? (totalCostSum / totalCardsCount) : 0;
-
         let maxTotal = 1;
         for (let i = 0; i <= 7; i++) {
             const total = costMap[i].unit + costMap[i].order + costMap[i].counter;
             if (total > maxTotal) maxTotal = total;
         }
         const barsHtml = [0,1,2,3,4,5,6,7].map(cost => {
-            const unit = costMap[cost].unit;
-            const order = costMap[cost].order;
-            const counter = costMap[cost].counter;
+            const unit = costMap[cost].unit, order = costMap[cost].order, counter = costMap[cost].counter;
             const total = unit + order + counter;
             if (total === 0) {
                 return `<div class="histogram-bar-wrapper"><div class="bar-stack" style="height:0;background:transparent;"></div><div class="bar-label">${cost===7?'7K+':cost+'K'}</div><div class="cost-total">0</div></div>`;
             }
             const ratio = total / maxTotal;
             const totalH = Math.max(4, ratio * 124);
-            const unitRatio = unit / total;
-            const orderRatio = order / total;
-            const counterRatio = counter / total;
-            const unitH = unitRatio * totalH;
-            const orderH = orderRatio * totalH;
-            const counterH = counterRatio * totalH;
+            const unitRatio = unit / total, orderRatio = order / total, counterRatio = counter / total;
+            const unitH = unitRatio * totalH, orderH = orderRatio * totalH, counterH = counterRatio * totalH;
             return `<div class="histogram-bar-wrapper">
                         <div class="bar-stack" style="height:128px;background:transparent;">
                             <div class="bar-unit" style="height:${unitH}px; background:#e8e4d0;" title="单位:${unit}"></div>
@@ -2123,7 +2238,6 @@
         }).join('');
         document.getElementById('modalHistogramBars').innerHTML = barsHtml;
         document.getElementById('modalTypeSummary').innerHTML = `<span>单位 <span class="unit-badge">${unitTotal}</span></span><span>指令 <span class="order-badge">${orderTotal}</span></span><span>反制 <span class="counter-badge">${counterTotal}</span></span>`;
-
         const rarityHtml = `<div class="rarity-stat rarity-standard"><span>普通</span> <span>${rarityCounts.Standard}</span></div>
                             <div class="rarity-stat rarity-limited"><span>限定</span> <span>${rarityCounts.Limited}</span></div>
                             <div class="rarity-stat rarity-special"><span>特殊</span> <span>${rarityCounts.Special}</span></div>
@@ -2181,6 +2295,7 @@
         return result;
     }
 
+    // 裁剪辅助（用于生成图片后的裁剪）
     function isDarkPixelForCanvas(ctx, x, y, threshold = 50) {
         try {
             const pixel = ctx.getImageData(x, y, 1, 1);
@@ -2246,9 +2361,8 @@
         return { left, top, width: right - left + 1, height: bottom - top + 1 };
     }
 
-    // 绘制二维码牌
-    async function drawQrCard(ctx, x, y, w, h, radius, qrCodeData) {
-        if (!qrCodeData) return;
+    // 绘制统计卡（可自定义标题）
+    async function drawStatsCard(ctx, x, y, w, h, radius, customTitle) {
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -2267,90 +2381,11 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // 标题
-        ctx.fillStyle = "#ffefbf";
-        ctx.font = `bold ${Math.floor(h * 0.08)}px "Segoe UI"`;
-        ctx.textAlign = "center";
-        ctx.fillText("卡组二维码", x + w/2, y + h * 0.10);
-
-        // 生成二维码图片
-        const qrSize = Math.min(w * 0.5, h * 0.35);
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(qrCodeData)}`;
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = qrUrl;
-        });
-
-        // 绘制二维码并反转颜色
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = img.width;
-        tempCanvas.height = img.height;
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.drawImage(img, 0, 0);
-        const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
-        const data = imageData.data;
-        // 反转颜色：将每个像素的RGB取反
-        for (let i = 0; i < data.length; i += 4) {
-            // 只反转非透明像素
-            if (data[i + 3] > 128) {
-                data[i] = 255 - data[i];
-                data[i + 1] = 255 - data[i + 1];
-                data[i + 2] = 255 - data[i + 2];
-            }
-        }
-        tempCtx.putImageData(imageData, 0, 0);
-        // 将反转后的二维码绘制到主画布
-        const qrX = x + (w - qrSize) / 2;
-        const qrY = y + h * 0.18;
-        ctx.drawImage(tempCanvas, qrX, qrY, qrSize, qrSize);
-
-        // 下方显示卡组代码
-        const codeText = qrCodeData;
-        const maxWidth = w * 0.85;
-        const fontSize = Math.floor(h * 0.035);
-        ctx.font = `${fontSize}px monospace`;
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#c9b06b";
-        // 自动换行
-        const words = codeText.match(/.{1,40}/g) || [codeText];
-        const lineHeight = fontSize * 1.4;
-        const startY = y + h * 0.68;
-        for (let i = 0; i < words.length; i++) {
-            const lineY = startY + i * lineHeight;
-            if (lineY > y + h - 10) break;
-            ctx.fillText(words[i], x + w/2, lineY);
-        }
-        ctx.restore();
-    }
-
-    async function drawStatsCard(ctx, x, y, w, h, radius) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + w - radius, y);
-        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-        ctx.lineTo(x + w, y + h - radius);
-        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-        ctx.lineTo(x + radius, y + h);
-        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-        ctx.fillStyle = "#1a1c12";
-        ctx.fill();
-        ctx.strokeStyle = "#c9aa5b";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
+        const title = customTitle || "卡组统计";
         let mainCount = 0, allyCount = 0, otherCount = 0;
         let rarityCounts = { Standard: 0, Limited: 0, Special: 0, Elite: 0 };
         let costMap = { 0:{unit:0,order:0,counter:0},1:{unit:0,order:0,counter:0},2:{unit:0,order:0,counter:0},3:{unit:0,order:0,counter:0},4:{unit:0,order:0,counter:0},5:{unit:0,order:0,counter:0},6:{unit:0,order:0,counter:0},7:{unit:0,order:0,counter:0} };
-        let unitTotal=0, orderTotal=0, counterTotal=0;
-        let totalCostSum = 0;
-        let totalCardsCount = 0;
+        let unitTotal=0, orderTotal=0, counterTotal=0, totalCostSum = 0, totalCardsCount = 0;
         for (let { card, count } of deckMap.values()) {
             if (card.faction === mainNation) mainCount += count;
             else if (card.faction === allyNation) allyCount += count;
@@ -2371,7 +2406,7 @@
         ctx.fillStyle = "#ffefbf";
         ctx.font = `bold ${Math.floor(h * 0.08)}px "Segoe UI"`;
         ctx.textAlign = "center";
-        ctx.fillText("卡组统计", x + w/2, y + h * 0.10);
+        ctx.fillText(title, x + w/2, y + h * 0.10);
 
         ctx.font = `${Math.floor(h * 0.05)}px "Segoe UI"`;
         ctx.textAlign = "left";
@@ -2434,9 +2469,7 @@
         }
         for (let i = 0; i <= 7; i++) {
             const bx = barStartX + i * barWidth;
-            const unit = costMap[i].unit;
-            const order = costMap[i].order;
-            const counter = costMap[i].counter;
+            const unit = costMap[i].unit, order = costMap[i].order, counter = costMap[i].counter;
             const total = unit + order + counter;
             if (total === 0) {
                 ctx.fillStyle = "#f5eaca";
@@ -2451,18 +2484,9 @@
             const unitH = maxCount > 0 ? (unit / maxCount) * barMaxHeight : 0;
             const orderH = maxCount > 0 ? (order / maxCount) * barMaxHeight : 0;
             const counterH = maxCount > 0 ? (counter / maxCount) * barMaxHeight : 0;
-            if (unit > 0) {
-                ctx.fillStyle = "#e8e4d0";
-                ctx.fillRect(bx, barAreaY + barMaxHeight - unitH, barWidth - barGap, unitH);
-            }
-            if (order > 0) {
-                ctx.fillStyle = "#f5c542";
-                ctx.fillRect(bx, barAreaY + barMaxHeight - unitH - orderH, barWidth - barGap, orderH);
-            }
-            if (counter > 0) {
-                ctx.fillStyle = "#5a5a5a";
-                ctx.fillRect(bx, barAreaY + barMaxHeight - unitH - orderH - counterH, barWidth - barGap, counterH);
-            }
+            if (unit > 0) ctx.fillRect(bx, barAreaY + barMaxHeight - unitH, barWidth - barGap, unitH);
+            if (order > 0) ctx.fillRect(bx, barAreaY + barMaxHeight - unitH - orderH, barWidth - barGap, orderH);
+            if (counter > 0) ctx.fillRect(bx, barAreaY + barMaxHeight - unitH - orderH - counterH, barWidth - barGap, counterH);
             ctx.fillStyle = "#f5eaca";
             ctx.font = `${Math.floor(h * 0.035)}px "Segoe UI"`;
             ctx.textAlign = "center";
@@ -2474,11 +2498,68 @@
         ctx.restore();
     }
 
+    // 绘制二维码卡（使用API参数，暗色风格）
+    async function drawQrCard(ctx, x, y, w, h, radius, qrCodeData, customTitle) {
+        if (!qrCodeData) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + w - radius, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+        ctx.lineTo(x + w, y + h - radius);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        ctx.lineTo(x + radius, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fillStyle = "#1a1c12";
+        ctx.fill();
+        ctx.strokeStyle = "#c9aa5b";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const title = customTitle || "📱 卡组二维码";
+        ctx.fillStyle = "#ffefbf";
+        ctx.font = `bold ${Math.floor(h * 0.08)}px "Segoe UI"`;
+        ctx.textAlign = "center";
+        ctx.fillText(title, x + w/2, y + h * 0.10);
+
+        const qrSize = Math.min(w * 0.5, h * 0.35);
+        // 使用API参数生成二维码：暗色背景，金色点
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(qrCodeData)}&bgcolor=1a1c12&color=f5c542&format=png`;
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = qrUrl;
+        });
+        const qrX = x + (w - qrSize) / 2;
+        const qrY = y + h * 0.18;
+        ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+
+        const codeText = qrCodeData;
+        const fontSize = Math.floor(h * 0.035);
+        ctx.font = `${fontSize}px monospace`;
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#c9b06b";
+        const words = codeText.match(/.{1,40}/g) || [codeText];
+        const lineHeight = fontSize * 1.4;
+        const startY = y + h * 0.68;
+        for (let i = 0; i < words.length; i++) {
+            const lineY = startY + i * lineHeight;
+            if (lineY > y + h - 10) break;
+            ctx.fillText(words[i], x + w/2, lineY);
+        }
+        ctx.restore();
+    }
+
     // 生成卡组图片
-    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled) {
+    async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled, statsTitle, qrTitle) {
         if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
 
-        // 按费用→cardId排序
+        // 排序：费用→cardId
         cardsWithVersion.sort((a, b) => {
             if (a.card.isHeadquarter) return -1;
             if (b.card.isHeadquarter) return 1;
@@ -2488,10 +2569,16 @@
             return a.card.cardId.localeCompare(b.card.cardId, undefined, { numeric: true, sensitivity: 'base' });
         });
 
+        // 张数统计
         const cardCountMap = {};
         for (const item of cardsWithVersion) {
             const key = item.card.cardId;
             cardCountMap[key] = (cardCountMap[key] || 0) + 1;
+        }
+        // 星标集合
+        const starredSet = new Set();
+        for (const [cardId, starred] of cardStarMap) {
+            if (starred) starredSet.add(cardId);
         }
 
         let displayCards = cardsWithVersion;
@@ -2510,7 +2597,6 @@
                 version: item.version,
                 count: item.count
             }));
-            // 重新排序
             displayCards.sort((a, b) => {
                 if (a.card.isHeadquarter) return -1;
                 if (b.card.isHeadquarter) return 1;
@@ -2521,7 +2607,6 @@
             });
         }
 
-        // 计算附加牌
         let extraCount = 0;
         if (addStatsCard) extraCount++;
         if (qrEnabled) extraCount++;
@@ -2550,6 +2635,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
+        // 画布绘制完成后统一裁剪
         const drawFoldMark = (cardId, x, y) => {
             const count = cardCountMap[cardId] || 0;
             if (count <= 1) return;
@@ -2563,7 +2649,7 @@
             const pad = 12;
             const rectW = textWidth + pad * 2;
             const rectH = 60;
-            const posX = x;
+            const posX = x + 10;
             const posY = y + 99;
             ctx.fillStyle = 'rgba(0,0,0,0.85)';
             ctx.beginPath();
@@ -2571,6 +2657,34 @@
             ctx.fill();
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, posX + pad, posY + rectH / 2);
+            ctx.restore();
+        };
+
+        const drawStarMark = (cardId, x, y) => {
+            if (!starredSet.has(cardId)) return;
+            const label = '★';
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 4;
+            ctx.font = 'bold 22px "Segoe UI"';
+            const metrics = ctx.measureText(label);
+            const textWidth = metrics.width;
+            const pad = 10;
+            const rectW = textWidth + pad * 2;
+            const rectH = 34;
+            // 如果有数量标签，放在数量标签下方；否则放在相同位置
+            const count = cardCountMap[cardId] || 0;
+            const posX = x + 10;
+            const posY = (count > 1) ? y + 99 + 60 : y + 99;
+            ctx.fillStyle = 'rgba(0,0,0,0.85)';
+            ctx.beginPath();
+            ctx.roundRect(posX, posY, rectW, rectH, 4);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffd700';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             ctx.fillText(label, posX + pad, posY + rectH / 2);
@@ -2611,33 +2725,33 @@
                     if (foldEnabled) {
                         drawFoldMark(card.cardId, x, y);
                     }
+                    drawStarMark(card.cardId, x, y);
                     cardIdx++;
                 } else if (addStatsCard && cardIdx === displayCards.length) {
-                    await drawStatsCard(ctx, x, y, cardW, cardH, radius);
+                    await drawStatsCard(ctx, x, y, cardW, cardH, radius, statsTitle);
                     cardIdx++;
                 } else if (qrEnabled && cardIdx === displayCards.length + (addStatsCard ? 1 : 0)) {
                     const deckCode = exportDeckCode();
                     if (deckCode) {
-                        await drawQrCard(ctx, x, y, cardW, cardH, radius, deckCode);
+                        await drawQrCard(ctx, x, y, cardW, cardH, radius, deckCode, qrTitle);
                     }
                     cardIdx++;
                 }
             }
         }
 
-        try {
-            const region = getCanvasCropRegion(ctx, canvas.width, canvas.height, 50);
-            if (region.width > 0 && region.height > 0 && 
-                (region.left > 0 || region.top > 0 || region.width < canvas.width || region.height < canvas.height)) {
+        // 应用统一裁剪模板（如已有）
+        if (cropTemplate) {
+            try {
                 const croppedCanvas = document.createElement('canvas');
-                croppedCanvas.width = region.width;
-                croppedCanvas.height = region.height;
+                croppedCanvas.width = cropTemplate.width;
+                croppedCanvas.height = cropTemplate.height;
                 const croppedCtx = croppedCanvas.getContext('2d');
-                croppedCtx.drawImage(canvas, region.left, region.top, region.width, region.height, 0, 0, region.width, region.height);
+                croppedCtx.drawImage(canvas, cropTemplate.left, cropTemplate.top, cropTemplate.width, cropTemplate.height, 0, 0, cropTemplate.width, cropTemplate.height);
                 return croppedCanvas;
+            } catch(e) {
+                console.warn('裁剪失败，使用原图:', e);
             }
-        } catch(e) {
-            console.warn('裁剪失败，使用原图:', e);
         }
         return canvas;
     }
@@ -2650,6 +2764,8 @@
         const addStatsCard = document.getElementById('statsCardToggle').checked && !document.getElementById('statsCardToggle').disabled;
         const foldEnabled = document.getElementById('foldToggle').checked;
         const qrEnabled = document.getElementById('qrToggle').checked;
+        const statsTitle = document.getElementById('statsCardTitle').value.trim() || null;
+        const qrTitle = document.getElementById('qrCardTitle').value.trim() || null;
         let bgColor = document.getElementById('bgColorSelect').value;
         if (bgColor === 'custom') bgColor = document.getElementById('customColor').value;
 
@@ -2664,10 +2780,20 @@
             }
         }
 
+        // 构建裁剪模板（使用第一张卡）
+        if (!cropTemplate && allCards.length > 0) {
+            try {
+                const templateCard = allCards.find(c => c.image && c.image.endsWith('.avif')) || allCards[0];
+                cropTemplate = await getCropTemplateFromCard(templateCard, lang);
+                console.log('裁剪模板已生成:', cropTemplate);
+            } catch(e) {
+                console.warn('模板生成失败，将使用备用裁剪:', e);
+            }
+        }
+
         const entries = Array.from(deckMap.entries());
         entries.sort((a, b) => {
-            const cardA = a[1].card;
-            const cardB = b[1].card;
+            const cardA = a[1].card, cardB = b[1].card;
             return (cardA._index || 0) - (cardB._index || 0);
         });
         const cardsWithVersion = [];
@@ -2690,7 +2816,7 @@
         const previewDiv = document.getElementById('imgGenPreview');
         previewDiv.innerHTML = '<div style="color:#e9dbbd; padding:20px;">生成中...</div>';
         try {
-            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled);
+            currentPreviewCanvas = await generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled, qrEnabled, statsTitle, qrTitle);
             previewDiv.innerHTML = '';
             previewDiv.appendChild(currentPreviewCanvas);
         } catch(e) {
@@ -2740,7 +2866,157 @@
         }
     });
 
-    // ==================== 原神启动 ====================
+    // ==================== QR 导入/导出 ====================
+    function setupQRImportExport() {
+        // 导入 - 文件
+        const fileBtn = document.getElementById('qrFileBtn');
+        const fileInput = document.getElementById('qrFileInput');
+        const status = document.getElementById('qrImportStatus');
+        if (fileBtn && fileInput) {
+            fileBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', async function() {
+                if (this.files && this.files[0]) {
+                    status.textContent = '读取中...';
+                    try {
+                        const file = this.files[0];
+                        const img = new Image();
+                        const url = URL.createObjectURL(file);
+                        img.src = url;
+                        await new Promise((r) => { img.onload = r; });
+                        // 使用 jsQR 解码（需要引入库）
+                        // 简化版本：使用画布提取数据
+                        const canvas = document.getElementById('qrCanvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                        // 使用 jsQR 解码
+                        if (typeof jsQR !== 'undefined') {
+                            const code = jsQR(imageData.data, img.width, img.height);
+                            if (code && code.data) {
+                                status.textContent = '✅ 解码成功！';
+                                // 导入卡组
+                                importDeckFromCode(code.data);
+                            } else {
+                                status.textContent = '❌ 未识别到二维码';
+                            }
+                        } else {
+                            status.textContent = '⚠️ 未加载解码库，请引入 jsQR';
+                            // 简单提示
+                            alert('请确保 jsQR 库已加载 (https://cdn.jsdelivr.net/npm/jsqr)');
+                        }
+                        URL.revokeObjectURL(url);
+                    } catch(e) {
+                        status.textContent = '❌ 读取失败';
+                        console.error(e);
+                    }
+                }
+            });
+        }
+
+        // 导入 - 摄像头
+        const cameraBtn = document.getElementById('qrCameraBtn');
+        if (cameraBtn) {
+            cameraBtn.addEventListener('click', async function() {
+                status.textContent = '📷 启动摄像头...';
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    const video = document.getElementById('qrVideo');
+                    video.srcObject = stream;
+                    await video.play();
+                    // 简单捕获一帧
+                    const canvas = document.getElementById('qrCanvas');
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    stream.getTracks().forEach(t => t.stop());
+                    if (typeof jsQR !== 'undefined') {
+                        const code = jsQR(imageData.data, canvas.width, canvas.height);
+                        if (code && code.data) {
+                            status.textContent = '✅ 解码成功！';
+                            importDeckFromCode(code.data);
+                        } else {
+                            status.textContent = '❌ 未识别到二维码';
+                        }
+                    } else {
+                        status.textContent = '⚠️ 请引入 jsQR 库';
+                    }
+                } catch(e) {
+                    status.textContent = '❌ 摄像头错误: ' + e.message;
+                }
+            });
+        }
+
+        // 导出 - 生成二维码卡
+        const exportBtn = document.getElementById('qrExportBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', async function() {
+                const title = document.getElementById('qrExportTitle').value.trim() || '卡组二维码';
+                const code = exportDeckCode();
+                if (!code) { alert('卡组为空'); return; }
+                // 生成一张二维码卡图片
+                const cardW = 500, cardH = 702;
+                const canvas = document.createElement('canvas');
+                canvas.width = cardW;
+                canvas.height = cardH;
+                const ctx = canvas.getContext('2d');
+                const radius = 15;
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(cardW - radius, 0);
+                ctx.quadraticCurveTo(cardW, 0, cardW, radius);
+                ctx.lineTo(cardW, cardH - radius);
+                ctx.quadraticCurveTo(cardW, cardH, cardW - radius, cardH);
+                ctx.lineTo(radius, cardH);
+                ctx.quadraticCurveTo(0, cardH, 0, cardH - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.fillStyle = '#1a1c12';
+                ctx.fill();
+                ctx.strokeStyle = '#c9aa5b';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffefbf';
+                ctx.font = 'bold 36px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.fillText(title, cardW/2, 60);
+
+                const qrSize = Math.min(cardW * 0.6, cardH * 0.4);
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(code)}&bgcolor=1a1c12&color=f5c542&format=png`;
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                await new Promise((r) => { img.onload = r; img.onerror = r; img.src = qrUrl; });
+                const qrX = (cardW - qrSize) / 2;
+                const qrY = 90;
+                ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+
+                const fontSize = 16;
+                ctx.font = `${fontSize}px monospace`;
+                ctx.fillStyle = '#c9b06b';
+                const words = code.match(/.{1,35}/g) || [code];
+                const lineHeight = fontSize * 1.6;
+                const startY = qrY + qrSize + 30;
+                for (let i = 0; i < words.length; i++) {
+                    const lineY = startY + i * lineHeight;
+                    if (lineY > cardH - 10) break;
+                    ctx.fillText(words[i], cardW/2, lineY);
+                }
+
+                // 下载
+                const link = document.createElement('a');
+                link.download = `qr_card_${new Date().toISOString().slice(0,19)}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    }
+
+    // ==================== 启动 ====================
     function initSidebars() {
         const toggle = document.getElementById('mobileDeckToggle');
         const panel = document.getElementById('mobileDeckPanel');
@@ -2758,6 +3034,7 @@
         });
         document.getElementById('genImgBtn')?.addEventListener('click', showImgGenModal);
         document.getElementById('mobileGenImgBtn')?.addEventListener('click', showImgGenModal);
+        setupQRImportExport();
     }
 
     function initNav() {
