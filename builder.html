@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>KARDS 军械库 | 卡组构筑</title>
+    <!-- 引入 jsQR 库用于二维码解码 -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <style>
         * {
             margin: 0;
@@ -2819,9 +2821,9 @@
 
         function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
 
-        // ==================== QR 导入/导出 ====================
+        // ==================== QR 导入（使用 jsQR） ====================
         function setupQRImportExport() {
-            // 桌面端 QR 导入
+            // 桌面端 QR 导入 — 使用 jsQR 解码
             const qrImportBtn = document.getElementById('qrImportBtn');
             const qrFileInput = document.getElementById('qrFileInput');
             if (qrImportBtn && qrFileInput) {
@@ -2830,42 +2832,33 @@
                     if (!this.files || !this.files[0]) return;
                     const file = this.files[0];
                     const status = document.getElementById('imageStatus');
-                    if (status) status.textContent = '⏳ 上传并解码中...';
-                    try {
-                        const formData = new FormData();
-                        formData.append('file', file); // 按照示例，字段名为 'file'
+                    if (status) status.textContent = '⏳ 正在解码二维码...';
 
-                        const response = await fetch('https://api.2dcode.biz/v1/read-qr-code', {
-                            method: 'POST',
-                            body: formData
+                    try {
+                        // 读取文件为 ImageData
+                        const img = await createImageBitmap(file);
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+
+                        // 使用 jsQR 解码
+                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: "dontInvert",
                         });
 
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                        const result = await response.json();
-
-                        let code = null;
-                        // 解析 data.contents 数组
-                        if (result?.data?.contents && Array.isArray(result.data.contents) && result.data.contents
-                            .length > 0) {
-                            code = result.data.contents[0];
-                        } else if (result?.data && typeof result.data === 'string') {
-                            code = result.data;
-                        } else {
-                            // 兼容其他可能的格式
-                            for (let key of Object.keys(result)) {
-                                if (typeof result[key] === 'string' && result[key].startsWith('%%')) {
-                                    code = result[key];
-                                    break;
-                                }
+                        if (code && code.data) {
+                            const decodedText = code.data;
+                            if (decodedText.startsWith('%%')) {
+                                importDeckFromCode(decodedText);
+                                if (status) status.textContent = '✅ 二维码解码成功！';
+                            } else {
+                                throw new Error('未识别到卡组代码（内容不以 %% 开头）');
                             }
-                        }
-
-                        if (code && code.startsWith('%%')) {
-                            importDeckFromCode(code);
-                            if (status) status.textContent = '✅ 二维码解码成功！';
                         } else {
-                            throw new Error('未识别到卡组代码');
+                            throw new Error('未检测到二维码');
                         }
                     } catch (e) {
                         if (status) status.textContent = '❌ 二维码解码失败: ' + e.message;
@@ -2882,9 +2875,8 @@
                     const code = exportDeckCode();
                     if (!code) { alert('卡组为空'); return; }
 
-                    // 弹出输入框让用户输入标题
                     const title = prompt('请输入二维码卡的标题：', '卡组二维码');
-                    if (title === null) return; // 用户取消
+                    if (title === null) return;
                     const finalTitle = title.trim() || '卡组二维码';
 
                     const cardW = 500,
