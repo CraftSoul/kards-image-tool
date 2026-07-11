@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js">
     </script>
     <style>
-        /* ===== 全局与基础样式（与之前保持一致） ===== */
+        /* ===== 全局与基础样式 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -1490,11 +1490,10 @@
             filter: invert(0.95);
         }
 
-        /* ===== 新增样式：上传按钮横向铺满 ===== */
+        /* ===== 上传按钮横向铺满 ===== */
         .upload-bar {
             margin: 0.5rem 0 1rem;
             display: none;
-            /* 初始隐藏，加载后显示 */;
         }
         .upload-bar .upload-btn {
             display: block;
@@ -1516,7 +1515,7 @@
             border-color: #eecb77;
         }
 
-        /* ===== 上传模态框预览 ===== */
+        /* ===== 上传模态框 ===== */
         .upload-preview-area {
             margin: 12px 0;
             text-align: center;
@@ -1535,10 +1534,91 @@
             max-height: 280px;
             border-radius: 8px;
             object-fit: cover;
-            /* 默认，会被JS动态覆盖 */;
         }
 
-        /* ===== 响应式微调 ===== */
+        .upload-form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        .upload-form-row label {
+            min-width: 70px;
+            font-size: 0.75rem;
+            color: #e9dbbd;
+            font-weight: 600;
+        }
+        .upload-form-row input,
+        .upload-form-row select {
+            flex: 1;
+            min-width: 120px;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.4rem 0.8rem;
+            color: #f5efdb;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .upload-form-row input:focus,
+        .upload-form-row select:focus {
+            border-color: #e6bc6a;
+            box-shadow: 0 0 0 2px rgba(220, 180, 80, 0.3);
+        }
+        .upload-form-row input[type="file"] {
+            padding: 0.3rem 0.5rem;
+            background: transparent;
+            border: none;
+        }
+        .upload-form-row .file-label {
+            background: #3a4a2a;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            color: #e9dbbd;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: inline-block;
+            border: 1px solid #aa8e4e;
+        }
+        .upload-form-row .file-label:hover {
+            background: #5a7a3a;
+        }
+
+        .upload-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: stretch;
+            margin-top: 16px;
+            border-top: 1px solid #aa8e4e;
+            padding-top: 16px;
+        }
+        .upload-actions button {
+            flex: 1;
+            padding: 0.6rem 0;
+            font-size: 0.9rem;
+            border-radius: 40px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: center;
+        }
+        .upload-actions .import-btn {
+            background: #6a8a4a;
+            color: #f5efdb;
+        }
+        .upload-actions .import-btn:hover {
+            background: #8aaa5a;
+        }
+        .upload-actions .import-btn:last-child {
+            background: #5a4a3a;
+        }
+        .upload-actions .import-btn:last-child:hover {
+            background: #7a5a4a;
+        }
+
+        /* 响应式 */
         @media (max-width: 600px) {
             .switch-item {
                 min-width: 100%;
@@ -1551,9 +1631,16 @@
                 font-size: 0.65rem;
                 padding: 0.25rem 0.6rem;
             }
+            .upload-form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .upload-form-row label {
+                min-width: auto;
+            }
         }
 
-        /* 自定义颜色输入样式 */
+        /* 自定义颜色输入 */
         #bgColorCustom {
             padding: 2px !important;
             height: 30px !important;
@@ -1657,7 +1744,7 @@
                     <div id="statsArea" style="display:none;"><div class="stats-group"><div class="stats-item"><div class="filter-label">⚔️ 攻击力</div><input type="number" id="attackExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div><div class="stats-item"><div class="filter-label">🛡️ 防御力</div><input type="number" id="defenseExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="12"></div><div class="stats-item"><div class="filter-label">⚙️ 行动花费</div><input type="number" id="opExact" class="exact-input" placeholder="输入数值" value="-1" min="-1" max="6"></div></div><div class="stats-note">※ 仅筛选单位时生效，-1 = 不筛选</div></div>
                 </div>
 
-                <!-- 上传按钮行：横向铺满，参考 seek 样式，初始隐藏 -->
+                <!-- 上传按钮行 -->
                 <div class="upload-bar" id="uploadBar" style="display:none;">
                     <button class="upload-btn" id="uploadCardBtn">📤 上传卡牌</button>
                 </div>
@@ -1804,7 +1891,7 @@
                 <select id="uploadImageFit">
                     <option value="cover">横铺满</option>
                     <option value="contain">纵铺满</option>
-                    <option value="stretch">拉！伸！</option>
+                    <option value="stretch">拉伸</option>
                 </select>
             </div>
             <!-- 预览区域 -->
@@ -1822,9 +1909,7 @@
             </div>
             <div class="upload-form-row">
                 <label>阵营</label>
-                <select id="uploadFaction">
-                    <!-- 动态填充 -->
-                </select>
+                <select id="uploadFaction"></select>
             </div>
             <div class="upload-form-row">
                 <label>花费 (K)</label>
@@ -2159,10 +2244,7 @@
                         cardId: j.id || raw.cardId || "",
                         importId: raw.importId || j.import_id || "",
                         titleZh: j.title?.["zh-Hans"] || j.title?.en || "未找到",
-                        titleEn: j.title?.["en-EN"] || "",
                         text_zh: j.text?.["zh-Hans"] || "",
-                        textMap: j.text || {},
-                        titleMap: j.title || {},
                         faction: factionRaw,
                         type: j.type || "",
                         rarity: j.rarity || "Standard",
@@ -2179,7 +2261,8 @@
                         canCreate: j.can_create || [],
                         rawJson: j,
                         isCustom: false,
-                        imageData: null
+                        imageData: null,
+                        imageFit: 'cover'
                     };
                 });
                 allCards.forEach((c, i) => c._index = i);
@@ -2281,7 +2364,6 @@
                 bgCustom.addEventListener('input', function() {
                     if (bgLabel) bgLabel.textContent = this.value;
                 });
-                // 初始状态
                 if (bgSelect.value !== 'custom') {
                     bgCustom.style.display = 'none';
                     if (bgLabel) bgLabel.style.display = 'none';
@@ -2436,7 +2518,6 @@
         function initSetFilter() {
             const container = document.getElementById('setMultiContainer');
             const setKeys = Object.keys(setTranslation);
-            // 移除 "自定义"，仅保留官方扩展包
             container.innerHTML = setKeys.map(s => {
                 const icon = setIconMap[s] || '';
                 return `<div class="filter-chip" data-filter="set" data-val="${s}">${icon ? `<img src="${icon}" width="18" height="18" onerror="this.style.display='none'">` : ''} ${setTranslation[s]}</div>`;
@@ -2525,7 +2606,7 @@
                 qtySpan.className = 'v-qty';
                 qtySpan.textContent = `x${entry.count}`;
                 row.appendChild(qtySpan);
-                if (card.isCustom) {
+                if (card.isCustom && !card.importId) {
                     const verLabel = document.createElement('span');
                     verLabel.textContent = '自定义';
                     verLabel.style.color = '#887e66';
@@ -2852,7 +2933,7 @@
             });
         }
 
-        // ==================== 导入导出 ====================
+        // ==================== 导入导出（区分纯自定义卡牌） ====================
         function getNationCode(faction) {
             const idx = allNationOptions.indexOf(faction);
             if (idx === -1) return '1';
@@ -2868,9 +2949,10 @@
 
         function exportDeckCode() {
             if (deckMap.size === 0) { alert("卡组为空，无法导出"); return null; }
+            // 检查是否存在纯自定义卡牌（isCustom 且 importId 为空）
             for (let { card } of deckMap.values()) {
-                if (card.isCustom) {
-                    alert("卡组中包含自定义卡牌，无法导出卡组代码（自定义卡牌无导入ID）");
+                if (card.isCustom && !card.importId) {
+                    alert("卡组中包含纯自定义卡牌（无导入ID），无法导出卡组代码");
                     return null;
                 }
             }
@@ -3105,13 +3187,13 @@
                 });
             }
 
-            // 桌面端 QR 导出
+            // 桌面端 QR 导出 — 检测纯自定义卡牌
             const qrExportBtn = document.getElementById('qrExportBtn');
             if (qrExportBtn) {
                 qrExportBtn.addEventListener('click', async function() {
                     for (let { card } of deckMap.values()) {
-                        if (card.isCustom) {
-                            alert("卡组中包含自定义卡牌，无法导出二维码卡（自定义卡牌无唯一ID）");
+                        if (card.isCustom && !card.importId) {
+                            alert("卡组中包含纯自定义卡牌（无导入ID），无法导出二维码卡");
                             return;
                         }
                     }
@@ -3222,7 +3304,7 @@
             }
         }
 
-        // ==================== 图片生成 ====================
+        // ==================== 图片生成（处理纯自定义卡牌） ====================
         async function fetchHeadquarterCard(name, lang) {
             if (!name || name.trim() === '') return null;
             const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(
@@ -3234,10 +3316,9 @@
                 id: -1,
                 cardId: 'headquarter',
                 titleZh: '总部',
-                titleEn: 'Headquarters',
                 image: `${formatted}.avif`,
                 faction: 'neutral',
-                type: 'order',
+                type: 'tank',
                 rarity: 'Standard',
                 cost: 0,
                 attack: undefined,
@@ -3251,7 +3332,8 @@
                 canCreate: [],
                 isHeadquarter: true,
                 isCustom: false,
-                imageData: null
+                imageData: null,
+                importId: ''
             };
         }
 
@@ -3500,8 +3582,9 @@
             qrEnabled, statsTitle, qrTitle) {
             if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
 
-            let hasCustom = cardsWithVersion.some(item => item.card.isCustom);
-            if (hasCustom && qrEnabled) {
+            // 检查纯自定义卡牌，自动禁用qrEnabled
+            let hasPureCustom = cardsWithVersion.some(item => item.card.isCustom && !item.card.importId);
+            if (hasPureCustom && qrEnabled) {
                 qrEnabled = false;
             }
 
@@ -3754,13 +3837,13 @@
                 bgColor = bgCustom.value;
             }
 
-            let hasCustom = false;
+            let hasPureCustom = false;
             for (let [_, entry] of deckMap) {
-                if (entry.card.isCustom) { hasCustom = true; break; }
+                if (entry.card.isCustom && !entry.card.importId) { hasPureCustom = true; break; }
             }
             let finalQrEnabled = qrEnabled;
-            if (hasCustom && qrEnabled) {
-                alert("卡组中包含自定义卡牌，已自动禁用二维码卡选项");
+            if (hasPureCustom && qrEnabled) {
+                alert("卡组中包含纯自定义卡牌（无导入ID），已自动禁用二维码卡选项");
                 finalQrEnabled = false;
                 document.getElementById('qrToggle').checked = false;
             }
@@ -3846,7 +3929,7 @@
             qualitySlider.oninput = () => { qualityVal.innerText = qualitySlider.value; };
         }
 
-        // ==================== 上传卡牌功能（含预览、自动加入卡组） ====================
+        // ==================== 上传卡牌功能 ====================
         function setupUpload() {
             const uploadBtn = document.getElementById('uploadCardBtn');
             const modal = document.getElementById('uploadModal');
@@ -3877,7 +3960,6 @@
                     previewImg.src = e.target.result;
                     previewImg.style.display = 'block';
                     previewPlaceholder.style.display = 'none';
-                    // 应用填充效果
                     updatePreviewFit();
                 };
                 reader.readAsDataURL(file);
@@ -3945,9 +4027,8 @@
                     }
                     existing.imageData = imageData;
                     existing.imageFit = fit;
-                    existing.isCustom = true;
+                    existing.isCustom = true; // 标记为自定义，但保留 importId（如果有）
                     targetCard = existing;
-                    // 替换后，如果不在卡组中则添加一张
                     if (!deckMap.has(existing.id)) {
                         addToDeck(existing);
                         alert(`已替换卡图并自动加入卡组 1 张`);
@@ -3960,16 +4041,13 @@
                     return;
                 }
 
-                // 创建新卡
+                // 创建纯自定义新卡（importId 为空）
                 const newCard = {
                     id: allCards.length,
                     cardId: cardId,
-                    importId: '',
+                    importId: '', // 纯自定义无导入ID
                     titleZh: name,
-                    titleEn: name,
                     text_zh: '',
-                    textMap: {},
-                    titleMap: { "zh-Hans": name, "en-EN": name },
                     faction: faction,
                     type: type,
                     rarity: rarity,
@@ -3995,7 +4073,6 @@
                 allCards.forEach((c, i) => c._index = i);
                 cardIndex[cardId] = newCard;
 
-                // 自动加入卡组
                 addToDeck(newCard);
                 alert(`卡牌 "${name}" 上传成功并已加入卡组 1 张`);
 

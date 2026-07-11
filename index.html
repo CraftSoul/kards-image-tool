@@ -803,7 +803,7 @@
                 <div class="detail-line"><strong>📜 卡牌文本</strong><br><span id="modalText" style="white-space: pre-line;"></span></div>
                 <div class="detail-line"><strong>✨ 词条</strong> <span id="modalAttributes"></span></div>
                 <div class="detail-line"><strong>📦 扩展包</strong> <span id="modalSet"></span></div>
-                <div class="detail-line"><strong>🌐 英文名</strong> <span id="modalEnName"></span></div>
+                <div class="detail-line"><strong>🌐 cardId</strong> <span id="modalCardId"></span></div>
                 <div class="detail-line"><strong>🔧 导入代码</strong> <span id="modalImportId"></span></div>
 
                 <div class="related-section" id="relatedSection">
@@ -1005,7 +1005,6 @@
                         cardId: j.id || raw.cardId || "",
                         importId: raw.importId || j.import_id || "",
                         titleZh: j.title ? (j.title["zh-Hans"] || j.title.en || "未找到") : "未找到",
-                        titleEn: j.title ? (j.title["en-EN"] || "") : "",
                         text_zh: j.text ? (j.text["zh-Hans"] || "") : "",
                         textMap: j.text || {},
                         titleMap: j.title || {},
@@ -1425,7 +1424,7 @@
             document.getElementById('modalAttributes').textContent = translateAttributes(c.attributes);
             // 扩展包翻译
             document.getElementById('modalSet').textContent = setTranslation[c.setName] || c.setName;
-            document.getElementById('modalEnName').textContent = c.titleEn || '---';
+            document.getElementById('modalCardId').textContent = c.cardId || '---';
             document.getElementById('modalImportId').textContent = c.importId || '---';
 
             const imgEl = document.getElementById('modalImg');
