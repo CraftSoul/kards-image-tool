@@ -1692,7 +1692,7 @@
                         <label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label>
                     </div>
                     <div class="switch-item-input" id="statsCardInputDiv">
-                        <input type="text" id="statsCardTitle" placeholder="统计卡标题">
+                        <input type="text" id="statsCardTitle" placeholder="统计卡标题 (默认: 卡组统计)">
                     </div>
                 </div>
                 <div class="switch-item" id="switchItemQrCard">
@@ -1701,7 +1701,7 @@
                         <label class="switch"><input type="checkbox" id="qrToggle"><span class="slider"></span></label>
                     </div>
                     <div class="switch-item-input" id="qrCardInputDiv">
-                        <input type="text" id="qrCardTitle" placeholder="二维码标题">
+                        <input type="text" id="qrCardTitle" placeholder="二维码标题 (默认: 卡组二维码)">
                     </div>
                 </div>
             </div>
@@ -2902,10 +2902,8 @@
                     try {
                         if (status) status.textContent = '⏳ 正在解码二维码...';
 
-                        // 读取文件为 ImageData
                         const img = await createImageBitmap(file);
                         const canvas = document.createElement('canvas');
-                        // 限制最大尺寸以提高 jsQR 性能
                         let width = img.width,
                             height = img.height;
                         const MAX_SIZE = 1200;
@@ -2920,14 +2918,11 @@
                         ctx.drawImage(img, 0, 0, width, height);
                         const imageData = ctx.getImageData(0, 0, width, height);
 
-                        // 使用 jsQR 解码，尝试两种反转模式
                         let code = jsQR(imageData.data, imageData.width, imageData.height, {
                             inversionAttempts: "attemptBoth",
                         });
 
                         if (!code) {
-                            // 如果第一次失败，尝试将图像转换为灰度再试（jsQR 内部处理，但我们可以再试一次）
-                            // 实际上 jsQR 已经处理了灰度，这里不再重复
                             throw new Error('未检测到二维码');
                         }
 
@@ -2998,7 +2993,6 @@
                     const qrY = 90;
                     ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
 
-                    // 自动换行：与二维码同宽
                     const maxLineWidth = qrSize * 0.9;
                     const fontSize = 16;
                     ctx.font = `${fontSize}px monospace`;
@@ -3019,8 +3013,8 @@
                     }
                     if (currentLine) lines.push(currentLine);
 
-                    const lineHeight = fontSize * 1.6;
-                    const startY = qrY + qrSize + 30;
+                    const lineHeight = fontSize * 1.5;
+                    const startY = qrY + qrSize + 20;
                     for (let i = 0; i < lines.length; i++) {
                         const lineY = startY + i * lineHeight;
                         if (lineY > cardH - 10) break;
@@ -3089,7 +3083,7 @@
             };
         }
 
-        // 绘制统计卡
+        // 绘制统计卡（修正条形图顺序：自下至上 单位→指令→反制）
         async function drawStatsCard(ctx, x, y, w, h, radius, customTitle) {
             ctx.save();
             ctx.beginPath();
@@ -3197,7 +3191,7 @@
             ctx.textAlign = "center";
             ctx.fillText(`平均费用: ${avgCost.toFixed(2)}`, x + w / 2, rarityY + lineH * 4 + 10);
 
-            // 条形图区域
+            // 条形图：自下至上 单位→指令→反制
             const barAreaY = y + h * 0.68;
             const barAreaH = h * 0.28;
             const barStartX = x + w * 0.06;
@@ -3222,18 +3216,22 @@
                 const orderH = maxCount > 0 ? (order / maxCount) * barMaxHeight : 0;
                 const counterH = maxCount > 0 ? (counter / maxCount) * barMaxHeight : 0;
 
+                // 从底部开始：单位(浅色) → 指令(黄色) → 反制(灰色)
                 let currentY = barAreaY + barMaxHeight;
 
+                // 单位（底部）
                 if (unit > 0) {
                     ctx.fillStyle = '#e8e4d0';
                     ctx.fillRect(bx, currentY - unitH, barWidth - barGap, unitH);
                     currentY -= unitH;
                 }
+                // 指令（中间）
                 if (order > 0) {
                     ctx.fillStyle = '#f5c542';
                     ctx.fillRect(bx, currentY - orderH, barWidth - barGap, orderH);
                     currentY -= orderH;
                 }
+                // 反制（顶部）
                 if (counter > 0) {
                     ctx.fillStyle = '#5a5a5a';
                     ctx.fillRect(bx, currentY - counterH, barWidth - barGap, counterH);
@@ -3249,6 +3247,7 @@
                 if (total > 0) {
                     ctx.fillStyle = "#ffefb9";
                     ctx.font = `${Math.floor(h * 0.03)}px "Segoe UI"`;
+                    // 总数值显示在顶部（反制之上）
                     ctx.fillText(total, bx + (barWidth - barGap) / 2, barAreaY + barMaxHeight - unitH - orderH - counterH -
                         h * 0.025);
                 } else {
@@ -3260,7 +3259,7 @@
             ctx.restore();
         }
 
-        // 绘制二维码卡（支持自定义标题，增大二维码，自动换行）
+        // 绘制二维码卡
         async function drawQrCard(ctx, x, y, w, h, radius, qrCodeData, customTitle) {
             if (!qrCodeData) return;
             ctx.save();
@@ -3287,7 +3286,6 @@
             ctx.textAlign = "center";
             ctx.fillText(title, x + w / 2, y + h * 0.10);
 
-            // 增大二维码尺寸
             const qrSize = Math.min(w * 0.7, h * 0.5);
             const qrUrl =
                 `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(qrCodeData)}&bgcolor=1a1c12&color=f5c542&format=png`;
@@ -3302,7 +3300,7 @@
             const qrY = y + h * 0.18;
             ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
 
-            // 自动换行：与二维码同宽
+            // 自动换行
             const maxLineWidth = qrSize * 0.9;
             const fontSize = Math.floor(h * 0.035);
             ctx.font = `${fontSize}px monospace`;
@@ -3333,12 +3331,11 @@
             ctx.restore();
         }
 
-        // 生成卡组图片
+        // ==================== 生成卡组图片（标签逻辑修改） ====================
         async function generateDeckImageWithOptions(cols, quality, lang, addStatsCard, bgColor, cardsWithVersion, foldEnabled,
             qrEnabled, statsTitle, qrTitle) {
             if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
 
-            // 排序
             cardsWithVersion.sort((a, b) => {
                 if (a.card.isHeadquarter) return -1;
                 if (b.card.isHeadquarter) return 1;
@@ -3348,7 +3345,6 @@
                 return a.card.cardId.localeCompare(b.card.cardId, undefined, { numeric: true, sensitivity: 'base' });
             });
 
-            // 统计每张卡的数量
             const cardCountMap = {};
             for (const item of cardsWithVersion) {
                 const key = item.card.cardId;
@@ -3399,77 +3395,54 @@
             canvas.height = rows * cardH;
             const ctx = canvas.getContext('2d');
 
-            // 背景颜色
             if (bgColor && bgColor !== 'transparent') {
                 ctx.fillStyle = bgColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             } else if (bgColor === 'transparent') {
-                // 透明背景，不填充
+                // 透明
             } else {
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
 
+            // 标签绘制辅助：折叠模式下每张卡只绘制一次标签，非折叠每张卡独立
             const drawnFoldSet = new Set();
             const drawnStarSet = new Set();
 
-            const drawFoldMark = (cardId, x, y) => {
-                const count = cardCountMap[cardId] || 0;
-                if (count <= 1) return;
-                if (!foldEnabled && drawnFoldSet.has(cardId)) return;
-                if (!foldEnabled) drawnFoldSet.add(cardId);
-
-                const label = '×' + (count > 99 ? '99+' : count);
+            // 绘制带尖角的标签
+            const drawTagWithArrow = (text, x, y, color, bgColorTag = 'rgba(0,0,0,0.85)') => {
                 ctx.save();
                 ctx.shadowColor = 'rgba(0,0,0,0.8)';
                 ctx.shadowBlur = 4;
                 ctx.font = 'bold 28px "Segoe UI"';
-                const metrics = ctx.measureText(label);
+                const metrics = ctx.measureText(text);
                 const textWidth = metrics.width;
                 const pad = 12;
                 const rectW = textWidth + pad * 2;
                 const rectH = 60;
+                const arrowSize = 14; // 尖角宽度
                 const posX = x;
-                const posY = y + 99;
-                ctx.fillStyle = 'rgba(0,0,0,0.85)';
+                const posY = y;
+
+                // 绘制矩形（左圆角，右直角，右侧带尖角）
                 ctx.beginPath();
-                ctx.rect(posX, posY, rectW, rectH);
+                ctx.moveTo(posX + 8, posY);
+                ctx.lineTo(posX + rectW, posY);
+                ctx.lineTo(posX + rectW + arrowSize, posY + rectH / 2);
+                ctx.lineTo(posX + rectW, posY + rectH);
+                ctx.lineTo(posX + 8, posY + rectH);
+                ctx.quadraticCurveTo(posX, posY + rectH, posX, posY + rectH - 8);
+                ctx.lineTo(posX, posY + 8);
+                ctx.quadraticCurveTo(posX, posY, posX + 8, posY);
+                ctx.closePath();
+
+                ctx.fillStyle = bgColorTag;
                 ctx.fill();
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = '#ffffff';
+                ctx.fillStyle = color;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(label, posX + pad, posY + rectH / 2);
-                ctx.restore();
-            };
-
-            const drawStarMark = (cardId, x, y) => {
-                if (!starredSet.has(cardId)) return;
-                if (!foldEnabled && drawnStarSet.has(cardId)) return;
-                if (!foldEnabled) drawnStarSet.add(cardId);
-
-                const label = '★';
-                ctx.save();
-                ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 4;
-                ctx.font = 'bold 32px "Segoe UI"';
-                const metrics = ctx.measureText(label);
-                const textWidth = metrics.width;
-                const pad = 10;
-                const rectW = textWidth + pad * 2;
-                const rectH = 60;
-                const posX = x;
-                const count = cardCountMap[cardId] || 0;
-                const posY = (count > 1) ? y + 99 + 60 + 4 : y + 99;
-                ctx.fillStyle = 'rgba(0,0,0,0.85)';
-                ctx.beginPath();
-                ctx.rect(posX, posY, rectW, rectH);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = '#ffd700';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(label, posX + pad, posY + rectH / 2);
+                ctx.fillText(text, posX + pad, posY + rectH / 2);
                 ctx.restore();
             };
 
@@ -3516,8 +3489,29 @@
                         }
                         ctx.restore();
 
-                        drawFoldMark(card.cardId, x, y);
-                        drawStarMark(card.cardId, x, y);
+                        // 数量标签：仅折叠模式下显示，且每张卡只显示一次
+                        if (foldEnabled) {
+                            const count = cardCountMap[card.cardId] || 0;
+                            if (count > 1 && !drawnFoldSet.has(card.cardId)) {
+                                drawTagWithArrow('×' + (count > 99 ? '99+' : count), x, y + 99, '#ffffff');
+                                drawnFoldSet.add(card.cardId);
+                            }
+                        }
+
+                        // 星标：非折叠时每张卡都显示，折叠时每张卡只显示一次
+                        if (starredSet.has(card.cardId)) {
+                            if (!foldEnabled || (foldEnabled && !drawnStarSet.has(card.cardId))) {
+                                const starY = y + 99 + (foldEnabled ? 0 : 0); // 若折叠且数量标签存在，则星标在数量标签下方
+                                // 如果折叠且已有数量标签，则星标下移
+                                let offset = 0;
+                                if (foldEnabled && drawnFoldSet.has(card.cardId)) {
+                                    offset = 64; // 数量标签高度60 + 间距4
+                                }
+                                drawTagWithArrow('★', x, y + 99 + offset, '#ffd700');
+                                if (foldEnabled) drawnStarSet.add(card.cardId);
+                            }
+                        }
+
                         cardIdx++;
                     } else if (addStatsCard && cardIdx === displayCards.length) {
                         await drawStatsCard(ctx, x, y, cardW, cardH, radius, statsTitle);
@@ -3548,7 +3542,6 @@
             const statsTitle = document.getElementById('statsCardTitle').value.trim() || null;
             const qrTitle = document.getElementById('qrCardTitle').value.trim() || null;
 
-            // 获取背景颜色
             const bgSelect = document.getElementById('bgColorSelect');
             const bgCustom = document.getElementById('bgColorCustom');
             let bgColor = bgSelect.value;
@@ -3556,7 +3549,6 @@
                 bgColor = bgCustom.value;
             }
 
-            // 确保裁剪模板已生成
             if (!cropTemplate) {
                 await generateCropTemplate();
             }
