@@ -1692,7 +1692,7 @@
                         <label class="switch"><input type="checkbox" id="statsCardToggle" checked><span class="slider"></span></label>
                     </div>
                     <div class="switch-item-input" id="statsCardInputDiv">
-                        <input type="text" id="statsCardTitle" placeholder="统计卡标题 (默认: 卡组统计)">
+                        <input type="text" id="statsCardTitle" placeholder="统计卡标题">
                     </div>
                 </div>
                 <div class="switch-item" id="switchItemQrCard">
@@ -1701,7 +1701,7 @@
                         <label class="switch"><input type="checkbox" id="qrToggle"><span class="slider"></span></label>
                     </div>
                     <div class="switch-item-input" id="qrCardInputDiv">
-                        <input type="text" id="qrCardTitle" placeholder="二维码标题 (默认: 卡组二维码)">
+                        <input type="text" id="qrCardTitle" placeholder="二维码标题">
                     </div>
                 </div>
             </div>
@@ -3222,23 +3222,22 @@
                 const orderH = maxCount > 0 ? (order / maxCount) * barMaxHeight : 0;
                 const counterH = maxCount > 0 ? (counter / maxCount) * barMaxHeight : 0;
 
-                // 从底部堆叠：反制(灰色) → 指令(黄色) → 单位(浅色)
                 let currentY = barAreaY + barMaxHeight;
 
-                if (counter > 0) {
-                    ctx.fillStyle = '#5a5a5a';
-                    ctx.fillRect(bx, currentY - counterH, barWidth - barGap, counterH);
-                    currentY -= counterH;
+                if (unit > 0) {
+                    ctx.fillStyle = '#e8e4d0';
+                    ctx.fillRect(bx, currentY - unitH, barWidth - barGap, unitH);
+                    currentY -= unitH;
                 }
                 if (order > 0) {
                     ctx.fillStyle = '#f5c542';
                     ctx.fillRect(bx, currentY - orderH, barWidth - barGap, orderH);
                     currentY -= orderH;
                 }
-                if (unit > 0) {
-                    ctx.fillStyle = '#e8e4d0';
-                    ctx.fillRect(bx, currentY - unitH, barWidth - barGap, unitH);
-                    currentY -= unitH;
+                if (counter > 0) {
+                    ctx.fillStyle = '#5a5a5a';
+                    ctx.fillRect(bx, currentY - counterH, barWidth - barGap, counterH);
+                    currentY -= counterH;
                 }
 
                 // 标签
