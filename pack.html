@@ -124,8 +124,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 16px;
-            transition: transform 0.1s;
+            transition: min-height 0.3s;
         }
         .animation-zone .empty-hint {
             color: #887e66;
@@ -140,6 +141,7 @@
             justify-content: center;
             gap: 12px;
             flex-wrap: wrap;
+            margin: 0;
         }
         .pack-row-bottom {
             margin-left: calc(var(--card-w) / 2 + 6px);
@@ -148,6 +150,7 @@
             perspective: 800px;
             cursor: pointer;
             flex-shrink: 0;
+            transition: transform 0.2s;
             position: relative;
             --card-w: 120px;
             width: var(--card-w);
@@ -161,7 +164,6 @@
             transform-style: preserve-3d;
             border-radius: calc(var(--card-w) * 30 / 500);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            will-change: transform;
         }
         .animation-zone .pack-card.flipped .pack-card-inner {
             transform: rotateY(-180deg);
@@ -196,7 +198,7 @@
             opacity: 0.3;
         }
 
-        /* 抬起动画 - 使用独立的 transform 组合 */
+        /* 卡牌抬起动画 */
         .animation-zone .pack-card.lift {
             animation: card-lift var(--lift-duration, 0.3s) ease-out forwards;
         }
@@ -205,48 +207,48 @@
                 transform: translateY(0) scale(1);
             }
             100% {
-                transform: translateY(-35px) scale(1.05);
+                transform: translateY(-45px) scale(1.18);
             }
         }
-        /* 拍下（下压回弹） */
+        /* 拍下（下压回弹）— 保持翻转状态 */
         .animation-zone .pack-card.slam {
             animation: card-slam var(--slam-duration, 0.25s) cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
         }
         @keyframes card-slam {
             0% {
-                transform: translateY(-35px) scale(1.05);
+                transform: rotateY(-180deg) translateY(-45px) scale(1.18);
             }
             60% {
-                transform: translateY(5px) scale(0.98);
+                transform: rotateY(-180deg) translateY(5px) scale(0.97);
             }
             100% {
-                transform: translateY(0) scale(1);
+                transform: rotateY(-180deg) translateY(0) scale(1);
             }
         }
 
-        /* 拍下震动 - 作用于整个动画区，利用 transform 和随机位移 */
+        /* 拍下震动 - 作用于整个动画区，并带动周围元素 */
         .animation-zone.shake {
-            animation: shake-zone var(--shake-duration, 0.3s) ease-in-out;
+            animation: shake-zone var(--shake-duration, 0.4s) ease-in-out;
         }
         @keyframes shake-zone {
             0%,
             100% {
-                transform: translate(0, 0) rotate(0deg);
+                transform: translate(0) rotate(0deg);
             }
             10% {
-                transform: translate(var(--shake-x, -4px), var(--shake-y, 3px)) rotate(0.5deg);
+                transform: translate(var(--shake-x, -6px), var(--shake-y, 4px)) rotate(-0.5deg);
             }
             30% {
-                transform: translate(calc(var(--shake-x, 5px) * -1), calc(var(--shake-y, -4px) * -1)) rotate(-0.8deg);
+                transform: translate(calc(var(--shake-x, 6px) * 0.7), calc(var(--shake-y, -5px) * 0.7)) rotate(0.8deg);
             }
             50% {
-                transform: translate(calc(var(--shake-x, -3px) * -1), calc(var(--shake-y, 5px) * -1)) rotate(0.3deg);
+                transform: translate(calc(var(--shake-x, -4px) * -1), calc(var(--shake-y, 3px) * -1)) rotate(-0.3deg);
             }
             70% {
-                transform: translate(var(--shake-x, 3px), var(--shake-y, -2px)) rotate(-0.5deg);
+                transform: translate(calc(var(--shake-x, 5px) * -0.5), calc(var(--shake-y, -4px) * -0.5)) rotate(0.4deg);
             }
             90% {
-                transform: translate(calc(var(--shake-x, -2px) * -1), calc(var(--shake-y, 2px) * -1)) rotate(0.2deg);
+                transform: translate(var(--shake-x, 3px), var(--shake-y, -2px)) rotate(-0.1deg);
             }
         }
 
@@ -294,6 +296,39 @@
         .params-panel .param-group input[type="number"] {
             width: 60px;
             min-width: 50px;
+        }
+        .params-panel .param-group input[type="range"] {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #3a3222;
+            border-radius: 2px;
+            outline: none;
+            border: none;
+        }
+        .params-panel .param-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c9a53b;
+            cursor: pointer;
+            border: none;
+        }
+        .params-panel .param-group input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c9a53b;
+            cursor: pointer;
+            border: none;
+        }
+        .params-panel .param-group .range-val {
+            font-size: 0.7rem;
+            color: #ffefb9;
+            min-width: 28px;
+            text-align: center;
         }
         .params-panel .switch-item {
             display: flex;
@@ -368,51 +403,6 @@
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-        }
-
-        /* 画质滑条 */
-        .quality-slider-group {
-            display: flex;
-            align-items: center;
-            gap: 6px 10px;
-        }
-        .quality-slider-group label {
-            font-size: 0.7rem;
-            color: #e9dbbd;
-            font-weight: 600;
-        }
-        .quality-slider-group input[type="range"] {
-            width: 80px;
-            height: 4px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: #3a3222;
-            border-radius: 2px;
-            outline: none;
-            border: none;
-        }
-        .quality-slider-group input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #c9a53b;
-            cursor: pointer;
-            border: none;
-        }
-        .quality-slider-group input[type="range"]::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #c9a53b;
-            cursor: pointer;
-            border: none;
-        }
-        .quality-slider-group .quality-val {
-            font-size: 0.7rem;
-            color: #ffefb9;
-            min-width: 28px;
-            text-align: center;
         }
 
         /* 各稀有度概率调节 */
@@ -847,7 +837,7 @@
             .prob-group .prob-item input[type="range"] {
                 width: 40px;
             }
-            .quality-slider-group input[type="range"] {
+            .params-panel .param-group input[type="range"] {
                 width: 60px;
             }
         }
@@ -871,8 +861,8 @@
             .prob-group .prob-item input[type="range"] {
                 width: 30px;
             }
-            .quality-slider-group input[type="range"] {
-                width: 40px;
+            .params-panel .param-group input[type="range"] {
+                width: 50px;
             }
         }
         @media (min-width: 769px) {
@@ -961,10 +951,10 @@
                     <option value="officer">军官卡包</option>
                 </select>
             </div>
-            <div class="param-group quality-slider-group">
+            <div class="param-group">
                 <label>画质</label>
                 <input type="range" id="qualitySlider" min="1" max="100" value="20">
-                <span class="quality-val" id="qualityVal">20</span>
+                <span class="range-val" id="qualityVal">20</span>
             </div>
             <div class="param-group switch-item">
                 <span>忽视概率</span>
@@ -1046,7 +1036,7 @@
                 <select id="uploadPackFit">
                     <option value="cover">横铺满</option>
                     <option value="contain">纵铺满</option>
-                    <option value="stretch">拉！伸！</option>
+                    <option value="stretch">拉伸</option>
                 </select>
             </div>
             <div class="upload-form-row">
@@ -1187,7 +1177,7 @@
         // ==================== 数据加载 ====================
         async function loadData() {
             const filterList = document.getElementById('filterList');
-            filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">正在寻找敌人...</div>';
+            filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">⏳ 加载卡牌数据...</div>';
             try {
                 const res = await fetch('data.json');
                 if (!res.ok) throw new Error("data.json failed");
@@ -1371,7 +1361,7 @@
                         <div class="filter-item" data-filter-idx="${idx}">
                             <div class="filter-header" data-toggle="${idx}">
                                 <span class="filter-label">📌 筛选器 ${idx+1}</span>
-                                <span class="filter-badge">${filter.isComplement ? '补集' : ''}</span>
+                                ${filter.isComplement ? `<span class="filter-badge">补集</span>` : ''}
                                 <span class="filter-badge">${resultCount} 张</span>
                                 <div class="filter-actions">
                                     <button class="btn-complement ${filter.isComplement?'active':''}" data-complement="${idx}">补集</button>
@@ -1432,7 +1422,7 @@
                                     </div>
                                     <div class="filter-result-preview">
                                         <span class="result-count">${resultCount} 张</span>
-                                        <span class="result-cards">${previewCards ? previewCards : '未找到'}</span>
+                                        <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
                                     </div>
                                 </div>
                             `}
@@ -1523,6 +1513,13 @@
                 uf.value = 'germany';
             }
 
+            // 画质滑块
+            const qualitySlider = document.getElementById('qualitySlider');
+            const qualityVal = document.getElementById('qualityVal');
+            qualitySlider.addEventListener('input', () => {
+                qualityVal.textContent = qualitySlider.value;
+            });
+
             // 不自动添加筛选器
             renderFilters();
 
@@ -1579,13 +1576,6 @@
                     valSpan.textContent = val;
                     probValues[rarity] = val;
                 });
-            });
-
-            // 画质滑块
-            const qualitySlider = document.getElementById('qualitySlider');
-            const qualityVal = document.getElementById('qualityVal');
-            qualitySlider.addEventListener('input', () => {
-                qualityVal.textContent = qualitySlider.value;
             });
 
             // 禁止重复切换时检查
@@ -1928,8 +1918,10 @@
             zone.appendChild(rowTop);
             zone.appendChild(rowBottom);
 
-            // 加载正面图片，使用画质滑条值
+            // 获取画质参数
             const quality = parseInt(document.getElementById('qualitySlider').value) || 20;
+
+            // 加载正面图片
             setTimeout(() => {
                 cardElements.forEach((item) => {
                     const frontImg = item.el.querySelector('.pack-card-front img');
@@ -1967,18 +1959,16 @@
                     if (el.classList.contains('flipped')) return;
                     if (el.classList.contains('placeholder')) return;
 
-                    // 抬起：仅 lift 动画控制 transform，不干扰 rotateY
+                    // 抬起
                     el.classList.add('lift');
                     el.style.setProperty('--lift-duration', speeds.lift + 's');
 
                     setTimeout(() => {
-                        // 翻转：添加 flipped 类（触发 rotateY），同时移除 lift
+                        // 移除lift，添加flipped（翻转）
                         el.classList.remove('lift');
                         el.classList.add('flipped');
-                        // 强制应用 flip 过渡时间
-                        el.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
 
-                        // 拍下
+                        // 拍下（下压回弹）
                         setTimeout(() => {
                             el.classList.add('slam');
                             el.style.setProperty('--slam-duration', speeds.slam + 's');
@@ -1991,7 +1981,7 @@
                                 const intensity = speeds.shake;
                                 const duration = 0.3 + intensity * 0.6;
                                 const zone = document.getElementById('animationZone');
-                                const amp = 4 + intensity * 10; // 振幅更大
+                                const amp = 4 + intensity * 8;
                                 zone.style.setProperty('--shake-duration', duration + 's');
                                 zone.style.setProperty('--shake-x', (Math.random() * amp - amp/2) + 'px');
                                 zone.style.setProperty('--shake-y', (Math.random() * amp - amp/2) + 'px');
@@ -2010,7 +2000,7 @@
             });
         }
 
-        // ==================== 原神启动 ====================
+        // ==================== 启动 ====================
         window.addEventListener('load', () => {
             loadData();
         });
