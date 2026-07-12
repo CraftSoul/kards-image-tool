@@ -122,11 +122,9 @@
             min-height: 280px;
             margin-bottom: 20px;
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            position: relative;
+            gap: 16px;
             transition: min-height 0.3s;
         }
         .animation-zone .empty-hint {
@@ -135,6 +133,16 @@
             text-align: center;
             width: 100%;
             user-select: none;
+            margin: auto;
+        }
+        .pack-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .pack-row-bottom {
+            margin-left: calc(var(--card-w) / 2 + 6px); /* 偏移半个卡片宽度 + gap 的一半 */
         }
         .animation-zone .pack-card {
             perspective: 800px;
@@ -142,6 +150,9 @@
             flex-shrink: 0;
             transition: transform 0.2s;
             position: relative;
+            --card-w: 120px;
+            width: var(--card-w);
+            height: calc(var(--card-w) * 1.4);
         }
         .animation-zone .pack-card-inner {
             position: relative;
@@ -152,7 +163,7 @@
             border-radius: calc(var(--card-w) * 15 / 500);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
-        .animation-zone .pack-card.flipping .pack-card-inner {
+        .animation-zone .pack-card.flipped .pack-card-inner {
             transform: rotateY(-180deg);
         }
         .animation-zone .pack-card-face {
@@ -197,6 +208,7 @@
                 transform: translateY(-35px) scale(1.05);
             }
         }
+        /* 拍下（下压回弹） */
         .animation-zone .pack-card.slam {
             animation: card-slam var(--slam-duration, 0.25s) cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
         }
@@ -765,8 +777,9 @@
             }
             .animation-zone .pack-card {
                 --card-w: 80px;
-                width: var(--card-w);
-                height: calc(var(--card-w) * 1.4);
+            }
+            .pack-row-bottom {
+                margin-left: calc(var(--card-w) / 2 + 4px);
             }
             .filter-body .filter-row {
                 flex-direction: column;
@@ -792,8 +805,14 @@
                 --card-w: 60px;
             }
             .animation-zone {
-                gap: 6px;
+                gap: 10px;
                 padding: 12px;
+            }
+            .pack-row {
+                gap: 6px;
+            }
+            .pack-row-bottom {
+                margin-left: calc(var(--card-w) / 2 + 3px);
             }
             .params-panel {
                 padding: 0.8rem 1rem;
@@ -805,8 +824,6 @@
         @media (min-width: 769px) {
             .animation-zone .pack-card {
                 --card-w: 120px;
-                width: var(--card-w);
-                height: calc(var(--card-w) * 1.4);
             }
         }
 
@@ -970,7 +987,7 @@
                 <select id="uploadPackFit">
                     <option value="cover">横铺满</option>
                     <option value="contain">纵铺满</option>
-                    <option value="stretch">拉！伸！</option>
+                    <option value="stretch">拉伸</option>
                 </select>
             </div>
             <div class="upload-form-row">
@@ -1110,6 +1127,8 @@
 
         // ==================== 数据加载 ====================
         async function loadData() {
+            const filterList = document.getElementById('filterList');
+            filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">⏳ 加载卡牌数据...</div>';
             try {
                 const res = await fetch('data.json');
                 if (!res.ok) throw new Error("data.json failed");
@@ -1149,7 +1168,7 @@
                 updatePoolSize();
             } catch (e) {
                 console.error(e);
-                document.getElementById('filterList').innerHTML = '<div style="color:#cc7755;padding:12px;">❌ 数据加载失败</div>';
+                filterList.innerHTML = '<div style="color:#cc7755;padding:12px;">❌ 数据加载失败</div>';
             }
         }
 
@@ -1445,21 +1464,7 @@
                 uf.value = 'germany';
             }
 
-            // 默认添加一个筛选器
-            if (filters.length === 0) {
-                filters.push({
-                    id: filterIdCounter++,
-                    status: 'all',
-                    search: '',
-                    types: [],
-                    rarities: [],
-                    factions: [],
-                    costs: [],
-                    sets: [],
-                    isComplement: false,
-                    collapsed: false
-                });
-            }
+            // 不自动添加筛选器
             renderFilters();
 
             // 导航菜单
@@ -1822,9 +1827,17 @@
                 displayCards.push(cards[i % cards.length]);
             }
 
+            // 创建两个行容器
+            const rowTop = document.createElement('div');
+            rowTop.className = 'pack-row';
+            const rowBottom = document.createElement('div');
+            rowBottom.className = 'pack-row pack-row-bottom';
+
+            // 填充卡片到对应行
             const cardElements = [];
             displayCards.forEach((card, idx) => {
                 const isTop = idx < topCount;
+                const container = isTop ? rowTop : rowBottom;
                 const div = document.createElement('div');
                 div.className = 'pack-card placeholder';
                 div.dataset.cardId = card.id;
@@ -1842,12 +1855,12 @@
                             </div>
                         </div>
                     `;
-                zone.appendChild(div);
+                container.appendChild(div);
                 cardElements.push({ el: div, card: card, isTop: isTop });
             });
 
-            // 卡片尺寸由CSS控制 (--card-w)
-            // 布局：flex-wrap 自动换行，上排 topCount 个，下排 bottomCount 个
+            zone.appendChild(rowTop);
+            zone.appendChild(rowBottom);
 
             // 加载正面图片
             setTimeout(() => {
@@ -1856,7 +1869,6 @@
                     const card = item.card;
                     if (card.isCustom && card.imageData) {
                         frontImg.src = card.imageData;
-                        // 应用图片填充
                         const fit = card.imageFit || 'cover';
                         frontImg.style.objectFit = fit;
                     } else if (card.image) {
@@ -1885,7 +1897,7 @@
                 const speeds = raritySpeeds[rarity] || raritySpeeds['Standard'];
 
                 el.addEventListener('click', function onClick() {
-                    if (el.classList.contains('flipping')) return;
+                    if (el.classList.contains('flipped')) return; // 已经翻过了
                     if (el.classList.contains('placeholder')) return;
 
                     // 抬起
@@ -1893,26 +1905,20 @@
                     el.style.setProperty('--lift-duration', speeds.lift + 's');
 
                     setTimeout(() => {
-                        // 翻转
-                        el.classList.add('flipping');
-                        el.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
-                        el.style.transform = 'rotateY(-180deg)';
+                        // 翻转：添加 flipped 类，保持正面
+                        el.classList.add('flipped');
+                        // 移除 lift 类（抬起结束）
+                        el.classList.remove('lift');
 
-                        // 拍下（翻转完成后）
+                        // 拍下（下压回弹）
                         setTimeout(() => {
-                            el.classList.remove('flipping', 'lift');
-                            el.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
-                            el.style.transform = 'rotateY(-180deg)';
-
-                            // 轻微下压
+                            el.classList.add('slam');
+                            el.style.setProperty('--slam-duration', speeds.slam + 's');
                             setTimeout(() => {
-                                el.style.transform = 'rotateY(-180deg) scale(0.97)';
-                                setTimeout(() => {
-                                    el.style.transform = 'rotateY(-180deg) scale(1)';
-                                }, 80);
-                            }, speeds.slam * 200);
+                                el.classList.remove('slam');
+                            }, speeds.slam * 1000);
 
-                            // 拍下时震动（仅非普通牌）
+                            // 震动（仅非普通牌）
                             if (speeds.shake > 0) {
                                 const intensity = speeds.shake;
                                 const duration = 0.3 + intensity * 0.6;
@@ -1934,11 +1940,9 @@
                     }, speeds.lift * 500);
                 }, { once: false });
             });
-
-            // 不自动翻转，不设超时
         }
 
-        // ==================== 原神启动 ====================
+        // ==================== 启动 ====================
         window.addEventListener('load', () => {
             loadData();
         });
