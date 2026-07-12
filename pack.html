@@ -124,8 +124,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: calc(var(--card-w, 120px) * 0.33);
-            transition: min-height 0.3s;
+            gap: 16px;
+            transition: transform 0.1s;
         }
         .animation-zone .empty-hint {
             color: #887e66;
@@ -138,17 +138,16 @@
         .pack-row {
             display: flex;
             justify-content: center;
-            gap: calc(var(--card-w, 120px) * 0.33);
+            gap: 12px;
             flex-wrap: wrap;
         }
         .pack-row-bottom {
-            margin-left: calc(var(--card-w, 120px) * 0.33 / 2 + 4px);
+            margin-left: calc(var(--card-w) / 2 + 6px);
         }
         .animation-zone .pack-card {
             perspective: 800px;
             cursor: pointer;
             flex-shrink: 0;
-            transition: transform 0.2s;
             position: relative;
             --card-w: 120px;
             width: var(--card-w);
@@ -158,10 +157,11 @@
             position: relative;
             width: 100%;
             height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border-radius: calc(var(--card-w) * 30 / 500);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
         }
         .animation-zone .pack-card.flipped .pack-card-inner {
             transform: rotateY(-180deg);
@@ -196,34 +196,58 @@
             opacity: 0.3;
         }
 
-        /* ===== 抬起 & 拍下 ===== */
-        .animation-zone .pack-card.lift .pack-card-inner {
-            transform: translateY(-35px) scale(1.15);
-            transition: transform var(--lift-duration, 0.3s) ease-out;
+        /* 抬起动画 - 使用独立的 transform 组合 */
+        .animation-zone .pack-card.lift {
+            animation: card-lift var(--lift-duration, 0.3s) ease-out forwards;
         }
-        .animation-zone .pack-card.flipped .pack-card-inner {
-            transform: translateY(-35px) scale(1.15) rotateY(-180deg);
-            transition: transform var(--flip-duration, 0.6s) cubic-bezier(0.4, 0, 0.2, 1);
+        @keyframes card-lift {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                transform: translateY(-35px) scale(1.05);
+            }
         }
-        .animation-zone .pack-card.slam .pack-card-inner {
+        /* 拍下（下压回弹） */
+        .animation-zone .pack-card.slam {
             animation: card-slam var(--slam-duration, 0.25s) cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
         }
         @keyframes card-slam {
-            0% { transform: translateY(-35px) scale(1.15) rotateY(-180deg); }
-            60% { transform: translateY(5px) scale(0.95) rotateY(-180deg); }
-            100% { transform: translateY(0) scale(1) rotateY(-180deg); }
+            0% {
+                transform: translateY(-35px) scale(1.05);
+            }
+            60% {
+                transform: translateY(5px) scale(0.98);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+            }
         }
 
-        /* ===== 震动（作用于整个动画区） ===== */
+        /* 拍下震动 - 作用于整个动画区，利用 transform 和随机位移 */
         .animation-zone.shake {
             animation: shake-zone var(--shake-duration, 0.3s) ease-in-out;
         }
         @keyframes shake-zone {
-            0%, 100% { transform: translate(0); }
-            20% { transform: translate(var(--shake-x, -6px), var(--shake-y, 5px)); }
-            40% { transform: translate(calc(var(--shake-x, 8px) * -1), calc(var(--shake-y, -6px) * -1)); }
-            60% { transform: translate(calc(var(--shake-x, -5px) * -1), calc(var(--shake-y, 7px) * -1)); }
-            80% { transform: translate(var(--shake-x, 5px), var(--shake-y, -4px)); }
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            10% {
+                transform: translate(var(--shake-x, -4px), var(--shake-y, 3px)) rotate(0.5deg);
+            }
+            30% {
+                transform: translate(calc(var(--shake-x, 5px) * -1), calc(var(--shake-y, -4px) * -1)) rotate(-0.8deg);
+            }
+            50% {
+                transform: translate(calc(var(--shake-x, -3px) * -1), calc(var(--shake-y, 5px) * -1)) rotate(0.3deg);
+            }
+            70% {
+                transform: translate(var(--shake-x, 3px), var(--shake-y, -2px)) rotate(-0.5deg);
+            }
+            90% {
+                transform: translate(calc(var(--shake-x, -2px) * -1), calc(var(--shake-y, 2px) * -1)) rotate(0.2deg);
+            }
         }
 
         /* ===== 参数区 ===== */
@@ -344,6 +368,51 @@
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+        }
+
+        /* 画质滑条 */
+        .quality-slider-group {
+            display: flex;
+            align-items: center;
+            gap: 6px 10px;
+        }
+        .quality-slider-group label {
+            font-size: 0.7rem;
+            color: #e9dbbd;
+            font-weight: 600;
+        }
+        .quality-slider-group input[type="range"] {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #3a3222;
+            border-radius: 2px;
+            outline: none;
+            border: none;
+        }
+        .quality-slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c9a53b;
+            cursor: pointer;
+            border: none;
+        }
+        .quality-slider-group input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c9a53b;
+            cursor: pointer;
+            border: none;
+        }
+        .quality-slider-group .quality-val {
+            font-size: 0.7rem;
+            color: #ffefb9;
+            min-width: 28px;
+            text-align: center;
         }
 
         /* 各稀有度概率调节 */
@@ -758,7 +827,7 @@
                 --card-w: 80px;
             }
             .pack-row-bottom {
-                margin-left: calc(var(--card-w) * 0.33 / 2 + 2px);
+                margin-left: calc(var(--card-w) / 2 + 4px);
             }
             .filter-body .filter-row {
                 flex-direction: column;
@@ -778,26 +847,32 @@
             .prob-group .prob-item input[type="range"] {
                 width: 40px;
             }
+            .quality-slider-group input[type="range"] {
+                width: 60px;
+            }
         }
         @media (max-width: 480px) {
             .animation-zone .pack-card {
                 --card-w: 60px;
             }
             .animation-zone {
-                gap: calc(var(--card-w) * 0.33);
+                gap: 10px;
                 padding: 12px;
             }
             .pack-row {
-                gap: calc(var(--card-w) * 0.33);
+                gap: 6px;
             }
             .pack-row-bottom {
-                margin-left: calc(var(--card-w) * 0.33 / 2 + 2px);
+                margin-left: calc(var(--card-w) / 2 + 3px);
             }
             .params-panel {
                 padding: 0.8rem 1rem;
             }
             .prob-group .prob-item input[type="range"] {
                 width: 30px;
+            }
+            .quality-slider-group input[type="range"] {
+                width: 40px;
             }
         }
         @media (min-width: 769px) {
@@ -886,6 +961,11 @@
                     <option value="officer">军官卡包</option>
                 </select>
             </div>
+            <div class="param-group quality-slider-group">
+                <label>画质</label>
+                <input type="range" id="qualitySlider" min="1" max="100" value="20">
+                <span class="quality-val" id="qualityVal">20</span>
+            </div>
             <div class="param-group switch-item">
                 <span>忽视概率</span>
                 <label class="switch"><input type="checkbox" id="ignoreProb"><span class="slider"></span></label>
@@ -966,7 +1046,7 @@
                 <select id="uploadPackFit">
                     <option value="cover">横铺满</option>
                     <option value="contain">纵铺满</option>
-                    <option value="stretch">拉伸</option>
+                    <option value="stretch">拉！伸！</option>
                 </select>
             </div>
             <div class="upload-form-row">
@@ -1107,7 +1187,7 @@
         // ==================== 数据加载 ====================
         async function loadData() {
             const filterList = document.getElementById('filterList');
-            filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">⏳ 加载卡牌数据...</div>';
+            filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">正在寻找敌人...</div>';
             try {
                 const res = await fetch('data.json');
                 if (!res.ok) throw new Error("data.json failed");
@@ -1352,7 +1432,7 @@
                                     </div>
                                     <div class="filter-result-preview">
                                         <span class="result-count">${resultCount} 张</span>
-                                        <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
+                                        <span class="result-cards">${previewCards ? previewCards : '未找到'}</span>
                                     </div>
                                 </div>
                             `}
@@ -1499,6 +1579,13 @@
                     valSpan.textContent = val;
                     probValues[rarity] = val;
                 });
+            });
+
+            // 画质滑块
+            const qualitySlider = document.getElementById('qualitySlider');
+            const qualityVal = document.getElementById('qualityVal');
+            qualitySlider.addEventListener('input', () => {
+                qualityVal.textContent = qualitySlider.value;
             });
 
             // 禁止重复切换时检查
@@ -1806,12 +1893,13 @@
                 displayCards.push(cards[i % cards.length]);
             }
 
-            // 创建两行
+            // 创建两个行容器
             const rowTop = document.createElement('div');
             rowTop.className = 'pack-row';
             const rowBottom = document.createElement('div');
             rowBottom.className = 'pack-row pack-row-bottom';
 
+            // 填充卡片到对应行
             const cardElements = [];
             displayCards.forEach((card, idx) => {
                 const isTop = idx < topCount;
@@ -1840,7 +1928,8 @@
             zone.appendChild(rowTop);
             zone.appendChild(rowBottom);
 
-            // 加载正面图片
+            // 加载正面图片，使用画质滑条值
+            const quality = parseInt(document.getElementById('qualitySlider').value) || 20;
             setTimeout(() => {
                 cardElements.forEach((item) => {
                     const frontImg = item.el.querySelector('.pack-card-front img');
@@ -1850,7 +1939,7 @@
                         const fit = card.imageFit || 'cover';
                         frontImg.style.objectFit = fit;
                     } else if (card.image) {
-                        frontImg.src = getCardImageUrl(card.image, 'zh-Hans', DEFAULT_VERSION, 100);
+                        frontImg.src = getCardImageUrl(card.image, 'zh-Hans', DEFAULT_VERSION, quality);
                         frontImg.style.objectFit = 'cover';
                     } else {
                         frontImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="168" viewBox="0 0 120 168"%3E%3Crect width="120" height="168" fill="%233a2f1a"/%3E%3Ctext x="50%25" y="50%25" font-size="10" fill="%23dba551" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E';
@@ -1873,57 +1962,55 @@
                 const card = item.card;
                 const rarity = card.rarity || 'Standard';
                 const speeds = raritySpeeds[rarity] || raritySpeeds['Standard'];
-                const inner = el.querySelector('.pack-card-inner');
 
                 el.addEventListener('click', function onClick() {
-                    if (el.classList.contains('flipped')) return; // 已翻过
+                    if (el.classList.contains('flipped')) return;
                     if (el.classList.contains('placeholder')) return;
 
-                    // 阶段1：抬起（使用类 lift，通过 transition 控制）
+                    // 抬起：仅 lift 动画控制 transform，不干扰 rotateY
                     el.classList.add('lift');
-                    inner.style.setProperty('--lift-duration', speeds.lift + 's');
-                    // 抬起结束后，触发翻转
-                    const liftTimeout = setTimeout(() => {
+                    el.style.setProperty('--lift-duration', speeds.lift + 's');
+
+                    setTimeout(() => {
+                        // 翻转：添加 flipped 类（触发 rotateY），同时移除 lift
                         el.classList.remove('lift');
-                        // 阶段2：翻转（添加 flipped，同时保持抬起状态）
                         el.classList.add('flipped');
-                        inner.style.setProperty('--flip-duration', speeds.flip + 's');
-                        // 翻转完成后，触发拍下
-                        const flipTimeout = setTimeout(() => {
-                            // 阶段3：拍下（slam 动画）
+                        // 强制应用 flip 过渡时间
+                        el.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
+
+                        // 拍下
+                        setTimeout(() => {
                             el.classList.add('slam');
-                            inner.style.setProperty('--slam-duration', speeds.slam + 's');
-                            // 拍下结束后，移除slam，保持最终状态
-                            const slamTimeout = setTimeout(() => {
+                            el.style.setProperty('--slam-duration', speeds.slam + 's');
+                            setTimeout(() => {
                                 el.classList.remove('slam');
-                                // 最终状态：保留 flipped，transform 回到原位（rotateY 保持）
-                                // 移除 lift 效果，但保留 rotateY
-                                inner.style.transform = 'rotateY(-180deg)';
-                                // 震动（仅非普通牌）
-                                if (speeds.shake > 0) {
-                                    const intensity = speeds.shake;
-                                    const duration = 0.3 + intensity * 0.6;
-                                    const amp = 4 + intensity * 8;
-                                    const zone = document.getElementById('animationZone');
-                                    zone.style.setProperty('--shake-duration', duration + 's');
-                                    zone.style.setProperty('--shake-x', (Math.random() * amp - amp/2) + 'px');
-                                    zone.style.setProperty('--shake-y', (Math.random() * amp - amp/2) + 'px');
-                                    zone.classList.add('shake');
-                                    setTimeout(() => zone.classList.remove('shake'), duration * 1000);
-                                }
-                                flipCount++;
-                                if (flipCount >= totalToFlip) {
-                                    isOpening = false;
-                                    document.getElementById('openPackBtn').disabled = false;
-                                }
-                            }, speeds.slam * 1200);
-                        }, speeds.flip * 600);
-                    }, speeds.lift * 600);
+                            }, speeds.slam * 1000);
+
+                            // 震动（仅非普通牌）
+                            if (speeds.shake > 0) {
+                                const intensity = speeds.shake;
+                                const duration = 0.3 + intensity * 0.6;
+                                const zone = document.getElementById('animationZone');
+                                const amp = 4 + intensity * 10; // 振幅更大
+                                zone.style.setProperty('--shake-duration', duration + 's');
+                                zone.style.setProperty('--shake-x', (Math.random() * amp - amp/2) + 'px');
+                                zone.style.setProperty('--shake-y', (Math.random() * amp - amp/2) + 'px');
+                                zone.classList.add('shake');
+                                setTimeout(() => zone.classList.remove('shake'), duration * 1000);
+                            }
+
+                            flipCount++;
+                            if (flipCount >= totalToFlip) {
+                                isOpening = false;
+                                document.getElementById('openPackBtn').disabled = false;
+                            }
+                        }, speeds.flip * 400 + speeds.lift * 200);
+                    }, speeds.lift * 500);
                 }, { once: false });
             });
         }
 
-        // ==================== 启动 ====================
+        // ==================== 原神启动 ====================
         window.addEventListener('load', () => {
             loadData();
         });
