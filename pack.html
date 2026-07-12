@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>KARDS 军械库 | 模拟开包</title>
     <style>
+        /* ===== 全局重置 & 主题 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -29,6 +30,7 @@
             margin: 0 auto;
         }
 
+        /* ===== 导航 ===== */
         .nav-bar {
             background: rgba(20, 20, 15, 0.96);
             backdrop-filter: blur(16px);
@@ -116,20 +118,15 @@
 
         /* ===== 动画区 ===== */
         .animation-zone {
-            background: rgba(10, 12, 8, 0.85);
-            backdrop-filter: blur(8px);
-            border-radius: 28px;
-            border: 1px solid #c9aa5b;
-            padding: 20px;
-            min-height: 320px;
+            padding: 20px 10px;
+            min-height: 240px;
             margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            gap: 12px;
+            gap: 16px 20px;
             position: relative;
-            overflow: hidden;
             transition: min-height 0.3s;
         }
         .animation-zone .empty-hint {
@@ -147,6 +144,7 @@
             flex-shrink: 0;
             transition: transform 0.2s;
             position: relative;
+            border-radius: var(--card-radius, 12px);
         }
         .animation-zone .pack-card-inner {
             position: relative;
@@ -154,18 +152,18 @@
             height: 100%;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            border-radius: 15px;
+            border-radius: var(--card-radius, 12px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
         .animation-zone .pack-card.flipping .pack-card-inner {
-            transform: rotateY(-180deg);
+            transform: rotateY(-180deg) !important;
         }
         .animation-zone .pack-card-face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 15px;
+            border-radius: var(--card-radius, 12px);
             overflow: hidden;
             background: #1a1c12;
         }
@@ -189,6 +187,7 @@
         .animation-zone .pack-card.placeholder .pack-card-back img {
             opacity: 0.3;
         }
+        /* 开包震动（拍下时） */
         .animation-zone.shake {
             animation: shake-zone var(--shake-duration, 0.3s) ease-in-out;
         }
@@ -198,19 +197,20 @@
                 transform: translate(0);
             }
             20% {
-                transform: translate(-4px, 3px);
+                transform: translate(var(--shake-x, -4px), var(--shake-y, 3px));
             }
             40% {
-                transform: translate(5px, -4px);
+                transform: translate(var(--shake-x2, 5px), var(--shake-y2, -4px));
             }
             60% {
-                transform: translate(-3px, 5px);
+                transform: translate(var(--shake-x3, -3px), var(--shake-y3, 5px));
             }
             80% {
-                transform: translate(3px, -2px);
+                transform: translate(var(--shake-x4, 3px), var(--shake-y4, -2px));
             }
         }
 
+        /* 卡牌抬起动画 */
         .animation-zone .pack-card.lift {
             animation: card-lift var(--lift-duration, 0.3s) ease-out forwards;
         }
@@ -219,7 +219,19 @@
                 transform: translateY(0) scale(1);
             }
             100% {
-                transform: translateY(-35px) scale(1.05);
+                transform: translateY(-45px) scale(1.05);
+            }
+        }
+        /* 精英滞空 */
+        .animation-zone .pack-card.hover {
+            animation: card-hover var(--hover-duration, 0.8s) ease-in-out infinite alternate;
+        }
+        @keyframes card-hover {
+            0% {
+                transform: translateY(-45px) scale(1.05) rotateY(-5deg);
+            }
+            100% {
+                transform: translateY(-60px) scale(1.08) rotateY(5deg);
             }
         }
         .animation-zone .pack-card.slam {
@@ -227,16 +239,24 @@
         }
         @keyframes card-slam {
             0% {
-                transform: translateY(-35px) scale(1.05);
+                transform: translateY(-45px) scale(1.05);
             }
             60% {
-                transform: translateY(5px) scale(0.98);
+                transform: translateY(6px) scale(0.97);
             }
             100% {
                 transform: translateY(0) scale(1);
             }
         }
 
+        /* 锁定状态 */
+        .animation-zone .pack-card.locked {
+            cursor: not-allowed;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* ===== 参数区 ===== */
         .params-panel {
             background: rgba(10, 12, 8, 0.94);
             backdrop-filter: blur(12px);
@@ -356,21 +376,31 @@
             transform: none;
         }
 
-        /* 概率调节滑块 */
-        .prob-slider-group {
+        /* 概率调节滑块组 */
+        .prob-sliders {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            padding: 0.2rem 0;
+            border-top: 1px solid rgba(170, 142, 78, 0.3);
+            margin-top: 0.2rem;
+            width: 100%;
+        }
+        .prob-sliders .prob-item {
             display: flex;
             align-items: center;
-            gap: 6px 12px;
-            flex-wrap: wrap;
+            gap: 6px 10px;
+            flex: 1 1 140px;
         }
-        .prob-slider-group label {
+        .prob-sliders .prob-item label {
             font-size: 0.7rem;
             color: #e9dbbd;
-            font-weight: 600;
             min-width: 50px;
+            font-weight: 600;
         }
-        .prob-slider-group input[type="range"] {
-            width: 80px;
+        .prob-sliders .prob-item input[type="range"] {
+            flex: 1;
+            min-width: 60px;
             height: 4px;
             -webkit-appearance: none;
             appearance: none;
@@ -379,7 +409,7 @@
             outline: none;
             border: none;
         }
-        .prob-slider-group input[type="range"]::-webkit-slider-thumb {
+        .prob-sliders .prob-item input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 14px;
             height: 14px;
@@ -388,7 +418,7 @@
             cursor: pointer;
             border: none;
         }
-        .prob-slider-group input[type="range"]::-moz-range-thumb {
+        .prob-sliders .prob-item input[type="range"]::-moz-range-thumb {
             width: 14px;
             height: 14px;
             border-radius: 50%;
@@ -396,27 +426,30 @@
             cursor: pointer;
             border: none;
         }
-        .prob-slider-group .prob-val {
+        .prob-sliders .prob-item .prob-val {
             font-size: 0.7rem;
             color: #ffefb9;
-            min-width: 32px;
-            text-align: center;
+            min-width: 36px;
+            text-align: right;
+            font-weight: 600;
         }
+
+        /* ===== 上传卡牌 ===== */
         .upload-bar-pack {
-            display: flex;
-            justify-content: flex-end;
             margin-bottom: 12px;
         }
         .upload-bar-pack .upload-btn {
+            width: 100%;
             background: #2a2a1c;
             border: 1px solid #aa8e4e;
             border-radius: 60px;
-            padding: 0.5rem 1.5rem;
-            font-size: 0.85rem;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #f5efdb;
             cursor: pointer;
             transition: 0.1s;
+            text-align: center;
         }
         .upload-bar-pack .upload-btn:hover {
             background: #c9a63b;
@@ -425,86 +458,137 @@
         }
 
         /* ===== 筛选器列表 ===== */
-        .filter-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-        }
-        .filter-item {
+        .filter-panel-pack {
             background: rgba(0, 0, 0, 0.5);
             border-radius: 20px;
             border: 1px solid rgba(170, 142, 78, 0.4);
-            overflow: hidden;
-            transition: border-color 0.2s;
+            padding: 12px 14px;
+            margin-top: 12px;
         }
-        .filter-item:hover {
-            border-color: rgba(170, 142, 78, 0.7);
+        .filter-group {
+            margin-bottom: 0.8rem;
+            border-bottom: 1px dashed rgba(170, 142, 78, 0.2);
+            padding-bottom: 0.6rem;
         }
-        .filter-header {
+        .filter-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .filter-group-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e9dbbd;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: rgba(0, 0, 0, 0.3);
             cursor: pointer;
             user-select: none;
-            flex-wrap: wrap;
         }
-        .filter-header .filter-label {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #ffefbf;
-            margin-right: 4px;
-        }
-        .filter-header .filter-badge {
-            font-size: 0.65rem;
-            color: #c9b06b;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 2px 10px;
+        .filter-group-title .reset-chip {
+            background: #2a2618;
+            border-color: #b69654;
+            font-size: 0.6rem;
+            padding: 0.1rem 0.6rem;
             border-radius: 40px;
-            border: 1px solid rgba(170, 142, 78, 0.3);
-        }
-        .filter-header .filter-actions {
-            display: flex;
-            gap: 6px;
-            margin-left: auto;
-            align-items: center;
-        }
-        .filter-header .filter-actions button {
-            background: transparent;
-            border: 1px solid rgba(170, 142, 78, 0.3);
-            border-radius: 30px;
-            padding: 2px 10px;
-            color: #e9dbbd;
-            font-size: 0.65rem;
             cursor: pointer;
-            transition: 0.1s;
+            color: #e9dbbd;
+            border: 1px solid #b69654;
         }
-        .filter-header .filter-actions button:hover {
-            background: rgba(170, 142, 78, 0.2);
-            border-color: #c9aa5b;
+        .filter-group-title .collapse-icon {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+            margin-left: 6px;
+            color: #c9b06b;
         }
-        .filter-header .filter-actions .btn-complement.active {
-            background: #5a4a3a;
-            border-color: #c9aa5b;
-            color: #ffefbf;
+        .filter-group-body {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            max-height: 600px;
         }
-        .filter-header .filter-actions .btn-delete {
-            color: #cc7755;
+        .filter-group-body.collapsed {
+            max-height: 0;
         }
-        .filter-header .filter-actions .btn-delete:hover {
-            background: rgba(200, 80, 50, 0.2);
-            border-color: #cc7755;
+        .multi-select-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .filter-chip {
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            color: #e9dbbd;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .filter-chip.active {
+            background: #c9a53b;
+            color: #1e1c10;
+            border-color: #c9a53b;
+            font-weight: 600;
+        }
+        .filter-chip img {
+            width: 16px;
+            height: 16px;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem 1rem;
+            align-items: center;
+            margin-bottom: 0.4rem;
+        }
+        .filter-row .filter-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e9dbbd;
+            font-weight: 600;
+            min-width: 50px;
+        }
+        .filter-row .filter-search {
+            flex: 1;
+            min-width: 120px;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.25rem 0.8rem;
+            color: #f5efdb;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .filter-row .filter-search:focus {
+            border-color: #e6bc6a;
+            box-shadow: 0 0 0 2px rgba(220, 180, 80, 0.3);
+        }
+        .filter-row select {
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 0.25rem 0.8rem;
+            color: #f5efdb;
+            font-size: 0.75rem;
+            outline: none;
         }
         .filter-summary {
             font-size: 0.7rem;
             color: #ab9f7c;
-            padding: 4px 14px 8px;
+            padding-top: 4px;
             display: flex;
             flex-wrap: wrap;
             gap: 4px 12px;
             border-top: 1px solid rgba(170, 142, 78, 0.1);
+            margin-top: 4px;
         }
         .filter-summary .summary-tag {
             background: rgba(0, 0, 0, 0.3);
@@ -513,108 +597,19 @@
             font-size: 0.65rem;
             color: #e9dbbd;
         }
-        .filter-body {
-            padding: 8px 14px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .filter-body.collapsed {
-            display: none;
-        }
-        .filter-body .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px 12px;
-            align-items: center;
-        }
-        .filter-body .filter-row label {
-            font-size: 0.7rem;
-            color: #e9dbbd;
-            font-weight: 600;
-            min-width: 44px;
-        }
-        .filter-body .filter-row input,
-        .filter-body .filter-row select {
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 40px;
-            padding: 0.25rem 0.7rem;
-            color: #f5efdb;
-            font-size: 0.75rem;
-            outline: none;
-            flex: 1;
-            min-width: 100px;
-        }
-        .filter-body .filter-row .chip-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            flex: 1;
-        }
-        .filter-body .filter-row .chip-group .chip {
-            background: #1e1c16;
-            border: 1px solid #aa8e4e;
-            border-radius: 30px;
-            padding: 0.15rem 0.6rem;
-            font-size: 0.65rem;
-            color: #e9dbbd;
-            cursor: pointer;
-            transition: 0.1s;
-            user-select: none;
-        }
-        .filter-body .filter-row .chip-group .chip.active {
-            background: #c9a53b;
-            color: #1e1c10;
-            border-color: #c9a53b;
-            font-weight: 600;
-        }
-        .filter-body .filter-row .chip-group .chip:hover {
-            border-color: #e6bc6a;
-        }
-        .filter-result-preview {
-            font-size: 0.7rem;
-            color: #ab9f7c;
-            padding-top: 4px;
-            border-top: 1px solid rgba(170, 142, 78, 0.1);
-            margin-top: 4px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 8px;
-            align-items: center;
-        }
-        .filter-result-preview .result-count {
-            color: #ffefbf;
-            font-weight: 600;
-        }
-        .filter-result-preview .result-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            max-height: 40px;
-            overflow: hidden;
-        }
-        .filter-result-preview .result-cards .mini-card {
-            font-size: 0.55rem;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 1px 6px;
-            border-radius: 4px;
-            color: #e9dbbd;
-            white-space: nowrap;
-        }
 
-        /* ===== 添加筛选器按钮 ===== */
+        /* ===== 添加/清除筛选器 ===== */
         .add-filter-bar {
             display: flex;
             gap: 10px;
-            margin-top: 8px;
-            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
         }
         .add-filter-bar button {
             background: #3a4a2a;
             border: 1px solid #aa8e4e;
             border-radius: 40px;
-            padding: 0.4rem 1.2rem;
+            padding: 0.3rem 1.2rem;
             color: #f5efdb;
             font-weight: 600;
             font-size: 0.8rem;
@@ -623,6 +618,12 @@
         }
         .add-filter-bar button:hover {
             background: #5a7a3a;
+        }
+        .add-filter-bar .btn-clear {
+            background: #4a3a2a;
+        }
+        .add-filter-bar .btn-clear:hover {
+            background: #6a4a3a;
         }
 
         /* ===== 上传模态框 ===== */
@@ -743,20 +744,18 @@
                 width: 80px;
                 height: 112px;
             }
-            .filter-body .filter-row {
+            .filter-row {
                 flex-direction: column;
                 align-items: stretch;
             }
-            .filter-body .filter-row label {
+            .filter-row .filter-label {
                 min-width: auto;
             }
-            .filter-header {
+            .filter-group-title {
                 flex-wrap: wrap;
             }
-            .filter-header .filter-actions {
-                margin-left: 0;
-                width: 100%;
-                justify-content: flex-end;
+            .prob-sliders .prob-item {
+                flex: 1 1 100%;
             }
         }
         @media (max-width: 480px) {
@@ -765,8 +764,8 @@
                 height: 84px;
             }
             .animation-zone {
-                gap: 6px;
-                padding: 12px;
+                gap: 8px;
+                padding: 12px 4px;
             }
             .params-panel {
                 padding: 0.8rem 1rem;
@@ -853,17 +852,8 @@
                     <option value="officer">军官卡包</option>
                 </select>
             </div>
-            <div class="param-group prob-slider-group">
-                <label>概率调节</label>
-                <input type="range" id="probMultiplier" min="0.1" max="3" step="0.05" value="1">
-                <span class="prob-val" id="probMultiplierVal">1.00</span>
-            </div>
             <div class="param-group switch-item">
-                <span>忽视概率</span>
-                <label class="switch"><input type="checkbox" id="ignoreProb"><span class="slider"></span></label>
-            </div>
-            <div class="param-group switch-item">
-                <span>俾斯麦兜底</span>
+                <span>保底</span>
                 <label class="switch"><input type="checkbox" id="pityEnabled" checked><span class="slider"></span></label>
             </div>
             <div class="param-group switch-item">
@@ -871,6 +861,30 @@
                 <label class="switch"><input type="checkbox" id="noDuplicates"><span class="slider"></span></label>
             </div>
             <button class="open-btn" id="openPackBtn">开包</button>
+
+            <!-- 概率调节滑块组 -->
+            <div class="prob-sliders" id="probSliders">
+                <div class="prob-item">
+                    <label>普通</label>
+                    <input type="range" class="prob-slider" data-rarity="Standard" min="0" max="100" value="74">
+                    <span class="prob-val" id="probVal-Standard">74%</span>
+                </div>
+                <div class="prob-item">
+                    <label>限定</label>
+                    <input type="range" class="prob-slider" data-rarity="Limited" min="0" max="100" value="19">
+                    <span class="prob-val" id="probVal-Limited">19%</span>
+                </div>
+                <div class="prob-item">
+                    <label>特殊</label>
+                    <input type="range" class="prob-slider" data-rarity="Special" min="0" max="100" value="5">
+                    <span class="prob-val" id="probVal-Special">5%</span>
+                </div>
+                <div class="prob-item">
+                    <label>精英</label>
+                    <input type="range" class="prob-slider" data-rarity="Elite" min="0" max="100" value="2">
+                    <span class="prob-val" id="probVal-Elite">2%</span>
+                </div>
+            </div>
         </div>
 
         <!-- ===== 上传卡牌 ===== -->
@@ -878,19 +892,111 @@
             <button class="upload-btn" id="uploadPackBtn">📤 上传卡牌到卡池</button>
         </div>
 
-        <!-- ===== 筛选器列表 ===== -->
-        <div style="margin-top:4px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+        <!-- ===== 筛选器面板 ===== -->
+        <div class="filter-panel-pack" id="filterPanelPack">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                 <span style="font-size:0.85rem; font-weight:600; color:#e9dbbd;">📋 卡池筛选器</span>
                 <span style="font-size:0.7rem; color:#ab9f7c;" id="poolSizeDisplay">卡池: 0 张</span>
             </div>
-            <div class="filter-list" id="filterList"></div>
+
+            <!-- 卡池状态（status） -->
+            <div class="filter-group">
+                <div class="filter-group-title" data-target="statusBody">
+                    <span>⚙️ 卡池</span>
+                    <span class="reset-chip" data-filter-type="status">✖ 清除</span>
+                    <span class="collapse-icon open">▶</span>
+                </div>
+                <div class="filter-group-body" id="statusBody">
+                    <div class="multi-select-btns" id="statusMultiContainer">
+                        <span class="filter-chip" data-filter="status" data-val="all">全部</span>
+                        <span class="filter-chip" data-filter="status" data-val="active">活跃</span>
+                        <span class="filter-chip" data-filter="status" data-val="reserve">预备</span>
+                        <span class="filter-chip" data-filter="status" data-val="spawn">衍生</span>
+                        <span class="filter-chip" data-filter="status" data-val="veteran">老兵</span>
+                        <span class="filter-chip" data-filter="status" data-val="custom">自定义</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 阵营 -->
+            <div class="filter-group">
+                <div class="filter-group-title" data-target="factionBody">
+                    <span>🏳️ 阵营</span>
+                    <span class="reset-chip" data-filter-type="faction">✖ 清除</span>
+                    <span class="collapse-icon open">▶</span>
+                </div>
+                <div class="filter-group-body" id="factionBody">
+                    <div class="multi-select-btns" id="factionMultiContainer"></div>
+                </div>
+            </div>
+
+            <!-- 类型 -->
+            <div class="filter-group">
+                <div class="filter-group-title" data-target="typeBody">
+                    <span>♠️ 类型</span>
+                    <span class="reset-chip" data-filter-type="type">✖ 清除</span>
+                    <span class="collapse-icon open">▶</span>
+                </div>
+                <div class="filter-group-body" id="typeBody">
+                    <div class="multi-select-btns" id="typeMultiContainer"></div>
+                </div>
+            </div>
+
+            <!-- 花费 -->
+            <div class="filter-group">
+                <div class="filter-group-title" data-target="costBody">
+                    <span>💰 花费</span>
+                    <span class="reset-chip" data-filter-type="cost">✖ 清除</span>
+                    <span class="collapse-icon open">▶</span>
+                </div>
+                <div class="filter-group-body" id="costBody">
+                    <div class="multi-select-btns" id="costMultiContainer"></div>
+                </div>
+            </div>
+
+            <!-- 稀有度 -->
+            <div class="filter-group">
+                <div class="filter-group-title" data-target="rarityBody">
+                    <span>🃏 稀有度</span>
+                    <span class="reset-chip" data-filter-type="rarity">✖ 清除</span>
+                    <span class="collapse-icon open">▶</span>
+                </div>
+                <div class="filter-group-body" id="rarityBody">
+                    <div class="multi-select-btns" id="rarityMultiContainer"></div>
+                </div>
+            </div>
+
+            <!-- 扩展包（无“自定义”） -->
+            <div class="filter-group">
+                <div class="filter-group-title" data-target="setBody">
+                    <span>📦 扩展包</span>
+                    <span class="reset-chip" data-filter-type="set">✖ 清除</span>
+                    <span class="collapse-icon open">▶</span>
+                </div>
+                <div class="filter-group-body" id="setBody">
+                    <div class="multi-select-btns" id="setMultiContainer"></div>
+                </div>
+            </div>
+
+            <!-- 搜索 -->
+            <div class="filter-group" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                <div class="filter-row">
+                    <span class="filter-label">🔍 搜索</span>
+                    <input type="text" class="filter-search" id="globalSearch" placeholder="卡名/文本">
+                </div>
+            </div>
+
+            <!-- 筛选结果摘要（动态） -->
+            <div class="filter-summary" id="filterSummary" style="margin-top:8px; border-top:1px solid rgba(170,142,78,0.2);">
+                <span>全部卡牌</span>
+            </div>
+
             <div class="add-filter-bar">
-                <button id="addFilterBtn">添加筛选器</button>
-                <button id="clearFiltersBtn" style="background:#4a3a2a;">清空所有</button>
+                <button id="clearFiltersBtn" class="btn-clear">清空筛选</button>
             </div>
         </div>
 
+        <!-- ===== Footer ===== -->
         <div class="footer-simple">
             <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a>
             <a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a>
@@ -904,6 +1010,14 @@
             <div class="upload-form-row">
                 <label>图片</label>
                 <input type="file" id="uploadPackImage" accept="image/*">
+            </div>
+            <div class="upload-form-row">
+                <label>图片填充</label>
+                <select id="uploadPackFit">
+                    <option value="cover">横铺满</option>
+                    <option value="contain">纵铺满</option>
+                    <option value="stretch">拉！伸！</option>
+                </select>
             </div>
             <div class="upload-form-row">
                 <label>卡名</label>
@@ -988,8 +1102,22 @@
             "BloodAndIron": "铁与血",
             "NavalWarfare": "海战",
             "Homefront": "国土阵线",
-            "OceaniaStorm": "澳新风暴",
-            "自定义": "自定义"
+            "OceaniaStorm": "澳新风暴"
+        };
+        const setIconMap = {
+            "Base": "https://www.datocms-assets.com/120590/1732572097-set-icon-base.svg",
+            "Allegiance": "https://www.datocms-assets.com/120590/1732572215-set-icon-allegiance.svg",
+            "Breakthrough": "https://www.datocms-assets.com/120590/1732572199-set-icon-breakthrough.svg",
+            "Legions": "https://www.datocms-assets.com/120590/1732572188-set-icon-legions.svg",
+            "WorldAtWar": "https://www.datocms-assets.com/120590/1732572859-set-icon-world.png",
+            "TheatersOfWar": "https://www.datocms-assets.com/120590/1732572178-set-icon-theaters.svg",
+            "BrothersInArms": "https://www.datocms-assets.com/120590/1732573000-set-icon-brothers.png",
+            "WinterWar": "https://www.datocms-assets.com/120590/1732572120-set-icon-winter.svg",
+            "CovertOps": "https://www.datocms-assets.com/120590/1732572110-set-icon-covert.svg",
+            "BloodAndIron": "https://www.datocms-assets.com/120590/1732573199-set-icon-blood.svg",
+            "NavalWarfare": "https://www.datocms-assets.com/120590/1750348798-naval-warfare.svg",
+            "Homefront": "https://www.datocms-assets.com/120590/1763718716-homefront.svg",
+            "OceaniaStorm": "https://www.datocms-assets.com/120590/1780567349-oceania_storm_set-icon.svg"
         };
         const typeNameMap = { "infantry": "步兵", "tank": "坦克", "fighter": "战斗机", "bomber": "轰炸机", "artillery": "炮兵",
             "order": "指令", "countermeasure": "反制" };
@@ -1006,11 +1134,11 @@
         const STATIC_COSTS = ["0", "1", "2", "3", "4", "5", "6", "7+"];
         const STATIC_RARITIES = ["Standard", "Limited", "Special", "Elite"];
         const typeKeys = Object.keys(typeNameMap);
+        const setKeys = Object.keys(setTranslation);
 
-        // ===== 卡背文件名首字母大写 =====
+        // 卡背文件名首字母大写
         const getBackImage = (faction) => {
             const ext = (faction === 'anzac' || faction === 'neutral') ? 'png' : 'jpg';
-            // 首字母大写
             const cap = faction.charAt(0).toUpperCase() + faction.slice(1);
             return `${cap}.${ext}`;
         };
@@ -1018,10 +1146,18 @@
         // ==================== 全局状态 ====================
         let allCards = [];
         let customCards = [];
-        let filters = [];
+        let selectedFilters = {
+            status: new Set(['all']),
+            factions: new Set(),
+            types: new Set(),
+            costs: new Set(),
+            rarities: new Set(),
+            sets: new Set(),
+            search: ''
+        };
         let filterIdCounter = 0;
         let isOpening = false;
-        let currentPackCards = [];
+        let isEliteLocked = false; // 精英特写锁定
 
         // ==================== 数据加载 ====================
         async function loadData() {
@@ -1059,21 +1195,18 @@
                         rawJson: j
                     };
                 });
-                // 合并自定义卡牌
                 rebuildCardList();
                 initUI();
                 updatePoolSize();
             } catch (e) {
                 console.error(e);
-                document.getElementById('filterList').innerHTML = '<div style="color:#cc7755;padding:12px;">❌ 数据加载失败</div>';
+                document.getElementById('filterPanelPack').innerHTML = '<div style="color:#cc7755;padding:12px;">❌ 数据加载失败</div>';
             }
         }
 
         function rebuildCardList() {
-            // 合并自定义卡牌（放在最前面）
             const customWithData = customCards.filter(c => c.imageData);
             const normalCards = allCards.filter(c => !c.isCustom);
-            // 重新排序：自定义在前
             const combined = [...customWithData, ...normalCards];
             combined.forEach((c, i) => c._index = i);
             return combined;
@@ -1098,229 +1231,234 @@
             return `${card.titleZh || ''} ${card.text_zh || ''} ${attrsTrans}`.toLowerCase();
         }
 
-        // ==================== 筛选器逻辑 ====================
-        function evaluateFilter(filter, card) {
+        // ==================== 筛选逻辑 ====================
+        function evaluateCard(card) {
             // 搜索
-            if (filter.search && filter.search.trim()) {
-                const s = filter.search.trim().toLowerCase();
-                if (!getSearchableText(card).includes(s)) return false;
-            }
-            // 类型
-            if (filter.types && filter.types.length) {
-                if (!filter.types.includes(card.type)) return false;
-            }
-            // 稀有度
-            if (filter.rarities && filter.rarities.length) {
-                if (!filter.rarities.includes(card.rarity)) return false;
-            }
-            // 阵营
-            if (filter.factions && filter.factions.length) {
-                if (!filter.factions.includes(card.faction)) return false;
-            }
-            // 花费
-            if (filter.costs && filter.costs.length) {
+            const search = selectedFilters.search.trim().toLowerCase();
+            if (search && !getSearchableText(card).includes(search)) return false;
+
+            // 状态
+            const statusSet = selectedFilters.status;
+            if (statusSet.size && !statusSet.has('all')) {
                 let match = false;
-                for (let c of filter.costs) {
-                    if (c === '7+' && card.cost >= 7) { match = true; break; }
-                    if (c !== '7+' && card.cost === parseInt(c)) { match = true; break; }
+                for (let s of statusSet) {
+                    if (s === 'active' && !card.reserved && !card.isSpawn && !card.isVeteranSet && !card.isCustom) match =
+                        true;
+                    if (s === 'reserve' && card.reserved && !card.isCustom) match = true;
+                    if (s === 'spawn' && card.isSpawn && !card.isCustom) match = true;
+                    if (s === 'veteran' && card.isVeteranSet && !card.isCustom) match = true;
+                    if (s === 'custom' && card.isCustom) match = true;
                 }
                 if (!match) return false;
             }
-            // 扩展包
-            if (filter.sets && filter.sets.length) {
+
+            // 阵营
+            if (selectedFilters.factions.size && !selectedFilters.factions.has(card.faction)) return false;
+            // 类型
+            if (selectedFilters.types.size && !selectedFilters.types.has(card.type)) return false;
+            // 花费
+            if (selectedFilters.costs.size) {
+                let costMatch = false;
+                for (let c of selectedFilters.costs) {
+                    if (c === '7+' && card.cost >= 7) { costMatch = true; break; }
+                    if (c !== '7+' && card.cost === parseInt(c)) { costMatch = true; break; }
+                }
+                if (!costMatch) return false;
+            }
+            // 稀有度
+            if (selectedFilters.rarities.size && !selectedFilters.rarities.has(card.rarity)) return false;
+            // 扩展包（无自定义）
+            if (selectedFilters.sets.size) {
                 const cardSet = card.isCustom ? '自定义' : (card.setName || '基础');
-                if (!filter.sets.includes(cardSet)) return false;
+                if (!selectedFilters.sets.has(cardSet)) return false;
             }
             return true;
         }
 
         function getFilteredPool() {
             const all = getFullCardList();
-            if (filters.length === 0) return all;
-            let pool = [];
-            for (const filter of filters) {
-                const result = all.filter(c => evaluateFilter(filter, c));
-                if (filter.isComplement) {
-                    // 补集：从全集中排除结果
-                    const excluded = new Set(result.map(c => c.id));
-                    const complement = all.filter(c => !excluded.has(c.id));
-                    pool = pool.concat(complement);
-                } else {
-                    pool = pool.concat(result);
-                }
-            }
-            // 去重
-            const seen = new Set();
-            const unique = [];
-            for (const c of pool) {
-                if (!seen.has(c.id)) {
-                    seen.add(c.id);
-                    unique.push(c);
-                }
-            }
-            return unique;
+            return all.filter(c => evaluateCard(c));
         }
 
         function updatePoolSize() {
             const pool = getFilteredPool();
             document.getElementById('poolSizeDisplay').textContent = `卡池: ${pool.length} 张`;
+            // 更新摘要
+            const summary = document.getElementById('filterSummary');
+            if (pool.length === 0) {
+                summary.innerHTML = '<span style="color:#cc7755;">无匹配卡牌</span>';
+            } else {
+                const preview = pool.slice(0, 8).map(c => c.titleZh).join('、');
+                summary.innerHTML = `<span>匹配 ${pool.length} 张</span><span style="color:#ab9f7c;">${preview}${pool.length>8?'...':''}</span>`;
+            }
             return pool;
         }
 
-        // ==================== 渲染筛选器 ====================
-        function renderFilters() {
-            const container = document.getElementById('filterList');
-            if (filters.length === 0) {
-                container.innerHTML =
-                    '<div style="color:#887e66; text-align:center; padding:12px; font-size:0.85rem;">暂无筛选器，卡池包含全部卡牌</div>';
-                updatePoolSize();
-                return;
-            }
-            let html = '';
-            filters.forEach((filter, idx) => {
-                const isCollapsed = filter.collapsed || false;
-                // 构建摘要
-                const parts = [];
-                if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
-                if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
-                if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r)
-                    .join('|'));
-                if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f)
-                    .join('|'));
-                if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
-                if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
-                const summaryText = parts.length ? parts.join(' | ') : '全部卡牌';
+        // ==================== 渲染筛选器界面（与builder一致） ====================
+        function renderFiltersUI() {
+            // 阵营
+            const fc = document.getElementById('factionMultiContainer');
+            const factionOptions = [...allNationOptions, 'neutral'];
+            fc.innerHTML = factionOptions.map(f =>
+                `<span class="filter-chip ${selectedFilters.factions.has(f)?'active':''}" data-filter="faction" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</span>`
+            ).join('');
 
-                // 计算该筛选器的结果数量
-                const all = getFullCardList();
-                const result = all.filter(c => evaluateFilter(filter, c));
-                const resultCount = result.length;
-                const previewCards = result.slice(0, 8).map(c => c.titleZh).join(', ');
+            // 类型
+            const tc = document.getElementById('typeMultiContainer');
+            tc.innerHTML = typeKeys.map(t =>
+                `<span class="filter-chip ${selectedFilters.types.has(t)?'active':''}" data-filter="type" data-val="${t}">${typeNameMap[t]}</span>`
+            ).join('');
 
-                html += `
-                        <div class="filter-item" data-filter-idx="${idx}">
-                            <div class="filter-header" data-toggle="${idx}">
-                                <span class="filter-label">📌 筛选器 ${idx+1}</span>
-                                <span class="filter-badge">${filter.isComplement ? '补集' : '并集'}</span>
-                                <span class="filter-badge">${resultCount} 张</span>
-                                <div class="filter-actions">
-                                    <button class="btn-complement ${filter.isComplement?'active':''}" data-complement="${idx}">补集</button>
-                                    <button data-toggle="${idx}">${isCollapsed ? '展开' : '折叠'}</button>
-                                    <button class="btn-delete" data-delete="${idx}">删除</button>
-                                </div>
-                            </div>
-                            ${isCollapsed ? `
-                                <div class="filter-summary">
-                                    <span>${summaryText}</span>
-                                </div>
-                            ` : `
-                                <div class="filter-body">
-                                    <div class="filter-row">
-                                        <label>搜索</label>
-                                        <input type="text" class="filter-search" data-idx="${idx}" value="${filter.search||''}" placeholder="卡名/文本">
-                                    </div>
-                                    <div class="filter-row">
-                                        <label>类型</label>
-                                        <div class="chip-group" data-filter="types" data-idx="${idx}">
-                                            ${typeKeys.map(t => `<span class="chip ${filter.types&&filter.types.includes(t)?'active':''}" data-val="${t}">${typeNameMap[t]}</span>`).join('')}
-                                        </div>
-                                    </div>
-                                    <div class="filter-row">
-                                        <label>稀有度</label>
-                                        <div class="chip-group" data-filter="rarities" data-idx="${idx}">
-                                            ${STATIC_RARITIES.map(r => `<span class="chip ${filter.rarities&&filter.rarities.includes(r)?'active':''}" data-val="${r}">${rarityDisplayMap[r]}</span>`).join('')}
-                                        </div>
-                                    </div>
-                                    <div class="filter-row">
-                                        <label>阵营</label>
-                                        <div class="chip-group" data-filter="factions" data-idx="${idx}">
-                                            ${[...allNationOptions, 'neutral'].map(f => `<span class="chip ${filter.factions&&filter.factions.includes(f)?'active':''}" data-val="${f}">${factionNames[f]}</span>`).join('')}
-                                        </div>
-                                    </div>
-                                    <div class="filter-row">
-                                        <label>花费</label>
-                                        <div class="chip-group" data-filter="costs" data-idx="${idx}">
-                                            ${STATIC_COSTS.map(c => `<span class="chip ${filter.costs&&filter.costs.includes(c)?'active':''}" data-val="${c}">${c==='7+'?'7K+':c+'K'}</span>`).join('')}
-                                        </div>
-                                    </div>
-                                    <div class="filter-row">
-                                        <label>扩展包</label>
-                                        <div class="chip-group" data-filter="sets" data-idx="${idx}">
-                                            ${Object.keys(setTranslation).map(s => `<span class="chip ${filter.sets&&filter.sets.includes(s)?'active':''}" data-val="${s}">${setTranslation[s]}</span>`).join('')}
-                                            <span class="chip ${filter.sets&&filter.sets.includes('自定义')?'active':''}" data-val="自定义">自定义</span>
-                                        </div>
-                                    </div>
-                                    <div class="filter-result-preview">
-                                        <span class="result-count">${resultCount} 张</span>
-                                        <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
-                                    </div>
-                                </div>
-                            `}
-                        </div>
-                    `;
+            // 花费
+            const cc = document.getElementById('costMultiContainer');
+            cc.innerHTML = STATIC_COSTS.map(c =>
+                `<span class="filter-chip ${selectedFilters.costs.has(c)?'active':''}" data-filter="cost" data-val="${c}">${c==='7+'?'7K+':c+'K'}</span>`
+            ).join('');
+
+            // 稀有度
+            const rc = document.getElementById('rarityMultiContainer');
+            rc.innerHTML = STATIC_RARITIES.map(r =>
+                `<span class="filter-chip ${selectedFilters.rarities.has(r)?'active':''}" data-filter="rarity" data-val="${r}">${rarityDisplayMap[r]}</span>`
+            ).join('');
+
+            // 扩展包（无自定义）
+            const sc = document.getElementById('setMultiContainer');
+            sc.innerHTML = setKeys.map(s => {
+                const icon = setIconMap[s] || '';
+                return `<span class="filter-chip ${selectedFilters.sets.has(s)?'active':''}" data-filter="set" data-val="${s}">${icon ? `<img src="${icon}" width="16" height="16" onerror="this.style.display='none'">` : ''} ${setTranslation[s]}</span>`;
+            }).join('');
+
+            // 状态
+            const statusChips = document.querySelectorAll('#statusMultiContainer .filter-chip');
+            statusChips.forEach(chip => {
+                const val = chip.dataset.val;
+                if (selectedFilters.status.has(val)) chip.classList.add('active');
+                else chip.classList.remove('active');
             });
-            container.innerHTML = html;
-            updatePoolSize();
 
-            // 事件绑定
-            container.querySelectorAll('.filter-header[data-toggle]').forEach(el => {
-                const idx = parseInt(el.dataset.toggle);
-                el.addEventListener('click', (e) => {
-                    if (e.target.closest('.filter-actions')) return;
-                    filters[idx].collapsed = !filters[idx].collapsed;
-                    renderFilters();
-                });
-            });
-            container.querySelectorAll('[data-toggle]').forEach(el => {
-                if (el.closest('.filter-actions')) {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const idx = parseInt(el.dataset.toggle);
-                        filters[idx].collapsed = !filters[idx].collapsed;
-                        renderFilters();
-                    });
+            // 搜索框
+            document.getElementById('globalSearch').value = selectedFilters.search || '';
+
+            // 折叠展开
+            document.querySelectorAll('.filter-group-title[data-target]').forEach(title => {
+                const targetId = title.dataset.target;
+                const body = document.getElementById(targetId);
+                const icon = title.querySelector('.collapse-icon');
+                if (body && icon) {
+                    const isCollapsed = body.classList.contains('collapsed');
+                    icon.textContent = isCollapsed ? '▶' : '▼';
                 }
             });
-            container.querySelectorAll('[data-delete]').forEach(el => {
-                el.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const idx = parseInt(el.dataset.delete);
-                    filters.splice(idx, 1);
-                    renderFilters();
-                });
+
+            updatePoolSize();
+
+            // 事件绑定（重新绑定）
+            bindFilterEvents();
+        }
+
+        function bindFilterEvents() {
+            // 折叠展开
+            document.querySelectorAll('.filter-group-title[data-target]').forEach(title => {
+                title.removeEventListener('click', title._toggleHandler);
+                title._toggleHandler = function(e) {
+                    if (e.target.classList.contains('reset-chip')) return;
+                    const targetId = this.dataset.target;
+                    const body = document.getElementById(targetId);
+                    const icon = this.querySelector('.collapse-icon');
+                    if (body) {
+                        body.classList.toggle('collapsed');
+                        if (icon) icon.textContent = body.classList.contains('collapsed') ? '▶' : '▼';
+                    }
+                };
+                title.addEventListener('click', title._toggleHandler);
             });
-            container.querySelectorAll('[data-complement]').forEach(el => {
-                el.addEventListener('click', (e) => {
+
+            // 清除重置
+            document.querySelectorAll('.reset-chip').forEach(chip => {
+                chip.removeEventListener('click', chip._resetHandler);
+                chip._resetHandler = function(e) {
                     e.stopPropagation();
-                    const idx = parseInt(el.dataset.complement);
-                    filters[idx].isComplement = !filters[idx].isComplement;
-                    renderFilters();
-                });
+                    const type = this.dataset.filterType;
+                    if (type === 'status') {
+                        selectedFilters.status = new Set(['all']);
+                    } else if (type === 'faction') {
+                        selectedFilters.factions.clear();
+                    } else if (type === 'type') {
+                        selectedFilters.types.clear();
+                    } else if (type === 'cost') {
+                        selectedFilters.costs.clear();
+                    } else if (type === 'rarity') {
+                        selectedFilters.rarities.clear();
+                    } else if (type === 'set') {
+                        selectedFilters.sets.clear();
+                    }
+                    renderFiltersUI();
+                };
+                chip.addEventListener('click', chip._resetHandler);
             });
-            // chip 点击
-            container.querySelectorAll('.chip-group .chip').forEach(chip => {
-                chip.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const idx = parseInt(chip.closest('.chip-group').dataset.idx);
-                    const filterKey = chip.closest('.chip-group').dataset.filter;
-                    const val = chip.dataset.val;
-                    if (!filters[idx]) return;
-                    if (!filters[idx][filterKey]) filters[idx][filterKey] = [];
-                    const arr = filters[idx][filterKey];
-                    const pos = arr.indexOf(val);
-                    if (pos > -1) arr.splice(pos, 1);
-                    else arr.push(val);
-                    renderFilters();
-                });
+
+            // 所有 chip 点击
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.removeEventListener('click', chip._chipHandler);
+                chip._chipHandler = function(e) {
+                    const filter = this.dataset.filter;
+                    const val = this.dataset.val;
+                    if (!filter || !val) return;
+
+                    if (filter === 'status') {
+                        // 状态特殊处理
+                        if (val === 'all') {
+                            selectedFilters.status = new Set(['all']);
+                        } else {
+                            selectedFilters.status.delete('all');
+                            if (selectedFilters.status.has(val)) selectedFilters.status.delete(val);
+                            else selectedFilters.status.add(val);
+                            if (selectedFilters.status.size === 0) selectedFilters.status.add('all');
+                        }
+                    } else {
+                        const map = {
+                            'faction': selectedFilters.factions,
+                            'type': selectedFilters.types,
+                            'cost': selectedFilters.costs,
+                            'rarity': selectedFilters.rarities,
+                            'set': selectedFilters.sets
+                        };
+                        const set = map[filter];
+                        if (set) {
+                            if (set.has(val)) set.delete(val);
+                            else set.add(val);
+                        }
+                    }
+                    renderFiltersUI();
+                };
+                chip.addEventListener('click', chip._chipHandler);
             });
+
             // 搜索输入
-            container.querySelectorAll('.filter-search').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const idx = parseInt(input.dataset.idx);
-                    filters[idx].search = input.value;
-                    renderFilters();
-                });
-            });
+            const searchInput = document.getElementById('globalSearch');
+            searchInput.removeEventListener('input', searchInput._searchHandler);
+            searchInput._searchHandler = function() {
+                selectedFilters.search = this.value;
+                renderFiltersUI();
+            };
+            searchInput.addEventListener('input', searchInput._searchHandler);
+
+            // 清空筛选
+            const clearBtn = document.getElementById('clearFiltersBtn');
+            clearBtn.removeEventListener('click', clearBtn._clearHandler);
+            clearBtn._clearHandler = function() {
+                selectedFilters = {
+                    status: new Set(['all']),
+                    factions: new Set(),
+                    types: new Set(),
+                    costs: new Set(),
+                    rarities: new Set(),
+                    sets: new Set(),
+                    search: ''
+                };
+                renderFiltersUI();
+            };
+            clearBtn.addEventListener('click', clearBtn._clearHandler);
         }
 
         // ==================== 初始化UI ====================
@@ -1335,21 +1473,7 @@
                 uf.value = 'germany';
             }
 
-            // 默认添加一个筛选器
-            if (filters.length === 0) {
-                filters.push({
-                    id: filterIdCounter++,
-                    search: '',
-                    types: [],
-                    rarities: [],
-                    factions: [],
-                    costs: [],
-                    sets: [],
-                    isComplement: false,
-                    collapsed: false
-                });
-            }
-            renderFilters();
+            renderFiltersUI();
 
             // 导航菜单
             const menuBtn = document.getElementById('menuToggleBtn');
@@ -1364,54 +1488,94 @@
                 }
             });
 
-            // 添加筛选器
-            document.getElementById('addFilterBtn').addEventListener('click', () => {
-                filters.push({
-                    id: filterIdCounter++,
-                    search: '',
-                    types: [],
-                    rarities: [],
-                    factions: [],
-                    costs: [],
-                    sets: [],
-                    isComplement: false,
-                    collapsed: false
-                });
-                renderFilters();
-            });
-
-            document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-                if (filters.length === 0) return;
-                if (confirm('确定清空所有筛选器？')) {
-                    filters = [];
-                    renderFilters();
-                }
-            });
-
             // 开包按钮
             document.getElementById('openPackBtn').addEventListener('click', openPack);
 
             // 上传
             setupUpload();
 
-            // 概率滑块
-            const slider = document.getElementById('probMultiplier');
-            const valDisplay = document.getElementById('probMultiplierVal');
-            slider.addEventListener('input', () => {
-                valDisplay.textContent = parseFloat(slider.value).toFixed(2);
+            // 概率滑块初始化
+            const sliders = document.querySelectorAll('.prob-slider');
+            sliders.forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const rarity = this.dataset.rarity;
+                    const val = parseInt(this.value);
+                    document.getElementById(`probVal-${rarity}`).textContent = val + '%';
+                    // 自动归一化（调整其他滑块保持总和100）
+                    normalizeProbabilities(this);
+                });
             });
 
-            // 禁止重复切换时检查
+            // 禁止重复检查
             document.getElementById('noDuplicates').addEventListener('change', () => {
-                // 自动检查卡池大小
                 const pool = getFilteredPool();
                 const packType = document.getElementById('packType').value;
                 const count = packType === 'standard' ? 5 : 7;
                 if (document.getElementById('noDuplicates').checked && pool.length < count) {
-                    alert(`卡池卡牌数量（${pool.length}）小于卡包卡牌数（${count}），禁止重复将自动禁用`);
+                    alert(`卡池卡牌数量（${pool.length}）小于卡包卡牌数（${count}），禁止重复已自动禁用`);
                     document.getElementById('noDuplicates').checked = false;
                 }
             });
+        }
+
+        // 概率归一化
+        function normalizeProbabilities(changedSlider) {
+            const sliders = document.querySelectorAll('.prob-slider');
+            const values = {};
+            let total = 0;
+            sliders.forEach(s => {
+                const val = parseInt(s.value);
+                values[s.dataset.rarity] = val;
+                total += val;
+            });
+            if (total === 0) {
+                // 全零，重置为默认
+                const defaults = { Standard: 74, Limited: 19, Special: 5, Elite: 2 };
+                sliders.forEach(s => {
+                    const d = defaults[s.dataset.rarity] || 0;
+                    s.value = d;
+                    document.getElementById(`probVal-${s.dataset.rarity}`).textContent = d + '%';
+                });
+                return;
+            }
+            // 如果总和不为100，按比例调整（但不影响用户拖动的那个）
+            const target = 100;
+            const diff = target - total;
+            // 只调整其他滑块
+            const others = Array.from(sliders).filter(s => s !== changedSlider);
+            if (others.length === 0) return;
+            // 按比例分配diff
+            const otherTotal = others.reduce((sum, s) => sum + parseInt(s.value), 0);
+            if (otherTotal === 0) {
+                // 平均分配
+                const each = Math.floor(diff / others.length);
+                let remain = diff - each * others.length;
+                others.forEach((s, i) => {
+                    let val = each + (i < remain ? 1 : 0);
+                    val = Math.max(0, Math.min(100, val));
+                    s.value = val;
+                    document.getElementById(`probVal-${s.dataset.rarity}`).textContent = val + '%';
+                });
+            } else {
+                others.forEach(s => {
+                    const current = parseInt(s.value);
+                    let val = Math.round(current + (current / otherTotal) * diff);
+                    val = Math.max(0, Math.min(100, val));
+                    s.value = val;
+                    document.getElementById(`probVal-${s.dataset.rarity}`).textContent = val + '%';
+                });
+            }
+            // 最后确保总和为100（微调）
+            let finalTotal = 0;
+            sliders.forEach(s => finalTotal += parseInt(s.value));
+            if (finalTotal !== 100 && sliders.length > 0) {
+                const adjust = 100 - finalTotal;
+                const last = sliders[sliders.length - 1];
+                let val = parseInt(last.value) + adjust;
+                val = Math.max(0, Math.min(100, val));
+                last.value = val;
+                document.getElementById(`probVal-${last.dataset.rarity}`).textContent = val + '%';
+            }
         }
 
         // ==================== 上传卡牌 ====================
@@ -1430,6 +1594,7 @@
                 document.getElementById('uploadPackFaction').value = 'germany';
                 document.getElementById('uploadPackType').value = 'infantry';
                 document.getElementById('uploadPackRarity').value = 'Standard';
+                document.getElementById('uploadPackFit').value = 'cover';
             });
 
             cancel.addEventListener('click', () => modal.classList.remove('open'));
@@ -1449,6 +1614,7 @@
                 if (isNaN(cost) || cost < 0 || cost > 24) { alert('花费 0~24'); return; }
                 const type = document.getElementById('uploadPackType').value;
                 const rarity = document.getElementById('uploadPackRarity').value;
+                const fit = document.getElementById('uploadPackFit').value;
 
                 const reader = new FileReader();
                 const imageData = await new Promise((resolve, reject) => {
@@ -1457,7 +1623,6 @@
                     reader.readAsDataURL(file);
                 });
 
-                // 检查是否已存在
                 const existing = customCards.find(c => c.cardId === cardId);
                 if (existing) {
                     if (!confirm(`cardId "${cardId}" 已存在，是否替换卡图？`)) return;
@@ -1468,6 +1633,7 @@
                     existing.cost = cost;
                     existing.type = type;
                     existing.rarity = rarity;
+                    existing.imageFit = fit;
                 } else {
                     customCards.push({
                         id: -1 - customCards.length,
@@ -1492,69 +1658,53 @@
                         canCreate: [],
                         isCustom: true,
                         imageData: imageData,
+                        imageFit: fit,
                         rawJson: {},
                         _index: 0
                     });
                 }
                 rebuildCardList();
-                renderFilters();
+                renderFiltersUI();
                 modal.classList.remove('open');
                 alert(`卡牌 "${name}" 已添加至卡池`);
             });
         }
 
-        // ==================== 开包核心逻辑 ====================
-        function getRarityFromPool(pool, ignoreProb, probMult, packType) {
-            // 普通卡包概率 (Standard Pack)
-            const stdProbs = { Standard: 0.739, Limited: 0.193, Special: 0.051, Elite: 0.017 };
-            // 军官卡包概率 (Officer Pack)
-            const offProbs = { Standard: 0.506, Limited: 0.32, Special: 0.124, Elite: 0.05 };
-
-            const baseProbs = packType === 'standard' ? stdProbs : offProbs;
-            if (ignoreProb) {
-                // 完全随机：从卡池中随机选一张，稀有度由卡牌本身决定
-                return null; // 表示直接随机选卡
-            }
-
-            // 应用概率调节
-            const adjusted = {};
+        // ==================== 开包核心 ====================
+        function getRarityFromPool(pool, packType) {
+            // 从滑块读取概率
+            const sliders = document.querySelectorAll('.prob-slider');
+            const probs = {};
+            sliders.forEach(s => {
+                probs[s.dataset.rarity] = parseInt(s.value) / 100;
+            });
+            // 归一化（理论上已经归一）
             let total = 0;
-            for (const [rarity, prob] of Object.entries(baseProbs)) {
-                const val = prob * probMult;
-                adjusted[rarity] = Math.max(0.001, val);
-                total += adjusted[rarity];
-            }
-            // 归一化
-            const norm = {};
-            for (const [rarity, val] of Object.entries(adjusted)) {
-                norm[rarity] = val / total;
-            }
+            for (let r of STATIC_RARITIES) total += probs[r] || 0;
+            if (total === 0) return null;
 
-            // 按稀有度从卡池中筛选
+            // 按稀有度筛选
             const rarityCards = {};
             for (const r of STATIC_RARITIES) {
                 rarityCards[r] = pool.filter(c => c.rarity === r);
             }
 
-            // 抽稀有度
             const roll = Math.random();
             let cum = 0;
             let selectedRarity = 'Standard';
             for (const r of STATIC_RARITIES) {
-                cum += norm[r] || 0;
+                cum += (probs[r] || 0) / total;
                 if (roll < cum) { selectedRarity = r; break; }
             }
-
             const candidates = rarityCards[selectedRarity] || [];
             if (candidates.length === 0) {
-                // 如果没有该稀有度的卡，降级到有卡的稀有度
+                // 降级
                 for (const r of STATIC_RARITIES) {
                     if (rarityCards[r] && rarityCards[r].length > 0) {
                         selectedRarity = r;
                         break;
                     }
                 }
-                // 如果还是没找到，返回任意卡
                 if (pool.length === 0) return null;
                 return pool[Math.floor(Math.random() * pool.length)];
             }
@@ -1562,29 +1712,20 @@
         }
 
         function applyPity(packType, drawnCards) {
-            // 普通卡包：至少1张 Limited+
-            // 军官卡包：至少2张 Limited+ 且 至少1张 Special+
+            const pool = getFilteredPool();
+            const noDup = document.getElementById('noDuplicates').checked;
+            const used = new Set(drawnCards.map(c => c.id));
+
             if (packType === 'standard') {
                 const hasLimitedOrBetter = drawnCards.some(c => c.rarity === 'Limited' || c.rarity === 'Special' || c
                 .rarity === 'Elite');
                 if (!hasLimitedOrBetter) {
-                    // 替换最后一张为 Limited+
-                    const pool = getFilteredPool();
                     const limitedPool = pool.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity ===
                         'Elite');
                     if (limitedPool.length > 0) {
-                        const replacement = limitedPool[Math.floor(Math.random() * limitedPool.length)];
-                        // 检查是否重复
-                        const noDup = document.getElementById('noDuplicates').checked;
-                        if (noDup) {
-                            const used = new Set(drawnCards.map(c => c.id));
-                            const avail = limitedPool.filter(c => !used.has(c.id));
-                            if (avail.length > 0) {
-                                drawnCards[drawnCards.length - 1] = avail[Math.floor(Math.random() * avail.length)];
-                            } else {
-                                drawnCards[drawnCards.length - 1] = replacement;
-                            }
-                        } else {
+                        const avail = noDup ? limitedPool.filter(c => !used.has(c.id)) : limitedPool;
+                        if (avail.length > 0) {
+                            const replacement = avail[Math.floor(Math.random() * avail.length)];
                             drawnCards[drawnCards.length - 1] = replacement;
                         }
                     }
@@ -1594,32 +1735,23 @@
                     'Elite');
                 const specialOrBetter = drawnCards.filter(c => c.rarity === 'Special' || c.rarity === 'Elite');
 
-                const pool = getFilteredPool();
-                const noDup = document.getElementById('noDuplicates').checked;
-                const used = new Set(drawnCards.map(c => c.id));
-
-                // 至少2张 Limited+
                 while (limitedOrBetter.length < 2) {
                     const candidates = pool.filter(c => (c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity ===
                         'Elite'));
                     const avail = noDup ? candidates.filter(c => !used.has(c.id)) : candidates;
                     if (avail.length === 0) break;
                     const pick = avail[Math.floor(Math.random() * avail.length)];
-                    // 替换一张非保底卡
                     const replaceIdx = drawnCards.findIndex(c => c.rarity === 'Standard');
                     if (replaceIdx > -1) {
                         drawnCards[replaceIdx] = pick;
                         used.add(pick.id);
                         limitedOrBetter.push(pick);
                     } else {
-                        // 没有Standard可替换，追加
                         drawnCards.push(pick);
                         used.add(pick.id);
                         limitedOrBetter.push(pick);
                     }
                 }
-
-                // 至少1张 Special+
                 while (specialOrBetter.length < 1) {
                     const candidates = pool.filter(c => (c.rarity === 'Special' || c.rarity === 'Elite'));
                     const avail = noDup ? candidates.filter(c => !used.has(c.id)) : candidates;
@@ -1641,12 +1773,10 @@
         }
 
         function openPack() {
-            if (isOpening) return;
+            if (isOpening || isEliteLocked) return;
             const packType = document.getElementById('packType').value;
             const count = packType === 'standard' ? 5 : 7;
             const noDuplicates = document.getElementById('noDuplicates').checked;
-            const ignoreProb = document.getElementById('ignoreProb').checked;
-            const probMult = parseFloat(document.getElementById('probMultiplier').value);
             const pityEnabled = document.getElementById('pityEnabled').checked;
 
             let pool = getFilteredPool();
@@ -1658,12 +1788,9 @@
             if (noDuplicates && pool.length < count) {
                 alert(`卡池卡牌数量（${pool.length}）小于卡包卡牌数（${count}），禁止重复已自动禁用`);
                 document.getElementById('noDuplicates').checked = false;
-                // 继续执行，但不用禁止重复
             }
-
             const finalNoDup = document.getElementById('noDuplicates').checked;
 
-            // 抽取卡牌
             let drawn = [];
             const usedIds = new Set();
 
@@ -1672,22 +1799,13 @@
                 let attempts = 0;
                 while (attempts < 50) {
                     attempts++;
-                    if (ignoreProb) {
-                        // 完全随机选卡
+                    const selected = getRarityFromPool(pool, packType);
+                    if (!selected) {
                         const avail = finalNoDup ? pool.filter(c => !usedIds.has(c.id)) : pool;
                         if (avail.length === 0) break;
                         card = avail[Math.floor(Math.random() * avail.length)];
                     } else {
-                        // 按概率选稀有度
-                        const selected = getRarityFromPool(pool, ignoreProb, probMult, packType);
-                        if (!selected) {
-                            // 降级：随机选
-                            const avail = finalNoDup ? pool.filter(c => !usedIds.has(c.id)) : pool;
-                            if (avail.length === 0) break;
-                            card = avail[Math.floor(Math.random() * avail.length)];
-                        } else {
-                            card = selected;
-                        }
+                        card = selected;
                     }
                     if (card && (!finalNoDup || !usedIds.has(card.id))) {
                         break;
@@ -1695,10 +1813,8 @@
                     card = null;
                 }
                 if (!card) {
-                    // 紧急兜底
                     const avail = pool.filter(c => !usedIds.has(c.id));
                     if (avail.length === 0) {
-                        // 所有卡都用过了，重置
                         usedIds.clear();
                         const resetAvail = pool;
                         if (resetAvail.length === 0) { alert('卡池为空'); return; }
@@ -1711,21 +1827,19 @@
                 usedIds.add(card.id);
             }
 
-            // 保底
             if (pityEnabled) {
                 drawn = applyPity(packType, drawn);
             }
 
-            // 显示动画
             displayPack(drawn, packType);
         }
 
         // ==================== 开包动画 ====================
         const raritySpeeds = {
-            'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0.15 },
-            'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25 },
-            'Special': { lift: 0.5, flip: 1.0, slam: 0.45, shake: 0.4 },
-            'Elite': { lift: 0.7, flip: 1.4, slam: 0.6, shake: 0.6 }
+            'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0, hover: 0 },
+            'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25, hover: 0 },
+            'Special': { lift: 0.5, flip: 1.0, slam: 0.45, shake: 0.4, hover: 0 },
+            'Elite': { lift: 0.7, flip: 1.4, slam: 0.6, shake: 0.6, hover: 0.8 }
         };
 
         function displayPack(cards, packType) {
@@ -1735,64 +1849,60 @@
             isOpening = true;
             document.getElementById('openPackBtn').disabled = true;
 
-            // 清空旧卡
             zone.querySelectorAll('.pack-card').forEach(el => el.remove());
 
-            // 布局：普通上3下2，军官上4下3
             const isOfficer = packType === 'officer';
             const topCount = isOfficer ? 4 : 3;
             const bottomCount = isOfficer ? 3 : 2;
             const total = topCount + bottomCount;
 
-            // 确保卡片数量匹配
             const displayCards = [];
             for (let i = 0; i < total; i++) {
                 displayCards.push(cards[i % cards.length]);
             }
 
-            // 创建卡片元素
             const cardElements = [];
+            // 先确定每张卡的尺寸
+            const zoneWidth = zone.offsetWidth || 800;
+            const maxCardWidth = 140;
+            const minCardWidth = 60;
+            const idealWidth = Math.min(maxCardWidth, (zoneWidth - 20) / Math.max(topCount, bottomCount) - 12);
+            const cardWidth = Math.max(minCardWidth, Math.min(maxCardWidth, idealWidth));
+            const cardHeight = cardWidth * 1.4;
+            const radius = Math.max(4, cardWidth * 0.03); // 基于卡牌宽度自适应
+
             displayCards.forEach((card, idx) => {
                 const isTop = idx < topCount;
-                const posInRow = isTop ? idx : idx - topCount;
-
                 const div = document.createElement('div');
                 div.className = 'pack-card placeholder';
                 div.dataset.cardId = card.id;
                 div.dataset.rarity = card.rarity || 'Standard';
+                div.style.width = cardWidth + 'px';
+                div.style.height = cardHeight + 'px';
+                div.style.setProperty('--card-radius', radius + 'px');
 
-                // 背面的卡背（首字母大写）
                 const backImg = getBackImage(card.faction || 'neutral');
 
                 div.innerHTML = `
-                        <div class="pack-card-inner">
-                            <div class="pack-card-face pack-card-back">
+                        <div class="pack-card-inner" style="border-radius:${radius}px;">
+                            <div class="pack-card-face pack-card-back" style="border-radius:${radius}px;">
                                 <img src="${backImg}" alt="卡背" loading="lazy">
                             </div>
-                            <div class="pack-card-face pack-card-front">
+                            <div class="pack-card-face pack-card-front" style="border-radius:${radius}px;">
                                 <img src="" alt="${card.titleZh}" loading="lazy">
                             </div>
                         </div>
                     `;
-                zone.appendChild(div);
-                cardElements.push({ el: div, card: card, isTop: isTop, pos: posInRow });
+                // 插入位置：上排靠前，下排靠后
+                if (isTop) {
+                    zone.appendChild(div);
+                } else {
+                    zone.insertBefore(div, zone.children[topCount] || null);
+                }
+                cardElements.push({ el: div, card: card, isTop: isTop });
             });
 
-            // 布局调整
-            const totalWidth = zone.offsetWidth || 800;
-            const cardWidth = Math.min(120, (totalWidth - 30) / Math.max(topCount, bottomCount) - 10);
-            const cardHeight = cardWidth * 1.4;
-
-            cardElements.forEach((item) => {
-                const el = item.el;
-                const w = Math.max(60, Math.min(120, cardWidth));
-                const h = w * 1.4;
-                el.style.width = w + 'px';
-                el.style.height = h + 'px';
-                // 位置由flex控制
-            });
-
-            // 等待DOM更新后加载正面图片
+            // 加载正面图片
             setTimeout(() => {
                 cardElements.forEach((item) => {
                     const frontImg = item.el.querySelector('.pack-card-front img');
@@ -1804,23 +1914,18 @@
                     } else {
                         frontImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="168" viewBox="0 0 120 168"%3E%3Crect width="120" height="168" fill="%233a2f1a"/%3E%3Ctext x="50%25" y="50%25" font-size="10" fill="%23dba551" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E';
                     }
-                    // 加载完成后移除placeholder
-                    frontImg.onload = () => {
-                        item.el.classList.remove('placeholder');
-                    };
-                    frontImg.onerror = () => {
-                        item.el.classList.remove('placeholder');
-                    };
-                    // 如果图片已缓存
+                    frontImg.onload = () => { item.el.classList.remove('placeholder'); };
+                    frontImg.onerror = () => { item.el.classList.remove('placeholder'); };
                     if (frontImg.complete && frontImg.naturalWidth > 0) {
                         item.el.classList.remove('placeholder');
                     }
                 });
             }, 100);
 
-            // 点击翻转
-            let flipCount = 0;
+            // 点击翻转逻辑
+            let flippedCount = 0;
             const totalToFlip = cardElements.length;
+            let eliteHovering = false;
 
             cardElements.forEach((item) => {
                 const el = item.el;
@@ -1829,9 +1934,99 @@
                 const speeds = raritySpeeds[rarity] || raritySpeeds['Standard'];
 
                 el.addEventListener('click', function onClick() {
-                    if (el.classList.contains('flipping')) return;
+                    if (el.classList.contains('flipping') || el.classList.contains('locked')) return;
                     if (el.classList.contains('placeholder')) return;
 
+                    // 如果当前有精英滞空，禁止其他卡点击
+                    if (isEliteLocked) {
+                        if (rarity !== 'Elite') {
+                            // 简单反馈
+                            return;
+                        }
+                    }
+
+                    // 精英牌特殊处理：滞空特写
+                    if (rarity === 'Elite') {
+                        // 锁定所有卡
+                        isEliteLocked = true;
+                        cardElements.forEach(other => {
+                            if (other.el !== el) other.el.classList.add('locked');
+                        });
+                        // 抬起并滞空
+                        el.classList.add('lift');
+                        el.style.setProperty('--lift-duration', speeds.lift + 's');
+                        setTimeout(() => {
+                            el.classList.add('hover');
+                            el.style.setProperty('--hover-duration', speeds.hover + 's');
+                            // 特写效果：放大
+                            el.style.transform = 'translateY(-60px) scale(1.15)';
+                            // 其他卡暗化
+                            cardElements.forEach(other => {
+                                if (other.el !== el) other.el.style.opacity = '0.3';
+                            });
+                            // 滞空一段时间后自动翻转
+                            setTimeout(() => {
+                                // 翻转
+                                el.classList.remove('hover', 'lift');
+                                el.classList.add('flipping');
+                                el.style.transition =
+                                    `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
+                                el.style.transform = 'rotateY(-180deg) scale(1)';
+                                // 恢复其他卡
+                                cardElements.forEach(other => {
+                                    other.el.style.opacity = '1';
+                                    other.el.classList.remove('locked');
+                                });
+                                isEliteLocked = false;
+                                // 拍下
+                                setTimeout(() => {
+                                    el.classList.remove('flipping');
+                                    el.style.transition =
+                                        `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
+                                    el.style.transform = 'rotateY(-180deg) scale(0.97)';
+                                    setTimeout(() => {
+                                        el.style.transform = 'rotateY(-180deg) scale(1)';
+                                        // 震动
+                                        if (speeds.shake > 0) {
+                                            const zone = document
+                                                .getElementById('animationZone');
+                                            const intensity = speeds.shake;
+                                            zone.style.setProperty('--shake-duration', (
+                                                speeds.slam * 1.5) + 's');
+                                            zone.style.setProperty('--shake-x', -(intensity *
+                                            10) + 'px');
+                                            zone.style.setProperty('--shake-y', (intensity *
+                                            8) + 'px');
+                                            zone.style.setProperty('--shake-x2', (intensity *
+                                            12) + 'px');
+                                            zone.style.setProperty('--shake-y2', -(intensity *
+                                            10) + 'px');
+                                            zone.style.setProperty('--shake-x3', -(intensity *
+                                            8) + 'px');
+                                            zone.style.setProperty('--shake-y3', (intensity *
+                                            12) + 'px');
+                                            zone.style.setProperty('--shake-x4', (intensity *
+                                            6) + 'px');
+                                            zone.style.setProperty('--shake-y4', -(intensity *
+                                            6) + 'px');
+                                            zone.classList.add('shake');
+                                            setTimeout(() => zone.classList.remove('shake'),
+                                                speeds.slam * 1500 + 200);
+                                        }
+                                        flippedCount++;
+                                        if (flippedCount >= totalToFlip) {
+                                            isOpening = false;
+                                            document.getElementById('openPackBtn').disabled =
+                                                false;
+                                        }
+                                    }, 150);
+                                }, speeds.flip * 300);
+                            }, speeds.hover * 1000 + 800);
+                        }, speeds.lift * 500);
+                        return;
+                    }
+
+                    // 非精英普通流程
                     // 抬起
                     el.classList.add('lift');
                     el.style.setProperty('--lift-duration', speeds.lift + 's');
@@ -1842,33 +2037,54 @@
                         el.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
                         el.style.transform = 'rotateY(-180deg)';
 
-                        // 震动屏幕
-                        const shakeIntensity = speeds.shake;
-                        const zone = document.getElementById('animationZone');
-                        zone.style.setProperty('--shake-duration', (speeds.flip * 0.6) + 's');
-                        zone.classList.add('shake');
-                        setTimeout(() => zone.classList.remove('shake'), speeds.flip * 600 + 100);
-
                         // 拍下
                         setTimeout(() => {
                             el.classList.remove('flipping', 'lift');
-                            el.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
+                            el.style.transition =
+                                `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
                             el.style.transform = 'rotateY(-180deg)';
 
-                            // 拍下后加一个轻微下压动画
+                            // 下压效果
                             setTimeout(() => {
                                 el.style.transform = 'rotateY(-180deg) scale(0.97)';
                                 setTimeout(() => {
                                     el.style.transform = 'rotateY(-180deg) scale(1)';
-                                }, 100);
+                                    // 震动（仅非普通）
+                                    if (speeds.shake > 0) {
+                                        const zone = document.getElementById(
+                                            'animationZone');
+                                        const intensity = speeds.shake;
+                                        zone.style.setProperty('--shake-duration', (
+                                            speeds.slam * 1.2) + 's');
+                                        zone.style.setProperty('--shake-x', -(intensity *
+                                            8) + 'px');
+                                        zone.style.setProperty('--shake-y', (intensity *
+                                            6) + 'px');
+                                        zone.style.setProperty('--shake-x2', (intensity *
+                                            10) + 'px');
+                                        zone.style.setProperty('--shake-y2', -(intensity *
+                                            8) + 'px');
+                                        zone.style.setProperty('--shake-x3', -(intensity *
+                                            6) + 'px');
+                                        zone.style.setProperty('--shake-y3', (intensity *
+                                            10) + 'px');
+                                        zone.style.setProperty('--shake-x4', (intensity *
+                                            4) + 'px');
+                                        zone.style.setProperty('--shake-y4', -(intensity *
+                                            4) + 'px');
+                                        zone.classList.add('shake');
+                                        setTimeout(() => zone.classList.remove('shake'),
+                                            speeds.slam * 1200 + 200);
+                                    }
+                                    flippedCount++;
+                                    if (flippedCount >= totalToFlip) {
+                                        isOpening = false;
+                                        document.getElementById('openPackBtn').disabled =
+                                            false;
+                                    }
+                                }, 150);
                             }, speeds.slam * 200);
-
-                            flipCount++;
-                            if (flipCount >= totalToFlip) {
-                                isOpening = false;
-                                document.getElementById('openPackBtn').disabled = false;
-                            }
-                        }, speeds.flip * 400 + speeds.lift * 200);
+                        }, speeds.flip * 300 + speeds.lift * 200);
                     }, speeds.lift * 500);
                 }, { once: false });
             });
