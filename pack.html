@@ -1039,7 +1039,7 @@
                 <select id="uploadPackFit">
                     <option value="cover">横铺满</option>
                     <option value="contain">纵铺满</option>
-                    <option value="stretch">拉伸</option>
+                    <option value="stretch">拉！伸！</option>
                 </select>
             </div>
             <div class="upload-preview-area" id="uploadPreviewArea">
@@ -1185,7 +1185,7 @@
         async function loadData() {
             document.getElementById('uploadBarPack').style.display = 'none';
             const filterList = document.getElementById('filterList');
-            filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">⏳ 加载卡牌数据...</div>';
+            filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">正在寻找敌人...</div>';
             try {
                 const res = await fetch('data.json');
                 if (!res.ok) throw new Error("data.json failed");
@@ -1423,7 +1423,7 @@
                                     </div>
                                     <div class="filter-result-preview">
                                         <span class="result-count">${resultCount} 张</span>
-                                        <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
+                                        <span class="result-cards">${previewCards ? previewCards : '未找到'}</span>
                                     </div>
                                 </div>
                             `}
@@ -1660,24 +1660,15 @@
                     reader.readAsDataURL(file);
                 });
 
-                // 检查所有卡牌（官方 + 自定义）是否有重复 cardId
                 const all = getFullCardList();
                 const existing = all.find(c => c.cardId === cardId);
                 if (existing) {
-                    if (!confirm(`cardId "${cardId}" 已存在（${existing.titleZh}），是否替换其卡图？\n其他数据将保持不变。`)) {
+                    if (!window.confirm(`cardId "${cardId}" 已存在（${existing.titleZh}），是否替换其卡图？\n其他数据将保持不变。`)) {
                         return;
                     }
                     // 替换图片数据
                     existing.imageData = imageData;
                     existing.imageFit = fit;
-                    // 如果是官方卡，保留其他原始数据；如果是自定义，可更新其他字段（但提示只替换图片）
-                    // 但为了和builder一致，这里也允许更新其他字段（用户可能想同时修改卡名等）
-                    existing.titleZh = name;
-                    existing.titleEn = name;
-                    existing.faction = faction;
-                    existing.cost = cost;
-                    existing.type = type;
-                    existing.rarity = rarity;
                 } else {
                     // 新建自定义卡
                     customCards.push({
@@ -1711,7 +1702,6 @@
                 rebuildCardList();
                 renderFilters();
                 modal.classList.remove('open');
-                alert(`卡牌 "${name}" 已添加至卡池`);
             });
         }
 
