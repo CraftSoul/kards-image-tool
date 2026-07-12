@@ -124,7 +124,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: calc(var(--card-w, 120px) * 0.33);
             transition: min-height 0.3s;
         }
         .animation-zone .empty-hint {
@@ -138,11 +138,11 @@
         .pack-row {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: calc(var(--card-w, 120px) * 0.33);
             flex-wrap: wrap;
         }
         .pack-row-bottom {
-            margin-left: calc(var(--card-w) / 2 + 6px); /* 偏移半个卡片宽度 + gap 的一半 */
+            margin-left: calc(var(--card-w, 120px) * 0.33 / 2 + 4px);
         }
         .animation-zone .pack-card {
             perspective: 800px;
@@ -158,10 +158,10 @@
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            border-radius: calc(var(--card-w) * 15 / 500);
+            border-radius: calc(var(--card-w) * 30 / 500);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .animation-zone .pack-card.flipped .pack-card-inner {
             transform: rotateY(-180deg);
@@ -171,7 +171,7 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: calc(var(--card-w) * 15 / 500);
+            border-radius: calc(var(--card-w) * 30 / 500);
             overflow: hidden;
             background: #1a1c12;
         }
@@ -196,55 +196,34 @@
             opacity: 0.3;
         }
 
-        /* 卡牌抬起动画 */
-        .animation-zone .pack-card.lift {
-            animation: card-lift var(--lift-duration, 0.3s) ease-out forwards;
+        /* ===== 抬起 & 拍下 ===== */
+        .animation-zone .pack-card.lift .pack-card-inner {
+            transform: translateY(-35px) scale(1.15);
+            transition: transform var(--lift-duration, 0.3s) ease-out;
         }
-        @keyframes card-lift {
-            0% {
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                transform: translateY(-35px) scale(1.05);
-            }
+        .animation-zone .pack-card.flipped .pack-card-inner {
+            transform: translateY(-35px) scale(1.15) rotateY(-180deg);
+            transition: transform var(--flip-duration, 0.6s) cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* 拍下（下压回弹） */
-        .animation-zone .pack-card.slam {
+        .animation-zone .pack-card.slam .pack-card-inner {
             animation: card-slam var(--slam-duration, 0.25s) cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
         }
         @keyframes card-slam {
-            0% {
-                transform: translateY(-35px) scale(1.05);
-            }
-            60% {
-                transform: translateY(5px) scale(0.98);
-            }
-            100% {
-                transform: translateY(0) scale(1);
-            }
+            0% { transform: translateY(-35px) scale(1.15) rotateY(-180deg); }
+            60% { transform: translateY(5px) scale(0.95) rotateY(-180deg); }
+            100% { transform: translateY(0) scale(1) rotateY(-180deg); }
         }
 
-        /* 拍下震动 - 作用于整个动画区 */
+        /* ===== 震动（作用于整个动画区） ===== */
         .animation-zone.shake {
             animation: shake-zone var(--shake-duration, 0.3s) ease-in-out;
         }
         @keyframes shake-zone {
-            0%,
-            100% {
-                transform: translate(0);
-            }
-            20% {
-                transform: translate(var(--shake-x, -4px), var(--shake-y, 3px));
-            }
-            40% {
-                transform: translate(calc(var(--shake-x, 5px) * -1), calc(var(--shake-y, -4px) * -1));
-            }
-            60% {
-                transform: translate(calc(var(--shake-x, -3px) * -1), calc(var(--shake-y, 5px) * -1));
-            }
-            80% {
-                transform: translate(var(--shake-x, 3px), var(--shake-y, -2px));
-            }
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(var(--shake-x, -6px), var(--shake-y, 5px)); }
+            40% { transform: translate(calc(var(--shake-x, 8px) * -1), calc(var(--shake-y, -6px) * -1)); }
+            60% { transform: translate(calc(var(--shake-x, -5px) * -1), calc(var(--shake-y, 7px) * -1)); }
+            80% { transform: translate(var(--shake-x, 5px), var(--shake-y, -4px)); }
         }
 
         /* ===== 参数区 ===== */
@@ -779,7 +758,7 @@
                 --card-w: 80px;
             }
             .pack-row-bottom {
-                margin-left: calc(var(--card-w) / 2 + 4px);
+                margin-left: calc(var(--card-w) * 0.33 / 2 + 2px);
             }
             .filter-body .filter-row {
                 flex-direction: column;
@@ -805,14 +784,14 @@
                 --card-w: 60px;
             }
             .animation-zone {
-                gap: 10px;
+                gap: calc(var(--card-w) * 0.33);
                 padding: 12px;
             }
             .pack-row {
-                gap: 6px;
+                gap: calc(var(--card-w) * 0.33);
             }
             .pack-row-bottom {
-                margin-left: calc(var(--card-w) / 2 + 3px);
+                margin-left: calc(var(--card-w) * 0.33 / 2 + 2px);
             }
             .params-panel {
                 padding: 0.8rem 1rem;
@@ -1312,7 +1291,7 @@
                         <div class="filter-item" data-filter-idx="${idx}">
                             <div class="filter-header" data-toggle="${idx}">
                                 <span class="filter-label">📌 筛选器 ${idx+1}</span>
-                                <span class="filter-badge">${filter.isComplement ? '补集' : '并集'}</span>
+                                <span class="filter-badge">${filter.isComplement ? '补集' : ''}</span>
                                 <span class="filter-badge">${resultCount} 张</span>
                                 <div class="filter-actions">
                                     <button class="btn-complement ${filter.isComplement?'active':''}" data-complement="${idx}">补集</button>
@@ -1827,13 +1806,12 @@
                 displayCards.push(cards[i % cards.length]);
             }
 
-            // 创建两个行容器
+            // 创建两行
             const rowTop = document.createElement('div');
             rowTop.className = 'pack-row';
             const rowBottom = document.createElement('div');
             rowBottom.className = 'pack-row pack-row-bottom';
 
-            // 填充卡片到对应行
             const cardElements = [];
             displayCards.forEach((card, idx) => {
                 const isTop = idx < topCount;
@@ -1895,49 +1873,52 @@
                 const card = item.card;
                 const rarity = card.rarity || 'Standard';
                 const speeds = raritySpeeds[rarity] || raritySpeeds['Standard'];
+                const inner = el.querySelector('.pack-card-inner');
 
                 el.addEventListener('click', function onClick() {
-                    if (el.classList.contains('flipped')) return; // 已经翻过了
+                    if (el.classList.contains('flipped')) return; // 已翻过
                     if (el.classList.contains('placeholder')) return;
 
-                    // 抬起
+                    // 阶段1：抬起（使用类 lift，通过 transition 控制）
                     el.classList.add('lift');
-                    el.style.setProperty('--lift-duration', speeds.lift + 's');
-
-                    setTimeout(() => {
-                        // 翻转：添加 flipped 类，保持正面
-                        el.classList.add('flipped');
-                        // 移除 lift 类（抬起结束）
+                    inner.style.setProperty('--lift-duration', speeds.lift + 's');
+                    // 抬起结束后，触发翻转
+                    const liftTimeout = setTimeout(() => {
                         el.classList.remove('lift');
-
-                        // 拍下（下压回弹）
-                        setTimeout(() => {
+                        // 阶段2：翻转（添加 flipped，同时保持抬起状态）
+                        el.classList.add('flipped');
+                        inner.style.setProperty('--flip-duration', speeds.flip + 's');
+                        // 翻转完成后，触发拍下
+                        const flipTimeout = setTimeout(() => {
+                            // 阶段3：拍下（slam 动画）
                             el.classList.add('slam');
-                            el.style.setProperty('--slam-duration', speeds.slam + 's');
-                            setTimeout(() => {
+                            inner.style.setProperty('--slam-duration', speeds.slam + 's');
+                            // 拍下结束后，移除slam，保持最终状态
+                            const slamTimeout = setTimeout(() => {
                                 el.classList.remove('slam');
-                            }, speeds.slam * 1000);
-
-                            // 震动（仅非普通牌）
-                            if (speeds.shake > 0) {
-                                const intensity = speeds.shake;
-                                const duration = 0.3 + intensity * 0.6;
-                                const zone = document.getElementById('animationZone');
-                                const amp = 4 + intensity * 8;
-                                zone.style.setProperty('--shake-duration', duration + 's');
-                                zone.style.setProperty('--shake-x', (Math.random() * amp - amp/2) + 'px');
-                                zone.style.setProperty('--shake-y', (Math.random() * amp - amp/2) + 'px');
-                                zone.classList.add('shake');
-                                setTimeout(() => zone.classList.remove('shake'), duration * 1000);
-                            }
-
-                            flipCount++;
-                            if (flipCount >= totalToFlip) {
-                                isOpening = false;
-                                document.getElementById('openPackBtn').disabled = false;
-                            }
-                        }, speeds.flip * 400 + speeds.lift * 200);
-                    }, speeds.lift * 500);
+                                // 最终状态：保留 flipped，transform 回到原位（rotateY 保持）
+                                // 移除 lift 效果，但保留 rotateY
+                                inner.style.transform = 'rotateY(-180deg)';
+                                // 震动（仅非普通牌）
+                                if (speeds.shake > 0) {
+                                    const intensity = speeds.shake;
+                                    const duration = 0.3 + intensity * 0.6;
+                                    const amp = 4 + intensity * 8;
+                                    const zone = document.getElementById('animationZone');
+                                    zone.style.setProperty('--shake-duration', duration + 's');
+                                    zone.style.setProperty('--shake-x', (Math.random() * amp - amp/2) + 'px');
+                                    zone.style.setProperty('--shake-y', (Math.random() * amp - amp/2) + 'px');
+                                    zone.classList.add('shake');
+                                    setTimeout(() => zone.classList.remove('shake'), duration * 1000);
+                                }
+                                flipCount++;
+                                if (flipCount >= totalToFlip) {
+                                    isOpening = false;
+                                    document.getElementById('openPackBtn').disabled = false;
+                                }
+                            }, speeds.slam * 1200);
+                        }, speeds.flip * 600);
+                    }, speeds.lift * 600);
                 }, { once: false });
             });
         }
