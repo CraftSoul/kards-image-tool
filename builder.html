@@ -2981,13 +2981,16 @@
                 const card = allCards.find(c => c.id === cardId);
                 if (!card) return;
 
+                const icon = row.querySelector('.deck-card-icon');
+                if (!icon) return;
+
                 // 清除旧事件
                 const cleanup = () => {
-                    row.removeEventListener('mouseenter', row._thumbEnter);
-                    row.removeEventListener('mouseleave', row._thumbLeave);
-                    row.removeEventListener('touchstart', row._thumbTouchStart);
-                    row.removeEventListener('touchend', row._thumbTouchEnd);
-                    row.removeEventListener('touchcancel', row._thumbTouchEnd);
+                    icon.removeEventListener('mouseenter', icon._thumbEnter);
+                    icon.removeEventListener('mouseleave', icon._thumbLeave);
+                    icon.removeEventListener('touchstart', icon._thumbTouchStart);
+                    icon.removeEventListener('touchend', icon._thumbTouchEnd);
+                    icon.removeEventListener('touchcancel', icon._thumbTouchEnd);
                 };
                 cleanup();
 
@@ -3000,29 +3003,23 @@
                 };
 
                 const showThumb = (e) => {
-                    // 获取鼠标或触摸位置
                     let clientX, clientY;
                     if (e.type === 'touchstart') {
                         const touch = e.touches[0];
                         clientX = touch.clientX;
                         clientY = touch.clientY;
-                        // 阻止默认长按菜单
                         e.preventDefault();
                     } else {
                         clientX = e.clientX;
                         clientY = e.clientY;
                     }
-                    // 设置图片
                     thumbImg.src = getThumbUrl();
-                    // 定位：在行左侧偏上一点
                     const rect = row.getBoundingClientRect();
-                    // 将缩略图放在行左侧，垂直居中
-                    const left = rect.left - 170; // 预留空间
+                    const left = rect.left - 170;
                     const top = rect.top + (rect.height - 120) / 2;
                     thumbElem.style.left = Math.max(10, left) + 'px';
                     thumbElem.style.top = Math.max(10, top) + 'px';
                     thumbElem.style.display = 'block';
-                    // 清除之前的隐藏定时器
                     if (thumbnailTimer) {
                         clearTimeout(thumbnailTimer);
                         thumbnailTimer = null;
@@ -3030,7 +3027,6 @@
                 };
 
                 const hideThumb = () => {
-                    // 延迟隐藏以便用户移动鼠标到缩略图（但缩略图不响应指针事件）
                     if (thumbnailTimer) clearTimeout(thumbnailTimer);
                     thumbnailTimer = setTimeout(() => {
                         thumbElem.style.display = 'none';
@@ -3042,16 +3038,16 @@
                 const touchStartHandler = (e) => showThumb(e);
                 const touchEndHandler = () => hideThumb();
 
-                row._thumbEnter = enterHandler;
-                row._thumbLeave = leaveHandler;
-                row._thumbTouchStart = touchStartHandler;
-                row._thumbTouchEnd = touchEndHandler;
+                icon._thumbEnter = enterHandler;
+                icon._thumbLeave = leaveHandler;
+                icon._thumbTouchStart = touchStartHandler;
+                icon._thumbTouchEnd = touchEndHandler;
 
-                row.addEventListener('mouseenter', enterHandler);
-                row.addEventListener('mouseleave', leaveHandler);
-                row.addEventListener('touchstart', touchStartHandler, { passive: false });
-                row.addEventListener('touchend', touchEndHandler);
-                row.addEventListener('touchcancel', touchEndHandler);
+                icon.addEventListener('mouseenter', enterHandler);
+                icon.addEventListener('mouseleave', leaveHandler);
+                icon.addEventListener('touchstart', touchStartHandler, { passive: false });
+                icon.addEventListener('touchend', touchEndHandler);
+                icon.addEventListener('touchcancel', touchEndHandler);
             });
         }
 
