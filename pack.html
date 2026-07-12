@@ -1183,9 +1183,7 @@
 
         // ==================== 数据加载 ====================
         async function loadData() {
-            // 隐藏上传按钮
             document.getElementById('uploadBarPack').style.display = 'none';
-
             const filterList = document.getElementById('filterList');
             filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">⏳ 加载卡牌数据...</div>';
             try {
@@ -1218,14 +1216,14 @@
                         isVeteranSet: j.set === "Special",
                         canCreate: j.can_create || [],
                         isCustom: false,
-                        imageData: null,
+                        imageData: null,      // 支持替换卡图
+                        imageFit: 'cover',
                         rawJson: j
                     };
                 });
                 rebuildCardList();
                 initUI();
                 updatePoolSize();
-                // 显示上传按钮
                 document.getElementById('uploadBarPack').style.display = 'block';
             } catch (e) {
                 console.error(e);
@@ -1235,17 +1233,13 @@
         }
 
         function rebuildCardList() {
-            const customWithData = customCards.filter(c => c.imageData);
-            const normalCards = allCards.filter(c => !c.isCustom);
-            const combined = [...customWithData, ...normalCards];
-            combined.forEach((c, i) => c._index = i);
-            return combined;
+            const all = [...allCards, ...customCards];
+            all.forEach((c, i) => c._index = i);
+            return all;
         }
 
         function getFullCardList() {
-            const customWithData = customCards.filter(c => c.imageData);
-            const normalCards = allCards.filter(c => !c.isCustom);
-            return [...customWithData, ...normalCards];
+            return [...allCards, ...customCards];
         }
 
         // ==================== 工具函数 ====================
@@ -1263,7 +1257,6 @@
 
         // ==================== 筛选器逻辑 ====================
         function evaluateFilter(filter, card) {
-            // 卡池状态
             if (filter.status && filter.status !== 'all') {
                 if (filter.status === 'active' && (card.reserved || card.isSpawn || card.isVeteranSet || card.isCustom))
                     return false;
@@ -1272,24 +1265,19 @@
                 if (filter.status === 'veteran' && (!card.isVeteranSet || card.isCustom)) return false;
                 if (filter.status === 'custom' && !card.isCustom) return false;
             }
-            // 搜索
             if (filter.search && filter.search.trim()) {
                 const s = filter.search.trim().toLowerCase();
                 if (!getSearchableText(card).includes(s)) return false;
             }
-            // 类型
             if (filter.types && filter.types.length) {
                 if (!filter.types.includes(card.type)) return false;
             }
-            // 稀有度
             if (filter.rarities && filter.rarities.length) {
                 if (!filter.rarities.includes(card.rarity)) return false;
             }
-            // 阵营
             if (filter.factions && filter.factions.length) {
                 if (!filter.factions.includes(card.faction)) return false;
             }
-            // 花费
             if (filter.costs && filter.costs.length) {
                 let match = false;
                 for (let c of filter.costs) {
@@ -1298,7 +1286,6 @@
                 }
                 if (!match) return false;
             }
-            // 扩展包
             if (filter.sets && filter.sets.length) {
                 const cardSet = card.isCustom ? '自定义' : (card.setName || '基础');
                 if (!filter.sets.includes(cardSet)) return false;
@@ -1337,7 +1324,7 @@
             return pool;
         }
 
-        // ==================== 渲染筛选器（支持焦点恢复） ====================
+        // ==================== 渲染筛选器（防抖） ====================
         let searchTimeout = null;
 
         function renderFilters(focusIdx) {
@@ -1351,7 +1338,6 @@
             let html = '';
             filters.forEach((filter, idx) => {
                 const isCollapsed = filter.collapsed || false;
-                // 构建摘要
                 const parts = [];
                 if (filter.status && filter.status !== 'all') {
                     const statusMap = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
@@ -1447,7 +1433,7 @@
             container.innerHTML = html;
             updatePoolSize();
 
-            // 事件绑定
+            // 事件绑定（略... 同前）
             container.querySelectorAll('.filter-header[data-toggle]').forEach(el => {
                 const idx = parseInt(el.dataset.toggle);
                 el.addEventListener('click', (e) => {
@@ -1482,7 +1468,6 @@
                     renderFilters();
                 });
             });
-            // chip 点击
             container.querySelectorAll('.chip-group .chip').forEach(chip => {
                 chip.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1498,25 +1483,20 @@
                     renderFilters();
                 });
             });
-            // 搜索输入 - 防抖处理
             container.querySelectorAll('.filter-search').forEach(input => {
                 input.addEventListener('input', (e) => {
                     const idx = parseInt(input.dataset.idx);
                     filters[idx].search = input.value;
                     clearTimeout(searchTimeout);
-                    const focusIdx = idx;
                     searchTimeout = setTimeout(() => {
-                        renderFilters(focusIdx);
+                        renderFilters(idx);
                     }, 300);
                 });
-                // 如果指定了焦点索引，聚焦该输入框
                 if (focusIdx !== undefined && parseInt(input.dataset.idx) === focusIdx) {
                     input.focus();
-                    // 将光标移到末尾
                     input.setSelectionRange(input.value.length, input.value.length);
                 }
             });
-            // status select
             container.querySelectorAll('.filter-status').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const idx = parseInt(select.dataset.idx);
@@ -1528,7 +1508,6 @@
 
         // ==================== 初始化UI ====================
         function initUI() {
-            // 上传模态框阵营
             const uf = document.getElementById('uploadPackFaction');
             if (uf) {
                 const allFactions = [...allNationOptions, 'neutral'];
@@ -1538,17 +1517,14 @@
                 uf.value = 'germany';
             }
 
-            // 画质滑块
             const qualitySlider = document.getElementById('qualitySlider');
             const qualityVal = document.getElementById('qualityVal');
             qualitySlider.addEventListener('input', () => {
                 qualityVal.textContent = qualitySlider.value;
             });
 
-            // 不自动添加筛选器
             renderFilters();
 
-            // 导航菜单
             const menuBtn = document.getElementById('menuToggleBtn');
             const navMenu = document.getElementById('navMenu');
             menuBtn.addEventListener('click', (e) => {
@@ -1561,7 +1537,6 @@
                 }
             });
 
-            // 添加筛选器
             document.getElementById('addFilterBtn').addEventListener('click', () => {
                 filters.push({
                     id: filterIdCounter++,
@@ -1586,13 +1561,9 @@
                 }
             });
 
-            // 开包按钮
             document.getElementById('openPackBtn').addEventListener('click', openPack);
-
-            // 上传
             setupUpload();
 
-            // 概率滑块
             document.querySelectorAll('.prob-slider').forEach(slider => {
                 const rarity = slider.dataset.rarity;
                 const valSpan = document.getElementById(`probVal-${rarity}`);
@@ -1603,7 +1574,6 @@
                 });
             });
 
-            // 禁止重复切换时检查
             document.getElementById('noDuplicates').addEventListener('change', () => {
                 const pool = getFilteredPool();
                 const packType = document.getElementById('packType').value;
@@ -1615,7 +1585,7 @@
             });
         }
 
-        // ==================== 上传卡牌（含预览 + 重复询问替换） ====================
+        // ==================== 上传卡牌（含预览 + 替换提示） ====================
         function setupUpload() {
             const btn = document.getElementById('uploadPackBtn');
             const modal = document.getElementById('uploadPackModal');
@@ -1626,7 +1596,6 @@
             const previewPlaceholder = document.getElementById('previewPlaceholder');
             const fitSelect = document.getElementById('uploadPackFit');
 
-            // 图片预览
             imageInput.addEventListener('change', function() {
                 const file = this.files[0];
                 if (!file) {
@@ -1691,17 +1660,18 @@
                     reader.readAsDataURL(file);
                 });
 
-                // 检查是否已存在
-                const existing = customCards.find(c => c.cardId === cardId);
+                // 检查所有卡牌（官方 + 自定义）是否有重复 cardId
+                const all = getFullCardList();
+                const existing = all.find(c => c.cardId === cardId);
                 if (existing) {
-                    if (!confirm(`cardId "${cardId}" 已存在，是否替换其卡图？\n其他数据（卡名、费用等）将保持不变。`)) {
+                    if (!confirm(`cardId "${cardId}" 已存在（${existing.titleZh}），是否替换其卡图？\n其他数据将保持不变。`)) {
                         return;
                     }
-                    // 替换卡图，保留其他数据
+                    // 替换图片数据
                     existing.imageData = imageData;
                     existing.imageFit = fit;
-                    // 如果用户修改了卡名等信息，可选择性更新，但按builder逻辑只替换图片
-                    // 但builder中替换时也允许更新其他字段，我们同样允许
+                    // 如果是官方卡，保留其他原始数据；如果是自定义，可更新其他字段（但提示只替换图片）
+                    // 但为了和builder一致，这里也允许更新其他字段（用户可能想同时修改卡名等）
                     existing.titleZh = name;
                     existing.titleEn = name;
                     existing.faction = faction;
@@ -1709,6 +1679,7 @@
                     existing.type = type;
                     existing.rarity = rarity;
                 } else {
+                    // 新建自定义卡
                     customCards.push({
                         id: -1 - customCards.length,
                         cardId: cardId,
@@ -1746,21 +1717,17 @@
 
         // ==================== 开包核心逻辑 ====================
         function getRarityFromPool(pool, ignoreProb) {
-            if (ignoreProb) return null; // 完全随机
-
-            // 使用用户调节的概率
+            if (ignoreProb) return null;
             const total = probValues.Standard + probValues.Limited + probValues.Special + probValues.Elite;
             if (total === 0) return null;
             const norm = {};
             for (const r of STATIC_RARITIES) {
                 norm[r] = probValues[r] / total;
             }
-
             const rarityCards = {};
             for (const r of STATIC_RARITIES) {
                 rarityCards[r] = pool.filter(c => c.rarity === r);
             }
-
             const roll = Math.random();
             let cum = 0;
             let selectedRarity = 'Standard';
@@ -1768,7 +1735,6 @@
                 cum += norm[r] || 0;
                 if (roll < cum) { selectedRarity = r; break; }
             }
-
             const candidates = rarityCards[selectedRarity] || [];
             if (candidates.length === 0) {
                 for (const r of STATIC_RARITIES) {
@@ -1803,7 +1769,7 @@
                         }
                     }
                 }
-            } else { // officer
+            } else {
                 const limitedOrBetter = drawnCards.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c
                     .rarity === 'Elite');
                 const specialOrBetter = drawnCards.filter(c => c.rarity === 'Special' || c.rarity === 'Elite');
@@ -1918,7 +1884,7 @@
             displayPack(drawn, packType);
         }
 
-        // ==================== 开包动画（纯JS控制transform，保持位置） ====================
+        // ==================== 开包动画（完全清空 + 纯JS控制） ====================
         const raritySpeeds = {
             'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0 },
             'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25 },
@@ -1933,7 +1899,8 @@
             isOpening = true;
             document.getElementById('openPackBtn').disabled = true;
 
-            zone.querySelectorAll('.pack-card').forEach(el => el.remove());
+            // 彻底清空动画区（清除所有卡牌和行容器）
+            zone.querySelectorAll('.pack-card, .pack-row').forEach(el => el.remove());
 
             const isOfficer = packType === 'officer';
             const topCount = isOfficer ? 4 : 3;
@@ -1945,13 +1912,11 @@
                 displayCards.push(cards[i % cards.length]);
             }
 
-            // 创建两个行容器
             const rowTop = document.createElement('div');
             rowTop.className = 'pack-row';
             const rowBottom = document.createElement('div');
             rowBottom.className = 'pack-row pack-row-bottom';
 
-            // 填充卡片到对应行
             const cardElements = [];
             displayCards.forEach((card, idx) => {
                 const isTop = idx < topCount;
@@ -1987,7 +1952,6 @@
             zone.appendChild(rowTop);
             zone.appendChild(rowBottom);
 
-            // 获取画质参数
             const quality = parseInt(document.getElementById('qualitySlider').value) || 20;
 
             // 加载正面图片
@@ -2014,7 +1978,6 @@
                 });
             }, 80);
 
-            // 点击翻转 - 使用 JS 控制 transform，保持位置稳定
             let flipCount = 0;
             const totalToFlip = cardElements.length;
 
@@ -2029,27 +1992,24 @@
                     if (el.classList.contains('flipped')) return;
                     if (el.classList.contains('placeholder')) return;
 
-                    // 锁定防止重复点击
                     el.style.pointerEvents = 'none';
 
-                    // 1. 抬起（lift）
+                    // 抬起
                     inner.style.transition = `transform ${speeds.lift}s ease-out`;
                     inner.style.transform = 'translateY(-45px) scale(1.18)';
 
                     setTimeout(() => {
-                        // 2. 翻转（flip）
+                        // 翻转
                         inner.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
                         inner.style.transform = 'rotateY(-180deg) translateY(-45px) scale(1.18)';
 
                         setTimeout(() => {
-                            // 3. 拍下（slam）– 保持旋转，下压回弹
+                            // 拍下
                             inner.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
                             inner.style.transform = 'rotateY(-180deg) translateY(0) scale(1)';
 
-                            // 标记已翻转
                             el.classList.add('flipped');
 
-                            // 震动（仅非普通牌）
                             if (speeds.shake > 0) {
                                 const intensity = speeds.shake;
                                 const duration = 0.3 + intensity * 0.6;
@@ -2062,7 +2022,6 @@
                                 setTimeout(() => zone.classList.remove('shake'), duration * 1000);
                             }
 
-                            // 解锁
                             el.style.pointerEvents = 'auto';
                             flipCount++;
                             if (flipCount >= totalToFlip) {
