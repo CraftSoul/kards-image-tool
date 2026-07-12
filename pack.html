@@ -1669,6 +1669,7 @@
                     // 替换图片数据
                     existing.imageData = imageData;
                     existing.imageFit = fit;
+                    existing.isCustom = true;
                 } else {
                     // 新建自定义卡
                     customCards.push({
@@ -1676,7 +1677,6 @@
                         cardId: cardId,
                         importId: '',
                         titleZh: name,
-                        titleEn: name,
                         text_zh: '',
                         faction: faction,
                         type: type,
