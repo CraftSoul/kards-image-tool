@@ -127,6 +127,7 @@
             justify-content: center;
             gap: 16px;
             transition: min-height 0.3s;
+            position: relative;
         }
         .animation-zone .empty-hint {
             color: #887e66;
@@ -150,11 +151,10 @@
             perspective: 800px;
             cursor: pointer;
             flex-shrink: 0;
-            transition: transform 0.2s;
-            position: relative;
             --card-w: 120px;
             width: var(--card-w);
             height: calc(var(--card-w) * 1.4);
+            transition: transform 0.3s ease-out;
         }
         .animation-zone .pack-card-inner {
             position: relative;
@@ -198,35 +198,7 @@
             opacity: 0.3;
         }
 
-        /* 卡牌抬起动画 */
-        .animation-zone .pack-card.lift {
-            animation: card-lift var(--lift-duration, 0.3s) ease-out forwards;
-        }
-        @keyframes card-lift {
-            0% {
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                transform: translateY(-45px) scale(1.18);
-            }
-        }
-        /* 拍下（下压回弹）— 保持翻转状态 */
-        .animation-zone .pack-card.slam {
-            animation: card-slam var(--slam-duration, 0.25s) cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
-        }
-        @keyframes card-slam {
-            0% {
-                transform: rotateY(-180deg) translateY(-45px) scale(1.18);
-            }
-            60% {
-                transform: rotateY(-180deg) translateY(5px) scale(0.97);
-            }
-            100% {
-                transform: rotateY(-180deg) translateY(0) scale(1);
-            }
-        }
-
-        /* 拍下震动 - 作用于整个动画区，并带动周围元素 */
+        /* 拍下震动 - 作用于整个动画区 */
         .animation-zone.shake {
             animation: shake-zone var(--shake-duration, 0.4s) ease-in-out;
         }
@@ -461,6 +433,7 @@
         /* ===== 上传卡牌 ===== */
         .upload-bar-pack {
             margin-bottom: 12px;
+            display: block;
         }
         .upload-bar-pack .upload-btn {
             display: block;
@@ -767,6 +740,30 @@
             background: transparent;
             border: none;
         }
+        .upload-modal-pack .upload-preview-area {
+            margin: 8px 0 12px;
+            text-align: center;
+            background: #0a0c08;
+            border-radius: 16px;
+            padding: 8px;
+            border: 1px dashed #7d6a42;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .upload-modal-pack .upload-preview-area img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            object-fit: cover;
+            display: none;
+        }
+        .upload-modal-pack .upload-preview-area .placeholder-text {
+            color: #7a705a;
+            font-size: 0.8rem;
+        }
         .upload-modal-pack .upload-actions {
             display: flex;
             gap: 12px;
@@ -840,6 +837,9 @@
             .params-panel .param-group input[type="range"] {
                 width: 60px;
             }
+            .upload-modal-pack .upload-preview-area img {
+                max-height: 140px;
+            }
         }
         @media (max-width: 480px) {
             .animation-zone .pack-card {
@@ -863,6 +863,9 @@
             }
             .params-panel .param-group input[type="range"] {
                 width: 50px;
+            }
+            .upload-modal-pack .upload-preview-area img {
+                max-height: 100px;
             }
         }
         @media (min-width: 769px) {
@@ -999,7 +1002,7 @@
         </div>
 
         <!-- ===== 上传卡牌 ===== -->
-        <div class="upload-bar-pack">
+        <div class="upload-bar-pack" id="uploadBarPack">
             <button class="upload-btn" id="uploadPackBtn">📤 上传卡牌到卡池</button>
         </div>
 
@@ -1038,6 +1041,10 @@
                     <option value="contain">纵铺满</option>
                     <option value="stretch">拉伸</option>
                 </select>
+            </div>
+            <div class="upload-preview-area" id="uploadPreviewArea">
+                <img id="uploadPreviewImg" src="" alt="预览">
+                <span class="placeholder-text" id="previewPlaceholder">选择图片后预览</span>
             </div>
             <div class="upload-form-row">
                 <label>卡名</label>
@@ -1176,6 +1183,9 @@
 
         // ==================== 数据加载 ====================
         async function loadData() {
+            // 隐藏上传按钮
+            document.getElementById('uploadBarPack').style.display = 'none';
+
             const filterList = document.getElementById('filterList');
             filterList.innerHTML = '<div style="color:#e9dbbd; text-align:center; padding:12px;">⏳ 加载卡牌数据...</div>';
             try {
@@ -1215,9 +1225,13 @@
                 rebuildCardList();
                 initUI();
                 updatePoolSize();
+                // 显示上传按钮
+                document.getElementById('uploadBarPack').style.display = 'block';
             } catch (e) {
                 console.error(e);
                 filterList.innerHTML = '<div style="color:#cc7755;padding:12px;">❌ 数据加载失败</div>';
+                // 即使失败也显示上传按钮（可能允许上传自定义卡牌？但数据加载失败说明无法获取数据，还是保留隐藏）
+                document.getElementById('uploadBarPack').style.display = 'none';
             }
         }
 
@@ -1590,30 +1604,62 @@
             });
         }
 
-        // ==================== 上传卡牌 ====================
+        // ==================== 上传卡牌（含预览） ====================
         function setupUpload() {
             const btn = document.getElementById('uploadPackBtn');
             const modal = document.getElementById('uploadPackModal');
             const cancel = document.getElementById('uploadPackCancel');
             const confirm = document.getElementById('uploadPackConfirm');
+            const imageInput = document.getElementById('uploadPackImage');
+            const previewImg = document.getElementById('uploadPreviewImg');
+            const previewPlaceholder = document.getElementById('previewPlaceholder');
+            const fitSelect = document.getElementById('uploadPackFit');
+
+            // 图片预览
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) {
+                    previewImg.style.display = 'none';
+                    previewPlaceholder.style.display = 'inline';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    // 应用填充效果
+                    const fit = fitSelect.value;
+                    previewImg.style.objectFit = fit;
+                };
+                reader.readAsDataURL(file);
+            });
+            fitSelect.addEventListener('change', function() {
+                if (previewImg.src && previewImg.src !== '') {
+                    previewImg.style.objectFit = this.value;
+                }
+            });
 
             btn.addEventListener('click', () => {
                 modal.classList.add('open');
-                document.getElementById('uploadPackImage').value = '';
+                imageInput.value = '';
+                previewImg.style.display = 'none';
+                previewPlaceholder.style.display = 'inline';
                 document.getElementById('uploadPackName').value = '未找到';
                 document.getElementById('uploadPackCardId').value = '';
                 document.getElementById('uploadPackCost').value = '0';
                 document.getElementById('uploadPackFaction').value = 'germany';
                 document.getElementById('uploadPackType').value = 'infantry';
                 document.getElementById('uploadPackRarity').value = 'Standard';
-                document.getElementById('uploadPackFit').value = 'cover';
+                fitSelect.value = 'cover';
+                previewImg.style.objectFit = 'cover';
             });
 
             cancel.addEventListener('click', () => modal.classList.remove('open'));
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
             confirm.addEventListener('click', async () => {
-                const file = document.getElementById('uploadPackImage').files[0];
+                const file = imageInput.files[0];
                 if (!file) { alert('请选择图片'); return; }
                 const cardId = document.getElementById('uploadPackCardId').value.trim();
                 if (!/^[a-z0-9_]+$/.test(cardId)) {
@@ -1626,7 +1672,7 @@
                 if (isNaN(cost) || cost < 0 || cost > 24) { alert('花费 0~24'); return; }
                 const type = document.getElementById('uploadPackType').value;
                 const rarity = document.getElementById('uploadPackRarity').value;
-                const fit = document.getElementById('uploadPackFit').value;
+                const fit = fitSelect.value;
 
                 const reader = new FileReader();
                 const imageData = await new Promise((resolve, reject) => {
@@ -1856,7 +1902,7 @@
             displayPack(drawn, packType);
         }
 
-        // ==================== 开包动画 ====================
+        // ==================== 开包动画（纯JS控制transform） ====================
         const raritySpeeds = {
             'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0 },
             'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25 },
@@ -1899,20 +1945,28 @@
                 div.dataset.cardId = card.id;
                 div.dataset.rarity = card.rarity || 'Standard';
 
-                const backImg = getBackImage(card.faction || 'neutral');
+                // 不使用 innerHTML，而是创建元素以更好地控制
+                const inner = document.createElement('div');
+                inner.className = 'pack-card-inner';
+                const back = document.createElement('div');
+                back.className = 'pack-card-face pack-card-back';
+                const backImg = document.createElement('img');
+                backImg.src = getBackImage(card.faction || 'neutral');
+                backImg.alt = '卡背';
+                backImg.loading = 'lazy';
+                back.appendChild(backImg);
+                const front = document.createElement('div');
+                front.className = 'pack-card-face pack-card-front';
+                const frontImg = document.createElement('img');
+                frontImg.alt = card.titleZh;
+                frontImg.loading = 'lazy';
+                front.appendChild(frontImg);
+                inner.appendChild(back);
+                inner.appendChild(front);
+                div.appendChild(inner);
 
-                div.innerHTML = `
-                        <div class="pack-card-inner">
-                            <div class="pack-card-face pack-card-back">
-                                <img src="${backImg}" alt="卡背" loading="lazy">
-                            </div>
-                            <div class="pack-card-face pack-card-front">
-                                <img src="" alt="${card.titleZh}" loading="lazy">
-                            </div>
-                        </div>
-                    `;
                 container.appendChild(div);
-                cardElements.push({ el: div, card: card, isTop: isTop });
+                cardElements.push({ el: div, card: card, isTop: isTop, frontImg: frontImg, inner: inner });
             });
 
             zone.appendChild(rowTop);
@@ -1924,8 +1978,8 @@
             // 加载正面图片
             setTimeout(() => {
                 cardElements.forEach((item) => {
-                    const frontImg = item.el.querySelector('.pack-card-front img');
                     const card = item.card;
+                    const frontImg = item.frontImg;
                     if (card.isCustom && card.imageData) {
                         frontImg.src = card.imageData;
                         const fit = card.imageFit || 'cover';
@@ -1945,12 +1999,13 @@
                 });
             }, 80);
 
-            // 点击翻转
+            // 点击翻转 - 使用 JS 控制 transform
             let flipCount = 0;
             const totalToFlip = cardElements.length;
 
             cardElements.forEach((item) => {
                 const el = item.el;
+                const inner = item.inner;
                 const card = item.card;
                 const rarity = card.rarity || 'Standard';
                 const speeds = raritySpeeds[rarity] || raritySpeeds['Standard'];
@@ -1959,22 +2014,25 @@
                     if (el.classList.contains('flipped')) return;
                     if (el.classList.contains('placeholder')) return;
 
-                    // 抬起
-                    el.classList.add('lift');
-                    el.style.setProperty('--lift-duration', speeds.lift + 's');
+                    // 锁定防止重复点击
+                    el.style.pointerEvents = 'none';
+
+                    // 1. 抬起（lift）
+                    inner.style.transition = `transform ${speeds.lift}s ease-out`;
+                    inner.style.transform = 'translateY(-45px) scale(1.18)';
 
                     setTimeout(() => {
-                        // 移除lift，添加flipped（翻转）
-                        el.classList.remove('lift');
-                        el.classList.add('flipped');
+                        // 2. 翻转（flip）
+                        inner.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
+                        inner.style.transform = 'rotateY(-180deg) translateY(-45px) scale(1.18)';
 
-                        // 拍下（下压回弹）
                         setTimeout(() => {
-                            el.classList.add('slam');
-                            el.style.setProperty('--slam-duration', speeds.slam + 's');
-                            setTimeout(() => {
-                                el.classList.remove('slam');
-                            }, speeds.slam * 1000);
+                            // 3. 拍下（slam）– 保持旋转，下压回弹
+                            inner.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
+                            inner.style.transform = 'rotateY(-180deg) translateY(0) scale(1)';
+
+                            // 标记已翻转
+                            el.classList.add('flipped');
 
                             // 震动（仅非普通牌）
                             if (speeds.shake > 0) {
@@ -1989,6 +2047,8 @@
                                 setTimeout(() => zone.classList.remove('shake'), duration * 1000);
                             }
 
+                            // 解锁
+                            el.style.pointerEvents = 'auto';
                             flipCount++;
                             if (flipCount >= totalToFlip) {
                                 isOpening = false;
