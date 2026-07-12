@@ -116,9 +116,9 @@
             font-weight: 700;
         }
 
-        /* ===== 动画区（无边框和背景） ===== */
+        /* ===== 动画区 ===== */
         .animation-zone {
-            padding: 20px 10px;
+            padding: 20px;
             min-height: 280px;
             margin-bottom: 20px;
             display: flex;
@@ -137,13 +137,11 @@
             user-select: none;
         }
         .animation-zone .pack-card {
-            width: 120px;
-            height: 168px;
             perspective: 800px;
             cursor: pointer;
             flex-shrink: 0;
-            position: relative;
             transition: transform 0.2s;
+            position: relative;
         }
         .animation-zone .pack-card-inner {
             position: relative;
@@ -151,10 +149,10 @@
             height: 100%;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            border-radius: var(--card-radius, 15px);
+            border-radius: calc(var(--card-w) * 15 / 500);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
-        .animation-zone .pack-card.flipped .pack-card-inner {
+        .animation-zone .pack-card.flipping .pack-card-inner {
             transform: rotateY(-180deg);
         }
         .animation-zone .pack-card-face {
@@ -162,7 +160,7 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: var(--card-radius, 15px);
+            border-radius: calc(var(--card-w) * 15 / 500);
             overflow: hidden;
             background: #1a1c12;
         }
@@ -187,7 +185,7 @@
             opacity: 0.3;
         }
 
-        /* 抬起动画 */
+        /* 卡牌抬起动画 */
         .animation-zone .pack-card.lift {
             animation: card-lift var(--lift-duration, 0.3s) ease-out forwards;
         }
@@ -199,7 +197,6 @@
                 transform: translateY(-35px) scale(1.05);
             }
         }
-        /* 拍下动画 */
         .animation-zone .pack-card.slam {
             animation: card-slam var(--slam-duration, 0.25s) cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
         }
@@ -214,7 +211,8 @@
                 transform: translateY(0) scale(1);
             }
         }
-        /* 拍下震动（仅稀有牌） */
+
+        /* 拍下震动 - 作用于整个动画区 */
         .animation-zone.shake {
             animation: shake-zone var(--shake-duration, 0.3s) ease-in-out;
         }
@@ -224,16 +222,16 @@
                 transform: translate(0);
             }
             20% {
-                transform: translate(calc(-1 * var(--shake-intensity, 4px)), calc(var(--shake-intensity, 4px) * 0.75));
+                transform: translate(var(--shake-x, -4px), var(--shake-y, 3px));
             }
             40% {
-                transform: translate(calc(var(--shake-intensity, 4px) * 1.25), calc(-1 * var(--shake-intensity, 4px) * 0.75));
+                transform: translate(calc(var(--shake-x, 5px) * -1), calc(var(--shake-y, -4px) * -1));
             }
             60% {
-                transform: translate(calc(-0.75 * var(--shake-intensity, 4px)), calc(var(--shake-intensity, 4px) * 0.5));
+                transform: translate(calc(var(--shake-x, -3px) * -1), calc(var(--shake-y, 5px) * -1));
             }
             80% {
-                transform: translate(calc(0.75 * var(--shake-intensity, 4px)), calc(-0.5 * var(--shake-intensity, 4px)));
+                transform: translate(var(--shake-x, 3px), var(--shake-y, -2px));
             }
         }
 
@@ -277,6 +275,10 @@
         .params-panel .param-group input[type="number"]:focus {
             border-color: #e6bc6a;
             box-shadow: 0 0 0 2px rgba(220, 180, 80, 0.3);
+        }
+        .params-panel .param-group input[type="number"] {
+            width: 60px;
+            min-width: 50px;
         }
         .params-panel .switch-item {
             display: flex;
@@ -334,7 +336,7 @@
         .params-panel .open-btn {
             background: #6a7a4a;
             border: none;
-            padding: 0.4rem 1.5rem;
+            padding: 0.45rem 1.6rem;
             border-radius: 60px;
             color: #f5efdb;
             font-weight: bold;
@@ -353,39 +355,36 @@
             transform: none;
         }
 
-        /* 各稀有度概率滑块 */
-        .prob-sliders {
+        /* 各稀有度概率调节 */
+        .prob-group {
             display: flex;
             flex-wrap: wrap;
             gap: 6px 16px;
-            width: 100%;
-            border-top: 1px solid rgba(170, 142, 78, 0.2);
-            padding-top: 10px;
-            margin-top: 4px;
+            align-items: center;
+            padding: 4px 0;
         }
-        .prob-sliders .prob-item {
+        .prob-group .prob-item {
             display: flex;
             align-items: center;
-            gap: 6px;
-            flex: 1 1 120px;
+            gap: 4px 6px;
         }
-        .prob-sliders .prob-item label {
-            font-size: 0.65rem;
+        .prob-group .prob-item label {
+            font-size: 0.6rem;
             color: #e9dbbd;
-            min-width: 50px;
+            font-weight: 600;
+            min-width: 28px;
         }
-        .prob-sliders .prob-item input[type="range"] {
-            width: 60px;
-            height: 4px;
+        .prob-group .prob-item input[type="range"] {
+            width: 50px;
+            height: 3px;
             -webkit-appearance: none;
             appearance: none;
             background: #3a3222;
             border-radius: 2px;
             outline: none;
             border: none;
-            flex: 1;
         }
-        .prob-sliders .prob-item input[type="range"]::-webkit-slider-thumb {
+        .prob-group .prob-item input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 12px;
             height: 12px;
@@ -394,7 +393,7 @@
             cursor: pointer;
             border: none;
         }
-        .prob-sliders .prob-item input[type="range"]::-moz-range-thumb {
+        .prob-group .prob-item input[type="range"]::-moz-range-thumb {
             width: 12px;
             height: 12px;
             border-radius: 50%;
@@ -402,17 +401,15 @@
             cursor: pointer;
             border: none;
         }
-        .prob-sliders .prob-item .prob-val {
+        .prob-group .prob-item .prob-val {
             font-size: 0.6rem;
             color: #ffefb9;
             min-width: 28px;
-            text-align: right;
+            text-align: center;
         }
 
         /* ===== 上传卡牌 ===== */
         .upload-bar-pack {
-            display: flex;
-            justify-content: stretch;
             margin-bottom: 12px;
         }
         .upload-bar-pack .upload-btn {
@@ -422,7 +419,7 @@
             border: 1px solid #aa8e4e;
             border-radius: 60px;
             padding: 0.6rem 1.5rem;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #f5efdb;
             cursor: pointer;
@@ -435,7 +432,7 @@
             border-color: #eecb77;
         }
 
-        /* ===== 筛选器列表（与 builder 风格一致） ===== */
+        /* ===== 筛选器列表 ===== */
         .filter-list {
             display: flex;
             flex-direction: column;
@@ -478,7 +475,7 @@
         }
         .filter-header .filter-actions {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             margin-left: auto;
             align-items: center;
         }
@@ -525,12 +522,12 @@
             color: #e9dbbd;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
         }
         .filter-summary .summary-tag img {
             width: 14px;
             height: 14px;
-            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+            object-fit: contain;
         }
         .filter-body {
             padding: 8px 14px 14px;
@@ -583,12 +580,12 @@
             user-select: none;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
         }
         .filter-body .filter-row .chip-group .chip img {
-            width: 14px;
-            height: 14px;
-            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
         }
         .filter-body .filter-row .chip-group .chip.active {
             background: #c9a53b;
@@ -630,7 +627,7 @@
             white-space: nowrap;
         }
 
-        /* ===== 添加筛选器 ===== */
+        /* ===== 添加筛选器按钮 ===== */
         .add-filter-bar {
             display: flex;
             gap: 10px;
@@ -757,7 +754,7 @@
             .params-panel {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 0.8rem;
+                gap: 0.6rem;
             }
             .params-panel .param-group {
                 justify-content: space-between;
@@ -767,8 +764,9 @@
                 width: 100%;
             }
             .animation-zone .pack-card {
-                width: 80px;
-                height: 112px;
+                --card-w: 80px;
+                width: var(--card-w);
+                height: calc(var(--card-w) * 1.4);
             }
             .filter-body .filter-row {
                 flex-direction: column;
@@ -785,18 +783,30 @@
                 width: 100%;
                 justify-content: flex-end;
             }
+            .prob-group .prob-item input[type="range"] {
+                width: 40px;
+            }
         }
         @media (max-width: 480px) {
             .animation-zone .pack-card {
-                width: 60px;
-                height: 84px;
+                --card-w: 60px;
             }
             .animation-zone {
                 gap: 6px;
-                padding: 12px 6px;
+                padding: 12px;
             }
             .params-panel {
                 padding: 0.8rem 1rem;
+            }
+            .prob-group .prob-item input[type="range"] {
+                width: 30px;
+            }
+        }
+        @media (min-width: 769px) {
+            .animation-zone .pack-card {
+                --card-w: 120px;
+                width: var(--card-w);
+                height: calc(var(--card-w) * 1.4);
             }
         }
 
@@ -866,7 +876,7 @@
             </div>
         </div>
 
-        <!-- ===== 动画区（无边框背景） ===== -->
+        <!-- ===== 动画区 ===== -->
         <div class="animation-zone" id="animationZone">
             <div class="empty-hint" id="emptyHint">🃏 选择卡包参数，点击「开包」</div>
         </div>
@@ -881,6 +891,10 @@
                 </select>
             </div>
             <div class="param-group switch-item">
+                <span>忽视概率</span>
+                <label class="switch"><input type="checkbox" id="ignoreProb"><span class="slider"></span></label>
+            </div>
+            <div class="param-group switch-item">
                 <span>保底</span>
                 <label class="switch"><input type="checkbox" id="pityEnabled" checked><span class="slider"></span></label>
             </div>
@@ -889,33 +903,36 @@
                 <label class="switch"><input type="checkbox" id="noDuplicates"><span class="slider"></span></label>
             </div>
             <button class="open-btn" id="openPackBtn">开包</button>
+        </div>
 
-            <!-- 各稀有度概率滑块 -->
-            <div class="prob-sliders" id="probSliders">
+        <!-- 各稀有度概率独立调节 -->
+        <div class="params-panel" style="margin-bottom:20px; padding:0.8rem 1.5rem;">
+            <div style="width:100%; font-size:0.7rem; color:#e9dbbd; font-weight:600; margin-bottom:4px;">🎲 各稀有度概率 (总和自动归一化)</div>
+            <div class="prob-group" id="probGroup">
                 <div class="prob-item">
-                    <label>普通</label>
+                    <label style="color:#9e9e9e;">普通</label>
                     <input type="range" class="prob-slider" data-rarity="Standard" min="0" max="100" value="74">
-                    <span class="prob-val" id="probVal_Standard">74%</span>
+                    <span class="prob-val" id="probVal-Standard">74</span>
                 </div>
                 <div class="prob-item">
-                    <label>限定</label>
+                    <label style="color:#cd7f32;">限定</label>
                     <input type="range" class="prob-slider" data-rarity="Limited" min="0" max="100" value="19">
-                    <span class="prob-val" id="probVal_Limited">19%</span>
+                    <span class="prob-val" id="probVal-Limited">19</span>
                 </div>
                 <div class="prob-item">
-                    <label>特殊</label>
+                    <label style="color:#c0c0c0;">特殊</label>
                     <input type="range" class="prob-slider" data-rarity="Special" min="0" max="100" value="5">
-                    <span class="prob-val" id="probVal_Special">5%</span>
+                    <span class="prob-val" id="probVal-Special">5</span>
                 </div>
                 <div class="prob-item">
-                    <label>精英</label>
+                    <label style="color:#ffd700;">精英</label>
                     <input type="range" class="prob-slider" data-rarity="Elite" min="0" max="100" value="2">
-                    <span class="prob-val" id="probVal_Elite">2%</span>
+                    <span class="prob-val" id="probVal-Elite">2</span>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 上传卡牌（铺满行） ===== -->
+        <!-- ===== 上传卡牌 ===== -->
         <div class="upload-bar-pack">
             <button class="upload-btn" id="uploadPackBtn">📤 上传卡牌到卡池</button>
         </div>
@@ -947,6 +964,14 @@
             <div class="upload-form-row">
                 <label>图片</label>
                 <input type="file" id="uploadPackImage" accept="image/*">
+            </div>
+            <div class="upload-form-row">
+                <label>图片填充</label>
+                <select id="uploadPackFit">
+                    <option value="cover">横铺满</option>
+                    <option value="contain">纵铺满</option>
+                    <option value="stretch">拉！伸！</option>
+                </select>
             </div>
             <div class="upload-form-row">
                 <label>卡名</label>
@@ -983,14 +1008,6 @@
                     <option value="Limited">限定</option>
                     <option value="Special">特殊</option>
                     <option value="Elite">精英</option>
-                </select>
-            </div>
-            <div class="upload-form-row">
-                <label>图片填充</label>
-                <select id="uploadPackFit">
-                    <option value="cover">横铺满</option>
-                    <option value="contain">纵铺满</option>
-                    <option value="stretch">拉！伸！</option>
                 </select>
             </div>
             <div class="upload-actions">
@@ -1058,20 +1075,15 @@
         };
         const typeNameMap = { "infantry": "步兵", "tank": "坦克", "fighter": "战斗机", "bomber": "轰炸机", "artillery": "炮兵",
             "order": "指令", "countermeasure": "反制" };
-        const unitTypes = ["infantry", "tank", "fighter", "bomber", "artillery"];
         const rarityDisplayMap = { "Standard": "普通", "Limited": "限定", "Special": "特殊", "Elite": "精英" };
         const factionNames = { "soviet": "苏联", "usa": "美国", "poland": "波兰", "neutral": "中立", "japan": "日本",
             "italy": "意大利", "france": "法国", "britain": "英国", "finland": "芬兰", "germany": "德国", "anzac": "澳新军团" };
-        const factionColor = { "germany": "#5A5F55", "britain": "#857A60", "soviet": "#4F3826", "usa": "#434B32",
-            "japan": "#90723C", "france": "#283454", "italy": "#555248", "poland": "#645633", "finland": "#C9C8BC",
-            "anzac": "#9E6F34", "neutral": "#6b6e5c" };
         const allNationOptions = ["germany", "britain", "japan", "soviet", "usa", "france", "italy", "poland", "finland",
             "anzac"
         ];
         const STATIC_COSTS = ["0", "1", "2", "3", "4", "5", "6", "7+"];
         const STATIC_RARITIES = ["Standard", "Limited", "Special", "Elite"];
         const typeKeys = Object.keys(typeNameMap);
-        const setKeys = Object.keys(setTranslation);
 
         // 卡背文件名首字母大写
         const getBackImage = (faction) => {
@@ -1086,6 +1098,15 @@
         let filters = [];
         let filterIdCounter = 0;
         let isOpening = false;
+        let currentPackCards = [];
+
+        // 概率存储
+        let probValues = {
+            Standard: 74,
+            Limited: 19,
+            Special: 5,
+            Elite: 2
+        };
 
         // ==================== 数据加载 ====================
         async function loadData() {
@@ -1120,7 +1141,6 @@
                         canCreate: j.can_create || [],
                         isCustom: false,
                         imageData: null,
-                        imageFit: 'cover',
                         rawJson: j
                     };
                 });
@@ -1160,26 +1180,16 @@
             return `${card.titleZh || ''} ${card.text_zh || ''} ${attrsTrans}`.toLowerCase();
         }
 
-        // ==================== 筛选器逻辑（与 builder 一致） ====================
-        const statusOptions = [
-            { value: 'all', label: '全部' },
-            { value: 'active', label: '活跃' },
-            { value: 'reserve', label: '预备' },
-            { value: 'spawn', label: '衍生' },
-            { value: 'veteran', label: '老兵' },
-            { value: 'custom', label: '自定义' }
-        ];
-
+        // ==================== 筛选器逻辑 ====================
         function evaluateFilter(filter, card) {
-            // 卡池筛选（status）
-            if (filter.status) {
-                const s = filter.status;
-                if (s === 'active' && (card.reserved || card.isSpawn || card.isVeteranSet || card.isCustom)) return false;
-                if (s === 'reserve' && !card.reserved) return false;
-                if (s === 'spawn' && !card.isSpawn) return false;
-                if (s === 'veteran' && !card.isVeteranSet) return false;
-                if (s === 'custom' && !card.isCustom) return false;
-                // 'all' 全部通过
+            // 卡池状态
+            if (filter.status && filter.status !== 'all') {
+                if (filter.status === 'active' && (card.reserved || card.isSpawn || card.isVeteranSet || card.isCustom))
+                    return false;
+                if (filter.status === 'reserve' && (!card.reserved || card.isCustom)) return false;
+                if (filter.status === 'spawn' && (!card.isSpawn || card.isCustom)) return false;
+                if (filter.status === 'veteran' && (!card.isVeteranSet || card.isCustom)) return false;
+                if (filter.status === 'custom' && !card.isCustom) return false;
             }
             // 搜索
             if (filter.search && filter.search.trim()) {
@@ -1207,10 +1217,9 @@
                 }
                 if (!match) return false;
             }
-            // 扩展包（无自定义）
+            // 扩展包
             if (filter.sets && filter.sets.length) {
-                if (card.isCustom) return false; // 自定义卡牌不属于任何官方扩展包
-                const cardSet = card.setName || '基础';
+                const cardSet = card.isCustom ? '自定义' : (card.setName || '基础');
                 if (!filter.sets.includes(cardSet)) return false;
             }
             return true;
@@ -1247,7 +1256,7 @@
             return pool;
         }
 
-        // ==================== 渲染筛选器（与 builder 风格一致） ====================
+        // ==================== 渲染筛选器 ====================
         function renderFilters() {
             const container = document.getElementById('filterList');
             if (filters.length === 0) {
@@ -1262,8 +1271,8 @@
                 // 构建摘要
                 const parts = [];
                 if (filter.status && filter.status !== 'all') {
-                    const label = statusOptions.find(s => s.value === filter.status)?.label || filter.status;
-                    parts.push(`📋 ${label}`);
+                    const statusMap = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
+                    parts.push(statusMap[filter.status] || filter.status);
                 }
                 if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
                 if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
@@ -1301,7 +1310,12 @@
                                     <div class="filter-row">
                                         <label>卡池</label>
                                         <select class="filter-status" data-idx="${idx}">
-                                            ${statusOptions.map(s => `<option value="${s.value}" ${filter.status===s.value?'selected':''}>${s.label}</option>`).join('')}
+                                            <option value="all" ${filter.status==='all'?'selected':''}>全部</option>
+                                            <option value="active" ${filter.status==='active'?'selected':''}>活跃</option>
+                                            <option value="reserve" ${filter.status==='reserve'?'selected':''}>预备</option>
+                                            <option value="spawn" ${filter.status==='spawn'?'selected':''}>衍生</option>
+                                            <option value="veteran" ${filter.status==='veteran'?'selected':''}>老兵</option>
+                                            <option value="custom" ${filter.status==='custom'?'selected':''}>自定义</option>
                                         </select>
                                     </div>
                                     <div class="filter-row">
@@ -1335,7 +1349,7 @@
                                     <div class="filter-row">
                                         <label>扩展包</label>
                                         <div class="chip-group" data-filter="sets" data-idx="${idx}">
-                                            ${setKeys.map(s => `<span class="chip ${filter.sets&&filter.sets.includes(s)?'active':''}" data-val="${s}"><img src="${setIconMap[s]}" onerror="this.style.display='none'"> ${setTranslation[s]}</span>`).join('')}
+                                            ${Object.keys(setTranslation).map(s => `<span class="chip ${filter.sets&&filter.sets.includes(s)?'active':''}" data-val="${s}"><img src="${setIconMap[s] || ''}" onerror="this.style.display='none'"> ${setTranslation[s]}</span>`).join('')}
                                         </div>
                                     </div>
                                     <div class="filter-result-preview">
@@ -1350,7 +1364,7 @@
             container.innerHTML = html;
             updatePoolSize();
 
-            // 事件绑定（与之前相同，但增加 status 变化）
+            // 事件绑定
             container.querySelectorAll('.filter-header[data-toggle]').forEach(el => {
                 const idx = parseInt(el.dataset.toggle);
                 el.addEventListener('click', (e) => {
@@ -1385,6 +1399,7 @@
                     renderFilters();
                 });
             });
+            // chip 点击
             container.querySelectorAll('.chip-group .chip').forEach(chip => {
                 chip.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1400,6 +1415,7 @@
                     renderFilters();
                 });
             });
+            // 搜索输入
             container.querySelectorAll('.filter-search').forEach(input => {
                 input.addEventListener('input', (e) => {
                     const idx = parseInt(input.dataset.idx);
@@ -1407,6 +1423,7 @@
                     renderFilters();
                 });
             });
+            // status select
             container.querySelectorAll('.filter-status').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const idx = parseInt(select.dataset.idx);
@@ -1428,7 +1445,7 @@
                 uf.value = 'germany';
             }
 
-            // 默认筛选器
+            // 默认添加一个筛选器
             if (filters.length === 0) {
                 filters.push({
                     id: filterIdCounter++,
@@ -1474,6 +1491,7 @@
                 });
                 renderFilters();
             });
+
             document.getElementById('clearFiltersBtn').addEventListener('click', () => {
                 if (filters.length === 0) return;
                 if (confirm('确定清空所有筛选器？')) {
@@ -1488,19 +1506,16 @@
             // 上传
             setupUpload();
 
-            // 各稀有度概率滑块联动
-            const sliders = document.querySelectorAll('.prob-slider');
-            sliders.forEach(slider => {
-                slider.addEventListener('input', function() {
-                    const val = parseInt(this.value);
-                    const rarity = this.dataset.rarity;
-                    document.getElementById(`probVal_${rarity}`).textContent = val + '%';
-                    // 归一化：保持总和100
-                    normalizeProbabilities(this);
+            // 概率滑块
+            document.querySelectorAll('.prob-slider').forEach(slider => {
+                const rarity = slider.dataset.rarity;
+                const valSpan = document.getElementById(`probVal-${rarity}`);
+                slider.addEventListener('input', () => {
+                    const val = parseInt(slider.value);
+                    valSpan.textContent = val;
+                    probValues[rarity] = val;
                 });
             });
-            // 初始化
-            normalizeProbabilities(null);
 
             // 禁止重复切换时检查
             document.getElementById('noDuplicates').addEventListener('change', () => {
@@ -1512,55 +1527,6 @@
                     document.getElementById('noDuplicates').checked = false;
                 }
             });
-        }
-
-        // 归一化概率
-        function normalizeProbabilities(changedSlider) {
-            const sliders = document.querySelectorAll('.prob-slider');
-            let total = 0;
-            const vals = [];
-            sliders.forEach(s => {
-                const v = parseInt(s.value);
-                vals.push(v);
-                total += v;
-            });
-            if (total === 0) {
-                // 避免全0，平均分配
-                const each = Math.floor(100 / sliders.length);
-                sliders.forEach((s, i) => {
-                    const val = i === sliders.length - 1 ? 100 - each * (sliders.length - 1) : each;
-                    s.value = val;
-                    document.getElementById(`probVal_${s.dataset.rarity}`).textContent = val + '%';
-                });
-                return;
-            }
-            // 不强制归一化，保留用户设定（但显示总和）
-            // 只是显示百分比，实际使用时归一化。
-        }
-
-        // 获取当前概率设置（归一化）
-        function getNormalizedProbs() {
-            const sliders = document.querySelectorAll('.prob-slider');
-            const vals = {};
-            let total = 0;
-            sliders.forEach(s => {
-                const v = parseInt(s.value);
-                vals[s.dataset.rarity] = v;
-                total += v;
-            });
-            if (total === 0) {
-                // 均匀分配
-                const keys = Object.keys(vals);
-                const each = 1 / keys.length;
-                const result = {};
-                keys.forEach(k => result[k] = each);
-                return result;
-            }
-            const result = {};
-            for (const [rarity, val] of Object.entries(vals)) {
-                result[rarity] = val / total;
-            }
-            return result;
         }
 
         // ==================== 上传卡牌 ====================
@@ -1655,27 +1621,33 @@
             });
         }
 
-        // ==================== 开包核心 ====================
-        function getRarityFromPool(pool, probs, packType) {
-            // probs 为归一化对象 {Standard, Limited, Special, Elite}
-            // 按稀有度从卡池中筛选
+        // ==================== 开包核心逻辑 ====================
+        function getRarityFromPool(pool, ignoreProb) {
+            if (ignoreProb) return null; // 完全随机
+
+            // 使用用户调节的概率
+            const total = probValues.Standard + probValues.Limited + probValues.Special + probValues.Elite;
+            if (total === 0) return null;
+            const norm = {};
+            for (const r of STATIC_RARITIES) {
+                norm[r] = probValues[r] / total;
+            }
+
             const rarityCards = {};
             for (const r of STATIC_RARITIES) {
                 rarityCards[r] = pool.filter(c => c.rarity === r);
             }
 
-            // 抽稀有度
             const roll = Math.random();
             let cum = 0;
             let selectedRarity = 'Standard';
             for (const r of STATIC_RARITIES) {
-                cum += probs[r] || 0;
+                cum += norm[r] || 0;
                 if (roll < cum) { selectedRarity = r; break; }
             }
 
             const candidates = rarityCards[selectedRarity] || [];
             if (candidates.length === 0) {
-                // 降级到有卡的稀有度
                 for (const r of STATIC_RARITIES) {
                     if (rarityCards[r] && rarityCards[r].length > 0) {
                         selectedRarity = r;
@@ -1691,7 +1663,7 @@
         function applyPity(packType, drawnCards) {
             if (packType === 'standard') {
                 const hasLimitedOrBetter = drawnCards.some(c => c.rarity === 'Limited' || c.rarity === 'Special' || c
-                .rarity === 'Elite');
+                    .rarity === 'Elite');
                 if (!hasLimitedOrBetter) {
                     const pool = getFilteredPool();
                     const limitedPool = pool.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity ===
@@ -1699,16 +1671,18 @@
                     if (limitedPool.length > 0) {
                         const noDup = document.getElementById('noDuplicates').checked;
                         const used = new Set(drawnCards.map(c => c.id));
-                        let avail = limitedPool;
-                        if (noDup) avail = limitedPool.filter(c => !used.has(c.id));
-                        if (avail.length === 0) avail = limitedPool;
-                        const replacement = avail[Math.floor(Math.random() * avail.length)];
-                        drawnCards[drawnCards.length - 1] = replacement;
+                        const avail = noDup ? limitedPool.filter(c => !used.has(c.id)) : limitedPool;
+                        if (avail.length > 0) {
+                            drawnCards[drawnCards.length - 1] = avail[Math.floor(Math.random() * avail.length)];
+                        } else {
+                            drawnCards[drawnCards.length - 1] = limitedPool[Math.floor(Math.random() * limitedPool
+                            .length)];
+                        }
                     }
                 }
             } else { // officer
-                const limitedOrBetter = drawnCards.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity ===
-                    'Elite');
+                const limitedOrBetter = drawnCards.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c
+                    .rarity === 'Elite');
                 const specialOrBetter = drawnCards.filter(c => c.rarity === 'Special' || c.rarity === 'Elite');
                 const pool = getFilteredPool();
                 const noDup = document.getElementById('noDuplicates').checked;
@@ -1717,8 +1691,7 @@
                 while (limitedOrBetter.length < 2) {
                     const candidates = pool.filter(c => (c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity ===
                         'Elite'));
-                    let avail = candidates;
-                    if (noDup) avail = candidates.filter(c => !used.has(c.id));
+                    const avail = noDup ? candidates.filter(c => !used.has(c.id)) : candidates;
                     if (avail.length === 0) break;
                     const pick = avail[Math.floor(Math.random() * avail.length)];
                     const replaceIdx = drawnCards.findIndex(c => c.rarity === 'Standard');
@@ -1732,10 +1705,10 @@
                         limitedOrBetter.push(pick);
                     }
                 }
+
                 while (specialOrBetter.length < 1) {
                     const candidates = pool.filter(c => (c.rarity === 'Special' || c.rarity === 'Elite'));
-                    let avail = candidates;
-                    if (noDup) avail = candidates.filter(c => !used.has(c.id));
+                    const avail = noDup ? candidates.filter(c => !used.has(c.id)) : candidates;
                     if (avail.length === 0) break;
                     const pick = avail[Math.floor(Math.random() * avail.length)];
                     const replaceIdx = drawnCards.findIndex(c => c.rarity === 'Standard');
@@ -1758,6 +1731,7 @@
             const packType = document.getElementById('packType').value;
             const count = packType === 'standard' ? 5 : 7;
             const noDuplicates = document.getElementById('noDuplicates').checked;
+            const ignoreProb = document.getElementById('ignoreProb').checked;
             const pityEnabled = document.getElementById('pityEnabled').checked;
 
             let pool = getFilteredPool();
@@ -1772,24 +1746,27 @@
             }
             const finalNoDup = document.getElementById('noDuplicates').checked;
 
-            // 获取归一化概率
-            const probs = getNormalizedProbs();
-
-            // 抽卡
             let drawn = [];
             const usedIds = new Set();
+
             for (let i = 0; i < count; i++) {
                 let card = null;
                 let attempts = 0;
                 while (attempts < 50) {
                     attempts++;
-                    const selected = getRarityFromPool(pool, probs, packType);
-                    if (!selected) {
+                    if (ignoreProb) {
                         const avail = finalNoDup ? pool.filter(c => !usedIds.has(c.id)) : pool;
                         if (avail.length === 0) break;
                         card = avail[Math.floor(Math.random() * avail.length)];
                     } else {
-                        card = selected;
+                        const selected = getRarityFromPool(pool, ignoreProb);
+                        if (!selected) {
+                            const avail = finalNoDup ? pool.filter(c => !usedIds.has(c.id)) : pool;
+                            if (avail.length === 0) break;
+                            card = avail[Math.floor(Math.random() * avail.length)];
+                        } else {
+                            card = selected;
+                        }
                     }
                     if (card && (!finalNoDup || !usedIds.has(card.id))) {
                         break;
@@ -1821,9 +1798,9 @@
         // ==================== 开包动画 ====================
         const raritySpeeds = {
             'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0 },
-            'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 6 },
-            'Special': { lift: 0.5, flip: 1.0, slam: 0.45, shake: 12 },
-            'Elite': { lift: 0.7, flip: 1.4, slam: 0.6, shake: 20 }
+            'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25 },
+            'Special': { lift: 0.5, flip: 1.0, slam: 0.45, shake: 0.4 },
+            'Elite': { lift: 0.7, flip: 1.4, slam: 0.6, shake: 0.6 }
         };
 
         function displayPack(cards, packType) {
@@ -1854,14 +1831,13 @@
                 div.dataset.rarity = card.rarity || 'Standard';
 
                 const backImg = getBackImage(card.faction || 'neutral');
-                const cardRadius = '15px'; // 固定，因为我们将通过CSS变量调整
 
                 div.innerHTML = `
-                        <div class="pack-card-inner" style="border-radius: ${cardRadius};">
-                            <div class="pack-card-face pack-card-back" style="border-radius: ${cardRadius};">
+                        <div class="pack-card-inner">
+                            <div class="pack-card-face pack-card-back">
                                 <img src="${backImg}" alt="卡背" loading="lazy">
                             </div>
-                            <div class="pack-card-face pack-card-front" style="border-radius: ${cardRadius};">
+                            <div class="pack-card-face pack-card-front">
                                 <img src="" alt="${card.titleZh}" loading="lazy">
                             </div>
                         </div>
@@ -1870,31 +1846,8 @@
                 cardElements.push({ el: div, card: card, isTop: isTop });
             });
 
-            // 布局：使用flex，确保top和bottom分开
-            // 将卡片分为两行
-            const topRow = document.createElement('div');
-            topRow.style.cssText = 'display:flex; justify-content:center; gap:12px; width:100%; flex-wrap:wrap;';
-            const bottomRow = document.createElement('div');
-            bottomRow.style.cssText = 'display:flex; justify-content:center; gap:12px; width:100%; flex-wrap:wrap; margin-top:8px;';
-
-            cardElements.forEach((item, idx) => {
-                const isTop = idx < topCount;
-                if (isTop) topRow.appendChild(item.el);
-                else bottomRow.appendChild(item.el);
-                // 设置大小
-                const w = Math.min(120, (zone.offsetWidth - 30) / Math.max(topCount, bottomCount) - 10);
-                const h = w * 1.4;
-                item.el.style.width = w + 'px';
-                item.el.style.height = h + 'px';
-                // 计算圆角
-                const radius = Math.max(4, w * (15 / 500));
-                item.el.querySelector('.pack-card-inner').style.borderRadius = radius + 'px';
-                item.el.querySelector('.pack-card-face').forEach(f => f.style.borderRadius = radius + 'px');
-            });
-
-            zone.innerHTML = '';
-            zone.appendChild(topRow);
-            zone.appendChild(bottomRow);
+            // 卡片尺寸由CSS控制 (--card-w)
+            // 布局：flex-wrap 自动换行，上排 topCount 个，下排 bottomCount 个
 
             // 加载正面图片
             setTimeout(() => {
@@ -1903,10 +1856,15 @@
                     const card = item.card;
                     if (card.isCustom && card.imageData) {
                         frontImg.src = card.imageData;
+                        // 应用图片填充
+                        const fit = card.imageFit || 'cover';
+                        frontImg.style.objectFit = fit;
                     } else if (card.image) {
                         frontImg.src = getCardImageUrl(card.image, 'zh-Hans', DEFAULT_VERSION, 100);
+                        frontImg.style.objectFit = 'cover';
                     } else {
                         frontImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="168" viewBox="0 0 120 168"%3E%3Crect width="120" height="168" fill="%233a2f1a"/%3E%3Ctext x="50%25" y="50%25" font-size="10" fill="%23dba551" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E';
+                        frontImg.style.objectFit = 'cover';
                     }
                     frontImg.onload = () => { item.el.classList.remove('placeholder'); };
                     frontImg.onerror = () => { item.el.classList.remove('placeholder'); };
@@ -1914,7 +1872,7 @@
                         item.el.classList.remove('placeholder');
                     }
                 });
-            }, 100);
+            }, 80);
 
             // 点击翻转
             let flipCount = 0;
@@ -1927,7 +1885,7 @@
                 const speeds = raritySpeeds[rarity] || raritySpeeds['Standard'];
 
                 el.addEventListener('click', function onClick() {
-                    if (el.classList.contains('flipped')) return;
+                    if (el.classList.contains('flipping')) return;
                     if (el.classList.contains('placeholder')) return;
 
                     // 抬起
@@ -1936,43 +1894,51 @@
 
                     setTimeout(() => {
                         // 翻转
-                        el.classList.add('flipped');
-                        // 拍下
-                        setTimeout(() => {
-                            el.classList.remove('lift');
-                            el.classList.add('slam');
-                            el.style.setProperty('--slam-duration', speeds.slam + 's');
+                        el.classList.add('flipping');
+                        el.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
+                        el.style.transform = 'rotateY(-180deg)';
 
-                            // 震动（仅稀有牌）
+                        // 拍下（翻转完成后）
+                        setTimeout(() => {
+                            el.classList.remove('flipping', 'lift');
+                            el.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
+                            el.style.transform = 'rotateY(-180deg)';
+
+                            // 轻微下压
+                            setTimeout(() => {
+                                el.style.transform = 'rotateY(-180deg) scale(0.97)';
+                                setTimeout(() => {
+                                    el.style.transform = 'rotateY(-180deg) scale(1)';
+                                }, 80);
+                            }, speeds.slam * 200);
+
+                            // 拍下时震动（仅非普通牌）
                             if (speeds.shake > 0) {
+                                const intensity = speeds.shake;
+                                const duration = 0.3 + intensity * 0.6;
                                 const zone = document.getElementById('animationZone');
-                                const intensity = speeds.shake * 0.4;
-                                zone.style.setProperty('--shake-duration', (speeds.slam * 1.2) + 's');
-                                zone.style.setProperty('--shake-intensity', intensity + 'px');
+                                const amp = 4 + intensity * 8;
+                                zone.style.setProperty('--shake-duration', duration + 's');
+                                zone.style.setProperty('--shake-x', (Math.random() * amp - amp/2) + 'px');
+                                zone.style.setProperty('--shake-y', (Math.random() * amp - amp/2) + 'px');
                                 zone.classList.add('shake');
-                                setTimeout(() => zone.classList.remove('shake'), speeds.slam * 1200);
+                                setTimeout(() => zone.classList.remove('shake'), duration * 1000);
                             }
 
-                            // 拍下后移除slam，保持flipped
-                            setTimeout(() => {
-                                el.classList.remove('slam');
-                                // 确保翻转状态保持
-                                el.style.transform = '';
-                                flipCount++;
-                                if (flipCount >= totalToFlip) {
-                                    isOpening = false;
-                                    document.getElementById('openPackBtn').disabled = false;
-                                }
-                            }, speeds.slam * 400);
+                            flipCount++;
+                            if (flipCount >= totalToFlip) {
+                                isOpening = false;
+                                document.getElementById('openPackBtn').disabled = false;
+                            }
                         }, speeds.flip * 400 + speeds.lift * 200);
                     }, speeds.lift * 500);
                 }, { once: false });
             });
 
-            // 没有超时解锁，依赖用户点击所有卡牌
+            // 不自动翻转，不设超时
         }
 
-        // ==================== 启动 ====================
+        // ==================== 原神启动 ====================
         window.addEventListener('load', () => {
             loadData();
         });
