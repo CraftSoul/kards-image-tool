@@ -118,16 +118,17 @@
 
         /* ===== 动画区 ===== */
         .animation-zone {
+            height: 360px; /* 固定高度，防止撑大 */
             padding: 20px;
-            min-height: 280px;
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 16px;
-            transition: min-height 0.3s;
+            transition: none;
             position: relative;
+            overflow: hidden;
         }
         .animation-zone .empty-hint {
             color: #887e66;
@@ -810,6 +811,10 @@
                 margin-left: 0;
                 width: 100%;
             }
+            .animation-zone {
+                height: 280px;
+                padding: 12px;
+            }
             .animation-zone .pack-card {
                 --card-w: 80px;
             }
@@ -842,6 +847,10 @@
             }
         }
         @media (max-width: 480px) {
+            .animation-zone {
+                height: 220px;
+                padding: 8px;
+            }
             .animation-zone .pack-card {
                 --card-w: 60px;
             }
@@ -1230,7 +1239,6 @@
             } catch (e) {
                 console.error(e);
                 filterList.innerHTML = '<div style="color:#cc7755;padding:12px;">❌ 数据加载失败</div>';
-                // 即使失败也显示上传按钮（可能允许上传自定义卡牌？但数据加载失败说明无法获取数据，还是保留隐藏）
                 document.getElementById('uploadBarPack').style.display = 'none';
             }
         }
@@ -1604,12 +1612,12 @@
             });
         }
 
-        // ==================== 上传卡牌（含预览） ====================
+        // ==================== 上传卡牌（含预览 + 重复确认） ====================
         function setupUpload() {
             const btn = document.getElementById('uploadPackBtn');
             const modal = document.getElementById('uploadPackModal');
             const cancel = document.getElementById('uploadPackCancel');
-            const confirm = document.getElementById('uploadPackConfirm');
+            const confirmBtn = document.getElementById('uploadPackConfirm');
             const imageInput = document.getElementById('uploadPackImage');
             const previewImg = document.getElementById('uploadPreviewImg');
             const previewPlaceholder = document.getElementById('previewPlaceholder');
@@ -1628,7 +1636,6 @@
                     previewImg.src = e.target.result;
                     previewImg.style.display = 'block';
                     previewPlaceholder.style.display = 'none';
-                    // 应用填充效果
                     const fit = fitSelect.value;
                     previewImg.style.objectFit = fit;
                 };
@@ -1658,7 +1665,7 @@
             cancel.addEventListener('click', () => modal.classList.remove('open'));
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
-            confirm.addEventListener('click', async () => {
+            confirmBtn.addEventListener('click', async () => {
                 const file = imageInput.files[0];
                 if (!file) { alert('请选择图片'); return; }
                 const cardId = document.getElementById('uploadPackCardId').value.trim();
@@ -1681,18 +1688,27 @@
                     reader.readAsDataURL(file);
                 });
 
-                const existing = customCards.find(c => c.cardId === cardId);
+                // 检查是否已存在（包括自定义和官方卡牌）
+                const existing = getFullCardList().find(c => c.cardId === cardId);
                 if (existing) {
-                    if (!confirm(`cardId "${cardId}" 已存在，是否替换卡图？`)) return;
+                    // 和 builder 一样询问是否替换
+                    if (!confirm(`cardId "${cardId}" 已存在（${existing.titleZh}），是否替换其卡图？\n其他数据将保持不变。`)) {
+                        return;
+                    }
+                    // 替换卡图，标记为自定义（若原来是官方卡牌，则变为自定义，但保留原有 importId 等）
                     existing.imageData = imageData;
+                    existing.imageFit = fit;
+                    existing.isCustom = true;
+                    // 更新其他元数据（如果用户想修改）
                     existing.titleZh = name;
                     existing.titleEn = name;
                     existing.faction = faction;
                     existing.cost = cost;
                     existing.type = type;
                     existing.rarity = rarity;
-                    existing.imageFit = fit;
+                    // 注意：如果是官方卡牌，importId 保留，这样可以导出代码
                 } else {
+                    // 全新自定义卡牌
                     customCards.push({
                         id: -1 - customCards.length,
                         cardId: cardId,
@@ -1902,7 +1918,7 @@
             displayPack(drawn, packType);
         }
 
-        // ==================== 开包动画（纯JS控制transform） ====================
+        // ==================== 开包动画 ====================
         const raritySpeeds = {
             'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0 },
             'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25 },
@@ -1917,7 +1933,10 @@
             isOpening = true;
             document.getElementById('openPackBtn').disabled = true;
 
+            // 清空旧卡片，但保留空状态提示（隐藏状态）
             zone.querySelectorAll('.pack-card').forEach(el => el.remove());
+            // 确保空提示隐藏
+            emptyHint.style.display = 'none';
 
             const isOfficer = packType === 'officer';
             const topCount = isOfficer ? 4 : 3;
@@ -1945,7 +1964,6 @@
                 div.dataset.cardId = card.id;
                 div.dataset.rarity = card.rarity || 'Standard';
 
-                // 不使用 innerHTML，而是创建元素以更好地控制
                 const inner = document.createElement('div');
                 inner.className = 'pack-card-inner';
                 const back = document.createElement('div');
