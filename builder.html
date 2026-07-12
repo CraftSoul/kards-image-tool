@@ -1637,6 +1637,7 @@
             width: 100%;
             height: auto;
             border-radius: 4px;
+            object-fit: cover;
         }
 
         /* 响应式 */
@@ -3014,6 +3015,14 @@
                         clientY = e.clientY;
                     }
                     thumbImg.src = getThumbUrl();
+                    // 应用图片填充方式（映射 stretch → fill）
+                    if (card.isCustom && card.imageFit) {
+                        let fit = card.imageFit;
+                        if (fit === 'stretch') fit = 'fill';
+                        thumbImg.style.objectFit = fit;
+                    } else {
+                        thumbImg.style.objectFit = 'cover';
+                    }
                     const rect = row.getBoundingClientRect();
                     const left = rect.left - 170;
                     const top = rect.top + (rect.height - 120) / 2;
@@ -3888,6 +3897,7 @@
                                         sy = (img.height - sh) / 2;
                                     }
                                 } else {
+                                    // stretch: 直接拉伸
                                     sw = img.width;
                                     sh = img.height;
                                 }
@@ -4083,7 +4093,8 @@
             });
 
             function updatePreviewFit() {
-                const fit = fitSelect.value;
+                let fit = fitSelect.value;
+                if (fit === 'stretch') fit = 'fill';
                 previewImg.style.objectFit = fit;
             }
             fitSelect.addEventListener('change', updatePreviewFit);
@@ -4144,7 +4155,7 @@
                     }
                     existing.imageData = imageData;
                     existing.imageFit = fit;
-                    existing.isCustom = true; // 标记为自定义，但保留 importId
+                    existing.isCustom = true;
                     targetCard = existing;
                     if (!deckMap.has(existing.id)) {
                         addToDeck(existing);
