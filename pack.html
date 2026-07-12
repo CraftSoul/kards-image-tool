@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>KARDS 军械库 | 模拟开包</title>
     <style>
-        /* ===== 全局重置 & 主题 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -30,7 +29,6 @@
             margin: 0 auto;
         }
 
-        /* ===== 导航 ===== */
         .nav-bar {
             background: rgba(20, 20, 15, 0.96);
             backdrop-filter: blur(16px);
@@ -116,7 +114,6 @@
             font-weight: 700;
         }
 
-        /* ===== 动画区 ===== */
         .animation-zone {
             padding: 20px;
             min-height: 280px;
@@ -198,7 +195,6 @@
             opacity: 0.3;
         }
 
-        /* 拍下震动 - 作用于整个动画区 */
         .animation-zone.shake {
             animation: shake-zone var(--shake-duration, 0.4s) ease-in-out;
         }
@@ -224,7 +220,6 @@
             }
         }
 
-        /* ===== 参数区 ===== */
         .params-panel {
             background: rgba(10, 12, 8, 0.94);
             backdrop-filter: blur(12px);
@@ -377,7 +372,6 @@
             transform: none;
         }
 
-        /* 各稀有度概率调节 */
         .prob-group {
             display: flex;
             flex-wrap: wrap;
@@ -430,7 +424,6 @@
             text-align: center;
         }
 
-        /* ===== 上传卡牌 ===== */
         .upload-bar-pack {
             margin-bottom: 12px;
             display: block;
@@ -455,7 +448,6 @@
             border-color: #eecb77;
         }
 
-        /* ===== 筛选器列表 ===== */
         .filter-list {
             display: flex;
             flex-direction: column;
@@ -650,7 +642,6 @@
             white-space: nowrap;
         }
 
-        /* ===== 添加筛选器按钮 ===== */
         .add-filter-bar {
             display: flex;
             gap: 10px;
@@ -672,7 +663,6 @@
             background: #5a7a3a;
         }
 
-        /* ===== 上传模态框 ===== */
         .upload-modal-pack {
             display: none;
             position: fixed;
@@ -796,7 +786,6 @@
             background: #7a5a4a;
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 768px) {
             .params-panel {
                 flex-direction: column;
@@ -873,8 +862,6 @@
                 --card-w: 120px;
             }
         }
-
-        /* ===== 滚动条美化 ===== */
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -887,8 +874,6 @@
             background: #c9aa5b;
             border-radius: 4px;
         }
-
-        /* ===== Footer ===== */
         .footer-simple {
             margin-top: 2rem;
             padding-top: 1rem;
