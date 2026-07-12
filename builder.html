@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js">
     </script>
     <style>
-        /* ===== 全局与基础样式 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -324,6 +323,7 @@
             transition: 0.1s;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
             position: relative;
+            cursor: default;
         }
         .headquarters-row {
             border-left-color: #b8860b;
@@ -1618,6 +1618,27 @@
             background: #7a5a4a;
         }
 
+        /* ===== 缩略图浮动 ===== */
+        .deck-thumbnail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 8px;
+            border: 2px solid #c9aa5b;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+            background: #1a1c12;
+            padding: 4px;
+            max-width: 160px;
+            display: none;
+            transition: opacity 0.15s;
+        }
+        .deck-thumbnail img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
         /* 响应式 */
         @media (max-width: 600px) {
             .switch-item {
@@ -1637,6 +1658,9 @@
             }
             .upload-form-row label {
                 min-width: auto;
+            }
+            .deck-thumbnail {
+                max-width: 120px;
             }
         }
 
@@ -1779,6 +1803,9 @@
         <div class="footer-simple"><a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a><a href="https://space.bilibili.com/3546775476505152" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/bilibili.svg" alt="bili"> BiliBili</a></div>
     </div>
 
+    <!-- 浮动缩略图 -->
+    <div class="deck-thumbnail" id="deckThumbnail"><img id="deckThumbImg" src="" alt="缩略图"></div>
+
     <!-- 统计模态框 -->
     <div id="statsModal" class="modal-stats">
         <div class="modal-stats-content">
@@ -1891,7 +1918,7 @@
                 <select id="uploadImageFit">
                     <option value="cover">横铺满</option>
                     <option value="contain">纵铺满</option>
-                    <option value="stretch">拉伸</option>
+                    <option value="stretch">拉！伸！</option>
                 </select>
             </div>
             <!-- 预览区域 -->
@@ -1950,7 +1977,7 @@
 
         function generateVersionList() {
             let versions = [];
-            for (let i = 0; i <= 9 + VERSION % 10; i++) {
+            for (let i = 0; i <= 12; i++) {
                 versions.push(`v${VERSION - i}`);
             }
             return versions;
@@ -2244,7 +2271,10 @@
                         cardId: j.id || raw.cardId || "",
                         importId: raw.importId || j.import_id || "",
                         titleZh: j.title?.["zh-Hans"] || j.title?.en || "未找到",
+                        titleEn: j.title?.["en-EN"] || "",
                         text_zh: j.text?.["zh-Hans"] || "",
+                        textMap: j.text || {},
+                        titleMap: j.title || {},
                         faction: factionRaw,
                         type: j.type || "",
                         rarity: j.rarity || "Standard",
@@ -2305,7 +2335,6 @@
                 renderDeckList('deckListContainer');
                 renderDeckList('mobileDeckList');
 
-                // 数据加载完成后显示上传按钮
                 document.getElementById('uploadBar').style.display = 'block';
             } catch (e) {
                 console.error(e);
@@ -2345,7 +2374,6 @@
                 langSelect.value = 'zh-Hans';
             }
 
-            // 背景颜色选择器联动
             const bgSelect = document.getElementById('bgColorSelect');
             const bgCustom = document.getElementById('bgColorCustom');
             const bgLabel = document.getElementById('bgColorLabel');
@@ -2373,7 +2401,6 @@
                 }
             }
 
-            // 上传模态框阵营选项
             const uploadFaction = document.getElementById('uploadFaction');
             if (uploadFaction) {
                 const allFactions = [...allNationOptions, 'neutral'];
@@ -2606,7 +2633,7 @@
                 qtySpan.className = 'v-qty';
                 qtySpan.textContent = `x${entry.count}`;
                 row.appendChild(qtySpan);
-                if (card.isCustom && !card.importId) {
+                if (card.isCustom) {
                     const verLabel = document.createElement('span');
                     verLabel.textContent = '自定义';
                     verLabel.style.color = '#887e66';
@@ -2691,7 +2718,10 @@
             if (selectedFilters.rarities.size) res = res.filter(c => selectedFilters.rarities.has(c.rarity));
             if (selectedFilters.sets.size) {
                 res = res.filter(c => {
-                    const effSet = c.isCustom ? '自定义' : getEffectiveSet(c);
+                    if (c.isCustom) {
+                        return selectedFilters.sets.has('自定义');
+                    }
+                    const effSet = getEffectiveSet(c);
                     return selectedFilters.sets.has(effSet);
                 });
             }
@@ -2873,6 +2903,7 @@
             if (toggleCount) toggleCount.innerText = total;
         }
 
+        // ==================== 渲染卡组列表 ====================
         function renderDeckList(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -2896,7 +2927,7 @@
                 const rarityClass = rarityClassMap[c.rarity] || "rarity-standard";
                 const rarityDisplay = rarityDisplayMap[c.rarity] || c.rarity;
                 const reserveIcon = c.reserved ? '<i class="deck-card-reserve-icon"></i>' : '';
-                html += `<div class="deck-card-row" style="border-left-color: ${borderColor};">
+                html += `<div class="deck-card-row" data-card-id="${c.id}" style="border-left-color: ${borderColor};">
                             <div class="deck-card-icon" style="background-image: url('${c.faction}.svg'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
                             <div class="deck-card-details">
                                 <div class="deck-card-name" title="${c.titleZh}">${c.titleZh}${reserveIcon}</div>
@@ -2914,6 +2945,7 @@
                         </div>`;
             });
             container.innerHTML = html;
+            // 绑定按钮事件
             container.querySelectorAll('.deck-remove-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -2931,9 +2963,99 @@
                     }
                 });
             });
+
+            // 绑定缩略图悬停/长按事件
+            attachThumbnails(container);
         }
 
-        // ==================== 导入导出（区分纯自定义卡牌） ====================
+        // ==================== 缩略图功能 ====================
+        let thumbnailTimer = null;
+        const thumbElem = document.getElementById('deckThumbnail');
+        const thumbImg = document.getElementById('deckThumbImg');
+
+        function attachThumbnails(container) {
+            const rows = container.querySelectorAll('.deck-card-row:not(.headquarters-row)');
+            rows.forEach(row => {
+                const cardId = parseInt(row.dataset.cardId);
+                if (isNaN(cardId)) return;
+                const card = allCards.find(c => c.id === cardId);
+                if (!card) return;
+
+                // 清除旧事件
+                const cleanup = () => {
+                    row.removeEventListener('mouseenter', row._thumbEnter);
+                    row.removeEventListener('mouseleave', row._thumbLeave);
+                    row.removeEventListener('touchstart', row._thumbTouchStart);
+                    row.removeEventListener('touchend', row._thumbTouchEnd);
+                    row.removeEventListener('touchcancel', row._thumbTouchEnd);
+                };
+                cleanup();
+
+                const getThumbUrl = () => {
+                    if (card.isCustom && card.imageData) {
+                        return card.imageData;
+                    } else {
+                        return getCardImageUrl(card.image, 'zh-Hans', DEFAULT_VERSION, 20);
+                    }
+                };
+
+                const showThumb = (e) => {
+                    // 获取鼠标或触摸位置
+                    let clientX, clientY;
+                    if (e.type === 'touchstart') {
+                        const touch = e.touches[0];
+                        clientX = touch.clientX;
+                        clientY = touch.clientY;
+                        // 阻止默认长按菜单
+                        e.preventDefault();
+                    } else {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+                    // 设置图片
+                    thumbImg.src = getThumbUrl();
+                    // 定位：在行左侧偏上一点
+                    const rect = row.getBoundingClientRect();
+                    // 将缩略图放在行左侧，垂直居中
+                    const left = rect.left - 170; // 预留空间
+                    const top = rect.top + (rect.height - 120) / 2;
+                    thumbElem.style.left = Math.max(10, left) + 'px';
+                    thumbElem.style.top = Math.max(10, top) + 'px';
+                    thumbElem.style.display = 'block';
+                    // 清除之前的隐藏定时器
+                    if (thumbnailTimer) {
+                        clearTimeout(thumbnailTimer);
+                        thumbnailTimer = null;
+                    }
+                };
+
+                const hideThumb = () => {
+                    // 延迟隐藏以便用户移动鼠标到缩略图（但缩略图不响应指针事件）
+                    if (thumbnailTimer) clearTimeout(thumbnailTimer);
+                    thumbnailTimer = setTimeout(() => {
+                        thumbElem.style.display = 'none';
+                    }, 200);
+                };
+
+                const enterHandler = (e) => showThumb(e);
+                const leaveHandler = () => hideThumb();
+                const touchStartHandler = (e) => showThumb(e);
+                const touchEndHandler = () => hideThumb();
+
+                row._thumbEnter = enterHandler;
+                row._thumbLeave = leaveHandler;
+                row._thumbTouchStart = touchStartHandler;
+                row._thumbTouchEnd = touchEndHandler;
+
+                row.addEventListener('mouseenter', enterHandler);
+                row.addEventListener('mouseleave', leaveHandler);
+                row.addEventListener('touchstart', touchStartHandler, { passive: false });
+                row.addEventListener('touchend', touchEndHandler);
+                row.addEventListener('touchcancel', touchEndHandler);
+            });
+        }
+
+        // ==================== 导入导出 ====================
         function getNationCode(faction) {
             const idx = allNationOptions.indexOf(faction);
             if (idx === -1) return '1';
@@ -2949,7 +3071,6 @@
 
         function exportDeckCode() {
             if (deckMap.size === 0) { alert("卡组为空，无法导出"); return null; }
-            // 检查是否存在纯自定义卡牌（isCustom 且 importId 为空）
             for (let { card } of deckMap.values()) {
                 if (card.isCustom && !card.importId) {
                     alert("卡组中包含纯自定义卡牌（无导入ID），无法导出卡组代码");
@@ -3304,7 +3425,7 @@
             }
         }
 
-        // ==================== 图片生成（处理纯自定义卡牌） ====================
+        // ==================== 图片生成 ====================
         async function fetchHeadquarterCard(name, lang) {
             if (!name || name.trim() === '') return null;
             const formatted = name.trim().toLowerCase().replace(/[&!\/\\\'"(),-]/g, '').replace(/[\.\s]+/g, '_').replace(
@@ -3316,9 +3437,10 @@
                 id: -1,
                 cardId: 'headquarter',
                 titleZh: '总部',
+                titleEn: 'Headquarters',
                 image: `${formatted}.avif`,
                 faction: 'neutral',
-                type: 'tank',
+                type: 'order',
                 rarity: 'Standard',
                 cost: 0,
                 attack: undefined,
@@ -3582,7 +3704,6 @@
             qrEnabled, statsTitle, qrTitle) {
             if (!cardsWithVersion || cardsWithVersion.length === 0) throw new Error("卡组为空");
 
-            // 检查纯自定义卡牌，自动禁用qrEnabled
             let hasPureCustom = cardsWithVersion.some(item => item.card.isCustom && !item.card.importId);
             if (hasPureCustom && qrEnabled) {
                 qrEnabled = false;
@@ -4027,7 +4148,7 @@
                     }
                     existing.imageData = imageData;
                     existing.imageFit = fit;
-                    existing.isCustom = true; // 标记为自定义，但保留 importId（如果有）
+                    existing.isCustom = true; // 标记为自定义，但保留 importId
                     targetCard = existing;
                     if (!deckMap.has(existing.id)) {
                         addToDeck(existing);
@@ -4041,13 +4162,16 @@
                     return;
                 }
 
-                // 创建纯自定义新卡（importId 为空）
+                // 创建纯自定义新卡
                 const newCard = {
                     id: allCards.length,
                     cardId: cardId,
-                    importId: '', // 纯自定义无导入ID
+                    importId: '',
                     titleZh: name,
+                    titleEn: name,
                     text_zh: '',
+                    textMap: {},
+                    titleMap: { "zh-Hans": name, "en-EN": name },
                     faction: faction,
                     type: type,
                     rarity: rarity,
@@ -4116,7 +4240,7 @@
             }
         }
 
-        // ==================== 启动 ====================
+        // ==================== 原神启动 ====================
         function initSidebars() {
             const toggle = document.getElementById('mobileDeckToggle');
             const panel = document.getElementById('mobileDeckPanel');

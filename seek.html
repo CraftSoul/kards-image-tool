@@ -372,7 +372,7 @@
         const LATEST_VERSION_NUM = 52;
         function generateVersionList() {
             let versions = [];
-            for (let i = 0; i <= 9+LATEST_VERSION_NUM%10; i++) {
+            for (let i = 0; i <= 12; i++) {
                 versions.push(`v${LATEST_VERSION_NUM-i}`);
             }
             return versions;
