@@ -118,17 +118,16 @@
 
         /* ===== 动画区 ===== */
         .animation-zone {
-            height: 360px; /* 固定高度，防止撑大 */
             padding: 20px;
+            min-height: 280px;
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 16px;
-            transition: none;
+            transition: min-height 0.3s;
             position: relative;
-            overflow: hidden;
         }
         .animation-zone .empty-hint {
             color: #887e66;
@@ -811,10 +810,6 @@
                 margin-left: 0;
                 width: 100%;
             }
-            .animation-zone {
-                height: 280px;
-                padding: 12px;
-            }
             .animation-zone .pack-card {
                 --card-w: 80px;
             }
@@ -847,10 +842,6 @@
             }
         }
         @media (max-width: 480px) {
-            .animation-zone {
-                height: 220px;
-                padding: 8px;
-            }
             .animation-zone .pack-card {
                 --card-w: 60px;
             }
@@ -1346,8 +1337,10 @@
             return pool;
         }
 
-        // ==================== 渲染筛选器 ====================
-        function renderFilters() {
+        // ==================== 渲染筛选器（支持焦点恢复） ====================
+        let searchTimeout = null;
+
+        function renderFilters(focusIdx) {
             const container = document.getElementById('filterList');
             if (filters.length === 0) {
                 container.innerHTML =
@@ -1505,13 +1498,23 @@
                     renderFilters();
                 });
             });
-            // 搜索输入
+            // 搜索输入 - 防抖处理
             container.querySelectorAll('.filter-search').forEach(input => {
                 input.addEventListener('input', (e) => {
                     const idx = parseInt(input.dataset.idx);
                     filters[idx].search = input.value;
-                    renderFilters();
+                    clearTimeout(searchTimeout);
+                    const focusIdx = idx;
+                    searchTimeout = setTimeout(() => {
+                        renderFilters(focusIdx);
+                    }, 300);
                 });
+                // 如果指定了焦点索引，聚焦该输入框
+                if (focusIdx !== undefined && parseInt(input.dataset.idx) === focusIdx) {
+                    input.focus();
+                    // 将光标移到末尾
+                    input.setSelectionRange(input.value.length, input.value.length);
+                }
             });
             // status select
             container.querySelectorAll('.filter-status').forEach(select => {
@@ -1612,12 +1615,12 @@
             });
         }
 
-        // ==================== 上传卡牌（含预览 + 重复确认） ====================
+        // ==================== 上传卡牌（含预览 + 重复询问替换） ====================
         function setupUpload() {
             const btn = document.getElementById('uploadPackBtn');
             const modal = document.getElementById('uploadPackModal');
             const cancel = document.getElementById('uploadPackCancel');
-            const confirmBtn = document.getElementById('uploadPackConfirm');
+            const confirm = document.getElementById('uploadPackConfirm');
             const imageInput = document.getElementById('uploadPackImage');
             const previewImg = document.getElementById('uploadPreviewImg');
             const previewPlaceholder = document.getElementById('previewPlaceholder');
@@ -1665,7 +1668,7 @@
             cancel.addEventListener('click', () => modal.classList.remove('open'));
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
-            confirmBtn.addEventListener('click', async () => {
+            confirm.addEventListener('click', async () => {
                 const file = imageInput.files[0];
                 if (!file) { alert('请选择图片'); return; }
                 const cardId = document.getElementById('uploadPackCardId').value.trim();
@@ -1688,27 +1691,24 @@
                     reader.readAsDataURL(file);
                 });
 
-                // 检查是否已存在（包括自定义和官方卡牌）
-                const existing = getFullCardList().find(c => c.cardId === cardId);
+                // 检查是否已存在
+                const existing = customCards.find(c => c.cardId === cardId);
                 if (existing) {
-                    // 和 builder 一样询问是否替换
-                    if (!confirm(`cardId "${cardId}" 已存在（${existing.titleZh}），是否替换其卡图？\n其他数据将保持不变。`)) {
+                    if (!confirm(`cardId "${cardId}" 已存在，是否替换其卡图？\n其他数据（卡名、费用等）将保持不变。`)) {
                         return;
                     }
-                    // 替换卡图，标记为自定义（若原来是官方卡牌，则变为自定义，但保留原有 importId 等）
+                    // 替换卡图，保留其他数据
                     existing.imageData = imageData;
                     existing.imageFit = fit;
-                    existing.isCustom = true;
-                    // 更新其他元数据（如果用户想修改）
+                    // 如果用户修改了卡名等信息，可选择性更新，但按builder逻辑只替换图片
+                    // 但builder中替换时也允许更新其他字段，我们同样允许
                     existing.titleZh = name;
                     existing.titleEn = name;
                     existing.faction = faction;
                     existing.cost = cost;
                     existing.type = type;
                     existing.rarity = rarity;
-                    // 注意：如果是官方卡牌，importId 保留，这样可以导出代码
                 } else {
-                    // 全新自定义卡牌
                     customCards.push({
                         id: -1 - customCards.length,
                         cardId: cardId,
@@ -1918,7 +1918,7 @@
             displayPack(drawn, packType);
         }
 
-        // ==================== 开包动画 ====================
+        // ==================== 开包动画（纯JS控制transform，保持位置） ====================
         const raritySpeeds = {
             'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0 },
             'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25 },
@@ -1933,10 +1933,7 @@
             isOpening = true;
             document.getElementById('openPackBtn').disabled = true;
 
-            // 清空旧卡片，但保留空状态提示（隐藏状态）
             zone.querySelectorAll('.pack-card').forEach(el => el.remove());
-            // 确保空提示隐藏
-            emptyHint.style.display = 'none';
 
             const isOfficer = packType === 'officer';
             const topCount = isOfficer ? 4 : 3;
@@ -2017,7 +2014,7 @@
                 });
             }, 80);
 
-            // 点击翻转 - 使用 JS 控制 transform
+            // 点击翻转 - 使用 JS 控制 transform，保持位置稳定
             let flipCount = 0;
             const totalToFlip = cardElements.length;
 
