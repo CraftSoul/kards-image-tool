@@ -1416,9 +1416,19 @@
                     `;
             });
             container.innerHTML = html;
+if (focusIdx !== undefined) {
+    const inputs = container.querySelectorAll('.filter-search');
+    const targetInput = Array.from(inputs).find(inp => parseInt(inp.dataset.idx) === focusIdx);
+    if (targetInput) {
+        requestAnimationFrame(() => {
+            targetInput.focus();
+            targetInput.setSelectionRange(targetInput.value.length, targetInput.value.length);
+        });
+    }
+}
             updatePoolSize();
 
-            // 事件绑定（略... 同前）
+            // 事件绑定
             container.querySelectorAll('.filter-header[data-toggle]').forEach(el => {
                 const idx = parseInt(el.dataset.toggle);
                 el.addEventListener('click', (e) => {
