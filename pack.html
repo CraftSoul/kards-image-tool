@@ -163,7 +163,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
         .animation-zone .pack-card.flipped .pack-card-inner {
-            transform: rotateY(-180deg);
+            transform: rotateY(180deg);
         }
         .animation-zone .pack-card-face {
             position: absolute;
@@ -185,7 +185,7 @@
             border: 2px solid #aa8e4e;
         }
         .animation-zone .pack-card-front {
-            transform: rotateY(180deg);
+            transform: rotateY(-180deg);
             border: 2px solid #c9aa5b;
         }
         .animation-zone .pack-card.placeholder .pack-card-back {
@@ -2015,12 +2015,12 @@
                     setTimeout(() => {
                         // 翻转
                         inner.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
-                        inner.style.transform = 'rotateY(-180deg) translateY(-45px) scale(1.18)';
+                        inner.style.transform = 'rotateY(180deg) translateY(-45px) scale(1.18)';
 
                         setTimeout(() => {
                             // 拍下
                             inner.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
-                            inner.style.transform = 'rotateY(-180deg) translateY(0) scale(1)';
+                            inner.style.transform = 'rotateY(180deg) translateY(0) scale(1)';
 
                             el.classList.add('flipped');
 
