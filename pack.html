@@ -1344,7 +1344,7 @@
                 const previewCards = result.slice(0, 8).map(c => c.titleZh).join(', ');
 
                 html += `
-                        <div class="filter-item" data-filter-idx="${idx}">
+                        <div class="filter-item" data-filter-idx="${idx}" data-idx="${idx}">
                             <div class="filter-header" data-toggle="${idx}">
                                 <span class="filter-label">📌 筛选器 ${idx+1}</span>
                                 ${filter.isComplement ? `<span class="filter-badge">补集</span>` : ''}
@@ -1407,7 +1407,7 @@
                                         </div>
                                     </div>
                                     <div class="filter-result-preview">
-                                        <span class="result-count">${resultCount} 张</span>
+                                        <span class="filter-badge qty-badge" data-idx="${idx}">${resultCount} 张</span>
                                         <span class="result-cards">${previewCards ? previewCards : '未找到'}</span>
                                     </div>
                                 </div>
@@ -1416,16 +1416,6 @@
                     `;
             });
             container.innerHTML = html;
-if (focusIdx !== undefined) {
-    const inputs = container.querySelectorAll('.filter-search');
-    const targetInput = Array.from(inputs).find(inp => parseInt(inp.dataset.idx) === focusIdx);
-    if (targetInput) {
-        requestAnimationFrame(() => {
-            targetInput.focus();
-            targetInput.setSelectionRange(targetInput.value.length, targetInput.value.length);
-        });
-    }
-}
             updatePoolSize();
 
             // 事件绑定
@@ -1479,19 +1469,19 @@ if (focusIdx !== undefined) {
                 });
             });
             container.querySelectorAll('.filter-search').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const idx = parseInt(input.dataset.idx);
-                    filters[idx].search = input.value;
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        renderFilters(idx);
-                    }, 300);
-                });
-                if (focusIdx !== undefined && parseInt(input.dataset.idx) === focusIdx) {
-                    input.focus();
-                    input.setSelectionRange(input.value.length, input.value.length);
-                }
-            });
+    input.addEventListener('input', (e) => {
+        const idx = parseInt(input.dataset.idx);
+        filters[idx].search = input.value;
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            updateFilterPreview(idx);
+        }, 300);
+    });
+    if (focusIdx !== undefined && parseInt(input.dataset.idx) === focusIdx) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }
+});
             container.querySelectorAll('.filter-status').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const idx = parseInt(select.dataset.idx);
@@ -1501,6 +1491,45 @@ if (focusIdx !== undefined) {
             });
         }
 
+        function updateFilterPreview(idx) {
+    const filter = filters[idx];
+    if (!filter) return;
+    const item = document.querySelector(`.filter-item[data-idx="${idx}"]`);
+    if (!item) return;
+
+    const all = getFullCardList();
+    const result = all.filter(c => evaluateFilter(filter, c));
+    const resultCount = result.length;
+    const previewCards = result.slice(0, 8).map(c => c.titleZh).join(', ');
+
+    const qtyBadge = item.querySelector('.qty-badge');
+    if (qtyBadge) qtyBadge.textContent = `${resultCount} 张`;
+
+    const summary = item.querySelector('.filter-summary');
+    if (summary) {
+        const parts = [];
+        if (filter.status && filter.status !== 'all') {
+            const statusMap = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
+            parts.push(statusMap[filter.status] || filter.status);
+        }
+        if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
+        if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
+        if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r).join('|'));
+        if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f).join('|'));
+        if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
+        if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
+        const summaryText = parts.length ? parts.join(' | ') : '全部卡牌';
+        summary.innerHTML = `<span>${summaryText}</span>`;
+    }
+
+    const preview = item.querySelector('.filter-result-preview');
+    if (preview) {
+        preview.innerHTML = `
+            <span class="result-count">${resultCount} 张</span>
+            <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
+        `;
+    }
+}
         // ==================== 初始化UI ====================
         function initUI() {
             const uf = document.getElementById('uploadPackFaction');
