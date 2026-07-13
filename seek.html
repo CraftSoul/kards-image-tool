@@ -223,7 +223,6 @@
             background: #1c1a10;
             display: block;
             margin: 0 auto;
-            min-height: 120px;
         }
         .status-msg {
             color: #f3d48f;
@@ -353,7 +352,7 @@
     </div>
 
     <div class="image-showcase">
-        <img id="cardImage" src="" alt="卡牌预览">
+        <img id="cardImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233f3a2a'/%3E%3Ctext x='50%25' y='50%25' font-size='14' fill='%23cfb87c' text-anchor='middle' dy='.3em'%3E⚙️ 等待检索 ⚙️%3C/text%3E%3C/svg%3E" alt="卡牌预览">
         <div id="imageStatus" class="status-msg">输入英文名，点击检索</div>
     </div>
 
@@ -442,9 +441,6 @@
             link.addEventListener('click', () => navMenu.classList.remove('open'));
         });
 
-        let currentObjectUrl = null;
-        let cachedBlob = null;
-
         let currentVariants = [];
         let activeVariantKey = null;
         let currentBaseClean = '';
@@ -531,184 +527,29 @@
             setLoading(true);
             const langDisplay = getLangName(lang);
             imageStatus.innerHTML = `⏳ 加载: ${item.formattedName}.avif (${langDisplay} | ${version})`;
-
-            try {
-                const resp = await fetch(highResUrl);
-                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                const blob = await resp.blob();
-                cachedBlob = blob;
-
-                if (currentObjectUrl) {
-                    URL.revokeObjectURL(currentObjectUrl);
-                    currentObjectUrl = null;
-                }
-
-                const url = URL.createObjectURL(blob);
-                currentObjectUrl = url;
-
-                // 设置 src 并等待 onload，确保图片完全加载并解码
-                await new Promise((resolve, reject) => {
-                    const onLoad = () => {
-                        cardImage.removeEventListener('load', onLoad);
-                        cardImage.removeEventListener('error', onError);
-                        if (cardImage.naturalWidth > 0 && cardImage.naturalHeight > 0) {
-                            resolve();
-                        } else {
-                            reject(new Error('图片尺寸无效'));
-                        }
-                    };
-                    const onError = (e) => {
-                        cardImage.removeEventListener('load', onLoad);
-                        cardImage.removeEventListener('error', onError);
-                        reject(e);
-                    };
-                    cardImage.addEventListener('load', onLoad);
-                    cardImage.addEventListener('error', onError);
-                    cardImage.src = url;
-
-                    // 如果图片已缓存且 complete 为 true，但事件可能不会触发，直接检查
-                    if (cardImage.complete) {
-                        if (cardImage.naturalWidth > 0) {
-                            onLoad();
-                        } else {
-                            reject(new Error('图片加载完成但尺寸无效'));
-                        }
-                    }
-                });
-
-                await cardImage.decode();
-
-                setLoading(false);
-                let extra = '';
-                if (item.isVeteran) extra = ' ⭐ 老兵';
-                else if (item.suffixKey && item.suffixKey !== '' && !item.isVeteran) extra = ` 🔹 ${item.displayName}`;
-                imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extra} (${langDisplay} | ${version})`;
-                cardImage.setAttribute('data-current-name', item.formattedName);
-                cardImage.setAttribute('data-lang', lang);
-                cardImage.setAttribute('data-version', version);
-                return true;
-            } catch (e) {
-                setLoading(false);
-                imageStatus.innerHTML = `❌ 加载失败: ${item.formattedName}.avif (版本 ${version}) - ${e.message}`;
-                if (currentObjectUrl) {
-                    URL.revokeObjectURL(currentObjectUrl);
-                    currentObjectUrl = null;
-                }
-                cardImage.src = '';
-                cachedBlob = null;
-                currentHighResUrl = '';
-                return false;
-            }
-        }
-
-        async function saveCroppedImage() {
-            if (!cardImage.src || cardImage.src === '') {
-                imageStatus.innerHTML = "⚠️ 无有效卡图";
-                return;
-            }
-
-            // 防御性检查：确保图片已完全加载
-            if (!cardImage.complete || cardImage.naturalWidth === 0) {
-                imageStatus.innerHTML = "⏳ 图片尚未完全加载，请稍后重试";
-                return;
-            }
-            try {
-                await cardImage.decode();
-            } catch (e) {
-                imageStatus.innerHTML = `⚠️ 图片解码失败: ${e.message}`;
-                return;
-            }
-
-            const w = cardImage.naturalWidth;
-            const h = cardImage.naturalHeight;
-            if (w === 0 || h === 0) {
-                imageStatus.innerHTML = "⚠️ 图片尺寸无效";
-                return;
-            }
-
-            saveBtn.disabled = true;
-            const originalText = saveBtn.innerText;
-            saveBtn.innerText = "💾 处理中...";
-
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(cardImage, 0, 0);
-
-                const imgData = ctx.getImageData(0, 0, w, h);
-                const data = imgData.data;
-
-                // BFS 边缘透明化
-                function isDarkPixel(data, x, y, width, threshold) {
-                    const idx = (y * width + x) * 4;
-                    const r = data[idx];
-                    const g = data[idx + 1];
-                    const b = data[idx + 2];
-                    return Math.max(r, g, b) <= threshold;
-                }
-
-                const visited = new Uint8Array(w * h);
-                const queue = [];
-                const threshold = 50;
-
-                const corners = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]];
-                for (const [cx, cy] of corners) {
-                    const idx = cy * w + cx;
-                    if (!visited[idx] && isDarkPixel(data, cx, cy, w, threshold)) {
-                        visited[idx] = 1;
-                        queue.push([cx, cy]);
-                    }
-                }
-
-                const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-                let transparentCount = 0;
-                while (queue.length > 0) {
-                    const [x, y] = queue.shift();
-                    const idx = (y * w + x) * 4;
-                    data[idx + 3] = 0;
-                    transparentCount++;
-
-                    for (const [dx, dy] of dirs) {
-                        const nx = x + dx;
-                        const ny = y + dy;
-                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                            const nidx = ny * w + nx;
-                            if (!visited[nidx] && isDarkPixel(data, nx, ny, w, threshold)) {
-                                visited[nidx] = 1;
-                                queue.push([nx, ny]);
-                            }
-                        }
-                    }
-                }
-
-                ctx.putImageData(imgData, 0, 0);
-
-                const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-                const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
-                const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
-                const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
-                const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
-                const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
-
-                const url = URL.createObjectURL(pngBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                imageStatus.innerHTML = `📦 保存成功: ${fileName} (透明边缘 ${transparentCount} 像素)`;
-            } catch (e) {
-                imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
-                console.error(e);
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerText = originalText;
-            }
+            return new Promise((resolve) => {
+                const imgTest = new Image();
+                imgTest.onload = () => {
+                    cardImage.src = highResUrl;
+                    setLoading(false);
+                    let extra = '';
+                    if (item.isVeteran) extra = ' ⭐ 老兵';
+                    else if (item.suffixKey && item.suffixKey !== '' && !item.isVeteran) extra = ` 🔹 ${item.displayName}`;
+                    imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extra} (${langDisplay} | ${version})`;
+                    cardImage.setAttribute('data-current-name', item.formattedName);
+                    cardImage.setAttribute('data-lang', lang);
+                    cardImage.setAttribute('data-version', version);
+                    resolve(true);
+                };
+                imgTest.onerror = () => {
+                    setLoading(false);
+                    imageStatus.innerHTML = `❌ 加载失败: ${item.formattedName}.avif (版本 ${version})`;
+                    cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 图片不可用 💀%3C/text%3E%3C/svg%3E";
+                    currentHighResUrl = '';
+                    resolve(false);
+                };
+                imgTest.src = highResUrl;
+            });
         }
 
         function renderVariantPanel(variants, activeKey, onSelect) {
@@ -765,13 +606,7 @@
                 imageStatus.innerHTML = `❌ 未找到 "${rawName}" 于版本 ${version}`;
                 variantsContainer.style.display = 'none';
                 currentVariants = [];
-                // 清空图片
-                if (currentObjectUrl) {
-                    URL.revokeObjectURL(currentObjectUrl);
-                    currentObjectUrl = null;
-                }
-                cardImage.src = '';
-                cachedBlob = null;
+                cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%23312d20'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23e6bf7a' text-anchor='middle' dy='.3em'%3E🔍 卡牌不存在 %3C/text%3E%3C/svg%3E";
                 currentHighResUrl = '';
                 return;
             }
@@ -807,6 +642,117 @@
         function getLangName(code) {
             const found = languages.find(l => l.code === code);
             return found ? found.label : code;
+        }
+
+        // ==================== 裁剪 ====================
+        function isDarkPixel(data, x, y, width, threshold) {
+            const idx = (y * width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            return Math.max(r, g, b) <= threshold;
+        }
+
+        // ==================== 保存图片 ====================
+        async function saveCroppedImage() {
+            const src = cardImage.src;
+            if (!src || src.includes("data:image/svg+xml") && (src.includes("等待") || src.includes("不存在") || src.includes("不可用"))) {
+                imageStatus.innerHTML = "⚠️ 无有效卡图";
+                return;
+            }
+            if (!cardImage.complete || cardImage.naturalWidth === 0) {
+                imageStatus.innerHTML = "⏳ 图片未完全加载，稍后重试";
+                return;
+            }
+            await cardImage.decode();
+
+            saveBtn.disabled = true;
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = "💾 处理中...";
+
+            try {
+                const resp = await fetch(src);
+                if (!resp.ok) throw new Error("fetch failed");
+                const blob = await resp.blob();
+                const bitmap = await createImageBitmap(blob);
+                const w = bitmap.width, h = bitmap.height;
+
+                // 获取图片数据
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = w;
+                tempCanvas.height = h;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(bitmap, 0, 0);
+                const imgData = tempCtx.getImageData(0, 0, w, h);
+                const data = imgData.data;
+
+                // BFS 标记所有四角相连的暗色像素，将其 alpha 设为 0（透明）
+                const visited = new Uint8Array(w * h);
+                const queue = [];
+                const threshold = 50;
+
+                const corners = [
+                    [0, 0],
+                    [w - 1, 0],
+                    [0, h - 1],
+                    [w - 1, h - 1]
+                ];
+
+                for (const [cx, cy] of corners) {
+                    const idx = cy * w + cx;
+                    if (!visited[idx] && isDarkPixel(data, cx, cy, w, threshold)) {
+                        visited[idx] = 1;
+                        queue.push([cx, cy]);
+                    }
+                }
+
+                const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+                let transparentCount = 0;
+                while (queue.length > 0) {
+                    const [x, y] = queue.shift();
+                    const idx = (y * w + x) * 4;
+                    data[idx + 3] = 0; // alpha = 0
+                    transparentCount++;
+
+                    for (const [dx, dy] of dirs) {
+                        const nx = x + dx;
+                        const ny = y + dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                            const nidx = ny * w + nx;
+                            if (!visited[nidx] && isDarkPixel(data, nx, ny, w, threshold)) {
+                                visited[nidx] = 1;
+                                queue.push([nx, ny]);
+                            }
+                        }
+                    }
+                }
+
+                tempCtx.putImageData(imgData, 0, 0);
+
+                const pngBlob = await new Promise(r => tempCanvas.toBlob(r, 'image/png'));
+                const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
+                const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
+                const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
+                const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
+                const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
+
+                const url = URL.createObjectURL(pngBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                imageStatus.innerHTML = `📦 保存成功: ${fileName} (透明边缘 ${transparentCount} 像素)`;
+            } catch (e) {
+                imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
+                console.error(e);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
+            }
         }
 
         async function copyHighUrl() {
@@ -850,7 +796,6 @@
             else if(cardNameInput.value.trim()) performSearch(false, null);
         });
 
-        // 初始自动检索示例卡
         setTimeout(() => { if(cardNameInput.value.trim() === "STALINGRAD") performSearch(false, null); }, 120);
     })();
 </script>
