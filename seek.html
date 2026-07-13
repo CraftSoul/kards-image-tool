@@ -664,6 +664,7 @@
                 imageStatus.innerHTML = "⏳ 图片未完全加载，稍后重试";
                 return;
             }
+            await cardImage.decode();
 
             saveBtn.disabled = true;
             const originalText = saveBtn.innerText;
