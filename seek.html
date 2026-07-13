@@ -527,7 +527,7 @@
         async function loadCardVariant(item, lang, version) {
             if (!item || !item.formattedName) return false;
             const highResUrl = buildHighResUrl(item.formattedName, lang, version);
-            currentHighResUrl = highResUrl;   // 供复制链接使用
+            currentHighResUrl = highResUrl;
             setLoading(true);
             const langDisplay = getLangName(lang);
             imageStatus.innerHTML = `⏳ 加载: ${item.formattedName}.avif (${langDisplay} | ${version})`;
@@ -536,9 +536,8 @@
                 const resp = await fetch(highResUrl);
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const blob = await resp.blob();
-                cachedBlob = blob;  // 缓存
+                cachedBlob = blob;
 
-                // 撤销之前的对象 URL
                 if (currentObjectUrl) {
                     URL.revokeObjectURL(currentObjectUrl);
                     currentObjectUrl = null;
@@ -546,7 +545,36 @@
 
                 const url = URL.createObjectURL(blob);
                 currentObjectUrl = url;
-                cardImage.src = url;
+
+                // 设置 src 并等待 onload，确保图片完全加载并解码
+                await new Promise((resolve, reject) => {
+                    const onLoad = () => {
+                        cardImage.removeEventListener('load', onLoad);
+                        cardImage.removeEventListener('error', onError);
+                        if (cardImage.naturalWidth > 0 && cardImage.naturalHeight > 0) {
+                            resolve();
+                        } else {
+                            reject(new Error('图片尺寸无效'));
+                        }
+                    };
+                    const onError = (e) => {
+                        cardImage.removeEventListener('load', onLoad);
+                        cardImage.removeEventListener('error', onError);
+                        reject(e);
+                    };
+                    cardImage.addEventListener('load', onLoad);
+                    cardImage.addEventListener('error', onError);
+                    cardImage.src = url;
+
+                    // 如果图片已缓存且 complete 为 true，但事件可能不会触发，直接检查
+                    if (cardImage.complete) {
+                        if (cardImage.naturalWidth > 0) {
+                            onLoad();
+                        } else {
+                            reject(new Error('图片加载完成但尺寸无效'));
+                        }
+                    }
+                });
 
                 await cardImage.decode();
 
@@ -570,6 +598,116 @@
                 cachedBlob = null;
                 currentHighResUrl = '';
                 return false;
+            }
+        }
+
+        async function saveCroppedImage() {
+            if (!cardImage.src || cardImage.src === '') {
+                imageStatus.innerHTML = "⚠️ 无有效卡图";
+                return;
+            }
+
+            // 防御性检查：确保图片已完全加载
+            if (!cardImage.complete || cardImage.naturalWidth === 0) {
+                imageStatus.innerHTML = "⏳ 图片尚未完全加载，请稍后重试";
+                return;
+            }
+            try {
+                await cardImage.decode();
+            } catch (e) {
+                imageStatus.innerHTML = `⚠️ 图片解码失败: ${e.message}`;
+                return;
+            }
+
+            const w = cardImage.naturalWidth;
+            const h = cardImage.naturalHeight;
+            if (w === 0 || h === 0) {
+                imageStatus.innerHTML = "⚠️ 图片尺寸无效";
+                return;
+            }
+
+            saveBtn.disabled = true;
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = "💾 处理中...";
+
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(cardImage, 0, 0);
+
+                const imgData = ctx.getImageData(0, 0, w, h);
+                const data = imgData.data;
+
+                // BFS 边缘透明化
+                function isDarkPixel(data, x, y, width, threshold) {
+                    const idx = (y * width + x) * 4;
+                    const r = data[idx];
+                    const g = data[idx + 1];
+                    const b = data[idx + 2];
+                    return Math.max(r, g, b) <= threshold;
+                }
+
+                const visited = new Uint8Array(w * h);
+                const queue = [];
+                const threshold = 50;
+
+                const corners = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]];
+                for (const [cx, cy] of corners) {
+                    const idx = cy * w + cx;
+                    if (!visited[idx] && isDarkPixel(data, cx, cy, w, threshold)) {
+                        visited[idx] = 1;
+                        queue.push([cx, cy]);
+                    }
+                }
+
+                const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+                let transparentCount = 0;
+                while (queue.length > 0) {
+                    const [x, y] = queue.shift();
+                    const idx = (y * w + x) * 4;
+                    data[idx + 3] = 0;
+                    transparentCount++;
+
+                    for (const [dx, dy] of dirs) {
+                        const nx = x + dx;
+                        const ny = y + dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                            const nidx = ny * w + nx;
+                            if (!visited[nidx] && isDarkPixel(data, nx, ny, w, threshold)) {
+                                visited[nidx] = 1;
+                                queue.push([nx, ny]);
+                            }
+                        }
+                    }
+                }
+
+                ctx.putImageData(imgData, 0, 0);
+
+                const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
+                const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
+                const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
+                const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
+                const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
+
+                const url = URL.createObjectURL(pngBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                imageStatus.innerHTML = `📦 保存成功: ${fileName} (透明边缘 ${transparentCount} 像素)`;
+            } catch (e) {
+                imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
+                console.error(e);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
             }
         }
 
@@ -669,118 +807,6 @@
         function getLangName(code) {
             const found = languages.find(l => l.code === code);
             return found ? found.label : code;
-        }
-
-        async function saveCroppedImage() {
-            // 检查图片是否有效
-            if (!cardImage.src || cardImage.src === '') {
-                imageStatus.innerHTML = "⚠️ 无有效卡图";
-                return;
-            }
-            // 确保解码完成
-            try {
-                await cardImage.decode();
-            } catch (e) {
-                imageStatus.innerHTML = `⚠️ 图片解码失败: ${e.message}`;
-                return;
-            }
-            const w = cardImage.naturalWidth;
-            const h = cardImage.naturalHeight;
-            if (w === 0 || h === 0) {
-                imageStatus.innerHTML = "⚠️ 图片尺寸无效";
-                return;
-            }
-
-            saveBtn.disabled = true;
-            const originalText = saveBtn.innerText;
-            saveBtn.innerText = "💾 处理中...";
-
-            try {
-                // 绘制到 canvas
-                const canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(cardImage, 0, 0);
-
-                const imgData = ctx.getImageData(0, 0, w, h);
-                const data = imgData.data;
-
-                // ------ BFS 暗色边缘透明化------
-                function isDarkPixel(data, x, y, width, threshold) {
-                    const idx = (y * width + x) * 4;
-                    const r = data[idx];
-                    const g = data[idx + 1];
-                    const b = data[idx + 2];
-                    return Math.max(r, g, b) <= threshold;
-                }
-
-                const visited = new Uint8Array(w * h);
-                const queue = [];
-                const threshold = 50;
-
-                const corners = [
-                    [0, 0],
-                    [w - 1, 0],
-                    [0, h - 1],
-                    [w - 1, h - 1]
-                ];
-
-                for (const [cx, cy] of corners) {
-                    const idx = cy * w + cx;
-                    if (!visited[idx] && isDarkPixel(data, cx, cy, w, threshold)) {
-                        visited[idx] = 1;
-                        queue.push([cx, cy]);
-                    }
-                }
-
-                const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-                let transparentCount = 0;
-                while (queue.length > 0) {
-                    const [x, y] = queue.shift();
-                    const idx = (y * w + x) * 4;
-                    data[idx + 3] = 0;
-                    transparentCount++;
-
-                    for (const [dx, dy] of dirs) {
-                        const nx = x + dx;
-                        const ny = y + dy;
-                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                            const nidx = ny * w + nx;
-                            if (!visited[nidx] && isDarkPixel(data, nx, ny, w, threshold)) {
-                                visited[nidx] = 1;
-                                queue.push([nx, ny]);
-                            }
-                        }
-                    }
-                }
-
-                ctx.putImageData(imgData, 0, 0);
-
-                const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-                const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
-                const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
-                const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
-                const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
-                const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
-
-                const url = URL.createObjectURL(pngBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                imageStatus.innerHTML = `📦 保存成功: ${fileName} (透明边缘 ${transparentCount} 像素)`;
-            } catch (e) {
-                imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
-                console.error(e);
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerText = originalText;
-            }
         }
 
         async function copyHighUrl() {
