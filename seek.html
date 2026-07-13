@@ -655,7 +655,7 @@
         }
 
         // ==================== 保存图片 ====================
-        async function saveCroppedImage() {
+        async function saveCroppedImage(retry = 0) {
     const img = cardImage;
     if (!img.src || img.src.includes("data:image/svg+xml") && 
         (img.src.includes("等待") || img.src.includes("不存在") || img.src.includes("不可用"))) {
@@ -686,6 +686,7 @@
         const data = imageData.data;
         const totalPixels = w * h;
 
+        // BFS 暗色像素处理（不变）
         const visited = new Uint8Array(totalPixels);
         const queue = [];
         const threshold = 50;
@@ -722,9 +723,12 @@
             }
         }
 
-        const ratio = transparentCount / totalPixels;
-        if (ratio > 0.30) {
-            imageStatus.innerHTML = `⚠️ 透明像素比例偏高 (${(ratio*100).toFixed(0)}%)，图片可能未完全加载，请重试检索再保存。`;
+        if (transparentCount > 300 && retry < 2) {
+            await new Promise(r => setTimeout(r, 100));
+            saveBtn.disabled = false;
+            saveBtn.innerText = originalText;
+            imageStatus.innerHTML = `🔄 透明像素异常 (${transparentCount})，正在重试...`;
+            return saveCroppedImage(retry + 1);
         }
 
         ctx.putImageData(imageData, 0, 0);
@@ -749,6 +753,10 @@
     } catch (e) {
         imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
         console.error(e);
+        if (retry < 2) {
+            await new Promise(r => setTimeout(r, 100));
+            return saveCroppedImage(retry + 1);
+        }
     } finally {
         saveBtn.disabled = false;
         saveBtn.innerText = originalText;
