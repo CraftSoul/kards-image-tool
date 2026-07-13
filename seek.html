@@ -520,38 +520,38 @@
             return { variants };
         }
 
-        async function loadCardVariant(item, lang, version) {
-            if (!item || !item.formattedName) return false;
-            const highResUrl = buildHighResUrl(item.formattedName, lang, version);
-            currentHighResUrl = highResUrl;
-            setLoading(true);
-            const langDisplay = getLangName(lang);
-            imageStatus.innerHTML = `⏳ 加载: ${item.formattedName}.avif (${langDisplay} | ${version})`;
-            return new Promise((resolve) => {
-                const imgTest = new Image();
-                imgTest.onload = () => {
-                    cardImage.crossOrigin = "anonymous";
-                    cardImage.src = highResUrl;
-                    setLoading(false);
-                    let extra = '';
-                    if (item.isVeteran) extra = ' ⭐ 老兵';
-                    else if (item.suffixKey && item.suffixKey !== '' && !item.isVeteran) extra = ` 🔹 ${item.displayName}`;
-                    imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extra} (${langDisplay} | ${version})`;
-                    cardImage.setAttribute('data-current-name', item.formattedName);
-                    cardImage.setAttribute('data-lang', lang);
-                    cardImage.setAttribute('data-version', version);
-                    resolve(true);
-                };
-                imgTest.onerror = () => {
-                    setLoading(false);
-                    imageStatus.innerHTML = `❌ 加载失败: ${item.formattedName}.avif (版本 ${version})`;
-                    cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 图片不可用 💀%3C/text%3E%3C/svg%3E";
-                    currentHighResUrl = '';
-                    resolve(false);
-                };
-                imgTest.src = highResUrl;
-            });
-        }
+        function loadCardVariant(item, lang, version) {
+    return new Promise((resolve) => {
+        const highResUrl = buildHighResUrl(item.formattedName, lang, version);
+        currentHighResUrl = highResUrl;
+        setLoading(true);
+        const langDisplay = getLangName(lang);
+        imageStatus.innerHTML = `⏳ 加载: ${item.formattedName}.avif (${langDisplay} | ${version})`;
+
+        cardImage.crossOrigin = "anonymous";
+        cardImage.src = highResUrl;
+
+        cardImage.onload = () => {
+            setLoading(false);
+            let extra = '';
+            if (item.isVeteran) extra = ' ⭐ 老兵';
+            else if (item.suffixKey && item.suffixKey !== '' && !item.isVeteran) extra = ` 🔹 ${item.displayName}`;
+            imageStatus.innerHTML = `✅ ${item.formattedName}.avif${extra} (${langDisplay} | ${version})`;
+            cardImage.setAttribute('data-current-name', item.formattedName);
+            cardImage.setAttribute('data-lang', lang);
+            cardImage.setAttribute('data-version', version);
+            resolve(true);
+        };
+
+        cardImage.onerror = () => {
+            setLoading(false);
+            imageStatus.innerHTML = `❌ 加载失败: ${item.formattedName}.avif (版本 ${version})`;
+            cardImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Crect width='280' height='200' fill='%233a2f1a'/%3E%3Ctext x='50%25' y='50%25' font-size='13' fill='%23dba551' text-anchor='middle' dy='.3em'%3E💀 图片不可用 💀%3C/text%3E%3C/svg%3E";
+            currentHighResUrl = '';
+            resolve(false);
+        };
+    });
+}
 
         function renderVariantPanel(variants, activeKey, onSelect) {
             if (!variants || variants.length <= 1) {
