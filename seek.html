@@ -530,6 +530,7 @@
             return new Promise((resolve) => {
                 const imgTest = new Image();
                 imgTest.onload = () => {
+                    cardImage.crossOrigin = "anonymous";
                     cardImage.src = highResUrl;
                     setLoading(false);
                     let extra = '';
@@ -655,105 +656,104 @@
 
         // ==================== 保存图片 ====================
         async function saveCroppedImage() {
-            const src = cardImage.src;
-            if (!src || src.includes("data:image/svg+xml") && (src.includes("等待") || src.includes("不存在") || src.includes("不可用"))) {
-                imageStatus.innerHTML = "⚠️ 无有效卡图";
-                return;
-            }
-            if (!cardImage.complete || cardImage.naturalWidth === 0) {
-                imageStatus.innerHTML = "⏳ 图片未完全加载，稍后重试";
-                return;
-            }
-            await cardImage.decode();
+    const img = cardImage;
+    if (!img.src || img.src.includes("data:image/svg+xml") && 
+        (img.src.includes("等待") || img.src.includes("不存在") || img.src.includes("不可用"))) {
+        imageStatus.innerHTML = "⚠️ 无有效卡图";
+        return;
+    }
+    if (!img.complete || img.naturalWidth === 0) {
+        imageStatus.innerHTML = "⏳ 图片未完全加载，请稍后重试";
+        return;
+    }
+    await img.decode();
 
-            saveBtn.disabled = true;
-            const originalText = saveBtn.innerText;
-            saveBtn.innerText = "💾 处理中...";
+    saveBtn.disabled = true;
+    const originalText = saveBtn.innerText;
+    saveBtn.innerText = "💾 处理中...";
 
-            try {
-                const resp = await fetch(src);
-                if (!resp.ok) throw new Error("fetch failed");
-                const blob = await resp.blob();
-                const bitmap = await createImageBitmap(blob);
-                const w = bitmap.width, h = bitmap.height;
+    try {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
 
-                // 获取图片数据
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = w;
-                tempCanvas.height = h;
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.drawImage(bitmap, 0, 0);
-                const imgData = tempCtx.getImageData(0, 0, w, h);
-                const data = imgData.data;
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
 
-                // BFS 标记所有四角相连的暗色像素，将其 alpha 设为 0（透明）
-                const visited = new Uint8Array(w * h);
-                const queue = [];
-                const threshold = 50;
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const data = imageData.data;
+        const totalPixels = w * h;
 
-                const corners = [
-                    [0, 0],
-                    [w - 1, 0],
-                    [0, h - 1],
-                    [w - 1, h - 1]
-                ];
+        const visited = new Uint8Array(totalPixels);
+        const queue = [];
+        const threshold = 50;
+        const corners = [[0,0], [w-1,0], [0,h-1], [w-1,h-1]];
+        const isDark = (x, y) => {
+            const idx = (y * w + x) * 4;
+            return Math.max(data[idx], data[idx+1], data[idx+2]) <= threshold;
+        };
 
-                for (const [cx, cy] of corners) {
-                    const idx = cy * w + cx;
-                    if (!visited[idx] && isDarkPixel(data, cx, cy, w, threshold)) {
-                        visited[idx] = 1;
-                        queue.push([cx, cy]);
-                    }
-                }
-
-                const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-                let transparentCount = 0;
-                while (queue.length > 0) {
-                    const [x, y] = queue.shift();
-                    const idx = (y * w + x) * 4;
-                    data[idx + 3] = 0; // alpha = 0
-                    transparentCount++;
-
-                    for (const [dx, dy] of dirs) {
-                        const nx = x + dx;
-                        const ny = y + dy;
-                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                            const nidx = ny * w + nx;
-                            if (!visited[nidx] && isDarkPixel(data, nx, ny, w, threshold)) {
-                                visited[nidx] = 1;
-                                queue.push([nx, ny]);
-                            }
-                        }
-                    }
-                }
-
-                tempCtx.putImageData(imgData, 0, 0);
-
-                const pngBlob = await new Promise(r => tempCanvas.toBlob(r, 'image/png'));
-                const namePart = cardImage.getAttribute('data-current-name') || 'kards_card';
-                const langAttr = cardImage.getAttribute('data-lang') || langSelect.value;
-                const versionAttr = cardImage.getAttribute('data-version') || currentVersion;
-                const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
-                const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
-
-                const url = URL.createObjectURL(pngBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                imageStatus.innerHTML = `📦 保存成功: ${fileName} (透明边缘 ${transparentCount} 像素)`;
-            } catch (e) {
-                imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
-                console.error(e);
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerText = originalText;
+        for (const [cx, cy] of corners) {
+            const idx = cy * w + cx;
+            if (!visited[idx] && isDark(cx, cy)) {
+                visited[idx] = 1;
+                queue.push([cx, cy]);
             }
         }
+
+        const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
+        let transparentCount = 0;
+        while (queue.length > 0) {
+            const [x, y] = queue.shift();
+            const idx = (y * w + x) * 4;
+            data[idx + 3] = 0;
+            transparentCount++;
+            for (const [dx, dy] of dirs) {
+                const nx = x + dx, ny = y + dy;
+                if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                    const nidx = ny * w + nx;
+                    if (!visited[nidx] && isDark(nx, ny)) {
+                        visited[nidx] = 1;
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+        }
+
+        const ratio = transparentCount / totalPixels;
+        if (ratio > 0.30) {
+            imageStatus.innerHTML = `⚠️ 透明像素比例偏高 (${(ratio*100).toFixed(0)}%)，图片可能未完全加载，请重试检索再保存。`;
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+
+        const namePart = img.getAttribute('data-current-name') || 'kards_card';
+        const langAttr = img.getAttribute('data-lang') || langSelect.value;
+        const versionAttr = img.getAttribute('data-version') || currentVersion;
+        const shortLang = langAttr.replace('-', '_').slice(0,2).toUpperCase();
+        const fileName = `${namePart}_${shortLang}_${versionAttr}.png`;
+
+        const url = URL.createObjectURL(pngBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        imageStatus.innerHTML = `📦 保存成功: ${fileName} (透明 ${transparentCount} 像素)`;
+    } catch (e) {
+        imageStatus.innerHTML = `❌ 保存失败: ${e.message}`;
+        console.error(e);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = originalText;
+    }
+}
 
         async function copyHighUrl() {
             if (!currentHighResUrl) {
