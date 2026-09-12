@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>KARDS 军械库 | 卡组构筑</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1692,6 +1692,46 @@
             font-size: 0.7rem;
             white-space: nowrap;
         }
+/* ===== PDF 打印模态框 ===== */
+.print-notice {
+    background: rgba(201, 165, 59, 0.10);
+    border: 1px solid rgba(201, 165, 59, 0.4);
+    border-radius: 16px;
+    padding: 10px 14px;
+    font-size: 0.75rem;
+    line-height: 1.85;
+    color: #e9dbbd;
+}
+.print-notice a {
+    color: #ffd966;
+    font-weight: 700;
+    text-decoration: underline;
+}
+.pdf-back-preview {
+    display: none;
+    margin: 10px 0 0;
+    text-align: center;
+}
+.pdf-back-preview img {
+    max-height: 150px;
+    border-radius: 8px;
+    border: 1px solid #aa8e4e;
+}
+.pdf-page-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #c9b06b;
+    margin-top: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.pdf-status {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #e9dbbd;
+    margin-top: 10px;
+    display: none;
+}
     </style>
 </head>
 <body>
@@ -1744,6 +1784,7 @@
                     <button id="mobileExportBtn" class="export-btn">📤 导出代码</button>
                     <button id="mobileQrExportBtn" class="gen-img-btn" style="background:#6a5a3a;">📤 导出二维码卡</button>
                     <button id="mobileGenImgBtn" class="gen-img-btn">🖼️ 生成图片</button>
+                    <button id="mobilePrintPdfBtn" class="gen-img-btn" style="background:#5a4a7a;">🖨️ 打印PDF</button>
                 </div>
             </div>
             <div class="stats-header"><button class="stats-btn" id="mobileStatsBtn">📊 统计</button></div>
@@ -1793,6 +1834,7 @@
                         <button id="exportBtn" class="export-btn">📤 导出代码</button>
                         <button id="qrExportBtn" class="gen-img-btn" style="background:#6a5a3a;">📤 导出二维码卡</button>
                         <button id="genImgBtn" class="gen-img-btn">🖼️ 生成图片</button>
+                        <button id="printPdfBtn" class="gen-img-btn" style="background:#5a4a7a;">🖨️ 打印PDF</button>
                     </div>
                 </div>
                 <div class="stats-header"><button class="stats-btn" id="statsBtn">📊 统计</button></div>
@@ -1969,10 +2011,104 @@
             </div>
         </div>
     </div>
+<!-- PDF 打印模态框 -->
+<div id="pdfPrintModal" class="img-gen-modal">
+    <div class="img-gen-content">
+        <div class="section-label">🖨️ 打印 PDF</div>
+
+        <div class="print-notice">
+            <div>· <b>总部、语言、版本</b> 跟随「生成图片」中的设置(不打印统计卡与二维码卡)</div>
+            <div>· 老兵、衍生卡等生成物需 <b>添加至卡组</b> 一同打印</div>
+            <div>· 异画、卡背可前往 <a href="https://1939.kardsdecker.com/" target="_blank" rel="noopener">KARDS DECKER</a> 下载</div>
+        </div>
+
+        <div class="section-label" style="margin-top:14px;">📐 纸张</div>
+        <div class="img-gen-controls">
+            <div class="img-gen-control">
+                <label>纸张规格</label>
+                <select id="pdfPaperSelect">
+                    <option value="a4">A4 (210×297mm)</option>
+                    <option value="a3">A3 (297×420mm)</option>
+                    <option value="letter">Letter (215.9×279.4mm)</option>
+                    <option value="custom">自定义</option>
+                </select>
+            </div>
+            <div class="img-gen-control" id="pdfPaperCustomWrap" style="display:none;">
+                <label>纸张宽 (mm)</label>
+                <input type="number" id="pdfPaperW" value="210" min="50" max="1200" step="0.1">
+            </div>
+            <div class="img-gen-control" id="pdfPaperCustomWrap2" style="display:none;">
+                <label>纸张高 (mm)</label>
+                <input type="number" id="pdfPaperH" value="297" min="50" max="1200" step="0.1">
+            </div>
+            <div class="img-gen-control">
+                <label>方向</label>
+                <select id="pdfOrientation">
+                    <option value="portrait">纵向</option>
+                    <option value="landscape">横向</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-label" style="margin-top:14px;">🃏 卡牌规格</div>
+        <div class="img-gen-controls">
+            <div class="img-gen-control">
+                <label>规格</label>
+                <select id="pdfCardSizeSelect">
+                    <option value="standard">标准 (63.5×88.9mm)</option>
+                    <option value="custom">自定义</option>
+                </select>
+            </div>
+            <div class="img-gen-control" id="pdfCardWWrap" style="display:none;">
+                <label>卡宽 (mm)</label>
+                <input type="number" id="pdfCardW" value="63.5" min="10" max="400" step="0.1">
+            </div>
+            <div class="img-gen-control" id="pdfCardHWrap" style="display:none;">
+                <label>卡高 (mm)</label>
+                <input type="number" id="pdfCardH" value="88.9" min="10" max="560" step="0.1">
+            </div>
+            <div class="img-gen-control" id="pdfRatioWrap" style="display:none; flex:0 0 auto; min-width:auto;">
+                <label>保持比例</label>
+                <label class="switch" style="width:44px; height:24px;"><input type="checkbox" id="pdfKeepRatio" checked><span class="slider" style="height:24px;"></span></label>
+            </div>
+        </div>
+
+        <div class="section-label" style="margin-top:14px;">⚙️ 排版</div>
+        <div class="switch-row">
+            <div class="switch-item">
+                <div class="switch-item-top">
+                    <span>↔️ 间隔</span>
+                    <label class="switch"><input type="checkbox" id="pdfGapToggle" checked><span class="slider"></span></label>
+                </div>
+            </div>
+            <div class="switch-item">
+                <div class="switch-item-top">
+                    <span>✂️ 裁剪线</span>
+                    <label class="switch"><input type="checkbox" id="pdfCropToggle" checked><span class="slider"></span></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-label" style="margin-top:14px;">🖼️ 卡背（可选 · 双面打印）</div>
+        <div class="upload-form-row">
+            <label>卡背图片</label>
+            <input type="file" id="pdfBackImage" accept="image/*">
+        </div>
+        <div class="pdf-back-preview" id="pdfBackPreview"><img id="pdfBackPreviewImg" src="" alt="卡背预览"></div>
+
+        <div id="pdfPageHint" class="pdf-page-hint"></div>
+
+        <div class="img-gen-actions" style="margin-top:16px;">
+            <button id="pdfGenerateBtn" class="gen-img-btn">📄 生成并下载 PDF</button>
+            <button id="pdfCloseBtn" class="import-btn">关闭</button>
+        </div>
+        <div id="pdfStatus" class="pdf-status"></div>
+    </div>
+</div>
 
     <script>
         // ==================== 版本定义 ====================
-        const VERSION = 52;
+        const VERSION = 53;
         const DEFAULT_VERSION = `v${VERSION}`;
 
         function generateVersionList() {
@@ -2229,7 +2365,7 @@
                 statusEl.textContent = '⏳ 正在生成裁剪模板...';
             }
             try {
-                const imgUrl = getCardImageUrl('resistance.avif', 'zh-Hans', DEFAULT_VERSION, 100);
+                const imgUrl = getCardImageUrl('resistance_b.avif', 'zh-Hans', DEFAULT_VERSION, 100);
                 const resp = await fetch(imgUrl);
                 if (!resp.ok) throw new Error('fetch failed');
                 const blob = await resp.blob();
@@ -2247,9 +2383,9 @@
                 }
                 return cropTemplate;
             } catch (e) {
-                console.warn('裁剪模板生成失败，将使用备用裁剪:', e);
+                console.warn('裁剪模板生成失败:', e);
                 if (statusEl) {
-                    statusEl.textContent = '❌ 裁剪模板生成失败，使用备用裁剪';
+                    statusEl.textContent = '❌ 裁剪模板生成失败';
                     setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
                 }
                 return null;
@@ -4214,6 +4350,460 @@
             });
         }
 
+// ==================== PDF 打印 ====================
+function loadImageFromSrc(src, cors) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        if (cors) img.crossOrigin = 'Anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('图片加载失败'));
+        img.src = src;
+    });
+}
+
+// 将一张卡渲染为 500×702 的 canvas
+async function renderCardCanvas(card, lang, quality) {
+    const cw = 500,
+        ch = 702;
+    const canvas = document.createElement('canvas');
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+
+    let img;
+    try {
+        if (card.isCustom && card.imageData) {
+            img = await loadImageFromSrc(card.imageData, false);
+        } else {
+            let ver = DEFAULT_VERSION;
+            if (!card.isHeadquarter) {
+                ver = cardVersionMap.get(card.cardId) || DEFAULT_VERSION;
+                if (!await probeImageExists(card.image, lang, ver)) ver = DEFAULT_VERSION;
+            }
+            img = await loadImageFromSrc(getCardImageUrl(card.image, lang, ver, quality), true);
+        }
+    } catch (e) {
+        ctx.fillStyle = '#1a1c12';
+        ctx.fillRect(0, 0, cw, ch);
+        ctx.fillStyle = '#c9b06b';
+        ctx.font = 'bold 26px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText((card.titleZh || '?').slice(0, 10), cw / 2, ch / 2);
+        return canvas;
+    }
+
+    if (cropTemplate && !card.isCustom) {
+        ctx.drawImage(img,
+            cropTemplate.left, cropTemplate.top, cropTemplate.width, cropTemplate.height,
+            0, 0, cw, ch);
+    } else if (card.isCustom) {
+        const fit = card.imageFit || 'cover';
+        const imgAspect = img.width / img.height;
+        const cardAspect = cw / ch;
+        let sx = 0,
+            sy = 0,
+            sw = img.width,
+            sh = img.height;
+        if (fit === 'cover') {
+            if (imgAspect > cardAspect) {
+                sh = img.height;
+                sw = img.height * cardAspect;
+                sx = (img.width - sw) / 2;
+            } else {
+                sw = img.width;
+                sh = img.width / cardAspect;
+                sy = (img.height - sh) / 2;
+            }
+        } else if (fit === 'contain') {
+            if (imgAspect < cardAspect) {
+                sh = img.height;
+                sw = img.height * cardAspect;
+                sx = (img.width - sw) / 2;
+            } else {
+                sw = img.width;
+                sh = img.width / cardAspect;
+                sy = (img.height - sh) / 2;
+            }
+        }
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+    } else {
+        ctx.drawImage(img, 0, 0, cw, ch);
+    }
+    return canvas;
+}
+
+// 处理卡背（拉伸为 500×702）
+async function prepareBackImage(file) {
+    const dataUrl = await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+    });
+    const img = await loadImageFromSrc(dataUrl, false);
+    const canvas = document.createElement('canvas');
+    canvas.width = 500;
+    canvas.height = 702;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 500, 702);
+    ctx.drawImage(img, 0, 0, 500, 702);
+    return canvas.toDataURL('image/jpeg', 0.92);
+}
+
+// 计算纸张 / 卡牌 / 网格布局
+function computePrintLayout() {
+    const paperSel = document.getElementById('pdfPaperSelect').value;
+    let pw, ph;
+    if (paperSel === 'custom') {
+        pw = parseFloat(document.getElementById('pdfPaperW').value) || 210;
+        ph = parseFloat(document.getElementById('pdfPaperH').value) || 297;
+    } else {
+        const sizes = {
+            a4: [210, 297],
+            a3: [297, 420],
+            letter: [215.9, 279.4]
+        };
+        const s = sizes[paperSel] || sizes.a4;
+        pw = s[0];
+        ph = s[1];
+    }
+    const a = Math.min(pw, ph),
+        b = Math.max(pw, ph);
+    const orient = document.getElementById('pdfOrientation').value;
+    const pageW = orient === 'landscape' ? b : a;
+    const pageH = orient === 'landscape' ? a : b;
+
+    const sizeSel = document.getElementById('pdfCardSizeSelect').value;
+    let cardW, cardH;
+    if (sizeSel === 'custom') {
+        cardW = parseFloat(document.getElementById('pdfCardW').value) || 63.5;
+        cardH = parseFloat(document.getElementById('pdfCardH').value) || 88.9;
+    } else {
+        cardW = 63.5;
+        cardH = 88.9;
+    }
+
+    const gapOn = document.getElementById('pdfGapToggle').checked;
+    const gap = gapOn ? 3 : 0;
+    const margin = 5;
+
+    const cols = Math.max(0, Math.floor((pageW - 2 * margin + gap) / (cardW + gap)));
+    const rows = Math.max(0, Math.floor((pageH - 2 * margin + gap) / (cardH + gap)));
+    const gridW = cols > 0 ? cols * cardW + (cols - 1) * gap : 0;
+    const gridH = rows > 0 ? rows * cardH + (rows - 1) * gap : 0;
+    const startX = (pageW - gridW) / 2;
+    const startY = (pageH - gridH) / 2;
+
+    return {
+        pageW, pageH, cardW, cardH, gap, margin,
+        cols, rows, perPage: cols * rows, startX, startY
+    };
+}
+
+function updatePdfHint() {
+    const el = document.getElementById('pdfPageHint');
+    if (!el) return;
+    const layout = computePrintLayout();
+    if (layout.cols < 1 || layout.rows < 1) {
+        el.textContent = '⚠️ 当前纸张放不下这张卡牌，请调整规格';
+        el.style.color = '#ff9999';
+    } else {
+        el.textContent = `📄 每页 ${layout.cols} 列 × ${layout.rows} 行 = ${layout.perPage} 张`;
+        el.style.color = '#c9b06b';
+    }
+}
+
+async function doGeneratePdf() {
+    const statusEl = document.getElementById('pdfStatus');
+    const genBtn = document.getElementById('pdfGenerateBtn');
+    const setStatus = (t) => {
+        if (!statusEl) return;
+        statusEl.style.display = 'block';
+        statusEl.textContent = t;
+    };
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert('PDF 库尚未加载完成，请检查网络后重试');
+        return;
+    }
+
+    const layout = computePrintLayout();
+    if (layout.cols < 1 || layout.rows < 1) {
+        alert('当前纸张 / 卡牌规格无法排版，请调整后重试');
+        return;
+    }
+
+    const lang = document.getElementById('imgLang').value;
+    const quality = 100; // 打印固定高质量
+
+    genBtn.disabled = true;
+    const oldLabel = genBtn.textContent;
+    genBtn.textContent = '⏳ 生成中...';
+
+    try {
+        // ---- 总部（跟随生成图片设置）----
+        const hqToggle = document.getElementById('headquarterToggle');
+        const hqName = document.getElementById('headquarterNameInput').value.trim();
+        let hqCard = null;
+        if (hqToggle.checked && hqName) {
+            setStatus('⏳ 正在获取总部卡图...');
+            hqCard = await fetchHeadquarterCard(hqName, lang);
+            if (!hqCard) {
+                if (!confirm(`总部图片 "${hqName}" 不存在，是否继续生成（不含总部）？`)) {
+                    genBtn.disabled = false;
+                    genBtn.textContent = oldLabel;
+                    statusEl.style.display = 'none';
+                    return;
+                }
+            }
+        }
+
+        // ---- 卡组内容 ----
+        const entries = Array.from(deckMap.values());
+        entries.sort((a, b) => {
+            const ca = cardCostMap.get(a.card.cardId) ?? a.card.cost;
+            const cb = cardCostMap.get(b.card.cardId) ?? b.card.cost;
+            if (ca !== cb) return ca - cb;
+            return a.card.cardId.localeCompare(b.card.cardId, undefined, {
+                numeric: true,
+                sensitivity: 'base'
+            });
+        });
+
+        const list = [];
+        if (hqCard) list.push({ card: hqCard, version: DEFAULT_VERSION });
+        for (const entry of entries) {
+            const ver = cardVersionMap.get(entry.card.cardId) || DEFAULT_VERSION;
+            for (let i = 0; i < entry.count; i++) {
+                list.push({ card: entry.card, version: ver });
+            }
+        }
+
+        if (list.length === 0) {
+            alert('卡组为空，无法打印');
+            genBtn.disabled = false;
+            genBtn.textContent = oldLabel;
+            statusEl.style.display = 'none';
+            return;
+        }
+
+        // ---- 裁剪模板 ----
+        if (!cropTemplate) {
+            setStatus('⏳ 正在生成裁剪模板...');
+            await generateCropTemplate();
+        }
+
+        // ---- 渲染卡图 ----
+        const images = [];
+        for (let i = 0; i < list.length; i++) {
+            setStatus(`⏳ 正在加载卡图 ${i + 1} / ${list.length} ...`);
+            const canvas = await renderCardCanvas(list[i].card, lang, quality);
+            images.push(canvas.toDataURL('image/jpeg', 0.92));
+            if (i % 4 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+
+        // ---- 卡背 ----
+        let backData = null;
+        const backFile = document.getElementById('pdfBackImage').files[0];
+        if (backFile) {
+            setStatus('⏳ 正在处理卡背...');
+            backData = await prepareBackImage(backFile);
+        }
+
+        // ---- 生成 PDF ----
+        setStatus('⏳ 正在排版 PDF...');
+        await new Promise(r => setTimeout(r, 50));
+
+        const {
+            jsPDF
+        } = window.jspdf;
+        const {
+            pageW, pageH, cardW, cardH, gap, cols, rows, perPage, startX, startY
+        } = layout;
+
+        const orient = pageW > pageH ? 'landscape' : 'portrait';
+        const doc = new jsPDF({
+            unit: 'mm',
+            format: [pageW, pageH],
+            orientation: orient,
+            compress: true
+        });
+
+        const cropMarks = document.getElementById('pdfCropToggle').checked;
+        const totalPages = Math.ceil(list.length / perPage);
+
+        const drawCropMarks = (x, y) => {
+            doc.setDrawColor(160, 160, 160);
+            doc.setLineWidth(0.1);
+            const len = 2.5,
+                off = 0.6;
+            const pts = [
+                [x, y, -1, -1],
+                [x + cardW, y, 1, -1],
+                [x, y + cardH, -1, 1],
+                [x + cardW, y + cardH, 1, 1]
+            ];
+            for (const [cx, cy, dx, dy] of pts) {
+                const px = cx + dx * off,
+                    py = cy + dy * off;
+                doc.line(px, py, px + dx * len, py);
+                doc.line(px, py, px, py + dy * len);
+            }
+        };
+
+        for (let p = 0; p < totalPages; p++) {
+            if (p > 0) doc.addPage();
+
+            // 正面
+            for (let k = 0; k < perPage; k++) {
+                const idx = p * perPage + k;
+                if (idx >= list.length) break;
+                const col = k % cols;
+                const row = Math.floor(k / cols);
+                const x = startX + col * (cardW + gap);
+                const y = startY + row * (cardH + gap);
+                doc.addImage(images[idx], 'JPEG', x, y, cardW, cardH);
+                if (cropMarks) drawCropMarks(x, y);
+            }
+
+            // 背面（双面打印）
+            if (backData) {
+                doc.addPage();
+                for (let k = 0; k < perPage; k++) {
+                    const idx = p * perPage + k;
+                    if (idx >= list.length) break;
+                    const col = k % cols;
+                    const row = Math.floor(k / cols);
+                    const mcol = cols - 1 - col;
+                    const x = startX + mcol * (cardW + gap);
+                    const y = startY + row * (cardH + gap);
+                    doc.addImage(backData, 'JPEG', x, y, cardW, cardH);
+                    if (cropMarks) drawCropMarks(x, y);
+                }
+            }
+        }
+
+        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+        doc.save(`deck_print_${stamp}.pdf`);
+
+        setStatus(`✅ 已生成 ${totalPages} 页${backData ? '（含卡背，共 ' + (totalPages * 2) + ' 页）' : ''}`);
+        setTimeout(() => {
+            if (statusEl) statusEl.style.display = 'none';
+        }, 4000);
+
+    } catch (e) {
+        console.error(e);
+        alert('PDF 生成失败: ' + e.message);
+        if (statusEl) statusEl.style.display = 'none';
+    } finally {
+        genBtn.disabled = false;
+        genBtn.textContent = oldLabel;
+    }
+}
+
+function setupPrintPdf() {
+    const modal = document.getElementById('pdfPrintModal');
+    if (!modal) return;
+
+    const openModal = () => {
+        if (deckMap.size === 0) {
+            const hqT = document.getElementById('headquarterToggle');
+            const hqN = document.getElementById('headquarterNameInput').value.trim();
+            if (!(hqT.checked && hqN)) {
+                alert('卡组为空，请先添加卡牌');
+                return;
+            }
+        }
+        modal.style.display = 'flex';
+        const st = document.getElementById('pdfStatus');
+        if (st) st.style.display = 'none';
+        updatePdfHint();
+    };
+
+    document.getElementById('printPdfBtn')?.addEventListener('click', openModal);
+    document.getElementById('mobilePrintPdfBtn')?.addEventListener('click', openModal);
+    document.getElementById('pdfCloseBtn')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
+
+    // 纸张规格切换
+    const paperSel = document.getElementById('pdfPaperSelect');
+    const togglePaperCustom = () => {
+        const c = paperSel.value === 'custom';
+        document.getElementById('pdfPaperCustomWrap').style.display = c ? 'block' : 'none';
+        document.getElementById('pdfPaperCustomWrap2').style.display = c ? 'block' : 'none';
+        updatePdfHint();
+    };
+    paperSel.addEventListener('change', togglePaperCustom);
+    togglePaperCustom();
+
+    // 卡牌规格切换
+    const cardSizeSel = document.getElementById('pdfCardSizeSelect');
+    const toggleCardCustom = () => {
+        const c = cardSizeSel.value === 'custom';
+        document.getElementById('pdfCardWWrap').style.display = c ? 'block' : 'none';
+        document.getElementById('pdfCardHWrap').style.display = c ? 'block' : 'none';
+        document.getElementById('pdfRatioWrap').style.display = c ? 'block' : 'none';
+        updatePdfHint();
+    };
+    cardSizeSel.addEventListener('change', toggleCardCustom);
+    toggleCardCustom();
+
+    // 自定义卡牌尺寸 + 保持比例（500 : 702）
+    const wIn = document.getElementById('pdfCardW');
+    const hIn = document.getElementById('pdfCardH');
+    const keepRatio = document.getElementById('pdfKeepRatio');
+
+    wIn.addEventListener('input', () => {
+        if (keepRatio.checked) {
+            const w = parseFloat(wIn.value);
+            if (!isNaN(w) && w > 0) hIn.value = (w * 702 / 500).toFixed(2);
+        }
+        updatePdfHint();
+    });
+    hIn.addEventListener('input', () => {
+        if (keepRatio.checked) {
+            const h = parseFloat(hIn.value);
+            if (!isNaN(h) && h > 0) wIn.value = (h * 500 / 702).toFixed(2);
+        }
+        updatePdfHint();
+    });
+
+    // 其它会影响排版的控件
+    ['pdfPaperW', 'pdfPaperH', 'pdfOrientation', 'pdfGapToggle', 'pdfCropToggle'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', updatePdfHint);
+        el.addEventListener('change', updatePdfHint);
+    });
+
+    // 卡背预览
+    const backInput = document.getElementById('pdfBackImage');
+    const backPreview = document.getElementById('pdfBackPreview');
+    const backPreviewImg = document.getElementById('pdfBackPreviewImg');
+    backInput.addEventListener('change', function() {
+        const f = this.files[0];
+        if (!f) {
+            backPreview.style.display = 'none';
+            backPreviewImg.src = '';
+            return;
+        }
+        const fr = new FileReader();
+        fr.onload = (e) => {
+            backPreviewImg.src = e.target.result;
+            backPreview.style.display = 'block';
+        };
+        fr.readAsDataURL(f);
+    });
+
+    document.getElementById('pdfGenerateBtn').addEventListener('click', doGeneratePdf);
+}
+
         // ==================== 开关与输入框联动 ====================
         function setupSwitchInputs() {
             const hqToggle = document.getElementById('headquarterToggle');
@@ -4268,6 +4858,7 @@
             setupQRImportExport();
             setupSwitchInputs();
             setupUpload();
+            setupPrintPdf();
         }
 
         function initNav() {

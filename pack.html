@@ -162,9 +162,6 @@
             border-radius: calc(var(--card-w) * 30 / 500);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
-        .animation-zone .pack-card.flipped .pack-card-inner {
-            transform: rotateY(180deg);
-        }
         .animation-zone .pack-card-face {
             position: absolute;
             width: 100%;
@@ -185,7 +182,7 @@
             border: 2px solid #aa8e4e;
         }
         .animation-zone .pack-card-front {
-            transform: rotateY(-180deg);
+            transform: rotateY(180deg);
             border: 2px solid #c9aa5b;
         }
         .animation-zone .pack-card.placeholder .pack-card-back {
@@ -1077,7 +1074,7 @@
 
     <script>
         // ==================== 版本定义 ====================
-        const VERSION = 52;
+        const VERSION = 53;
         const DEFAULT_VERSION = `v${VERSION}`;
 
         // ==================== 常量与翻译 ====================
@@ -2010,17 +2007,17 @@
 
                     // 抬起
                     inner.style.transition = `transform ${speeds.lift}s ease-out`;
-                    inner.style.transform = 'translateY(-45px) scale(1.18)';
+                    inner.style.transform = 'rotateY(0deg) translateY(-45px) scale(1.18)';
 
                     setTimeout(() => {
                         // 翻转
                         inner.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
-                        inner.style.transform = 'rotateY(180deg) translateY(-45px) scale(1.18)';
+                        inner.style.transform = 'rotateY(-180deg) translateY(-45px) scale(1.18)';
 
                         setTimeout(() => {
                             // 拍下
                             inner.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
-                            inner.style.transform = 'rotateY(180deg) translateY(0) scale(1)';
+                            inner.style.transform = 'rotateY(-180deg) translateY(0) scale(1)';
 
                             el.classList.add('flipped');
 
@@ -2042,8 +2039,8 @@
                                 isOpening = false;
                                 document.getElementById('openPackBtn').disabled = false;
                             }
-                        }, speeds.flip * 400 + speeds.lift * 200);
-                    }, speeds.lift * 500);
+                        }, speeds.flip * 1000);
+                    }, speeds.lift * 1000);
                 }, { once: false });
             });
         }

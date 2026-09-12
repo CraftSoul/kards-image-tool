@@ -369,7 +369,7 @@
 
 <script>
     (function() {
-        const LATEST_VERSION_NUM = 52;
+        const LATEST_VERSION_NUM = 53;
         function generateVersionList() {
             let versions = [];
             for (let i = 0; i <= 12; i++) {
@@ -487,13 +487,8 @@
         }
 
         async function progressiveDiscover(baseClean, lang, version, includeVariants) {
-            const originalExists = await testImageExists(baseClean, lang, version);
             let variants = [];
-            if (originalExists) {
-                variants.push({ suffixKey: '', displayName: '原版', formattedName: baseClean, isVeteran: false });
-            } else {
-                return { variants: [] };
-            }
+            variants.push({ suffixKey: '', displayName: '原版', formattedName: baseClean, isVeteran: false });
             if (!includeVariants) return { variants };
 
             const suffixLetters = ['b','c','d','e','f','g','h','i','j','k','l'];

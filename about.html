@@ -35,7 +35,7 @@
             backdrop-filter: blur(16px);
             border: 1px solid #aa8e4e;
             border-radius: 20px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             overflow: hidden;
             box-shadow: 0 6px 14px rgba(0,0,0,0.3);
         }
@@ -59,6 +59,27 @@
             color: transparent;
             white-space: nowrap;
         }
+        
+        .lang-toggle {
+            background: rgba(210, 210, 225, 0.1);
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f2e2b0;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+        }
+        .lang-toggle:hover {
+            background: #c9a53b;
+            color: #1e1c10;
+            border-color: #c9a53b;
+        }
 
         .menu-btn {
             background: rgba(210, 210, 225, 0.12);
@@ -80,19 +101,24 @@
             background-color: #f2e2b0;
             border-radius: 2px;
         }
+
         .nav-menu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.35s ease-out;
             background: rgba(10, 10, 8, 0.98);
         }
-        .nav-menu.open { max-height: 400px; }
+        .nav-menu.open { 
+            max-height: 550px; /* 增加高度以容纳语言按钮 */
+        }
+
         .menu-links {
             display: flex;
             flex-direction: column;
             gap: 8px;
             padding: 16px 20px 20px;
         }
+
         .menu-link {
             display: block;
             text-decoration: none;
@@ -111,6 +137,24 @@
             background: #c9a53b;
             color: #1e1c10;
             font-weight: 700;
+        }
+
+        /* 菜单内的语言切换容器 */
+        .menu-lang-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(170, 142, 78, 0.3);
+        }
+        .menu-lang-row .lang-toggle {
+            width: 100%;
+            max-width: 200px;
+            justify-content: center;
+            padding: 12px 16px;
+            font-size: 1rem;
+            background: rgba(210, 210, 225, 0.12);
+            border: 1px solid #aa8e4e;
         }
 
         .about-section {
@@ -216,6 +260,10 @@
             color: #ffefb3;
             border-bottom-color: #ffda8a;
         }
+        .block-text strong {
+            color: #f7e6b0;
+            font-weight: 700;
+        }
 
         .divider-line {
             margin: 1rem 0 2rem;
@@ -276,124 +324,250 @@
             .block-text { padding: 1rem; }
             .block-text h2 { font-size: 1.3rem; }
         }
+
+        /* ----- 中央公告弹窗（仅一个确认按钮，无取消）----- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            max-width: 500px;
+            width: 90%;
+            background: #1e1c14;
+            border: 1px solid #dbb45c;
+            border-radius: 24px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.8);
+            padding: 28px 24px 24px;
+            color: #f3ecda;
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h3 {
+            font-size: 1.6rem;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #f9efcf, #e6cc8a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+        .modal-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: #e6dfcb;
+            text-align: left;
+        }
+        .modal-content p a {
+            color: #fad974;
+            text-decoration: none;
+            border-bottom: 1px dotted #e6bc6a;
+        }
+        .modal-content p a:hover {
+            color: #ffefb3;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .modal-btn {
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #f2e2b0;
+            border-color: #aa8e4e;
+            flex: 1;
+            max-width: 160px;
+        }
+        .modal-btn.primary {
+            background: #c9a53b;
+            color: #1e1c10;
+            border-color: #c9a53b;
+        }
+        .modal-btn.primary:hover {
+            background: #e0b94a;
+            border-color: #e0b94a;
+        }
+        /* 公告弹窗仅有一个确认按钮，取消按钮已彻底移除 */
+        .modal-actions.single {
+            justify-content: center;
+        }
+        .modal-actions.single .modal-btn {
+            max-width: 200px;
+            flex: 0 1 auto;
+        }
     </style>
 </head>
 <body>
 <div class="app-container">
-    <div class="nav-bar">
-        <div class="nav-header-row">
-            <div class="nav-brand">KARDS 军械库</div>
-            <div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div>
-        </div>
-        <div class="nav-menu" id="navMenu">
-            <div class="menu-links">
-                <a class="menu-link" href="index.html" data-target="index">卡牌收藏</a>
-                <a class="menu-link" href="builder.html" data-target="builder">卡组构筑</a>
-                <a class="menu-link" href="seek.html" data-target="seek">英文直检</a>
-                <a class="menu-link" href="duel.html" data-target="duel">击剑大厅</a>
-                <a class="menu-link" href="pack.html" data-target="pack">模拟开包</a>
-                <a class="menu-link active" href="#" data-target="about">关于军械库</a>
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle">🌐 Non-Chinese users?</h3>
+            <p id="modalText"></p>
+            <div class="modal-actions single" id="modalActions">
+                <button class="modal-btn primary" id="modalConfirmBtn">Confirm</button>
             </div>
         </div>
     </div>
 
-    <div class="about-section">
+    <div class="nav-bar">
+        <div class="nav-header-row">
+            <div class="nav-brand" id="brandText">KARDS 军械库</div>
+            <div class="menu-btn" id="menuToggleBtn"><span></span><span></span><span></span></div>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <div class="menu-links">
+                <a class="menu-link" href="index.html" data-target="index" data-i18n="nav_collection">卡牌收藏</a>
+                <a class="menu-link" href="builder.html" data-target="builder" data-i18n="nav_builder">卡组构筑</a>
+                <a class="menu-link" href="seek.html" data-target="seek" data-i18n="nav_seek">英文直检</a>
+                <a class="menu-link" href="duel.html" data-target="duel" data-i18n="nav_duel">击剑大厅</a>
+                <a class="menu-link" href="pack.html" data-target="pack" data-i18n="nav_pack">模拟开包</a>
+                <a class="menu-link active" href="#" data-target="about" data-i18n="nav_about">关于军械库</a>
+                <!-- 语言切换按钮移入菜单，独立一行 -->
+                <div class="menu-lang-row">
+                    <button class="lang-toggle" id="langToggleBtn">🌐 EN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-section" id="aboutSection">
+        <!-- block1 声明 -->
         <div class="content-block image-text" id="block1">
             <div class="block-image">
-                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/zh-Hans/sincerely_yours.avif&q=100" alt="诚挚问候" loading="lazy">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v53/zh-Hans/sincerely_yours.avif&q=100" alt="诚挚问候" loading="lazy">
             </div>
-            <div class="block-text">
+            <div class="block-text" data-i18n-block="block1">
                 <h2>📜 声明</h2>
-                <p>KARDS 军械库遵循1939 Games的 <a href="https://support.kards.com/hc/en-us/articles/360027838532-KARDS-Community-License" target="_blank" rel="noopener noreferrer">"Community content policy" (社区内容政策)</a> ，使用<a href="https://www.1939games.com/" target="_blank" rel="noopener noreferrer">1939 Games</a> 拥有的资产。1939 Games 并未直接支持或赞助本项目。所有卡牌图像版权归 1939 Games 所有，本项目仅作非商业学习与工具用途。</p>
+                <p><strong>KARDS 军械库</strong>遵循1939 Games的 <a href="https://support.kards.com/hc/en-us/articles/360027838532-KARDS-Community-License" target="_blank" rel="noopener noreferrer">"Community content policy" (社区内容政策)</a> ，使用<a href="https://www.1939games.com/" target="_blank" rel="noopener noreferrer">1939 Games</a> 拥有的资产。1939 Games 并未直接支持或赞助本项目。所有卡牌图像版权归 1939 Games 所有，本项目仅作非商业学习与工具用途。</p>
             </div>
         </div>
-
+        
+        <!-- block2 支持 -->
         <div class="content-block text-image" id="block2">
             <div class="block-image">
-                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/de-DE/spoils_of_war.avif&q=100" alt="战利品" loading="lazy">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v53/it-IT/spirit_of_rome.avif&q=100" alt="罗马精神" loading="lazy">
             </div>
-            <div class="block-text">
-                <h2>📚 卡牌收藏</h2>
-                <p>·通过<a href="https://wsrv.nl/" target="_blank" rel="noopener noreferrer">Weserv</a>从官网获取卡图，爬虫不使用</p>
-                <p>·全语言卡图&文本支持，在详情页切换</p>
-                <p>·可回溯一年内的游戏版本(未去除无效选项)</p>
-                <p>·老兵与衍生卡单独卡池，跟随上级扩展包</p>
+            <div class="block-text" data-i18n-block="block2">
+                <h2>🧩 支持</h2>
+                <p>作为<a href="https://space.bilibili.com/3546775476505152" target="_blank" rel="noopener noreferrer">百年匠魂</a>の神金研发，军械库遵循 MIT 协议，于 <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank" rel="noopener noreferrer">GitHub</a> 开源。对于网站本身，未经明确授权，禁止任何形式的商业性搬运、剪辑和二次发布。</p>
+                <p>可通过 <a href="https://craftsoul.github.io/kards-image-tool/about.html" target="_blank" rel="noopener noreferrer">GitHub Pages</a> 和 <a href="https://karsenal.netlify.app/about" target="_blank" rel="noopener noreferrer">Netlify</a> 链接访问。<a href="https://github.com/CraftSoul/kapi" target="_blank" rel="noopener noreferrer">卡组图片API</a>已部署，使用请标注作者和版权说明。</p>
+                <p>欢迎加入QQ群：<a href="https://qm.qq.com/q/9ezLyrKAnu" target="_blank" rel="noopener noreferrer">1055860783</a></p>
             </div>
         </div>
 
+        <!-- block3 卡牌收藏 -->
         <div class="content-block image-text" id="block3">
             <div class="block-image">
-                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/ja-JP/reorganize.avif&q=100" alt="调整" loading="lazy">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v53/de-DE/spoils_of_war.avif&q=100" alt="战利品" loading="lazy">
             </div>
-            <div class="block-text">
-                <h2>🛠️ 卡组构筑</h2>
-                <p>·完全无限制的卡组编辑器</p>
-                <p>·导入&导出卡组代码/二维码</p>
-                <p>·生成卡组图片，支持自定义参数</p>
-                <p>·上传卡牌，cardId相同时替换卡图</p>
+            <div class="block-text" data-i18n-block="block3">
+                <h2>📚 卡牌收藏</h2>
+                <p>·通过 <a href="https://wsrv.nl/" target="_blank" rel="noopener noreferrer">Weserv</a> 从官网获取卡图以避免跨域问题</p>
+                <p>·点击缩略卡牌查看详情，下载图片或复制链接</p>
+                <p>·切换卡图和文本语言，回溯一年内的游戏版本</p>
+                <p>·<strong>老兵</strong>与<strong>衍生</strong>卡独立作为卡池，跟随上级扩展包</p>
             </div>
         </div>
 
+        <!-- block4 卡组构筑 -->
         <div class="content-block text-image" id="block4">
+            <div class="block-image">
+                <a href="https://sts.huijiwiki.com/wiki/%E9%87%8D%E7%BC%96%E7%A8%8B" target="_blank" rel="noopener noreferrer">
+                    <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v53/ja-JP/reorganize.avif&q=100" alt="调整" loading="lazy">
+                </a>
+            </div>
+            <div class="block-text" data-i18n-block="block4">
+                <h2>🛠️ 卡组构筑</h2>
+                <p>·手动组建或通过卡组代码/二维码导入卡组</p>
+                <p>·生成卡组图片，可添加附件、设置版本、标记卡牌</p>
+                <p>·上传自定义卡牌，或使用相同<strong>cardId</strong>替换卡图</p>
+            </div>
+        </div>
+
+        <!-- block5 英文直检 -->
+        <div class="content-block image-text" id="block5">
             <div class="block-image">
                 <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/fr-FR/resistance.avif&q=100" alt="抵抗" loading="lazy">
             </div>
-            <div class="block-text">
+            <div class="block-text" data-i18n-block="block5">
                 <h2>⚡ 英文直检</h2>
-                <p>·无需维护卡牌JSON数据</p>
-                <p>·自动发现同名变体、老兵</p>
-                <p>·查找官方未收录卡牌，如总部、旧版抵抗、天气</p>
+                <p>·无需维护卡牌JSON数据，根据英文名转换cardId</p>
+                <p>·探针检测自动发现同名变体、老兵形态</p>
+                <p>·查找官方未收录卡牌，如<strong>总部</strong>、旧版<strong>抵抗</strong>(于v53被移除)、<strong>天气</strong></p>
             </div>
         </div>
 
-        <div class="content-block image-text" id="block5">
+        <!-- block6 击剑大厅 -->
+        <div class="content-block text-image" id="block6">
             <div class="block-image">
-                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/ru-RU/by_the_sword.avif&q=100" alt="以剑之名" loading="lazy">
+                <a href="https://craftsoul.github.io/soviettap/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v53/ru-RU/by_the_sword.avif&q=100" alt="以剑之名" loading="lazy">
+                </a>
             </div>
-            <div class="block-text">
+            <div class="block-text" data-i18n-block="block6">
                 <h2>⚔️ 击剑大厅</h2>
-                <p>·发布击剑申请</p>
-                <p>·可选卡组Ban位</p>
+                <p>·填写信息并发布击剑申请</p>
+                <p>·设置等级和卡组Ban位</p>
                 <p>·根据预期卡组筛选申请</p>
             </div>
         </div>
 
-        <div class="content-block text-image" id="block6">
+        <!-- block7 模拟开包 -->
+        <div class="content-block image-text" id="block7">
             <div class="block-image">
-                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/pl-PL/agency_africa.avif&q=100" alt="非洲情报局" loading="lazy">
+                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v53/pl-PL/agency_africa.avif&q=100" alt="非洲情报局" loading="lazy">
             </div>
-            <div class="block-text">
+            <div class="block-text" data-i18n-block="block7">
                 <h2>🎲 模拟开包</h2>
                 <p>·娱乐性功能，模拟开启卡包</p>
                 <p>·添加多个筛选器，取并集作为卡池</p>
-                <p>·同样支持上传卡牌</p>
+                <p>·同样支持上传自定义卡牌</p>
             </div>
         </div>
         
-        <div class="content-block image-text" id="block7">
-            <div class="block-image">
-                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/it-IT/spirit_of_rome.avif&q=100" alt="罗马精神" loading="lazy">
-            </div>
-            <div class="block-text">
-                <h2>👥 交流反馈</h2>
-                <p>在<a href="https://space.bilibili.com/3546775476505152" target="_blank" rel="noopener noreferrer">哔哩哔哩</a>和<a href="https://github.com/CraftSoul/kards-image-tool" target="_blank" rel="noopener noreferrer">GitHub</a>上支持作者、参与讨论</p>
-            </div>
-        </div>
-        
+        <!-- block8 友链 -->
         <div class="content-block text-image" id="block8">
             <div class="block-image">
-                <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v52/en-EN/a_few_good_men.avif&q=100" alt="坏人多多" loading="lazy">
+                <a href="https://www.bilibili.com/video/BV1GJ411x7h7" target="_blank" rel="noopener noreferrer">
+                    <img src="https://images.weserv.nl/?url=ssl:www.kards.com/images/card/v53/en-EN/a_few_good_men.avif&q=100" alt="坏人多多" loading="lazy">
+                </a>
             </div>
-            <div class="block-text">
-                <h2>🤝 共建社区</h2>
-                <p>社区的繁荣需要共同努力，望列位诸公多多支持</p>
-                <p>·<a href="https://1939.giaory.xyz" target="_blank" rel="noopener noreferrer">KARDS DECKER</a>-KARDS社区工具，智能配卡与深度构筑引擎</p>
-                <p>·<a href="https://kards.fandom.com/zh/wiki/KARDS_Wiki" target="_blank" rel="noopener noreferrer">FANDOM WIKI中文站</a>-中国KARDS游戏爱好者的Wiki社区</p>
-                <p>·<a href="https://kards.fandom.com/wiki/KARDS_-_The_WWII_CCG_Wiki" target="_blank" rel="noopener noreferrer">FANDOM WIKI英文站</a>-开放的国际KARDS Wiki社区网站</p>
+            <div class="block-text" data-i18n-block="block8">
+                <h2>👥 友链</h2>
+                <p>·<a href="https://1939.kardsdecker.com" target="_blank" rel="noopener noreferrer">KARDS DECKER</a>-KARDS社区工具，智能配卡与深度构筑引擎</p>
                 <p>·<a href="http://decks.breeze.org.cn" target="_blank" rel="noopener noreferrer">TrBrazの卡组库</a>-综合查询工具&静冈bot的联络站</p>
                 <p>·<a href="https://space.bilibili.com/692733404" target="_blank" rel="noopener noreferrer">雷性朗姆酒</a>-KARDS Amiya bot作者</p>
+                <p>·<a href="https://qm.qq.com/q/IWHcwhbO6c" target="_blank" rel="noopener noreferrer">蘑菇</a>-QQ社区AI猫娘~</p>
             </div>
         </div>
+    </div>
 
     <div class="footer-simple">
         <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="github"> GitHub</a>
@@ -403,6 +577,193 @@
 
 <script>
     (function() {
+        // 多语言数据
+        const langData = {
+            zh: {
+                brand: 'KARDS 军械库',
+                nav_collection: '卡牌收藏',
+                nav_builder: '卡组构筑',
+                nav_seek: '英文直检',
+                nav_duel: '击剑大厅',
+                nav_pack: '模拟开包',
+                nav_about: '关于军械库',
+                blocks: {
+                    block1: {
+                        title: '📜 声明',
+                        content: `<p><strong>KARDS 军械库</strong>遵循1939 Games的 <a href="https://support.kards.com/hc/en-us/articles/360027838532-KARDS-Community-License" target="_blank" rel="noopener noreferrer">"Community content policy" (社区内容政策)</a> ，使用<a href="https://www.1939games.com/" target="_blank" rel="noopener noreferrer">1939 Games</a> 拥有的资产。1939 Games 并未直接支持或赞助本项目。所有卡牌图像版权归 1939 Games 所有，本项目仅作非商业学习与工具用途。</p>`
+                    },
+                    block2: {
+                        title: '🧩 支持',
+                        content: `<p>作为<a href="https://space.bilibili.com/3546775476505152" target="_blank" rel="noopener noreferrer">百年匠魂</a>の神金研发，军械库遵循 MIT 协议，于 <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank" rel="noopener noreferrer">GitHub</a> 开源。对于网站本身，未经明确授权，禁止任何形式的商业性搬运、剪辑和二次发布。</p><p>可通过 <a href="https://craftsoul.github.io/kards-image-tool/about.html" target="_blank" rel="noopener noreferrer">GitHub Pages</a> 和 <a href="https://karsenal.netlify.app/about" target="_blank" rel="noopener noreferrer">Netlify</a> 链接访问。<a href="https://github.com/CraftSoul/kapi" target="_blank" rel="noopener noreferrer">卡组图片API</a>已部署，使用请标注作者和版权说明。</p><p>欢迎加入QQ群：<a href="https://qm.qq.com/q/9ezLyrKAnu" target="_blank" rel="noopener noreferrer">1055860783</a></p>`
+                    },
+                    block3: {
+                        title: '📚 卡牌收藏',
+                        content: `<p>·通过 <a href="https://wsrv.nl/" target="_blank" rel="noopener noreferrer">Weserv</a> 从官网获取卡图以避免跨域问题</p><p>·点击缩略卡牌查看详情，下载图片或复制链接</p><p>·切换卡图和文本语言，回溯一年内的游戏版本</p><p>·<strong>老兵</strong>与<strong>衍生</strong>卡独立作为卡池，跟随上级扩展包</p>`
+                    },
+                    block4: {
+                        title: '🛠️ 卡组构筑',
+                        content: `<p>·手动组建或通过卡组代码/二维码导入卡组</p><p>·生成卡组图片，可添加附件、设置版本、标记卡牌</p><p>·上传自定义卡牌，或使用相同<strong>cardId</strong>替换卡图</p>`
+                    },
+                    block5: {
+                        title: '⚡ 英文直检',
+                        content: `<p>·无需维护卡牌JSON数据，根据英文名转换cardId</p><p>·探针检测自动发现同名变体、老兵形态</p><p>·查找官方未收录卡牌，如<strong>总部</strong>、旧版<strong>抵抗</strong>(于v53被移除)、<strong>天气</strong></p>`
+                    },
+                    block6: {
+                        title: '⚔️ 击剑大厅',
+                        content: `<p>·填写信息并发布击剑申请</p><p>·设置等级和卡组Ban位</p><p>·根据预期卡组筛选申请</p>`
+                    },
+                    block7: {
+                        title: '🎲 模拟开包',
+                        content: `<p>·娱乐性功能，模拟开启卡包</p><p>·添加多个筛选器，取并集作为卡池</p><p>·同样支持上传自定义卡牌</p>`
+                    },
+                    block8: {
+                        title: '👥 友链',
+                        content: `<p>·<a href="https://1939.kardsdecker.com" target="_blank" rel="noopener noreferrer">KARDS DECKER</a>-KARDS社区工具，智能配卡与深度构筑引擎</p><p>·<a href="http://decks.breeze.org.cn" target="_blank" rel="noopener noreferrer">TrBrazの卡组库</a>-综合查询工具&静冈bot的联络站</p><p>·<a href="https://space.bilibili.com/692733404" target="_blank" rel="noopener noreferrer">雷性朗姆酒</a>-KARDS Amiya bot作者</p><p>·<a href="https://qm.qq.com/q/IWHcwhbO6c" target="_blank" rel="noopener noreferrer">蘑菇</a>-QQ社区AI猫娘~</p>`
+                    }
+                }
+            },
+            en: {
+                brand: 'KARDS Arsenal',
+                nav_collection: 'Card Collection',
+                nav_builder: 'Deck Builder',
+                nav_seek: 'Direct Search',
+                nav_duel: 'Duel Hall',
+                nav_pack: 'Pack Simulator',
+                nav_about: 'About Karsenal',
+                blocks: {
+                    block1: {
+                        title: '📜 Statement',
+                        content: `<p><strong>KARDS Arsenal</strong> was created under 1939 Games’ <a href="https://support.kards.com/hc/en-us/articles/360027838532-KARDS-Community-License" target="_blank" rel="noopener noreferrer">"Community content policy"</a> using assets owned by <a href="https://www.1939games.com/" target="_blank" rel="noopener noreferrer">1939 Games</a>. 1939 Games does not endorse or sponsor this project. All card images are copyrighted by 1939 Games, and this project is for non-commercial learning and tool purposes.</p>`
+                    },
+                    block2: {
+                        title: '🧩 Support',
+                        content: `<p>Developed by <a href="https://space.bilibili.com/3546775476505152" target="_blank" rel="noopener noreferrer">CraftSoul</a>, KARDS Arsenal is open-source under MIT on <a href="https://github.com/CraftSoul/kards-image-tool" target="_blank" rel="noopener noreferrer">GitHub</a>. Unauthorized commercial use, redistribution, or editing is prohibited.</p><p>Available via <a href="https://craftsoul.github.io/kards-image-tool/about.html" target="_blank" rel="noopener noreferrer">GitHub Pages</a> and <a href="https://karsenal.netlify.app/about" target="_blank" rel="noopener noreferrer">Netlify</a>. <a href="https://github.com/CraftSoul/kapi" target="_blank" rel="noopener noreferrer">Deck Image API</a> is deployed; please credit the author and copyright.</p><p>QQ Group: <a href="https://qm.qq.com/q/9ezLyrKAnu" target="_blank" rel="noopener noreferrer">1055860783</a></p>`
+                    },
+                    block3: {
+                        title: '📚 Card Collection',
+                        content: `<p>· Fetch card images via <a href="https://wsrv.nl/" target="_blank" rel="noopener noreferrer">Weserv</a> to avoid CORS</p><p>· Click thumbnail to view details, download or copy link</p><p>· Switch image/text language, browse versions within one year</p><p>· <strong>Veteran</strong> and <strong>Spawn</strong> cards are independent pools, tied to their parent sets</p>`
+                    },
+                    block4: {
+                        title: '🛠️ Deck Builder',
+                        content: `<p>· Build manually or import via deck code / QR</p><p>· Generate deck image with attachments, version, and card marking</p><p>· Upload custom cards, or replace card art using same <strong>cardId</strong></p>`
+                    },
+                    block5: {
+                        title: '⚡ Direct Search',
+                        content: `<p>· No JSON maintenance needed, convert English name to cardId</p><p>· Probe automatically discovers variants and Veteran forms</p><p>· Find unlisted cards like <strong>HQ</strong>, old <strong>Resistance</strong>(removed in v53), <strong>Weather</strong></p>`
+                    },
+                    block6: {
+                        title: '⚔️ Duel Hall',
+                        content: `<p>· Post duel requests with details</p><p>· Set rank and deck ban slots</p><p>· Filter applications by expected decks</p>`
+                    },
+                    block7: {
+                        title: '🎲 Pack Simulator',
+                        content: `<p>· Fun feature: simulate opening packs</p><p>· Add multiple filters, union as card pool</p><p>· Also supports uploading custom cards</p>`
+                    },
+                    block8: {
+                        title: '👥 Friendship Links',
+                        content: `<p>·<a href="https://1939.kardsdecker.com" target="_blank" rel="noopener noreferrer">KARDS DECKER</a> - community deck building & intelligence</p><p>·<a href="http://decks.breeze.org.cn" target="_blank" rel="noopener noreferrer">TrBrazの卡组库</a> - query tool & <strong>Shizuoka bot</strong> hub</p><p>·<a href="https://space.bilibili.com/692733404" target="_blank" rel="noopener noreferrer">雷性朗姆酒</a> - <strong>KARDS Amiya bot</strong> creator</p><p>·<a href="https://qm.qq.com/q/IWHcwhbO6c" target="_blank" rel="noopener noreferrer">Mushroom</a> - QQ community AI catgirl~</p>`
+                    }
+                }
+            }
+        };
+
+        let currentLang = 'zh';
+        // 获取弹窗元素
+        const modalOverlay = document.getElementById('confirmModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        
+        // 当前待执行的切换动作
+        let pendingAction = null;
+
+        // 显示公告弹窗
+        function showAnnouncementModal(title, text, onConfirm) {
+            modalTitle.textContent = title;
+            modalText.innerHTML = text;
+            pendingAction = onConfirm;
+            modalOverlay.classList.add('show');
+        }
+
+        // 隐藏弹窗
+        function hideModal() {
+            modalOverlay.classList.remove('show');
+            pendingAction = null;
+        }
+
+        // 仅存确认按钮事件
+        modalConfirmBtn.addEventListener('click', function() {
+            if (pendingAction) {
+                pendingAction();
+            }
+            hideModal();
+        });
+        // 点击遮罩关闭
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                hideModal();
+            }
+        });
+
+        function applyLanguage(lang) {
+            const data = langData[lang];
+            if (!data) return;
+            document.getElementById('brandText').textContent = data.brand;
+            document.querySelectorAll('.menu-link').forEach(link => {
+                const key = link.getAttribute('data-i18n');
+                if (key && data[key]) {
+                    link.textContent = data[key];
+                }
+            });
+            document.querySelectorAll('.block-text[data-i18n-block]').forEach(el => {
+                const key = el.getAttribute('data-i18n-block');
+                if (key && data.blocks[key]) {
+                    const block = data.blocks[key];
+                    const h2 = el.querySelector('h2');
+                    if (h2) h2.textContent = block.title;
+                    const h2Clone = h2.cloneNode(true);
+                    el.innerHTML = '';
+                    el.appendChild(h2Clone);
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = block.content;
+                    while (tmp.firstChild) {
+                        el.appendChild(tmp.firstChild);
+                    }
+                }
+            });
+            // 更新语言切换按钮文本
+            const langBtn = document.getElementById('langToggleBtn');
+            if (langBtn) {
+                langBtn.textContent = lang === 'zh' ? '🌐 EN' : '🌐 中文';
+            }
+            currentLang = lang;
+            localStorage.setItem('kards_lang', lang);
+        }
+
+        document.getElementById('langToggleBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const nextLang = currentLang === 'zh' ? 'en' : 'zh';
+            
+            // 如果切换到英文，且没有显示过公告，则显示公告并切换
+            if (nextLang === 'en' && !localStorage.getItem('kards_en_toast_shown')) {
+                const title = '🌐 Non-Chinese users?';
+                const text = `Sorry for only translating this page. The KARDS Arsenal is an unofficial tool for addressing the issue of "inability to directly access the KARDS official website in China," using Weserv as an agent. If you can visit the official website directly, remove "https://images.weserv.nl/url=ssl:" from the card link to get original AVIF image.`;
+                showAnnouncementModal(title, text, function() {
+                    // 确认后执行切换，并记录已显示公告
+                    localStorage.setItem('kards_en_toast_shown', '1');
+                    applyLanguage(nextLang);
+                });
+            } else {
+                // 正常直接切换
+                applyLanguage(nextLang);
+            }
+        });
+
+        // 初始化语言
+        const savedLang = localStorage.getItem('kards_lang') || 'zh';
+        applyLanguage(savedLang);
+
+        // 菜单切换
         const menuToggleBtn = document.getElementById('menuToggleBtn');
         const navMenu = document.getElementById('navMenu');
         if (menuToggleBtn) {
@@ -421,7 +782,6 @@
                 navMenu.classList.remove('open');
             });
         });
-        const currentPath = window.location.pathname;
     })();
 </script>
 </body>
