@@ -414,11 +414,30 @@
             cursor: pointer;
             border: none;
         }
-        .prob-group .prob-item .prob-val {
-            font-size: 0.6rem;
-            color: #ffefb9;
-            min-width: 28px;
+        .prob-group .prob-item input[type="number"] {
+            width: 56px;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            padding: 2px 6px;
+            color: #f5efdb;
+            font-size: 0.68rem;
+            outline: none;
             text-align: center;
+            -moz-appearance: textfield;
+        }
+        .prob-group .prob-item input[type="number"]::-webkit-outer-spin-button,
+        .prob-group .prob-item input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .prob-group .prob-item input[type="number"]:focus {
+            border-color: #e6bc6a;
+        }
+        .prob-group .prob-item input[type="number"]:disabled,
+        .prob-group .prob-item input[type="range"]:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
         }
 
         .upload-bar-pack {
@@ -941,6 +960,10 @@
                 <input type="range" id="qualitySlider" min="1" max="100" value="20">
                 <span class="range-val" id="qualityVal">20</span>
             </div>
+            <div class="param-group">
+                <label>🌐 语言</label>
+                <select id="langSelect" style="min-width:120px;"></select>
+            </div>
             <div class="param-group switch-item">
                 <span>忽视概率</span>
                 <label class="switch"><input type="checkbox" id="ignoreProb"><span class="slider"></span></label>
@@ -958,27 +981,33 @@
 
         <!-- 各稀有度概率独立调节 -->
         <div class="params-panel" style="margin-bottom:20px; padding:0.8rem 1.5rem;">
-            <div style="width:100%; font-size:0.7rem; color:#e9dbbd; font-weight:600; margin-bottom:4px;">🎲 各稀有度概率 (总和自动归一化)</div>
+            <div style="width:100%; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:4px;">
+                <span style="font-size:0.7rem; color:#e9dbbd; font-weight:600;">🎲 各稀有度概率 (总和自动归一化)</span>
+                <div class="switch-item" style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-size:0.7rem; color:#e9dbbd; font-weight:600;">标准概率</span>
+                    <label class="switch"><input type="checkbox" id="standardProb" checked><span class="slider"></span></label>
+                </div>
+            </div>
             <div class="prob-group" id="probGroup">
                 <div class="prob-item">
                     <label style="color:#9e9e9e;">普通</label>
-                    <input type="range" class="prob-slider" data-rarity="Standard" min="0" max="100" value="74">
-                    <span class="prob-val" id="probVal-Standard">74</span>
+                    <input type="range" class="prob-slider" data-rarity="Standard" min="0" max="100" value="73.9" step="0.1">
+                    <input type="number" class="prob-input" data-rarity="Standard" min="0" max="100" value="73.9" step="0.1">
                 </div>
                 <div class="prob-item">
                     <label style="color:#cd7f32;">限定</label>
-                    <input type="range" class="prob-slider" data-rarity="Limited" min="0" max="100" value="19">
-                    <span class="prob-val" id="probVal-Limited">19</span>
+                    <input type="range" class="prob-slider" data-rarity="Limited" min="0" max="100" value="19.3" step="0.1">
+                    <input type="number" class="prob-input" data-rarity="Limited" min="0" max="100" value="19.3" step="0.1">
                 </div>
                 <div class="prob-item">
                     <label style="color:#c0c0c0;">特殊</label>
-                    <input type="range" class="prob-slider" data-rarity="Special" min="0" max="100" value="5">
-                    <span class="prob-val" id="probVal-Special">5</span>
+                    <input type="range" class="prob-slider" data-rarity="Special" min="0" max="100" value="5.1" step="0.1">
+                    <input type="number" class="prob-input" data-rarity="Special" min="0" max="100" value="5.1" step="0.1">
                 </div>
                 <div class="prob-item">
                     <label style="color:#ffd700;">精英</label>
-                    <input type="range" class="prob-slider" data-rarity="Elite" min="0" max="100" value="2">
-                    <span class="prob-val" id="probVal-Elite">2</span>
+                    <input type="range" class="prob-slider" data-rarity="Elite" min="0" max="100" value="1.7" step="0.1">
+                    <input type="number" class="prob-input" data-rarity="Elite" min="0" max="100" value="1.7" step="0.1">
                 </div>
             </div>
         </div>
@@ -1077,41 +1106,39 @@
         const VERSION = 53;
         const DEFAULT_VERSION = `v${VERSION}`;
 
+        // ==================== 语言 ====================
+        const languages = [
+            { code: 'zh-Hans', label: '简体中文', flag: '🇨🇳' },
+            { code: 'zh-Hant', label: '繁體中文', flag: '🇨🇳' },
+            { code: 'en-EN', label: 'English', flag: '🇺🇸' },
+            { code: 'fr-FR', label: 'Français', flag: '🇫🇷' },
+            { code: 'de-DE', label: 'Deutsch', flag: '🇩🇪' },
+            { code: 'pl-PL', label: 'Polski', flag: '🇵🇱' },
+            { code: 'pt-BR', label: 'Português', flag: '🇧🇷' },
+            { code: 'ru-RU', label: 'Pусский', flag: '🇷🇺' },
+            { code: 'it-IT', label: 'Italiano', flag: '🇮🇹' },
+            { code: 'es-ES', label: 'Español', flag: '🇪🇸' },
+            { code: 'ko-KR', label: '한국어', flag: '🇰🇷' },
+            { code: 'ja-JP', label: '日本語', flag: '🇯🇵' }
+        ];
+
+        function getCurrentLang() {
+            const el = document.getElementById('langSelect');
+            return el ? el.value : 'zh-Hans';
+        }
+
         // ==================== 常量与翻译 ====================
         const attrTranslation = {
-            "blitz": "闪击",
-            "fury": "奋战",
-            "smokescreen": "烟幕",
-            "pincer": "钳击",
-            "salvage": "收缴",
-            "guard": "守护",
-            "heavyArmor1": "重甲 1",
-            "heavyArmor2": "重甲 2",
-            "heavyArmor3": "重甲 3",
-            "alpine": "山地",
-            "mobilize": "动员",
-            "covert": "隐蔽",
-            "shock": "冲击",
-            "bond": "协力",
-            "ambush": "伏击",
-            "intel1": "情报 1",
-            "intel2": "情报 2",
-            "intel3": "情报 3"
+            "blitz": "闪击", "fury": "奋战", "smokescreen": "烟幕", "pincer": "钳击", "salvage": "收缴",
+            "guard": "守护", "heavyArmor1": "重甲 1", "heavyArmor2": "重甲 2", "heavyArmor3": "重甲 3",
+            "alpine": "山地", "mobilize": "动员", "covert": "隐蔽", "shock": "冲击", "bond": "协力",
+            "ambush": "伏击", "intel1": "情报 1", "intel2": "情报 2", "intel3": "情报 3"
         };
         const setTranslation = {
-            "Base": "基础",
-            "Allegiance": "忠诚",
-            "Breakthrough": "突破",
-            "Legions": "军团",
-            "WorldAtWar": "世纪大战",
-            "TheatersOfWar": "战区",
-            "BrothersInArms": "战友",
-            "WinterWar": "冬季战争",
-            "CovertOps": "秘密行动",
-            "BloodAndIron": "铁与血",
-            "NavalWarfare": "海战",
-            "Homefront": "国土阵线",
-            "OceaniaStorm": "澳新风暴"
+            "Base": "基础", "Allegiance": "忠诚", "Breakthrough": "突破", "Legions": "军团",
+            "WorldAtWar": "世纪大战", "TheatersOfWar": "战区", "BrothersInArms": "战友",
+            "WinterWar": "冬季战争", "CovertOps": "秘密行动", "BloodAndIron": "铁与血",
+            "NavalWarfare": "海战", "Homefront": "国土阵线", "OceaniaStorm": "澳新风暴"
         };
         const setIconMap = {
             "Base": "https://www.datocms-assets.com/120590/1732572097-set-icon-base.svg",
@@ -1133,12 +1160,16 @@
         const rarityDisplayMap = { "Standard": "普通", "Limited": "限定", "Special": "特殊", "Elite": "精英" };
         const factionNames = { "soviet": "苏联", "usa": "美国", "poland": "波兰", "neutral": "中立", "japan": "日本",
             "italy": "意大利", "france": "法国", "britain": "英国", "finland": "芬兰", "germany": "德国", "anzac": "澳新军团" };
-        const allNationOptions = ["germany", "britain", "japan", "soviet", "usa", "france", "italy", "poland", "finland",
-            "anzac"
-        ];
+        const allNationOptions = ["germany", "britain", "japan", "soviet", "usa", "france", "italy", "poland", "finland", "anzac"];
         const STATIC_COSTS = ["0", "1", "2", "3", "4", "5", "6", "7+"];
         const STATIC_RARITIES = ["Standard", "Limited", "Special", "Elite"];
         const typeKeys = Object.keys(typeNameMap);
+
+        // ==================== 卡包标准概率 ====================
+        const STANDARD_PROBS = {
+            standard: { Standard: 73.9, Limited: 19.3, Special: 5.1, Elite: 1.7 },
+            officer: { Standard: 50.6, Limited: 32.0, Special: 12.4, Elite: 5.0 }
+        };
 
         // 卡背文件名首字母大写
         const getBackImage = (faction) => {
@@ -1155,12 +1186,11 @@
         let isOpening = false;
         let currentPackCards = [];
 
-        // 概率存储
         let probValues = {
-            Standard: 74,
-            Limited: 19,
-            Special: 5,
-            Elite: 2
+            Standard: 73.9,
+            Limited: 19.3,
+            Special: 5.1,
+            Elite: 1.7
         };
 
         // ==================== 数据加载 ====================
@@ -1183,6 +1213,8 @@
                         titleZh: j.title?.["zh-Hans"] || j.title?.en || "未找到",
                         titleEn: j.title?.["en-EN"] || "",
                         text_zh: j.text?.["zh-Hans"] || "",
+                        titleMap: j.title || {},
+                        textMap: j.text || {},
                         faction: factionRaw,
                         type: j.type || "",
                         rarity: j.rarity || "Standard",
@@ -1198,7 +1230,7 @@
                         isVeteranSet: j.set === "Special",
                         canCreate: j.can_create || [],
                         isCustom: false,
-                        imageData: null,      // 支持替换卡图
+                        imageData: null,
                         imageFit: 'cover',
                         rawJson: j
                     };
@@ -1232,9 +1264,17 @@
             return `https://images.weserv.nl/?url=ssl:www.kards.com/images/card/${ver}/${lang}/${imgName}&q=${q}`;
         }
 
+        function getCardTitleByLang(card, lang) {
+            if (card.titleMap && card.titleMap[lang]) return card.titleMap[lang];
+            return card.titleZh || '';
+        }
+
         function getSearchableText(card) {
+            const lang = getCurrentLang();
+            const title = (card.titleMap && card.titleMap[lang]) || card.titleZh || '';
+            const text = (card.textMap && card.textMap[lang]) || card.text_zh || '';
             const attrsTrans = (card.attributes || []).map(a => attrTranslation[a] || a).join(" ");
-            return `${card.titleZh || ''} ${card.text_zh || ''} ${attrsTrans}`.toLowerCase();
+            return `${title} ${text} ${attrsTrans}`.toLowerCase();
         }
 
         // ==================== 筛选器逻辑 ====================
@@ -1306,7 +1346,7 @@
             return pool;
         }
 
-        // ==================== 渲染筛选器（防抖） ====================
+        // ==================== 渲染筛选器 ====================
         let searchTimeout = null;
 
         function renderFilters(focusIdx) {
@@ -1327,10 +1367,8 @@
                 }
                 if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
                 if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
-                if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r)
-                    .join('|'));
-                if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f)
-                    .join('|'));
+                if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r).join('|'));
+                if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f).join('|'));
                 if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
                 if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
                 const summaryText = parts.length ? parts.join(' | ') : '全部卡牌';
@@ -1338,7 +1376,7 @@
                 const all = getFullCardList();
                 const result = all.filter(c => evaluateFilter(filter, c));
                 const resultCount = result.length;
-                const previewCards = result.slice(0, 8).map(c => c.titleZh).join(', ');
+                const previewCards = result.slice(0, 8).map(c => getCardTitleByLang(c, getCurrentLang())).join(', ');
 
                 html += `
                         <div class="filter-item" data-filter-idx="${idx}" data-idx="${idx}">
@@ -1415,7 +1453,6 @@
             container.innerHTML = html;
             updatePoolSize();
 
-            // 事件绑定
             container.querySelectorAll('.filter-header[data-toggle]').forEach(el => {
                 const idx = parseInt(el.dataset.toggle);
                 el.addEventListener('click', (e) => {
@@ -1466,19 +1503,19 @@
                 });
             });
             container.querySelectorAll('.filter-search').forEach(input => {
-    input.addEventListener('input', (e) => {
-        const idx = parseInt(input.dataset.idx);
-        filters[idx].search = input.value;
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            updateFilterPreview(idx);
-        }, 300);
-    });
-    if (focusIdx !== undefined && parseInt(input.dataset.idx) === focusIdx) {
-        input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
-    }
-});
+                input.addEventListener('input', (e) => {
+                    const idx = parseInt(input.dataset.idx);
+                    filters[idx].search = input.value;
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        updateFilterPreview(idx);
+                    }, 300);
+                });
+                if (focusIdx !== undefined && parseInt(input.dataset.idx) === focusIdx) {
+                    input.focus();
+                    input.setSelectionRange(input.value.length, input.value.length);
+                }
+            });
             container.querySelectorAll('.filter-status').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const idx = parseInt(select.dataset.idx);
@@ -1489,46 +1526,116 @@
         }
 
         function updateFilterPreview(idx) {
-    const filter = filters[idx];
-    if (!filter) return;
-    const item = document.querySelector(`.filter-item[data-idx="${idx}"]`);
-    if (!item) return;
+            const filter = filters[idx];
+            if (!filter) return;
+            const item = document.querySelector(`.filter-item[data-idx="${idx}"]`);
+            if (!item) return;
 
-    const all = getFullCardList();
-    const result = all.filter(c => evaluateFilter(filter, c));
-    const resultCount = result.length;
-    const previewCards = result.slice(0, 8).map(c => c.titleZh).join(', ');
+            const all = getFullCardList();
+            const result = all.filter(c => evaluateFilter(filter, c));
+            const resultCount = result.length;
+            const previewCards = result.slice(0, 8).map(c => getCardTitleByLang(c, getCurrentLang())).join(', ');
 
-    const qtyBadge = item.querySelector('.qty-badge');
-    if (qtyBadge) qtyBadge.textContent = `${resultCount} 张`;
+            const qtyBadge = item.querySelector('.qty-badge');
+            if (qtyBadge) qtyBadge.textContent = `${resultCount} 张`;
 
-    const summary = item.querySelector('.filter-summary');
-    if (summary) {
-        const parts = [];
-        if (filter.status && filter.status !== 'all') {
-            const statusMap = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
-            parts.push(statusMap[filter.status] || filter.status);
+            const summary = item.querySelector('.filter-summary');
+            if (summary) {
+                const parts = [];
+                if (filter.status && filter.status !== 'all') {
+                    const statusMap = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
+                    parts.push(statusMap[filter.status] || filter.status);
+                }
+                if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
+                if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
+                if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r).join('|'));
+                if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f).join('|'));
+                if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
+                if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
+                const summaryText = parts.length ? parts.join(' | ') : '全部卡牌';
+                summary.innerHTML = `<span>${summaryText}</span>`;
+            }
+
+            const preview = item.querySelector('.filter-result-preview');
+            if (preview) {
+                preview.innerHTML = `
+                    <span class="result-count">${resultCount} 张</span>
+                    <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
+                `;
+            }
         }
-        if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
-        if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
-        if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r).join('|'));
-        if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f).join('|'));
-        if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
-        if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
-        const summaryText = parts.length ? parts.join(' | ') : '全部卡牌';
-        summary.innerHTML = `<span>${summaryText}</span>`;
-    }
 
-    const preview = item.querySelector('.filter-result-preview');
-    if (preview) {
-        preview.innerHTML = `
-            <span class="result-count">${resultCount} 张</span>
-            <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
-        `;
-    }
-}
+        // ==================== 概率控件 ====================
+        function syncProbControls() {
+            for (const r of STATIC_RARITIES) {
+                const slider = document.querySelector(`.prob-slider[data-rarity="${r}"]`);
+                const input = document.querySelector(`.prob-input[data-rarity="${r}"]`);
+                if (slider) slider.value = probValues[r];
+                if (input) input.value = probValues[r].toFixed(1);
+            }
+        }
+
+        function applyStandardProbs() {
+            const packType = document.getElementById('packType').value;
+            const std = STANDARD_PROBS[packType] || STANDARD_PROBS.standard;
+            for (const r of STATIC_RARITIES) {
+                probValues[r] = std[r];
+            }
+            syncProbControls();
+        }
+
+        function updateProbControlsState() {
+            const locked = document.getElementById('standardProb').checked;
+            document.querySelectorAll('.prob-slider, .prob-input').forEach(el => {
+                el.disabled = locked;
+            });
+            if (locked) applyStandardProbs();
+        }
+
+        function bindProbControls() {
+            document.querySelectorAll('.prob-slider').forEach(slider => {
+                const rarity = slider.dataset.rarity;
+                const input = document.querySelector(`.prob-input[data-rarity="${rarity}"]`);
+                slider.addEventListener('input', () => {
+                    const val = parseFloat(slider.value);
+                    if (input) input.value = isNaN(val) ? '0.0' : val.toFixed(1);
+                    probValues[rarity] = isNaN(val) ? 0 : val;
+                });
+            });
+            document.querySelectorAll('.prob-input').forEach(input => {
+                const rarity = input.dataset.rarity;
+                const slider = document.querySelector(`.prob-slider[data-rarity="${rarity}"]`);
+                const apply = () => {
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) val = 0;
+                    val = Math.max(0, Math.min(100, val));
+                    val = Math.round(val * 10) / 10;
+                    input.value = val.toFixed(1);
+                    if (slider) slider.value = val;
+                    probValues[rarity] = val;
+                };
+                input.addEventListener('change', apply);
+                input.addEventListener('blur', apply);
+            });
+            document.getElementById('standardProb').addEventListener('change', updateProbControlsState);
+            document.getElementById('packType').addEventListener('change', () => {
+                if (document.getElementById('standardProb').checked) {
+                    applyStandardProbs();
+                }
+            });
+        }
+
         // ==================== 初始化UI ====================
         function initUI() {
+            // 语言选项
+            const langSel = document.getElementById('langSelect');
+            langSel.innerHTML = languages.map(l => `<option value="${l.code}">${l.flag} ${l.label}</option>`).join('');
+            langSel.value = 'zh-Hans';
+            langSel.addEventListener('change', () => {
+                renderFilters();
+            });
+
+            // 上传阵营
             const uf = document.getElementById('uploadPackFaction');
             if (uf) {
                 const allFactions = [...allNationOptions, 'neutral'];
@@ -1542,6 +1649,26 @@
             const qualityVal = document.getElementById('qualityVal');
             qualitySlider.addEventListener('input', () => {
                 qualityVal.textContent = qualitySlider.value;
+            });
+
+            // 概率控件
+            bindProbControls();
+            // 初始化时应用标准概率（默认开）
+            syncProbControls();
+            updateProbControlsState();
+
+            // 初始默认筛选器：活跃
+            filters.push({
+                id: filterIdCounter++,
+                status: 'active',
+                search: '',
+                types: [],
+                rarities: [],
+                factions: [],
+                costs: [],
+                sets: [],
+                isComplement: false,
+                collapsed: false
             });
 
             renderFilters();
@@ -1585,16 +1712,6 @@
             document.getElementById('openPackBtn').addEventListener('click', openPack);
             setupUpload();
 
-            document.querySelectorAll('.prob-slider').forEach(slider => {
-                const rarity = slider.dataset.rarity;
-                const valSpan = document.getElementById(`probVal-${rarity}`);
-                slider.addEventListener('input', () => {
-                    const val = parseInt(slider.value);
-                    valSpan.textContent = val;
-                    probValues[rarity] = val;
-                });
-            });
-
             document.getElementById('noDuplicates').addEventListener('change', () => {
                 const pool = getFilteredPool();
                 const packType = document.getElementById('packType').value;
@@ -1606,7 +1723,7 @@
             });
         }
 
-        // ==================== 上传卡牌（含预览 + 替换提示） ====================
+        // ==================== 上传卡牌 ====================
         function setupUpload() {
             const btn = document.getElementById('uploadPackBtn');
             const modal = document.getElementById('uploadPackModal');
@@ -1687,18 +1804,18 @@
                     if (!window.confirm(`cardId "${cardId}" 已存在（${existing.titleZh}），是否替换其卡图？\n其他数据将保持不变。`)) {
                         return;
                     }
-                    // 替换图片数据
                     existing.imageData = imageData;
                     existing.imageFit = fit;
                     existing.isCustom = true;
                 } else {
-                    // 新建自定义卡
                     customCards.push({
                         id: -1 - customCards.length,
                         cardId: cardId,
                         importId: '',
                         titleZh: name,
                         text_zh: '',
+                        titleMap: { 'zh-Hans': name },
+                        textMap: {},
                         faction: faction,
                         type: type,
                         rarity: rarity,
@@ -1762,12 +1879,10 @@
 
         function applyPity(packType, drawnCards) {
             if (packType === 'standard') {
-                const hasLimitedOrBetter = drawnCards.some(c => c.rarity === 'Limited' || c.rarity === 'Special' || c
-                    .rarity === 'Elite');
+                const hasLimitedOrBetter = drawnCards.some(c => c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity === 'Elite');
                 if (!hasLimitedOrBetter) {
                     const pool = getFilteredPool();
-                    const limitedPool = pool.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity ===
-                        'Elite');
+                    const limitedPool = pool.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity === 'Elite');
                     if (limitedPool.length > 0) {
                         const noDup = document.getElementById('noDuplicates').checked;
                         const used = new Set(drawnCards.map(c => c.id));
@@ -1775,22 +1890,19 @@
                         if (avail.length > 0) {
                             drawnCards[drawnCards.length - 1] = avail[Math.floor(Math.random() * avail.length)];
                         } else {
-                            drawnCards[drawnCards.length - 1] = limitedPool[Math.floor(Math.random() * limitedPool
-                            .length)];
+                            drawnCards[drawnCards.length - 1] = limitedPool[Math.floor(Math.random() * limitedPool.length)];
                         }
                     }
                 }
             } else {
-                const limitedOrBetter = drawnCards.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c
-                    .rarity === 'Elite');
+                const limitedOrBetter = drawnCards.filter(c => c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity === 'Elite');
                 const specialOrBetter = drawnCards.filter(c => c.rarity === 'Special' || c.rarity === 'Elite');
                 const pool = getFilteredPool();
                 const noDup = document.getElementById('noDuplicates').checked;
                 const used = new Set(drawnCards.map(c => c.id));
 
                 while (limitedOrBetter.length < 2) {
-                    const candidates = pool.filter(c => (c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity ===
-                        'Elite'));
+                    const candidates = pool.filter(c => (c.rarity === 'Limited' || c.rarity === 'Special' || c.rarity === 'Elite'));
                     const avail = noDup ? candidates.filter(c => !used.has(c.id)) : candidates;
                     if (avail.length === 0) break;
                     const pick = avail[Math.floor(Math.random() * avail.length)];
@@ -1895,7 +2007,7 @@
             displayPack(drawn, packType);
         }
 
-        // ==================== 开包动画（完全清空 + 纯JS控制） ====================
+        // ==================== 开包动画 ====================
         const raritySpeeds = {
             'Standard': { lift: 0.25, flip: 0.5, slam: 0.2, shake: 0 },
             'Limited': { lift: 0.35, flip: 0.7, slam: 0.3, shake: 0.25 },
@@ -1910,7 +2022,6 @@
             isOpening = true;
             document.getElementById('openPackBtn').disabled = true;
 
-            // 彻底清空动画区（清除所有卡牌和行容器）
             zone.querySelectorAll('.pack-card, .pack-row').forEach(el => el.remove());
 
             const isOfficer = packType === 'officer';
@@ -1929,6 +2040,7 @@
             rowBottom.className = 'pack-row pack-row-bottom';
 
             const cardElements = [];
+            const lang = getCurrentLang();
             displayCards.forEach((card, idx) => {
                 const isTop = idx < topCount;
                 const container = isTop ? rowTop : rowBottom;
@@ -1949,7 +2061,7 @@
                 const front = document.createElement('div');
                 front.className = 'pack-card-face pack-card-front';
                 const frontImg = document.createElement('img');
-                frontImg.alt = card.titleZh;
+                frontImg.alt = getCardTitleByLang(card, lang);
                 frontImg.loading = 'lazy';
                 front.appendChild(frontImg);
                 inner.appendChild(back);
@@ -1965,7 +2077,6 @@
 
             const quality = parseInt(document.getElementById('qualitySlider').value) || 20;
 
-            // 加载正面图片
             setTimeout(() => {
                 cardElements.forEach((item) => {
                     const card = item.card;
@@ -1975,10 +2086,10 @@
                         const fit = card.imageFit || 'cover';
                         frontImg.style.objectFit = fit;
                     } else if (card.image) {
-                        frontImg.src = getCardImageUrl(card.image, 'zh-Hans', DEFAULT_VERSION, quality);
+                        frontImg.src = getCardImageUrl(card.image, lang, DEFAULT_VERSION, quality);
                         frontImg.style.objectFit = 'cover';
                     } else {
-                        frontImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="168" viewBox="0 0 120 168"%3E%3Crect width="120" height="168" fill="%233a2f1a"/%3E%3Ctext x="50%25" y="50%25" font-size="10" fill="%23dba551" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E';
+                        frontImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="168" viewBox="0 0 120 168"%3E%3Crect width="120" height="168" fill="%233a2f1a"/%3E%3C/svg%3E';
                         frontImg.style.objectFit = 'cover';
                     }
                     frontImg.onload = () => { item.el.classList.remove('placeholder'); };
@@ -2005,17 +2116,14 @@
 
                     el.style.pointerEvents = 'none';
 
-                    // 抬起
                     inner.style.transition = `transform ${speeds.lift}s ease-out`;
                     inner.style.transform = 'rotateY(0deg) translateY(-45px) scale(1.18)';
 
                     setTimeout(() => {
-                        // 翻转
                         inner.style.transition = `transform ${speeds.flip}s cubic-bezier(0.4, 0, 0.2, 1)`;
                         inner.style.transform = 'rotateY(-180deg) translateY(-45px) scale(1.18)';
 
                         setTimeout(() => {
-                            // 拍下
                             inner.style.transition = `transform ${speeds.slam}s cubic-bezier(0.2, 0.9, 0.4, 1)`;
                             inner.style.transform = 'rotateY(-180deg) translateY(0) scale(1)';
 
@@ -2027,8 +2135,8 @@
                                 const zone = document.getElementById('animationZone');
                                 const amp = 4 + intensity * 8;
                                 zone.style.setProperty('--shake-duration', duration + 's');
-                                zone.style.setProperty('--shake-x', (Math.random() * amp - amp/2) + 'px');
-                                zone.style.setProperty('--shake-y', (Math.random() * amp - amp/2) + 'px');
+                                zone.style.setProperty('--shake-x', (Math.random() * amp - amp / 2) + 'px');
+                                zone.style.setProperty('--shake-y', (Math.random() * amp - amp / 2) + 'px');
                                 zone.classList.add('shake');
                                 setTimeout(() => zone.classList.remove('shake'), duration * 1000);
                             }
