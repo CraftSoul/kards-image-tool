@@ -874,6 +874,7 @@
                             <hr style="border:none;border-top:1px dashed rgba(170,142,78,.3);margin:6px 0;">
                             <div><b>快捷填充</b>（在搜索框输入后从下拉选择）：</div>
                             <div>· <code>白板</code> / <code>wb</code> → 文本为空的卡</div>
+                            <div>· <code>非白板</code> / <code>nwb</code> → 文本非空的卡</div>
                             <div>· <code>abc</code>（三位数字）→ 花费 a，b 攻 c 防的单位</div>
                             <div>· <code>abcd</code>（四位数字）→ 花费 a、行动 b、c 攻 d 防的单位</div>
                             <div>· <code>a/b</code> → a 攻 b 防的单位</div>
@@ -1806,6 +1807,13 @@
                     label: '文本为空',
                     hint: '将搜索替换为 text:',
                     apply: () => { input.value = 'text:'; }
+                });
+            }
+            if (raw === '非白板' || lower === 'nwb') {
+                items.push({
+                    label: '文本非空',
+                    hint: '将搜索替换为 text:_*',
+                    apply: () => { input.value = 'text:_*'; }
                 });
             }
 

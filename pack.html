@@ -440,6 +440,40 @@
             cursor: not-allowed;
         }
 
+        /* 概率面板 */
+        #probPanel {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0.9rem 1.5rem 1rem;
+        }
+        #probPanel .prob-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        #probPanel .prob-header-title {
+            font-size: 0.7rem;
+            color: #e9dbbd;
+            font-weight: 600;
+        }
+        #probPanel .prob-header-switches {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        #ignoreProbHint {
+            display: none;
+            font-size: 0.7rem;
+            color: #e9a96b;
+            padding: 6px 0 0;
+            line-height: 1.6;
+        }
+
         .upload-bar-pack {
             margin-bottom: 12px;
             display: block;
@@ -619,9 +653,9 @@
             object-fit: contain;
         }
         .filter-body .filter-row .chip-group .chip.active {
-            background: #c9a53b;
-            color: #1e1c10;
-            border-color: #c9a53b;
+            background: var(--chip-color, #c9a53b);
+            color: var(--chip-text, #1e1c10);
+            border-color: var(--chip-color, #c9a53b);
             font-weight: 600;
         }
         .filter-body .filter-row .chip-group .chip:hover {
@@ -656,6 +690,19 @@
             border-radius: 4px;
             color: #e9dbbd;
             white-space: nowrap;
+        }
+        .search-hint {
+            font-size: 0.6rem;
+            color: #887e66;
+            line-height: 1.6;
+            padding-top: 2px;
+        }
+        .search-hint code {
+            color: #c9b06b;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0 4px;
+            border-radius: 4px;
+            font-family: monospace;
         }
 
         .add-filter-bar {
@@ -745,6 +792,57 @@
             padding: 0.2rem 0.5rem;
             background: transparent;
             border: none;
+        }
+        .upload-modal-pack .src-segmented {
+            display: inline-flex;
+            background: #1e1c16;
+            border: 1px solid #aa8e4e;
+            border-radius: 40px;
+            overflow: hidden;
+            flex: 1;
+            min-width: 160px;
+        }
+        .upload-modal-pack .src-seg {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.3rem 1rem;
+            color: #c9b06b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+            outline: none;
+        }
+        .upload-modal-pack .src-seg:hover {
+            color: #ffefbf;
+            background: rgba(201, 165, 59, 0.12);
+        }
+        .upload-modal-pack .src-seg.active {
+            background: #c9a53b;
+            color: #1e1c10;
+            font-weight: 700;
+        }
+        .mini-btn {
+            background: #2a4a2a;
+            border: none;
+            color: #8fdf8f;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .mini-btn:hover {
+            background: #3a6a3a;
+            color: #afffaf;
+        }
+        .mini-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .upload-modal-pack .upload-preview-area {
             margin: 8px 0 12px;
@@ -965,10 +1063,6 @@
                 <select id="langSelect" style="min-width:120px;"></select>
             </div>
             <div class="param-group switch-item">
-                <span>忽视概率</span>
-                <label class="switch"><input type="checkbox" id="ignoreProb"><span class="slider"></span></label>
-            </div>
-            <div class="param-group switch-item">
                 <span>保底</span>
                 <label class="switch"><input type="checkbox" id="pityEnabled" checked><span class="slider"></span></label>
             </div>
@@ -979,37 +1073,46 @@
             <button class="open-btn" id="openPackBtn">开包</button>
         </div>
 
-        <!-- 各稀有度概率独立调节 -->
-        <div class="params-panel" style="margin-bottom:20px; padding:0.8rem 1.5rem;">
-            <div style="width:100%; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:4px;">
-                <span style="font-size:0.7rem; color:#e9dbbd; font-weight:600;">🎲 各稀有度概率 (总和自动归一化)</span>
-                <div class="switch-item" style="display:flex; align-items:center; gap:6px;">
-                    <span style="font-size:0.7rem; color:#e9dbbd; font-weight:600;">标准概率</span>
-                    <label class="switch"><input type="checkbox" id="standardProb" checked><span class="slider"></span></label>
+        <!-- 各稀有度概率独立调节 + 忽视概率 -->
+        <div class="params-panel" id="probPanel">
+            <div class="prob-header">
+                <span class="prob-header-title">🎲 各稀有度概率 (总和自动归一化)</span>
+                <div class="prob-header-switches">
+                    <div class="switch-item" id="standardProbWrap">
+                        <span>标准概率</span>
+                        <label class="switch"><input type="checkbox" id="standardProb" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="switch-item" id="ignoreProbWrap">
+                        <span>忽视概率</span>
+                        <label class="switch"><input type="checkbox" id="ignoreProb"><span class="slider"></span></label>
+                    </div>
                 </div>
             </div>
-            <div class="prob-group" id="probGroup">
-                <div class="prob-item">
-                    <label style="color:#9e9e9e;">普通</label>
-                    <input type="range" class="prob-slider" data-rarity="Standard" min="0" max="100" value="73.9" step="0.1">
-                    <input type="number" class="prob-input" data-rarity="Standard" min="0" max="100" value="73.9" step="0.1">
-                </div>
-                <div class="prob-item">
-                    <label style="color:#cd7f32;">限定</label>
-                    <input type="range" class="prob-slider" data-rarity="Limited" min="0" max="100" value="19.3" step="0.1">
-                    <input type="number" class="prob-input" data-rarity="Limited" min="0" max="100" value="19.3" step="0.1">
-                </div>
-                <div class="prob-item">
-                    <label style="color:#c0c0c0;">特殊</label>
-                    <input type="range" class="prob-slider" data-rarity="Special" min="0" max="100" value="5.1" step="0.1">
-                    <input type="number" class="prob-input" data-rarity="Special" min="0" max="100" value="5.1" step="0.1">
-                </div>
-                <div class="prob-item">
-                    <label style="color:#ffd700;">精英</label>
-                    <input type="range" class="prob-slider" data-rarity="Elite" min="0" max="100" value="1.7" step="0.1">
-                    <input type="number" class="prob-input" data-rarity="Elite" min="0" max="100" value="1.7" step="0.1">
+            <div id="probBody">
+                <div class="prob-group" id="probGroup">
+                    <div class="prob-item">
+                        <label style="color:#9e9e9e;">普通</label>
+                        <input type="range" class="prob-slider" data-rarity="Standard" min="0" max="100" value="73.9" step="0.1">
+                        <input type="number" class="prob-input" data-rarity="Standard" min="0" max="100" value="73.9" step="0.1">
+                    </div>
+                    <div class="prob-item">
+                        <label style="color:#cd7f32;">限定</label>
+                        <input type="range" class="prob-slider" data-rarity="Limited" min="0" max="100" value="19.3" step="0.1">
+                        <input type="number" class="prob-input" data-rarity="Limited" min="0" max="100" value="19.3" step="0.1">
+                    </div>
+                    <div class="prob-item">
+                        <label style="color:#c0c0c0;">特殊</label>
+                        <input type="range" class="prob-slider" data-rarity="Special" min="0" max="100" value="5.1" step="0.1">
+                        <input type="number" class="prob-input" data-rarity="Special" min="0" max="100" value="5.1" step="0.1">
+                    </div>
+                    <div class="prob-item">
+                        <label style="color:#ffd700;">精英</label>
+                        <input type="range" class="prob-slider" data-rarity="Elite" min="0" max="100" value="1.7" step="0.1">
+                        <input type="number" class="prob-input" data-rarity="Elite" min="0" max="100" value="1.7" step="0.1">
+                    </div>
                 </div>
             </div>
+            <div id="ignoreProbHint">⚠️ 忽视概率已开启：将从卡池中完全随机抽取，稀有度概率与标准概率设置暂不生效。</div>
         </div>
 
         <!-- ===== 上传卡牌 ===== -->
@@ -1042,8 +1145,20 @@
         <div class="upload-content">
             <div class="section-label">📤 上传卡牌到卡池</div>
             <div class="upload-form-row">
-                <label>图片</label>
+                <label>图片来源</label>
+                <div class="src-segmented" id="uploadSrcSegmented">
+                    <button type="button" class="src-seg active" data-src="file">📁 本地文件</button>
+                    <button type="button" class="src-seg" data-src="url">🔗 URL</button>
+                </div>
+            </div>
+            <div class="upload-form-row" id="uploadFileRow">
+                <label>本地文件</label>
                 <input type="file" id="uploadPackImage" accept="image/*">
+            </div>
+            <div class="upload-form-row" id="uploadUrlRow" style="display:none;">
+                <label>图片 URL</label>
+                <input type="text" id="uploadPackUrl" placeholder="https://...">
+                <button class="mini-btn" id="uploadPackUrlApply">应用</button>
             </div>
             <div class="upload-form-row">
                 <label>图片填充</label>
@@ -1055,14 +1170,14 @@
             </div>
             <div class="upload-preview-area" id="uploadPreviewArea">
                 <img id="uploadPreviewImg" src="" alt="预览">
-                <span class="placeholder-text" id="previewPlaceholder">选择图片后预览</span>
+                <span class="placeholder-text" id="previewPlaceholder">选择图片或输入 URL 后预览</span>
             </div>
             <div class="upload-form-row">
                 <label>卡名</label>
                 <input type="text" id="uploadPackName" placeholder="未找到" value="未找到">
             </div>
             <div class="upload-form-row">
-                <label>cardId</label>
+                <label>cardId(相同时替换卡图)</label>
                 <input type="text" id="uploadPackCardId" placeholder="小写字母/数字/下划线" pattern="[a-z0-9_]+">
             </div>
             <div class="upload-form-row">
@@ -1164,6 +1279,36 @@
         const STATIC_COSTS = ["0", "1", "2", "3", "4", "5", "6", "7+"];
         const STATIC_RARITIES = ["Standard", "Limited", "Special", "Elite"];
         const typeKeys = Object.keys(typeNameMap);
+
+        // 卡池状态（多选）
+        const STATIC_STATUSES = [
+            { val: 'active', label: '活跃' },
+            { val: 'reserve', label: '预备' },
+            { val: 'spawn', label: '衍生' },
+            { val: 'veteran', label: '老兵' },
+            { val: 'custom', label: '自定义' }
+        ];
+        const STATUS_LABEL_MAP = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
+
+        // ==================== Chip 着色 ====================
+        const factionColor = { "germany": "#5A5F55", "britain": "#857A60", "soviet": "#4F3826", "usa": "#434B32",
+            "japan": "#90723C", "france": "#283454", "italy": "#555248", "poland": "#645633",
+            "finland": "#C9C8BC", "anzac": "#9E6F34", "neutral": "#6b6e5c" };
+        const rarityColor = { "Standard": "#9e9e9e", "Limited": "#cd7f32", "Special": "#c0c0c0", "Elite": "#ffd700" };
+        const TYPE_COLOR = { "infantry": "#e8e4d0", "tank": "#e8e4d0", "fighter": "#e8e4d0", "bomber": "#e8e4d0",
+            "artillery": "#e8e4d0", "order": "#f5c542", "countermeasure": "#5a5a5a" };
+
+        function contrastText(hex) {
+            if (!hex) return "#1e1c10";
+            const c = hex.replace('#', '');
+            if (c.length !== 6) return "#1e1c10";
+            const r = parseInt(c.substr(0, 2), 16), g = parseInt(c.substr(2, 2), 16), b = parseInt(c.substr(4, 2), 16);
+            return ((0.299 * r + 0.587 * g + 0.114 * b) / 255) > 0.62 ? '#161a0c' : '#ffffff';
+        }
+        function chipColorStyle(color) {
+            if (!color) return '';
+            return ` style="--chip-color:${color};--chip-text:${contrastText(color)};"`;
+        }
 
         // ==================== 卡包标准概率 ====================
         const STANDARD_PROBS = {
@@ -1269,27 +1414,138 @@
             return card.titleZh || '';
         }
 
-        function getSearchableText(card) {
+        function fileToDataUrl(file) {
+            return new Promise((res, rej) => {
+                const fr = new FileReader();
+                fr.onload = () => res(fr.result);
+                fr.onerror = rej;
+                fr.readAsDataURL(file);
+            });
+        }
+
+        async function fetchImageAsDataUrl(url) {
+            // 优先用 fetch（可拿到 CORS 头时）
+            try {
+                const resp = await fetch(url, { mode: 'cors' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const blob = await resp.blob();
+                return await fileToDataUrl(blob);
+            } catch (e) {
+                // 回退到 Image + Canvas
+                return await new Promise((res, rej) => {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.onload = () => {
+                        try {
+                            const c = document.createElement('canvas');
+                            c.width = img.naturalWidth;
+                            c.height = img.naturalHeight;
+                            c.getContext('2d').drawImage(img, 0, 0);
+                            res(c.toDataURL('image/png'));
+                        } catch (err) {
+                            rej(new Error('图片跨域，无法读取像素'));
+                        }
+                    };
+                    img.onerror = () => rej(new Error('图片加载失败'));
+                    img.src = url;
+                });
+            }
+        }
+
+        // ==================== 搜索语法 ====================
+        // 语法：
+        //   %          分隔多个条件（全部满足）
+        //   title:xxx  只搜索卡名
+        //   text:xxx   只搜索卡牌文本
+        //   >abc       匹配开头
+        //   abc<       匹配结尾
+        //   _          任意单字符
+        //   *          任意多个字符
+        function escapeReChar(ch) {
+            return ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function buildSearchRegex(pattern) {
+            let p = pattern, prefix = '', suffix = '';
+            if (p.startsWith('>')) { prefix = '^'; p = p.slice(1); }
+            if (p.endsWith('<') && p.length > 0) { suffix = '$'; p = p.slice(0, -1); }
+            let body = '';
+            for (let i = 0; i < p.length; i++) {
+                const ch = p[i];
+                if (ch === '_') body += '.';
+                else if (ch === '*') body += '.*';
+                else body += escapeReChar(ch);
+            }
+            try {
+                return new RegExp(prefix + body + suffix, 'i');
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function parseQueryParts(query) {
+            const q = (query || '').trim();
+            if (!q) return [];
+            return q.split('%').map(s => s.trim()).filter(s => s.length > 0).map(part => {
+                let mode = 'all', pat = part;
+                const m = part.match(/^(title|text):([\s\S]*)$/i);
+                if (m) { mode = m[1].toLowerCase(); pat = m[2]; }
+                return { mode, pat };
+            });
+        }
+
+        function matchFieldText(fieldText, pat) {
+            if (pat === '') return fieldText.trim() === '';
+            if (!fieldText) return false;
+            const re = buildSearchRegex(pat);
+            if (!re) return true;
+            re.lastIndex = 0;
+            return re.test(fieldText);
+        }
+
+        function getSearchFields(card) {
             const lang = getCurrentLang();
             const title = (card.titleMap && card.titleMap[lang]) || card.titleZh || '';
             const text = (card.textMap && card.textMap[lang]) || card.text_zh || '';
-            const attrsTrans = (card.attributes || []).map(a => attrTranslation[a] || a).join(" ");
-            return `${title} ${text} ${attrsTrans}`.toLowerCase();
+            const attrs = (card.attributes || []).map(a => attrTranslation[a] || a).join(' ');
+            return {
+                title: title,
+                text: text,
+                all: [title, text, attrs].filter(Boolean).join(' ')
+            };
+        }
+
+        function matchSearchQuery(card, query) {
+            const parts = parseQueryParts(query);
+            if (parts.length === 0) return true;
+            const f = getSearchFields(card);
+            return parts.every(({ mode, pat }) => {
+                const field = mode === 'title' ? f.title : (mode === 'text' ? f.text : f.all);
+                return matchFieldText(field, pat);
+            });
+        }
+
+        // 兼容旧调用（当前只用于搜索）
+        function getSearchableText(card) {
+            return getSearchFields(card).all;
         }
 
         // ==================== 筛选器逻辑 ====================
         function evaluateFilter(filter, card) {
-            if (filter.status && filter.status !== 'all') {
-                if (filter.status === 'active' && (card.reserved || card.isSpawn || card.isVeteranSet || card.isCustom))
-                    return false;
-                if (filter.status === 'reserve' && (!card.reserved || card.isCustom)) return false;
-                if (filter.status === 'spawn' && (!card.isSpawn || card.isCustom)) return false;
-                if (filter.status === 'veteran' && (!card.isVeteranSet || card.isCustom)) return false;
-                if (filter.status === 'custom' && !card.isCustom) return false;
+            // 卡池（多选）
+            if (filter.statuses && filter.statuses.length) {
+                let ok = false;
+                for (const s of filter.statuses) {
+                    if (s === 'active' && !card.reserved && !card.isSpawn && !card.isVeteranSet) { ok = true; break; }
+                    if (s === 'reserve' && card.reserved) { ok = true; break; }
+                    if (s === 'spawn' && card.isSpawn) { ok = true; break; }
+                    if (s === 'veteran' && card.isVeteranSet) { ok = true; break; }
+                    if (s === 'custom' && card.isCustom) { ok = true; break; }
+                }
+                if (!ok) return false;
             }
             if (filter.search && filter.search.trim()) {
-                const s = filter.search.trim().toLowerCase();
-                if (!getSearchableText(card).includes(s)) return false;
+                if (!matchSearchQuery(card, filter.search)) return false;
             }
             if (filter.types && filter.types.length) {
                 if (!filter.types.includes(card.type)) return false;
@@ -1309,7 +1565,7 @@
                 if (!match) return false;
             }
             if (filter.sets && filter.sets.length) {
-                const cardSet = card.isCustom ? '自定义' : (card.setName || '基础');
+                const cardSet = card.setName || '基础';
                 if (!filter.sets.includes(cardSet)) return false;
             }
             return true;
@@ -1349,6 +1605,20 @@
         // ==================== 渲染筛选器 ====================
         let searchTimeout = null;
 
+        function buildFilterSummaryParts(filter) {
+            const parts = [];
+            if (filter.statuses && filter.statuses.length) {
+                parts.push(filter.statuses.map(s => STATUS_LABEL_MAP[s] || s).join('|'));
+            }
+            if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
+            if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
+            if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r).join('|'));
+            if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f).join('|'));
+            if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
+            if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
+            return parts.length ? parts.join(' | ') : '全部卡牌';
+        }
+
         function renderFilters(focusIdx) {
             const container = document.getElementById('filterList');
             if (filters.length === 0) {
@@ -1360,18 +1630,7 @@
             let html = '';
             filters.forEach((filter, idx) => {
                 const isCollapsed = filter.collapsed || false;
-                const parts = [];
-                if (filter.status && filter.status !== 'all') {
-                    const statusMap = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
-                    parts.push(statusMap[filter.status] || filter.status);
-                }
-                if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
-                if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
-                if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r).join('|'));
-                if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f).join('|'));
-                if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
-                if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
-                const summaryText = parts.length ? parts.join(' | ') : '全部卡牌';
+                const summaryText = buildFilterSummaryParts(filter);
 
                 const all = getFullCardList();
                 const result = all.filter(c => evaluateFilter(filter, c));
@@ -1398,35 +1657,33 @@
                                 <div class="filter-body">
                                     <div class="filter-row">
                                         <label>卡池</label>
-                                        <select class="filter-status" data-idx="${idx}">
-                                            <option value="all" ${filter.status==='all'?'selected':''}>全部</option>
-                                            <option value="active" ${filter.status==='active'?'selected':''}>活跃</option>
-                                            <option value="reserve" ${filter.status==='reserve'?'selected':''}>预备</option>
-                                            <option value="spawn" ${filter.status==='spawn'?'selected':''}>衍生</option>
-                                            <option value="veteran" ${filter.status==='veteran'?'selected':''}>老兵</option>
-                                            <option value="custom" ${filter.status==='custom'?'selected':''}>自定义</option>
-                                        </select>
+                                        <div class="chip-group" data-filter="statuses" data-idx="${idx}">
+                                            ${STATIC_STATUSES.map(s => `<span class="chip ${filter.statuses && filter.statuses.includes(s.val)?'active':''}" data-val="${s.val}">${s.label}</span>`).join('')}
+                                        </div>
                                     </div>
                                     <div class="filter-row">
                                         <label>搜索</label>
-                                        <input type="text" class="filter-search" data-idx="${idx}" value="${filter.search||''}" placeholder="卡名/文本">
+                                        <div style="flex:1; min-width:160px; display:flex; flex-direction:column; gap:2px;">
+                                            <input type="text" class="filter-search" data-idx="${idx}" value="${(filter.search||'').replace(/"/g,'&quot;')}" placeholder="卡名/文本">
+                                            <div class="search-hint"><code>title:xxx</code> 只搜卡名 · <code>text:xxx</code> 只搜文本 · <code>%</code> 分隔多条件 · <code>_</code> 单字符 · <code>*</code> 任意 · <code>&gt;a</code> 开头 · <code>a&lt;</code> 结尾</div>
+                                        </div>
                                     </div>
                                     <div class="filter-row">
                                         <label>类型</label>
                                         <div class="chip-group" data-filter="types" data-idx="${idx}">
-                                            ${typeKeys.map(t => `<span class="chip ${filter.types&&filter.types.includes(t)?'active':''}" data-val="${t}">${typeNameMap[t]}</span>`).join('')}
+                                            ${typeKeys.map(t => `<span class="chip ${filter.types&&filter.types.includes(t)?'active':''}" data-val="${t}"${chipColorStyle(TYPE_COLOR[t])}>${typeNameMap[t]}</span>`).join('')}
                                         </div>
                                     </div>
                                     <div class="filter-row">
                                         <label>稀有度</label>
                                         <div class="chip-group" data-filter="rarities" data-idx="${idx}">
-                                            ${STATIC_RARITIES.map(r => `<span class="chip ${filter.rarities&&filter.rarities.includes(r)?'active':''}" data-val="${r}">${rarityDisplayMap[r]}</span>`).join('')}
+                                            ${STATIC_RARITIES.map(r => `<span class="chip ${filter.rarities&&filter.rarities.includes(r)?'active':''}" data-val="${r}"${chipColorStyle(rarityColor[r])}>${rarityDisplayMap[r]}</span>`).join('')}
                                         </div>
                                     </div>
                                     <div class="filter-row">
                                         <label>阵营</label>
                                         <div class="chip-group" data-filter="factions" data-idx="${idx}">
-                                            ${[...allNationOptions, 'neutral'].map(f => `<span class="chip ${filter.factions&&filter.factions.includes(f)?'active':''}" data-val="${f}"><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</span>`).join('')}
+                                            ${[...allNationOptions, 'neutral'].map(f => `<span class="chip ${filter.factions&&filter.factions.includes(f)?'active':''}" data-val="${f}"${chipColorStyle(factionColor[f])}><img src="${f}.svg" onerror="this.style.display='none'"> ${factionNames[f]}</span>`).join('')}
                                         </div>
                                     </div>
                                     <div class="filter-row">
@@ -1516,13 +1773,6 @@
                     input.setSelectionRange(input.value.length, input.value.length);
                 }
             });
-            container.querySelectorAll('.filter-status').forEach(select => {
-                select.addEventListener('change', (e) => {
-                    const idx = parseInt(select.dataset.idx);
-                    filters[idx].status = select.value;
-                    renderFilters();
-                });
-            });
         }
 
         function updateFilterPreview(idx) {
@@ -1541,19 +1791,7 @@
 
             const summary = item.querySelector('.filter-summary');
             if (summary) {
-                const parts = [];
-                if (filter.status && filter.status !== 'all') {
-                    const statusMap = { active: '活跃', reserve: '预备', spawn: '衍生', veteran: '老兵', custom: '自定义' };
-                    parts.push(statusMap[filter.status] || filter.status);
-                }
-                if (filter.search && filter.search.trim()) parts.push(`🔍 "${filter.search.trim()}"`);
-                if (filter.types && filter.types.length) parts.push(filter.types.map(t => typeNameMap[t] || t).join('|'));
-                if (filter.rarities && filter.rarities.length) parts.push(filter.rarities.map(r => rarityDisplayMap[r] || r).join('|'));
-                if (filter.factions && filter.factions.length) parts.push(filter.factions.map(f => factionNames[f] || f).join('|'));
-                if (filter.costs && filter.costs.length) parts.push(filter.costs.join('|'));
-                if (filter.sets && filter.sets.length) parts.push(filter.sets.map(s => setTranslation[s] || s).join('|'));
-                const summaryText = parts.length ? parts.join(' | ') : '全部卡牌';
-                summary.innerHTML = `<span>${summaryText}</span>`;
+                summary.innerHTML = `<span>${buildFilterSummaryParts(filter)}</span>`;
             }
 
             const preview = item.querySelector('.filter-result-preview');
@@ -1563,6 +1801,7 @@
                     <span class="result-cards">${previewCards ? previewCards : '无匹配'}</span>
                 `;
             }
+            updatePoolSize();
         }
 
         // ==================== 概率控件 ====================
@@ -1592,6 +1831,17 @@
             if (locked) applyStandardProbs();
         }
 
+        // 忽视概率开关：开启时隐藏该区其他控件
+        function updateIgnoreProbState() {
+            const ignored = document.getElementById('ignoreProb').checked;
+            const body = document.getElementById('probBody');
+            const stdWrap = document.getElementById('standardProbWrap');
+            const hint = document.getElementById('ignoreProbHint');
+            if (body) body.style.display = ignored ? 'none' : '';
+            if (stdWrap) stdWrap.style.display = ignored ? 'none' : 'flex';
+            if (hint) hint.style.display = ignored ? 'block' : 'none';
+        }
+
         function bindProbControls() {
             document.querySelectorAll('.prob-slider').forEach(slider => {
                 const rarity = slider.dataset.rarity;
@@ -1618,6 +1868,7 @@
                 input.addEventListener('blur', apply);
             });
             document.getElementById('standardProb').addEventListener('change', updateProbControlsState);
+            document.getElementById('ignoreProb').addEventListener('change', updateIgnoreProbState);
             document.getElementById('packType').addEventListener('change', () => {
                 if (document.getElementById('standardProb').checked) {
                     applyStandardProbs();
@@ -1653,14 +1904,14 @@
 
             // 概率控件
             bindProbControls();
-            // 初始化时应用标准概率（默认开）
             syncProbControls();
             updateProbControlsState();
+            updateIgnoreProbState();
 
-            // 初始默认筛选器：活跃
+            // 初始默认筛选器：活跃（多选）
             filters.push({
                 id: filterIdCounter++,
-                status: 'active',
+                statuses: ['active'],
                 search: '',
                 types: [],
                 rarities: [],
@@ -1688,7 +1939,7 @@
             document.getElementById('addFilterBtn').addEventListener('click', () => {
                 filters.push({
                     id: filterIdCounter++,
-                    status: 'all',
+                    statuses: [],
                     search: '',
                     types: [],
                     rarities: [],
@@ -1730,38 +1981,87 @@
             const cancel = document.getElementById('uploadPackCancel');
             const confirm = document.getElementById('uploadPackConfirm');
             const imageInput = document.getElementById('uploadPackImage');
+            const urlInput = document.getElementById('uploadPackUrl');
+            const urlApply = document.getElementById('uploadPackUrlApply');
             const previewImg = document.getElementById('uploadPreviewImg');
             const previewPlaceholder = document.getElementById('previewPlaceholder');
             const fitSelect = document.getElementById('uploadPackFit');
 
-            imageInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (!file) {
-                    previewImg.style.display = 'none';
-                    previewPlaceholder.style.display = 'inline';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
+            let uploadImageData = null;
+
+            function normalizeFit(v) {
+                return v === 'stretch' ? 'fill' : v;
+            }
+
+            function setPreview(dataUrl) {
+                uploadImageData = dataUrl;
+                if (dataUrl) {
+                    previewImg.src = dataUrl;
                     previewImg.style.display = 'block';
                     previewPlaceholder.style.display = 'none';
-                    const fit = fitSelect.value;
-                    previewImg.style.objectFit = fit;
-                };
-                reader.readAsDataURL(file);
+                    previewImg.style.objectFit = normalizeFit(fitSelect.value);
+                } else {
+                    previewImg.style.display = 'none';
+                    previewImg.src = '';
+                    previewPlaceholder.style.display = 'inline';
+                }
+            }
+
+            function setSource(src) {
+                document.querySelectorAll('#uploadSrcSegmented .src-seg').forEach(b => {
+                    b.classList.toggle('active', b.dataset.src === src);
+                });
+                document.getElementById('uploadFileRow').style.display = src === 'file' ? 'flex' : 'none';
+                document.getElementById('uploadUrlRow').style.display = src === 'url' ? 'flex' : 'none';
+            }
+
+            document.querySelectorAll('#uploadSrcSegmented .src-seg').forEach(b => {
+                b.addEventListener('click', () => setSource(b.dataset.src));
             });
-            fitSelect.addEventListener('change', function() {
-                if (previewImg.src && previewImg.src !== '') {
-                    previewImg.style.objectFit = this.value;
+
+            imageInput.addEventListener('change', async function () {
+                if (!this.files[0]) { setPreview(null); return; }
+                try {
+                    setPreview(await fileToDataUrl(this.files[0]));
+                } catch (e) {
+                    alert('读取文件失败');
+                }
+            });
+
+            urlApply.addEventListener('click', async () => {
+                const url = urlInput.value.trim();
+                if (!url) { alert('请输入图片 URL'); return; }
+                urlApply.disabled = true;
+                urlApply.textContent = '加载中';
+                try {
+                    setPreview(await fetchImageAsDataUrl(url));
+                } catch (e) {
+                    alert('加载失败: ' + e.message);
+                } finally {
+                    urlApply.disabled = false;
+                    urlApply.textContent = '应用';
+                }
+            });
+
+            urlInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    urlApply.click();
+                }
+            });
+
+            fitSelect.addEventListener('change', function () {
+                if (uploadImageData) {
+                    previewImg.style.objectFit = normalizeFit(this.value);
                 }
             });
 
             btn.addEventListener('click', () => {
                 modal.classList.add('open');
                 imageInput.value = '';
-                previewImg.style.display = 'none';
-                previewPlaceholder.style.display = 'inline';
+                urlInput.value = '';
+                setPreview(null);
+                setSource('file');
                 document.getElementById('uploadPackName').value = '未找到';
                 document.getElementById('uploadPackCardId').value = '';
                 document.getElementById('uploadPackCost').value = '0';
@@ -1776,8 +2076,7 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
             confirm.addEventListener('click', async () => {
-                const file = imageInput.files[0];
-                if (!file) { alert('请选择图片'); return; }
+                if (!uploadImageData) { alert('请选择图片或输入 URL'); return; }
                 const cardId = document.getElementById('uploadPackCardId').value.trim();
                 if (!/^[a-z0-9_]+$/.test(cardId)) {
                     alert('cardId 只能包含小写字母、数字和下划线');
@@ -1791,20 +2090,13 @@
                 const rarity = document.getElementById('uploadPackRarity').value;
                 const fit = fitSelect.value;
 
-                const reader = new FileReader();
-                const imageData = await new Promise((resolve, reject) => {
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-
                 const all = getFullCardList();
                 const existing = all.find(c => c.cardId === cardId);
                 if (existing) {
                     if (!window.confirm(`cardId "${cardId}" 已存在（${existing.titleZh}），是否替换其卡图？\n其他数据将保持不变。`)) {
                         return;
                     }
-                    existing.imageData = imageData;
+                    existing.imageData = uploadImageData;
                     existing.imageFit = fit;
                     existing.isCustom = true;
                 } else {
@@ -1831,7 +2123,7 @@
                         isVeteranSet: false,
                         canCreate: [],
                         isCustom: true,
-                        imageData: imageData,
+                        imageData: uploadImageData,
                         imageFit: fit,
                         rawJson: {},
                         _index: 0
@@ -2084,7 +2376,7 @@
                     if (card.isCustom && card.imageData) {
                         frontImg.src = card.imageData;
                         const fit = card.imageFit || 'cover';
-                        frontImg.style.objectFit = fit;
+                        frontImg.style.objectFit = fit === 'stretch' ? 'fill' : fit;
                     } else if (card.image) {
                         frontImg.src = getCardImageUrl(card.image, lang, DEFAULT_VERSION, quality);
                         frontImg.style.objectFit = 'cover';
